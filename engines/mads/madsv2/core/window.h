@@ -95,88 +95,7 @@ typedef struct {
 
 typedef ScrollBar *ScrollBarPtr;
 
-
 extern int window_box_mode;
-
-
-/* window_1 */
-void window_set(WindowPtr window, int ul_x, int ul_y, int lr_x, int lr_y);
-
-/* window_2 */
-void window_line_across(WindowPtr window, short line_y);
-
-/* window_3 */
-void window_color(WindowPtr window, short new_color);
-void window_wipe(WindowPtr window);
-void window_shadow(WindowPtr window);
-
-/* window_4 */
-void window_define_scrollbar(WindowPtr window,
-	ScrollBarPtr scroll,
-	int vertical,
-	int left_or_bottom,
-	long min_value,
-	long max_value,
-	long scroll_value,
-	long page_value,
-	int normal_color,
-	int select_color);
-
-/* window_4 */
-void window_draw_scrollbar(ScrollBarPtr scroll);
-
-/* window_4 */
-long window_translate_thumb(ScrollBarPtr scroll,
-	long current_value);
-
-long window_make_thumb(ScrollBarPtr scroll, long current_value);
-long window_draw_thumb(ScrollBarPtr scroll, long current_value);
-
-/* window_4 */
-int window_scrollbar_detect(ScrollBarPtr scroll,
-	int x, int y,
-	long value, long *new_value,
-	int prior_detect);
-
-/* window_4 */
-int window_detect(ScrollBarPtr scroll, int x, int y,
-	long value, long *new_value,
-	int prior_detect,
-	long base_value, long value_mult);
-
-
-int window_vert_detect(WindowPtr window, int x, int y,
-	int tight_vert, int tight_horiz);
-
-/* window_4 */
-void window_horiz_scrollbar(WindowPtr window, short bar_color);
-void window_vert_scrollbar(WindowPtr window, short bar_color);
-
-
-/* window_5 */
-void window_title(WindowPtr window, char *title,
-	short title_color, short background_color);
-
-/* window_6 */
-void window_abort(char *message);
-byte *window_create(WindowPtr window);
-void      window_destroy(WindowPtr window);
-
-/* window_7 */
-int window_normal_color(WindowPtr window);
-int window_line_width(WindowPtr window);
-void window_text_setup(WindowPtr window, int follow);
-
-/* window_8 */
-void window_init_screen(WindowPtr main_window, char *prog_name,
-	char *prog_author, char *prog_version,
-	char *lib_version_no, char *compile_date);
-
-/* window_9 */
-void window_draw_box(WindowPtr window, int type);
-
-
-/* window_a */
 extern int  window_num_trap_routines;
 extern byte *window_trap_routine[WINDOW_MAX_TRAP_ROUTINES];
 extern char window_trap_string[WINDOW_MAX_TRAP_ROUTINES][80];
@@ -184,44 +103,107 @@ extern char window_trap_string[WINDOW_MAX_TRAP_ROUTINES][80];
 extern byte *window_incoming_string;
 extern int window_display_string;
 
-/* window_a */
-void window_trap_output(WindowPtr window,
-	void (*(any_char_routine))(),
-	char *trap_string, ...);
 
-void window_restore_output(void);
+/**
+ * Sets window coordinates
+ */
+extern void window_set(WindowPtr window, int ul_x, int ul_y, int lr_x, int lr_y);
 
+/**
+ * Draws a line across a window, joining with the edges
+ */
+extern void window_line_across(WindowPtr window, short line_y);
 
-/* window_c.cpp */
-void window_define(WindowPtr window,
-	int x1, int y1, int x2, int y2,
+/**
+ * Sets the color byte for all characters in region
+ */
+extern void window_color(WindowPtr window, short new_color);
+
+/**
+ * Clears (sets to space) specified region
+ */
+extern void window_wipe(WindowPtr window);
+
+/**
+ *Draws "shadow" behind foreground window
+ */
+extern void window_shadow(WindowPtr window);
+
+extern void window_define_scrollbar(WindowPtr window, ScrollBarPtr scroll, int vertical,
+	int left_or_bottom, long min_value, long max_value, long scroll_value,
+	long page_value, int normal_color, int select_color);
+extern void window_draw_scrollbar(ScrollBarPtr scroll);
+extern long window_translate_thumb(ScrollBarPtr scroll, long current_value);
+extern long window_make_thumb(ScrollBarPtr scroll, long current_value);
+extern long window_draw_thumb(ScrollBarPtr scroll, long current_value);
+extern int window_scrollbar_detect(ScrollBarPtr scroll, int x, int y,
+	long value, long *new_value, int prior_detect);
+extern int window_detect(ScrollBarPtr scroll, int x, int y, long value, long *new_value,
+	int prior_detect, long base_value, long value_mult);
+extern int window_vert_detect(WindowPtr window, int x, int y,
+	int tight_vert, int tight_horiz);
+
+/**
+ * Draws up a horizontal scroll bar for the specified window
+ */
+extern void window_horiz_scrollbar(WindowPtr window, short bar_color);
+
+/**
+ * Draws up a vertical scroll bar for the specified window
+ */
+extern void window_vert_scrollbar(WindowPtr window, short bar_color);
+
+/**
+ * Draws the title of the specified window
+ */
+extern void window_title(WindowPtr window, const char *title, short title_color, short background_color);
+extern void window_abort(const char *message);
+extern byte *window_create(WindowPtr window);
+extern void window_destroy(WindowPtr window);
+extern int window_normal_color(WindowPtr window);
+extern int window_line_width(WindowPtr window);
+extern void window_text_setup(WindowPtr window, int follow);
+extern void window_init_screen(WindowPtr main_window, const char *prog_name, const char *prog_author,
+	const char *prog_version, const char *lib_version_no, const char *compile_date);
+extern void window_draw_box(WindowPtr window, int type);
+
+/**
+ * Sets up int 21 trapping in a particular window.
+ *
+ *         window                  the window to receive all subsequent
+ *                                 int 21 characters
+ *
+ *         any_char_routine        routine to be called whenever any
+ *                                 character comes through the int 21
+ *                                 pipe.  "AL" will contain the
+ *                                 character (which can be changed
+ *                                 to a different character or to
+ *                                 NULL if desired)
+ *
+ *         trap_string,routine     List of strings to be trapped;
+ *                                 each string should be followed by
+ *                                 a pointer to the function to be
+ *                                 called when that string is received.
+ */
+extern void window_trap_output(WindowPtr window, void (*(any_char_routine))(),
+	const char *trap_string, ...);
+
+/**
+ * Restores the traditional DOS int 29 functionality.
+ */
+extern void window_restore_output(void);
+
+extern void window_define(WindowPtr window, int x1, int y1, int x2, int y2,
 	int color, int shadow, int save);
-
-/* window_d.cpp */
-void window_center(WindowPtr window, char *text,
-	int line, int color);
-
-/* window_e.cpp */
-int window_show(WindowPtr window, char *text,
-	int xx, int yy);
-
-/* window_f.cpp */
-void window_repeat(WindowPtr window, char wipe_item,
-	int x1, int x2, int y1);
-void window_wipe_line(WindowPtr window, int yy);
-
-/* window_g.cpp */
-int window_printf(WindowPtr window, int x, int y, char *string, ...);
-
-/* window_h.cpp */
-void window_clear(WindowPtr window);
-
-/* window_i.cpp */
-int window_show_color(WindowPtr window, char *text, int xx, int yy, int color);
-
-/* window_j.cpp */
-void window_10_install(void);
-void window_10_remove(void);
+extern void window_center(WindowPtr window, const char *text, int line, int color);
+extern int window_show(WindowPtr window, const char *text, int xx, int yy);
+extern void window_repeat(WindowPtr window, char wipe_item, int x1, int x2, int y1);
+extern void window_wipe_line(WindowPtr window, int yy);
+extern int window_printf(WindowPtr window, int x, int y, const char *string, ...);
+extern void window_clear(WindowPtr window);
+extern int window_show_color(WindowPtr window, const char *text, int xx, int yy, int color);
+extern void window_10_install(void);
+extern void window_10_remove(void);
 
 } // namespace MADSV2
 } // namespace MADS

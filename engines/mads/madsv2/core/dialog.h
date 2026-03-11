@@ -125,11 +125,10 @@ namespace MADSV2 {
 
 /* Quick dialog definition macros */
 
-#define dialog_declare(dd)       DialogPtr dd = NULL; ItemPtr ok_item, cancel_item, result_item
-#define dialog_buttons(dd)       ok_item = dialog_ok_button(dd);cancel_item = dialog_cancel_button(dd)
-#define dialog_exec(dd, ii)      result_item = dialog_execute(dd, ii, ok_item, NULL);
-
-
+#define dialog_declare(dd)		DialogPtr dd = NULL; ItemPtr ok_item = nullptr, cancel_item = nullptr, result_item = nullptr
+#define dialog_declare_ok(dd)	DialogPtr dd = NULL; ItemPtr ok_item = nullptr, result_item = nullptr
+#define dialog_buttons(dd)		ok_item = dialog_ok_button(dd);cancel_item = dialog_cancel_button(dd)
+#define dialog_exec(dd, ii)		result_item = dialog_execute(dd, ii, ok_item, NULL);
 
 
 struct DialogItem {
@@ -149,8 +148,6 @@ struct DialogItem {
 typedef struct DialogItem Item;
 typedef Item *ItemPtr;
 
-
-
 struct DialogList {
 	char *list;
 	Window window;
@@ -166,8 +163,6 @@ struct DialogList {
 
 typedef struct DialogList List;
 typedef List *ListPtr;
-
-
 
 struct DialogBox {
 	Window window;                        /* window boundaries           */
@@ -221,213 +216,244 @@ struct DialogBox {
 typedef struct DialogBox Dialog;
 typedef Dialog *DialogPtr;
 
-
 #define StringMode(x)   (((x).type == DD_I_STRING) || ((x).type == DD_I_FILENAME) || ((x).type == DD_I_LISTBASED))
 #define DialogString(x) StringMode(x->item[x->active_item])
 
-
-/* dialog_1.cpp */
-extern int       dialog_error;
-extern int       dialog_quicksearch_flag;
-extern int       dialog_wildcard_exits;
-
+extern int dialog_error;
+extern bool dialog_quicksearch_flag;
+extern bool dialog_wildcard_exits;
 extern long dialog_timeout;
-
 extern int dialog_language;
 
+/**
+ * Adds a button to the dialog box (see external docs).
+ */
+extern ItemPtr dialog_add_button(DialogPtr dialog, int x, int y, const char *prompt);
 
-
-ItemPtr dialog_add_button(DialogPtr dialog, int x, int y, const char *prompt);
-
-ItemPtr dialog_add_checkbox(DialogPtr dialog, int x, int y,
+/**
+ * Adds a check box to the dialog.
+ */
+extern ItemPtr dialog_add_checkbox(DialogPtr dialog, int x, int y,
 	const char *prompt, int default_val, int class_);
 
-void    dialog_grey_checkbox(ItemPtr item);
+/**
+ * Causes the specified checkbox to be displayed "greyed out".
+ */
+extern void dialog_grey_checkbox(ItemPtr item);
 
-/* dialog_1.cpp */
-ItemPtr dialog_add_message(DialogPtr dialog, int x, int y, const char *prompt);
+/**
+ * Adds a message string to the dialog
+ */
+extern ItemPtr dialog_add_message(DialogPtr dialog, int x, int y, const char *prompt);
 
-void    dialog_add_blank(DialogPtr dialog);
+/**
+ * Adds a blank line to an AUTOFILLing dialog
+ */
+extern void dialog_add_blank(DialogPtr dialog);
 
-/* dialog_1.cpp */
-ItemPtr dialog_add_string(DialogPtr dialog, int x, int y,
-	char *prompt,
-	char *default_val,
-	int width);
+/**
+ * Adds a string entry item to the dialog box
+ */
+extern ItemPtr dialog_add_string(DialogPtr dialog, int x, int y,
+	const char *prompt, const char *default_val, int width);
 
-/* dialog_1.cpp */
-ItemPtr dialog_add_listbased(DialogPtr dialog, int x, int y,
-	char *prompt,
-	char *default_val, int width,
-	char *title, char *mylist,
-	int elements, int element_offset,
-	int entry_width, int rows, int columns);
+/**
+ * Add a list-based string item to the dialog box
+ */
+extern ItemPtr dialog_add_listbased(DialogPtr dialog, int x, int y, const char *prompt,
+	const char *default_val, int width, const char *title, char *mylist,
+	int elements, int element_offset, int entry_width, int rows, int columns);
 
-/* dialog_1.cpp */
-ItemPtr dialog_add_filename(DialogPtr dialog, int x, int y,
-	char *prompt,
-	char *default_val, char *path,
-	int rows,
-	char *filebuf, int max_file_elements,
+/**
+ * Adds a filename-base string item to the dialog box
+ */
+extern ItemPtr dialog_add_filename(DialogPtr dialog, int x, int y, const char *prompt,
+	const char *default_val, const char *path, int rows, char *filebuf, int max_file_elements,
 	char *dirsbuf, int max_dirs_elements);
 
-/* dialog_1.cpp */
-ItemPtr dialog_append_list(DialogPtr dialog, int x, int y,
-	ItemPtr base_string,
-	char *title,
-	char *mylist,
-	int elements, int element_offset,
-	int entry_width, int rows, int columns);
+/**
+ * Appends a second list to a listbased string
+ */
+extern ItemPtr dialog_append_list(DialogPtr dialog, int x, int y,
+	ItemPtr base_string, const char *title, const char *mylist, int elements,
+	int element_offset, int entry_width, int rows, int columns);
 
-/* dialog_1.cpp */
-void    dialog_set_colors(int normal, int select,
-	int hilite, int greyed);
+extern void dialog_set_colors(int normal, int select, int hilite, int greyed);
+extern void dialog_set_workspace_size(long workspace);
+extern void dialog_set_string_space(DialogPtr dialog, const char *space, long size);
 
-/* dialog_1.cpp */
-void    dialog_set_workspace_size(long workspace);
-void    dialog_set_string_space(DialogPtr dialog,
-	char *space, long size);
+/**
+ * Begins a new dialog box, and allocates memory for it if necessary
+ */
+extern DialogPtr dialog_create(DialogPtr dialog, int ul_x, int ul_y,
+	int width, int normal_color, int select_color, int hilite_color);
 
+/**
+ * Deallocates memory for a dynamically allocated dialog box
+*/
+extern void dialog_destroy(DialogPtr dialog);
 
-/* dialog_1.cpp */
-DialogPtr dialog_create(DialogPtr dialog,
-	int ul_x, int ul_y,
-	int width,
-	int normal_color,
-	int select_color,
-	int hilite_color);
+/**
+ * Deallocates memory for dialog, but does not restore screen
+ */
+extern void dialog_destroy_persist(DialogPtr dialog);
 
-void    dialog_destroy(DialogPtr dialog);
-void    dialog_destroy_persist(DialogPtr dialog);
+/**
+ * Creates a dialog box and adds a filename entry to it
+ */
+extern DialogPtr dialog_file_create(DialogPtr dialog, int ul_x, int ul_y,
+	int normal_color, int select_color, int hilite_color, ItemPtr *ok_item,
+	ItemPtr *first_item, const char *default_val, const char *path, int rows,
+	char *filebuf, int maxfiles, char *dirsbuf, int maxdirs, const char *prompt);
 
-/* dialog_1.cpp */
-DialogPtr dialog_file_create(DialogPtr dialog,
-	int ul_x, int ul_y,
-	int normal_color, int select_color,
-	int hilite_color,
-	ItemPtr *ok_item, ItemPtr *first_item,
-	char *default_val, char *path,
-	int rows,
-	char *filebuf, int maxfiles,
-	char *dirsbuf, int maxdirs,
-	char *prompt);
+/**
+ * Assembly routine to read a file directory into the specified
+ * list structure.  "Wild" is the wildcard spec to match (e.g. "*.*")
+ * in searching, "dirflag" determines whether the list should receive
+ * files or subdirectories (true = just subdirectories, false = just files).
+ */
+extern int dialog_read_dir_to_list(ListPtr target, const char *wild, int dirflag);
 
-/* dialog_1.cpp */
-int     dialog_read_dir_to_list(ListPtr target,
-	char *wild,
-	int dirflag);
+/**
+ * Sets up a callback function which is activated each time an
+ * item is highlighted in a list box.
+ *
+ * The proper prototype for a callback function is:
+ * void callback (DialogPtr dialog, ListPtr list);
+ */
+extern void dialog_set_list_callback(DialogPtr dialog, void (*(callback))());
 
-/* dialog_1.cpp */
-void    dialog_set_list_callback(DialogPtr dialog,
-	void (*(callback))());
+/**
+ * Sets up a callback function which is activated each time a mouse
+ * event is detected on a different video screen from the dialog box
+ * (use when mouse is in double screen mode).  The prototype for the
+ * callback function is:
+ *
+ * int   callback (int mouse_button, int mouse_status,
+ *                int mouse_x, int mouse_y, int mouse_video_mode);
+ *         If function returns "false", dialog box will continue
+ *         to run as usual; if function returns true, dialog immediately
+ *         aborts with NULL item, and dialog_error contains
+ *         DD_ERR_ABORTEDBYCALLBACK.
+ *
+ * double_only     If true, then callback is only activated when
+ *                 cursor event occurs on a different *screen* from
+ *                 the dialog box.  If false, then callback occurs
+ *                 even when cursor is simply outside the dialog box
+ *                 (on the same screen).
+ *
+ *
+ * Mouse cursor will be visible at the time the callback routine is
+ * activated.
+ */
+typedef int (*MouseCallback)(int mouse_button, int mouse_status, int mouse_x, int mouse_y, int mouse_video_mode);
+extern void dialog_set_mouse_callback(MouseCallback callback, int double_only);
 
-void    dialog_set_mouse_callback(void (*(callback))(),
-	int double_only);
+typedef void (*PageCallback)(int mykey, ItemPtr item, DialogPtr dialog);
+extern void dialog_set_page_callback(PageCallback fn);
 
-void    dialog_set_page_callback(void (*(callback))());
+/**
+ * Sets up a callback function which is activated each time a
+ * check box item is modified.
+ *
+ * The proper prototype for a callback function is:
+ * int callback (DialogPtr dialog, ItemPtr item);
+ *
+ * If the callback routine returns "true", the dialog is
+ * immediately aborted (returns NULL handle, and dialog_error
+ * is set to DD_ERR_ABORTEDBYCALLBACK).
+ */
+extern void dialog_set_checkbox_callback(DialogPtr dialog, void (*(callback))());
 
-void    dialog_set_checkbox_callback(DialogPtr dialog,
-	void (*(callback))());
+/**
+ * Returns the value of the specified checkbox
+ */
+extern int dialog_read_checkbox(DialogPtr dialog, ItemPtr item);
 
-/* dialog_1.cpp */
-int     dialog_read_checkbox(DialogPtr dialog, ItemPtr item);
-char *dialog_read_string(DialogPtr dialog, ItemPtr item);
-char *dialog_read_list(DialogPtr dialog, ItemPtr item);
-char *dialog_read_pathname(DialogPtr dialog, ItemPtr item);
-char *dialog_read_filename(DialogPtr dialog, ItemPtr item);
-char *dialog_read_filepath(DialogPtr dialog, ItemPtr item);
+/**
+ * Returns a pointer to the specified string buffer
+ */
+extern char *dialog_read_string(DialogPtr dialog, ItemPtr item);
 
+/**
+ * Returns a pointer to the specified list-based string
+ */
+extern char *dialog_read_list(DialogPtr dialog, ItemPtr item);
 
-/* dialog_1.cpp */
-void    dialog_show_all(DialogPtr dialog);
+/**
+ * Returns the dialog box's path
+ */
+extern char *dialog_read_pathname(DialogPtr dialog, ItemPtr item);
 
-/* dialog_1.cpp */
-ItemPtr dialog_execute(DialogPtr dialog,
-	ItemPtr active_item,
-	ItemPtr default_button,
-	KeyPtr key_buffer);
+/**
+ * Returns the filename selected by the user
+ */
+extern char *dialog_read_filename(DialogPtr dialog, ItemPtr item);
 
+/**
+ * Returns the filename and full path selected by the user
+ */
+extern char *dialog_read_filepath(DialogPtr dialog, ItemPtr item);
 
-/* dialog_2.cpp */
-char *dialog_select_file(char *prompt,
-	char *path,
-	char *filespec,
-	char *output);
+/**
+ * Routine to display the entire dialog box
+ */
+extern void dialog_show_all(DialogPtr dialog);
 
+/**
+ * The main loop for executing a dialog.  Includes keyboard
+ * handler and mouse scanner.
+ */
+extern ItemPtr dialog_execute(DialogPtr dialog, ItemPtr active_item,
+	ItemPtr default_button, KeyPtr key_buffer);
 
-/* dialog_3.cpp */
-char *dialog_enter_string(char *reply,
-	char *top_prompt,
-	char *left_prompt,
-	char *my_default,
-	int maxlen);
+extern char *dialog_select_file(const char *prompt, const char *path,
+	const char *filespec, char *output);
+extern char *dialog_enter_string(char *reply, const char *top_prompt,
+	const char *left_prompt, char *my_default, int maxlen);
 
+/**
+ * Prompts user to enter an integer value (displays default).
+ * Returns 0 if user aborted, or entry was out of range.
+ */
+extern int dialog_enter_int(const char *top_prompt, int my_default);
 
-/* dialog_4.cpp */
-int dialog_enter_int(char *top_prompt, int my_default);
+extern DialogPtr dialog_create_default();
 
+/**
+ * Pops up a quick dialog to inform user of an error or to ask
+ * a yes/no question.
+ */
+extern int dialog_alert(int x, int y, int buttons, const char *string1,
+	const char *string2, const char *string3, const char *string4);
 
-/* dialog_5.cpp */
-DialogPtr dialog_create_default(void);
+extern void dialog_set_alert_colors(int normal, int select, int hilite);
+extern int dialog_alert_center(int buttons, const char *string1,
+	const char *string2, const char *string3, const char *string4);
+extern int dialog_alert_ok(const char *string1, const char *string2,
+	const char *string3, const char *string4);
+extern void dialog_newsay(int x, int y);
+extern void dialog_say(char *message, int x);
+extern Window dialog_sayit(int saymode);
 
+extern ItemPtr dialog_left_message(DialogPtr dialog, const char *prompt);
+extern ItemPtr dialog_center_message(DialogPtr dialog, const char *prompt);
+extern ItemPtr dialog_left_string(DialogPtr dialog, const char *prompt, const char *string, int width);
+extern ItemPtr dialog_left_button(DialogPtr dialog, const char *prompt);
+extern ItemPtr dialog_ok_button(DialogPtr dialog);
+extern ItemPtr dialog_cancel_button(DialogPtr dialog);
+extern char *dialog_get_string(DialogPtr dialog, ItemPtr item, char *target);
 
-/* dialog_6.cpp */
-int  dialog_alert(int x, int y, int buttons,
-	char *string1,
-	char *string2,
-	char *string3,
-	char *string4);
-
-void dialog_set_alert_colors(int normal,
-	int select,
-	int hilite);
-
-
-/* dialog_7.cpp */
-int     dialog_alert_center(int buttons,
-	char *string1,
-	char *string2,
-	char *string3,
-	char *string4);
-
-/* dialog_8.cpp */
-int     dialog_alert_ok(char *string1,
-	char *string2,
-	char *string3,
-	char *string4);
-
-/* dialog_9.cpp */
-void    dialog_newsay(int x, int y);
-void    dialog_say(char *message, int x);
-Window  dialog_sayit(int saymode);
-
-
-/* dialog_a.cpp */
-ItemPtr dialog_left_message(DialogPtr dialog, char *prompt);
-ItemPtr dialog_center_message(DialogPtr dialog, char *prompt);
-ItemPtr dialog_left_string(DialogPtr dialog, char *prompt,
-	char *string, int width);
-ItemPtr dialog_left_button(DialogPtr dialog, char *prompt);
-ItemPtr dialog_ok_button(DialogPtr dialog);
-ItemPtr dialog_cancel_button(DialogPtr dialog);
-char *dialog_get_string(DialogPtr dialog, ItemPtr item,
-	char *target);
-
-
-/* dialog_b.cpp */
-ItemPtr dialog_add_number(DialogPtr dialog, int x, int y,
-	char *prompt, int num, int width);
-ItemPtr dialog_left_number(DialogPtr dialog, char *prompt,
+extern ItemPtr dialog_add_number(DialogPtr dialog, int x, int y,
+	const char *prompt, int num, int width);
+extern ItemPtr dialog_left_number(DialogPtr dialog, char *prompt,
 	int num, int width);
-int     dialog_get_number(DialogPtr dialog, ItemPtr item);
+extern int dialog_get_number(DialogPtr dialog, ItemPtr item);
 
+extern void dialog_trap_critical();
+extern void dialog_restore_critical();
 
-/* dialog_e.cpp */
-void dialog_trap_critical(void);
-void dialog_restore_critical(void);
-
-/* dialog_f.cpp */
-void dialog_watch_point(char *string, long x, long y);
+extern void dialog_watch_point(const char *string, long x, long y);
 
 } // namespace MADSV2
 } // namespace MADS

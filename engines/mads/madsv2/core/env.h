@@ -69,63 +69,65 @@ extern int env_search_mode;
 extern int env_search_cd;
 extern char env_cd_drive;
 extern int env_privileges;
-
 extern int env_sound_override;
-
 extern long env_concat_file_size; /* Size of last concat file opened */
+extern char env_null[7];
 
 
-
-/* env_0.c */
-int env_verify(void);
-
-/* env_1.c */
+extern int env_verify(void);
 Common::SeekableReadStream *env_open(const char *file_path, const char *options);
 int env_exist(const char *file_name);
 long env_get_file_size(Common::Stream *handle);
-
-/* env_1.c */
-char *env_get_path(char *madspath, char *infile);
-
-/* env_1.c */
+char *env_get_path(char *madspath, const char *infile);
 char *env_catint(char *out, int value, int digits);
-
-/* env_1.c */
-char * env_fill_path(char *path, int env_mode, int env_room);
-
-
-/* env_2.c */
-char * env_dos_error_name(char *error_buf);
-
-/* env_3.c */
-char * env_get_level_path(char *out, int item_type,
-	char *file_spec,
-	int first_level,
-	int second_level);
-
-Common::Stream * env_open_level(int item_type,
-	char *file_spec,
-	int level_one, int level_two,
-	char *options);
-
-
-/* env_4.c */
-extern char env_null[7];
-
+char *env_fill_path(char *path, int env_mode, int env_room);
+char *env_dos_error_name(char *error_buf);
+char *env_get_level_path(char *out, int item_type, const char *file_spec,
+	int first_level, int second_level);
+Common::SeekableReadStream *env_open_level(int item_type, const char *file_spec,
+	int level_one, int level_two, const char *options);
 char *env_get(char *target, char *env);
 
+/**
+ * Given a pointer to an environment variable, returns a pointer
+ * to the next variable in the environment list (if pointer is
+ * to a null string, the end of the list has been reached).
+ */
+char *env_next(char *variable);
 
-/* env_5.c */
-char * env_next(char *variable);
-char * env_find_end(char *environment);
-int         env_size(char *environment);
-int         env_free(char *environment);
+/**
+ * Given a pointer to an environment, returns a pointer to one
+ * byte after the end of the entire environment.
+ */
+char *env_find_end(char *environment);
 
-/* env_5.c */
-char * env_find(char *environment, char *variable);
-void        env_delete(char *environment, char *variable);
-int         env_insert(char *environment, char *variable,
-	char *value);
+/**
+ * Given a pointer to the start of an environment, returns the
+ * size in bytes of that environment.
+ */
+int env_size(char *environment);
+
+int env_free(char *environment);
+
+/**
+ * Given a pointer to an environment and a variable, returns a
+ * pointer to that variable name in the environment.  Returns
+ * NULL if no match found.
+ */
+char *env_find(char *environment, const char *variable);
+
+/**
+ * Given an environment and a variable name, deletes that
+ * variable from the environment table.
+ */
+void env_delete(char *environment, const char *variable);
+
+/**
+ * Given a pointer to an environment, a variable name, and a value,
+ * inserts that variable into the environment table with the
+ * designated value.  Returns 0 for success, -1 for failure.
+ */
+int env_insert(char *environment, const char *variable, const char *value);
 
 } // namespace MADSV2
 } // namespace MADS

@@ -62,36 +62,43 @@ MODULE_OBJS += \
 	madsv2/engine.o \
 	madsv2/core/buffer.o \
 	madsv2/core/camera.o \
+	madsv2/core/cursor.o \
 	madsv2/core/cycle.o \
+	madsv2/core/dialog.o \
 	madsv2/core/ems.o \
+	madsv2/core/env.o \
 	madsv2/core/error.o \
 	madsv2/core/fileio.o \
-	madsv2/core/font_1.o \
+	madsv2/core/font.o \
 	madsv2/core/himem.o \
+	madsv2/core/hspot.o \
 	madsv2/core/inter.o \
 	madsv2/core/kernel.o \
+	madsv2/core/keys.o \
+	madsv2/core/lbm.o \
+	madsv2/core/loader.o \
+	madsv2/core/magic.o \
 	madsv2/core/matte.o \
 	madsv2/core/mcga.o \
-	madsv2/core/mem_2.o \
-	madsv2/core/mouse_1.o \
-	madsv2/core/mouse_2.o \
-	madsv2/core/mouse_3.o \
-	madsv2/core/mouse_4.o \
+	madsv2/core/mem.o \
+	madsv2/core/mouse.o \
 	madsv2/core/object.o \
-	madsv2/core/pack_6.o \
+	madsv2/core/pack.o \
 	madsv2/core/pal.o \
 	madsv2/core/player.o \
 	madsv2/core/popup.o \
 	madsv2/core/quote_1.o \
 	madsv2/core/rail.o \
 	madsv2/core/screen.o \
+	madsv2/core/sort.o \
 	madsv2/core/speech.o \
 	madsv2/core/sprite.o \
 	madsv2/core/text.o \
-	madsv2/core/tile_3.o \
+	madsv2/core/tile.o \
 	madsv2/core/timer.o \
 	madsv2/core/video_1.o \
-	madsv2/core/vocab_8.o \
+	madsv2/core/vocab.o \
+	madsv2/core/window.o \
 	madsv2/phantom/mads/mads.o \
 	madsv2/phantom/main_menu.o \
 	madsv2/phantom/main.o

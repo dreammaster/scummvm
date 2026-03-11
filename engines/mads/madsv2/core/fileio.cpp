@@ -61,7 +61,7 @@ void fileio_name_new_ext(char *bakfile, char *mainfile, char *new_ext) {
 
 	Common::strcpy_s(temp_dir, mainfile);
 
-	_fullpath(temp_full, temp_dir, 80);
+	mads_fullpath(temp_full, temp_dir, 80);
 
 	_splitpath(temp_full, temp_drive, temp_dir, temp_name, temp_ext);
 
@@ -166,11 +166,19 @@ int fileio_copy(const char *source, const char *dest) {
 	return -1;
 }
 
-long fileio_setpos(Common::SeekableReadStream *handle, long pos) {
-	return handle->seek(pos);
+long fileio_setpos(Common::Stream *handle, long pos) {
+	auto *rs = dynamic_cast<Common::SeekableReadStream *>(handle);
+	auto *ws = dynamic_cast<Common::SeekableWriteStream *>(handle);
+
+	if (rs)
+		return rs->pos();
+	if (ws)
+		return ws->pos();
+
+	return -1;
 }
 
-long fileio_fread_f(byte *target, long record_size, long record_count, Common::SeekableReadStream *handle) {
+long fileio_fread_f(void *target, long record_size, long record_count, Common::SeekableReadStream *handle) {
 	if (!record_size)
 		return 0;
 
@@ -180,7 +188,7 @@ long fileio_fread_f(byte *target, long record_size, long record_count, Common::S
 	return total_read / record_size;
 }
 
-long fileio_fwrite_f(const byte *source, long record_size, long record_count, Common::WriteStream *handle) {
+long fileio_fwrite_f(const void *source, long record_size, long record_count, Common::WriteStream *handle) {
 	if (!record_size)
 		return 0;
 

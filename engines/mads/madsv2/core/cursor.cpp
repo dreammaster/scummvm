@@ -19,36 +19,43 @@
  *
  */
 
-#include "mads/madsv2/core/general.h"
-#include "mads/madsv2/core/video.h"
-#include "mads/madsv2/core/mouse.h"
+#include "mads/madsv2/core/cursor.h"
+#include "mads/madsv2/core/screen.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern Buffer scr_work;
+int cursor_mode;             /* global cursor mode (insert/overwrite) */
+int cursor_follow = false;
+int text_x = 0, text_y = 0;
 
-void mouse_video_init() {
-	mouse_set_work_buffer(scr_work.data, scr_work.x);
-	mouse_set_view_port_loc(0, 0, scr_work.x - 1, scr_work.y - 1);
-	mouse_set_view_port(0, 0);
+void cursor_set_size(short start, short finish) {
+	// No implementation
 }
 
-void mouse_video_update(int from_x, int from_y, int unto_x, int unto_y,
-		int size_x, int size_y) {
-	int refresh_flag;
+void cursor_set_pos(short x, short y) {
+	// No implementation
+}
 
-	mouse_freeze();
-	refresh_flag = mouse_refresh_view_port();
+void cursor_get_pos(int *x, int *y) {
+	*x = *y = 0;
+}
 
-	video_update(&scr_work, from_x, from_y, unto_x, unto_y, size_x, size_y);
+void cursor_set_mode(int my_type) {
+	// No implementation
+}
 
-	if (refresh_flag) mouse_refresh_done();
-	mouse_thaw();
+void cursor_toggle_insert(void) {
+	if (cursor_mode == CURSOR_OVERWRITE) {
+		cursor_set_mode(CURSOR_INSERT);
+	} else {
+		cursor_set_mode(CURSOR_OVERWRITE);
+	}
+}
+
+void cursor_set_follow(int follow) {
+	cursor_follow = follow;
 }
 
 } // namespace MADSV2
 } // namespace MADS
-
-
-

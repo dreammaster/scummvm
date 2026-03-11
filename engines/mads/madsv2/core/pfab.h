@@ -19,21 +19,44 @@
  *
  */
 
-#ifndef MADS_CORE_PACK_D_H
-#define MADS_CORE_PACK_D_H
+#ifndef MADS_CORE_PFAB_H
+#define MADS_CORE_PFAB_H
 
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-/* pack_d.c */
-extern int pack_ems_page_handle;
-extern int pack_ems_page_marker;
-extern int pack_ems_page_offset;
+extern word pFABcomp(
+	word (*read_buff)(char *buffer, word *size),
+	word (*write_buff)(char *buffer, word *size),
+	char *work_buff,
+	word *type,
+	word *dsize);
 
-/* pack_d.cpp */
-extern void pack_write_ems(char *buffer, word *mysize);
+extern word pFABexp0(
+	word (*read_buff)(char *buffer, word *size),
+	word (*write_buff)(char *buffer, word *size),
+	char *work_buff);
+
+extern word pFABexp1(
+	word (*read_buff)(char *buffer, word *size),
+	char *write_buf,
+	char *work_buff);
+
+extern word pFABexp2(
+	byte *read_buf,
+	byte *write_buf,
+	char *work_buff);
+
+#define CMP_BINARY             0
+#define CMP_ASCII              1
+
+#define CMP_NO_ERROR           0
+#define CMP_INVALID_DICTSIZE   1
+#define CMP_INVALID_MODE       2
+#define CMP_BAD_DATA           3
+#define CMP_ABORT              4
 
 } // namespace MADSV2
 } // namespace MADS

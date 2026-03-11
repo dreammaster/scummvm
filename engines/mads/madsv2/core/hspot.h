@@ -48,39 +48,51 @@ typedef struct {
 
 extern Spot spot[max_hot_spots + 1];
 extern int numspots;
-
-
 extern int hotkeys[max_hot_spots + 1];
 
+/**
+ * Adds a spot to the list given it's data.
+ * @return	Returns TRUE if successful, FALSE if an error occured.
+ */
+extern int hspot_add(int ul_x, int ul_y, int lr_x, int lr_y, int class_, int num, int video_mode);
 
-/* hspot_1.c */
-int hspot_add(int ul_x, int ul_y,
-	int lr_x, int lr_y,
-	int class_, int num, int video_mode);
+/**
+ * Marks current spots as inactive, and pushes pointer
+ */
+extern int hspot_push();
 
-/* hspot_2.c */
-int hspot_push(void);
-int hspot_pop(void);
+/**
+ * Restores the hotspot list from a push_spots call
+ */
+extern int hspot_pop();
 
-/* hspot_4.c */
-int hspot_remove(int class_, int num);
+/**
+ * Given the class and number, removes that hotspot from the list.
+ *
+ * If <class> is HS_ALL then ALL hotspots are cleared.
+ * If <num> is HS_ALL then ALL hotspots for that class are cleared.
+ * @return	Returns number of hotspots that were erased.
+ */
+extern int hspot_remove(int class_, int num);
+extern void hspot_toggle(int class_, int num, int active);
+extern void hspot_wipe();
+extern int hspot_key(int key);
+extern int hspot_begin(int x, int y, int class_, int num, int hotkey);
+extern int hspot_end();
+extern void hspot_dummy();
 
-/* hspot_5.c */
-void hspot_toggle(int class_, int num, int active);
+/**
+ * Given X,Y returns the hotspot the coordinates fall into.
+ * 0 is returned if coords are not in a hotspot.
+ */
+extern int hspot_which(int x, int y, int video_mode);
 
-/* hspot_6.c */
-void hspot_wipe(void);
-int hspot_key(int key);
-int hspot_begin(int x, int y, int class_, int num, int hotkey);
-int hspot_end(void);
-
-void hspot_dummy(void);
-
-/* hspot_7.c */
-int hspot_which(int x, int y, int video_mode);
-
-/* hspot_8.c */
-int hspot_which_reverse(int x, int y, int video_mode);
+/**
+ * Given X,Y returns the hotspot the coordinates fall into.
+ * 0 is returned if coords are not in a hotspot.
+ *
+ */
+extern int hspot_which_reverse(int x, int y, int video_mode);
 
 } // namespace MADSV2
 } // namespace MADS

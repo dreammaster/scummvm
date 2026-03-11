@@ -27,22 +27,19 @@
 namespace MADS {
 namespace MADSV2 {
 
-extern unsigned short implode(
-	unsigned (*read_buff)(char *buffer, unsigned short *size),
-	void (*write_buff)(char *buffer, unsigned short *size),
+extern word implode(
+	word (*read_buff)(char *buffer, word *size),
+	word (*write_buff)(char *buffer, word *size),
 	char *work_buff,
-	unsigned short int *type,
-	unsigned short int *dsize);
+	word *type,
+	word *dsize);
 
-extern unsigned explode(
-	unsigned (*read_buff)(char *buffer, unsigned short *size),
-	void (*write_buff)(char *buffer, unsigned short *size),
+extern word explode(
+	word (*read_buff)(char *buffer, word *size),
+	word (*write_buff)(char *buffer, word *size),
 	char *work_buff);
 
-extern unsigned long crc32(
-	unsigned char *buffer,
-	unsigned short int *size,
-	unsigned long *old_crc);
+extern long crc32(unsigned char *buffer, word *size, long *old_crc);
 
 
 #define CMP_BINARY             0

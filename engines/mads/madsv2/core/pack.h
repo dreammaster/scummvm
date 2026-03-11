@@ -114,9 +114,9 @@ extern long pack_write_size;            /* Size left to write            */
 extern long pack_write_count;           /* Size written so           */
 
 /* Pointer to read routine  */
-extern word (*pack_read_routine)(char *buffer, word *size);
+extern word(*pack_read_routine)(char *buffer, word *size);
 /* Pointer to write routine */
-extern void (*pack_write_routine)(char *buffer, word *size);
+extern word(*pack_write_routine)(char *buffer, word *size);
 
 extern word pack_mode;                  /* Packing mode (zip/none)       */
 extern byte *pack_buffer;           /* Packing scrap buffer          */
@@ -128,41 +128,45 @@ extern byte pack_zip_enabled;           /* ZIP packing enabled           */
 extern byte pack_pfab_enabled;          /* PFAB packing enabled          */
 extern int  pack_strategy;              /* Current packing strategy      */
 
+extern int pack_ems_page_handle;
+extern int pack_ems_page_marker;
+extern int pack_ems_page_offset;
+
 /* All compression routines called through function pointers, so that */
 /* we can determine at compile time which compression modules will be */
 /* linked.                                                            */
 
-extern unsigned short (*pack_implode_routine)
-(unsigned (*read_buff)(char *buffer, unsigned short *size),
-	void (*write_buff)(char *buffer, unsigned short *size),
+extern word (*pack_implode_routine)(
+	word (*read_buff)(char *buffer, word *size),
+	word (*write_buff)(char *buffer, word *size),
 	char *work_buff,
-	unsigned short int *type,
-	unsigned short int *dsize);
+	word *type,
+	word *dsize);
 
-extern unsigned (*pack_explode_routine)
-(unsigned (*read_buff)(char *buffer, unsigned short *size),
-	void (*write_buff)(char *buffer, unsigned short *size),
+extern word (*pack_explode_routine)(
+	word (*read_buff)(char *buffer, word *size),
+	word (*write_buff)(char *buffer, word *size),
 	char *work_buff);
 
-extern unsigned short (*pack_pFABcomp_routine)
-(unsigned (*read_buff)(char *buffer, unsigned short *size),
-	void (*write_buff)(char *buffer, unsigned short *size),
+extern word (*pack_pFABcomp_routine)(
+	word (*read_buff)(char *buffer, word *size),
+	word (*write_buff)(char *buffer, word *size),
 	char *work_buff,
-	unsigned short int *type,
-	unsigned short int *dsize);
+	word *type,
+	word *dsize);
 
-extern unsigned (*pack_pFABexp0_routine)
-(unsigned (*read_buff)(char *buffer, unsigned short *size),
-	void (*write_buff)(char *buffer, unsigned short *size),
+extern word (*pack_pFABexp0_routine)(
+	word (*read_buff)(char *buffer, word *size),
+	word (*write_buff)(char *buffer, word *size),
 	char *work_buff);
 
-extern unsigned (*pack_pFABexp1_routine)
-(unsigned (*read_buff)(char *buffer, unsigned short *size),
+extern word (*pack_pFABexp1_routine)(
+	word (*read_buff)(char *buffer, word *size),
 	char *write_buf,
 	char *work_buff);
 
-extern unsigned (*pack_pFABexp2_routine)
-(byte *read_buf,
+extern word (*pack_pFABexp2_routine)(
+	byte *read_buf,
 	byte *write_buf,
 	char *work_buff);
 
@@ -171,61 +175,22 @@ extern byte *pack_special_buffer;
 extern void (*(pack_special_function))();
 
 
-
-
-/* pack_1.c */
-word pack_read_memory(char *buffer, word *size);
-
-/* pack_2.c */
-void pack_write_memory(char *buffer, word *size);
-
-/* pack_3.c */
-word pack_read_file(char *buffer, word *size);
-
-/* pack_4.c */
-void pack_write_file(char *buffer, word *size);
-
-/* pack_5.c */
-word pack_a_packet(int packing_flag, int explode_mode);
-
-/* pack_6.c */
-long   pack_data(int packing_flag, long size,
-	int source_type, void *source,
+extern word pack_read_memory(char *buffer, word *size);
+extern word pack_write_memory(char *buffer, word *size);
+extern word pack_read_file(char *buffer, word *size);
+extern word pack_write_file(char *buffer, word *size);
+extern word pack_a_packet(int packing_flag, int explode_mode);
+extern long pack_data(int packing_flag, long size, int source_type, void *source,
 	int dest_type, void *dest);
-
-/* pack_6.c */
-void pack_set_special_buffer(byte *buffer_address,
+extern void pack_set_special_buffer(byte *buffer_address,
 	void (*(special_function))());
-
-
-/* pack_7.c */
-int    pack_check(void);
-
-/* pack_8.c */
-void pack_enable_zip(void);
-
-/* pack_9.c */
-void pack_enable_pfab(void);
-
-/* pack_a.c */
-void pack_enable_pfab_explode(void);
-
-/* pack_b.c */
-void pack_enable_zip_explode(void);
-
-/* pack_c.c */
-long pack_rle(byte *target,
-	byte *source,
-	word source_size);
-
-
-/* pack_d.c */
-extern int pack_ems_page_handle;
-extern int pack_ems_page_marker;
-extern int pack_ems_page_offset;
-
-/* pack_d.c */
-void pack_write_ems(char *buffer, word *mysize);
+extern int pack_check(void);
+extern void pack_enable_zip(void);
+extern void pack_enable_pfab(void);
+extern void pack_enable_pfab_explode(void);
+extern void pack_enable_zip_explode(void);
+extern long pack_rle(byte *target, byte *source, word source_size);
+extern word pack_write_ems(char *buffer, word *mysize);
 
 } // namespace MADSV2
 } // namespace MADS

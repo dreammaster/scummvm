@@ -19,27 +19,12 @@
  *
  */
 
-#ifndef MADS_CORE_VOCAB_8_H
-#define MADS_CORE_VOCAB_8_H
-
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/lbm.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern void vocab_unload_active();  /* vocab_8.c */
-extern void vocab_init_active();
-extern int vocab_active_id(word id);
-extern int vocab_make_active(word id);
-extern int vocab_load_active();
 
-extern char *vocab_text;
-extern word vocab_size;
-extern word vocab_active;
-extern word vocab_list_id[VOCAB_MAX_ACTIVE];
-extern word vocab_list_pointer[VOCAB_MAX_ACTIVE];
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

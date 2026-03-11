@@ -43,7 +43,7 @@ typedef struct {
 	int xms_handle;             /* XMS handle  (if LOADER_XMS)           */
 	long xms_offset;            /* XMS offset  (if LOADER_XMS)           */
 	int ems_page_marker;        /* Current EMS logical page #            */
-	word ems_page_offset;       /* Current EMS logical page offset       */
+	int ems_page_offset;        /* Current EMS logical page offset       */
 	long decompress_size;       /* Decompressed size of file             */
 	int pack_list_marker;       /* Packing list marker                   */
 	PackList pack;              /* Packing list                          */
@@ -67,29 +67,12 @@ extern long loader_size_disk;
 extern int  loader_ems_search_disabled;
 extern char loader_last[14];
 
-
-/* loader_1.c */
-int  loader_open(LoadHandle handle, const char *filename, const char *options, int flags);
-
-int  loader_close(LoadHandle handle);
-
-void loader_set_priority(LoadHandle handle, int priority);
-
-/* loader_2.c */
-long loader_read(void *target,
-	long record_size,
-	long record_count,
-	LoadHandle handle);
-
-/* loader_3.c */
-long loader_write(void *target,
-	long record_size,
-	long record_count,
-	LoadHandle handle);
-
-/* loader_4.c */
-long loader_write_2(Common::WriteStream *source_handle, long total_size,
-	LoadHandle handle);
+extern int loader_open(LoadHandle handle, const char *filename, const char *options, int flags);
+extern int loader_close(LoadHandle handle);
+extern void loader_set_priority(LoadHandle handle, int priority);
+extern long loader_read(void *target, long record_size, long record_count, LoadHandle handle);
+extern long loader_write(void *target, long record_size, long record_count, LoadHandle handle);
+extern long loader_write_2(Common::WriteStream *source_handle, long total_size, LoadHandle handle);
 
 } // namespace MADSV2
 } // namespace MADS

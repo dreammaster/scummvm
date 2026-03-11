@@ -207,31 +207,67 @@ struct KeyBuffer {
 
 typedef struct KeyBuffer *KeyPtr;
 
-
-/* keys_1.c */
-int  keys_any(void);
-int  keys_get(void);
-void keys_flush(void);
-
-/* keys_2.c */
-void keys_flush_buffer(KeyPtr key_buf);
-void keys_fill_buffer(KeyPtr key_buf);
-int  keys_read_buffer(KeyPtr key_buf);
-int  keys_append_buffer(KeyPtr key_buf, int newchar);
-int  keys_insert_buffer(KeyPtr key_buf, int newchar, int before);
-void keys_stuff_buffer(KeyPtr key_buf, int *newstuff);
-
-/* keys_3.c */
-int  keys_fix_alt(int target);
-
-/* keys_4.c */
 extern word keys_special_button;
 
-void keys_install(void);
-void keys_remove(void);
-int  keys_check_install(void);
-void keys_enable(void);
-void keys_disable(void);
+
+extern int keys_any();
+extern int keys_get();
+
+/**
+ * Flushes the typeahead buffer
+ */
+extern void keys_flush();
+
+/**
+ * Flushes the contents of the specified key buffer
+ */
+extern void keys_flush_buffer(KeyPtr key_buf);
+
+/**
+ * Adds any waiting typeahead input keys to the key buffer
+ */
+extern void keys_fill_buffer(KeyPtr key_buf);
+
+/**
+ * Reads next character from key buffer (return 0 if no key available)
+ */
+extern int keys_read_buffer(KeyPtr key_buf);
+
+/**
+ * Appends the specified character to the key buffer list.  Returns
+ * 0 if key list overflows; returns new length of list otherwise.
+ */
+extern int keys_append_buffer(KeyPtr key_buf, int newchar);
+
+/**
+ * Inserts a character into the key buffer list *before* the specified
+ * element (first element is 0).  Returns 0 if key list overflows (or
+ * if "before" is out of range).  Otherwise, returns "before + 1" for
+ * use in adding lists of characters to middle of queue.
+ */
+extern int keys_insert_buffer(KeyPtr key_buf, int newchar, int before);
+
+/**
+ * Wipes the old key buffer and inserts the specified string in its place.
+ */
+extern void keys_stuff_buffer(KeyPtr key_buf, int *newstuff);
+
+/**
+ * If "target" is an ALT-key combination, returns the ascii value
+ * of the associated (upper case) letter.
+ * If "target" is an ascii letter, returns the UPPER CASE version
+ * of that letter.
+ *
+ * (Used by routines that trap ALT key and need to accept alt-key
+ * and plain key as same key value)
+ */
+extern int keys_fix_alt(int target);
+
+extern void keys_install();
+extern void keys_remove();
+extern int keys_check_install();
+extern void keys_enable();
+extern void keys_disable();
 
 } // namespace MADSV2
 } // namespace MADS

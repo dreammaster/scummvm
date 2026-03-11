@@ -19,42 +19,38 @@
  *
  */
 
+#ifndef MADS_CORE_CURSOR_H
+#define MADS_CORE_CURSOR_H
+
 #include "mads/madsv2/core/general.h"
-#include "mads/madsv2/core/ems.h"
-#include "mads/madsv2/core/dialog.h"
-#include "mads/madsv2/core/matte.h"
-#include "mads/madsv2/core/tile.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-int tile_ems_available = false;
-int tile_picture_handle = -1;
-int tile_attribute_handle = -1;
+#define CURSOR_OFF                   0       /* Cursor off                     */
+#define CURSOR_ON                    1       /* Cursor on                      */
+#define CURSOR_INSERT                2       /* Cursor in insert mode          */
+#define CURSOR_OVERWRITE             3       /* Cursor in overwrite mode       */
 
+extern int cursor_mode;          /* global cursor insert mode flag */
+extern int cursor_follow;        /* global cursor follow flag      */
 
-int tile_setup(void) {
-	int error_flag = true;
+/**
+ * Sets text cursor size
+ */
+extern void cursor_set_size(short start, short finish);
 
-	picture_map.map = NULL;
-	depth_map.map = NULL;
+/**
+ * Sets text cursor position
+ */
+extern void cursor_set_pos(short x, short y);
 
-	tile_picture_handle = ems_get_page_handle(TILE_MAX_PAGES);
-	if (tile_picture_handle < 0) goto done;
-
-	tile_attribute_handle = ems_get_page_handle(TILE_MAX_PAGES >> 1);
-	if (tile_attribute_handle < 0) goto done;
-
-	tile_ems_available = true;
-	error_flag = false;
-
-done:
-	if (error_flag) {
-		if (tile_picture_handle >= 0) ems_free_page_handle(tile_picture_handle);
-	}
-
-	return error_flag;
-}
+extern void cursor_get_pos(int *x, int *y);
+extern void cursor_set_mode(int my_type);
+extern void cursor_toggle_insert();
+extern void cursor_set_follow(int follow);
 
 } // namespace MADSV2
 } // namespace MADS
+
+#endif

@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/system.h"
 #include "engines/util.h"
 #include "mads/madsv2/engine.h"
 #include "mads/madsv2/phantom/main.h"
@@ -43,6 +44,50 @@ Common::Error MADSV2Engine::run() {
 	Phantom::phantom_main();
 
 	return Common::kNoError;
+}
+
+void MADSV2Engine::pollEvents() {
+	Common::Event e;
+	while (g_system->getEventManager()->pollEvent(e) && !shouldQuit())
+		_events.push_back(e);
+}
+
+bool MADSV2Engine::hasPendingKey() {
+	pollEvents();
+
+	for (auto it = _events.begin(); it != _events.end(); ++it) {
+		if (it->type == Common::EVENT_KEYDOWN)
+			return true;
+	}
+
+	return false;
+}
+
+int MADSV2Engine::getKey() {
+	pollEvents();
+
+	for (auto it = _events.begin(); it != _events.end(); ++it) {
+		if (it->type == Common::EVENT_KEYDOWN) {
+			Common::Event e = *it;
+			_events.erase(it);
+			return (e.kbd.keycode & 0xff) | 0x100;
+		}
+	}
+
+	return 0;
+}
+
+void MADSV2Engine::flushKeys() {
+	pollEvents();
+
+	for (auto it = _events.begin(); it != _events.end(); ) {
+		if (it->type == Common::EVENT_KEYDOWN) {
+			Common::Event e = *it;
+			it = _events.erase(it);
+		} else {
+			++it;
+		}
+	}
 }
 
 } // namespace MADSV2

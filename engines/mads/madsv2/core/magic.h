@@ -22,7 +22,7 @@
 #ifndef MADS_CORE_MAGIC_H
 #define MADS_CORE_MAGIC_H
 
-#include "common/scummsys.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -52,100 +52,56 @@ typedef MagicGrey *MagicGreyPtr;
 
 extern byte magic_color_flags[3];
 extern byte magic_color_values[3];
-
-
-/* magic_1.c */
-void magic_get_grey_values(Palette *pal, byte *grey_value,
-	int base_color, int num_colors);
-
-/* magic_2.c */
-void magic_grey_palette(Palette pal);
-
-
-/* magic_3.c */
-void magic_grey_popularity(byte *grey_list,
-	byte *grey_table,
-	int num_colors);
-void magic_set_color_flags(byte r, byte g, byte b);
-void magic_set_color_values(byte r, byte g, byte b);
-void magic_map_to_grey_ramp(Palette *pal,
-	int base_color, int num_colors,
-	int base_grey, int num_greys,
-	MagicGreyPtr magic_map);
-
-/* magic_4.c */
-void magic_grey_ramp_palette(Palette pal, int num_greys);
-
-
-/* magic_5.c */
-void magic_fade_to_grey(Palette pal, byte *map_pointer,
-	int base_color, int num_colors,
-	int base_grey, int num_greys,
-	int tick_delay, int steps);
-/* magic_6.c */
-void magic_fade_from_grey(RGBcolor *pal, Palette target,
-	int base_color, int num_colors,
-	int base_grey, int num_greys,
-	int tick_delay, int steps);
-
-/* magic_7.c */
-void magic_screen_change_corner(Buffer *new_screen, Palette pal,
-	int corner_id,
-	int buffer_base_x, int buffer_base_y,
-	int screen_base_x, int screen_base_y,
-	int thru_black, int set_palette,
-	int tick_delay);
-
-/* magic_8.c */
-void magic_screen_change_edge(Buffer *new_screen, Palette pal,
-	int edge_id,
-	int buffer_base_x, int buffer_base_y,
-	int screen_base_x, int screen_base_y,
-	int thru_black, int set_palette,
-	int tick_delay);
-
-/* magic_9.c */
-
+extern int magic_low_fade_bound;
+extern int magic_high_fade_bound;
 extern int magic_special_center_x;
 extern int magic_special_center_y;
 
-void magic_screen_change_circle(Buffer *new_screen, Palette pal,
-	int inward_flag,
-	int buffer_base_x, int buffer_base_y,
-	int screen_base_x, int screen_base_y,
-	int thru_black, int set_palette,
+
+extern void magic_get_grey_values(Palette *pal, byte *grey_value,
+	int base_color, int num_colors);
+extern void magic_grey_palette(Palette *pal);
+extern void magic_grey_popularity(byte *grey_list, byte *grey_table, int num_colors);
+extern void magic_set_color_flags(byte r, byte g, byte b);
+extern void magic_set_color_values(byte r, byte g, byte b);
+extern void magic_map_to_grey_ramp(Palette *pal, int base_color, int num_colors,
+	int base_grey, int num_greys, MagicGreyPtr magic_map);
+extern void magic_grey_ramp_palette(Palette pal, int num_greys);
+extern void magic_fade_to_grey(Palette pal, byte *map_pointer,
+	int base_color, int num_colors, int base_grey, int num_greys,
+	int tick_delay, int steps);
+extern void magic_fade_from_grey(RGBcolor *pal, Palette target, int base_color,
+	int num_colors, int base_grey, int num_greys, int tick_delay, int steps);
+extern void magic_screen_change_corner(Buffer *new_screen, Palette pal, int corner_id,
+	int buffer_base_x, int buffer_base_y, int screen_base_x, int screen_base_y,
+	int thru_black, int set_palette, int tick_delay);
+extern void magic_screen_change_edge(Buffer *new_screen, Palette pal, int edge_id,
+	int buffer_base_x, int buffer_base_y, int screen_base_x, int screen_base_y,
+	int thru_black, int set_palette, int tick_delay);
+extern void magic_screen_change_circle(Buffer *new_screen, Palette pal,
+	int inward_flag, int buffer_base_x, int buffer_base_y,
+	int screen_base_x, int screen_base_y, int thru_black, int set_palette,
 	int tick_delay, int pixel_rate);
-
-
-/* magic_a.c */
-void magic_shrink_buffer(Buffer *from, Buffer *unto);
-
-
-/* magic_b.c */
-int  magic_shrinking_buffer(Buffer *source, Buffer *rear,
-	int grow_flag,
-	int buffer_base_x, int buffer_base_y,
-	int screen_base_x, int screen_base_y,
+extern void magic_shrink_buffer(Buffer *from, Buffer *unto);
+extern int  magic_shrinking_buffer(Buffer *source, Buffer *rear, int grow_flag,
+	int buffer_base_x, int buffer_base_y, int screen_base_x, int screen_base_y,
 	int tick_delay);
+extern void magic_swap_me_in_the_dark_baby(byte *swap, Palette pal, int start);
+extern void magic_swap_foreground(byte *background_table, Palette background_palette);
 
-/* magic_c.c */
-extern int magic_low_fade_bound;
-extern int magic_high_fade_bound;
-
-void magic_swap_me_in_the_dark_baby(byte *swap,
-	Palette pal,
-	int start);
-void magic_swap_foreground(byte *background_table,
-	Palette background_palette);
-
-/* magic_d.c */
-int  magic_closest_color(RGBcolor *match_color,
-	byte *list,
-	int list_wrap,
+/**
+ * Given a color and a color list, returns the number of the color
+ * list entry which most closely matches the original color.  "list_wrap"
+ * indicates the spacing between color entries, and "list_length"
+ * indicates the number of color entries.
+ */
+extern int  magic_closest_color(RGBcolor *match_color, byte *list, int list_wrap,
 	int list_length);
 
-/* magic_e.c */
-int magic_hash_color(RGBcolor *hash_color);
+/**
+ * Gets the 128-based grey-scale hash for a color (R * 76) + (G * 38) + (B * 14)
+ */
+extern int magic_hash_color(RGBcolor *hash_color);
 
 } // namespace MADSV2
 } // namespace MADS

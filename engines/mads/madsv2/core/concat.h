@@ -19,24 +19,30 @@
  *
  */
 
-#ifndef MADS_CORE_PACK_1_H
-#define MADS_CORE_PACK_1_H
+#ifndef MADS_CORE_CONCAT_H
+#define MADS_CORE_CONCAT_H
 
-#include "common/stream.h"
-#include "mads/madsv2/core/general.h"
+#include "common/scummsys.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern byte *pack_read_memory_ptr;
-extern byte *pack_write_memory_ptr;
-extern Common::SeekableReadStream *pack_read_file_handle;
-extern Common::WriteStream *pack_write_file_handle;
+#define CONCAT_ID_STRING                "MADSCONCAT 1.0\032"
+#define CONCAT_ID_LENGTH                16
+#define CONCAT_ID_CHECK                 10
 
-word pack_read_memory(char *buffer, word *size);
-void pack_write_memory(char *buffer, word *size);
-word pack_read_file(char *buffer, word *size);
-void pack_write_file(char *buffer, word *size);
+#define CONCAT_EXT                      ".HAG"
+
+#define CONCAT_MAX_FILES                750
+#define CONCAT_MAX_OUT                  10
+
+typedef struct {
+	long file_offset;
+	long file_size;
+	char name[13];
+} Concat;
+
+typedef Concat *ConcatPtr;
 
 } // namespace MADSV2
 } // namespace MADS

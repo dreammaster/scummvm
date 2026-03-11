@@ -39,7 +39,7 @@ int fileio_ffputs(const char *mystring, Common::WriteStream *stream);
 char *fileio_fix_lf_input(char *mystring);
 void fileio_fix_lf_output(char *mystring);
 int fileio_copy(const char *source, const char *dest);
-long fileio_setpos(Common::SeekableReadStream *handle, long pos);
+long fileio_setpos(Common::Stream *handle, long pos);
 long fileio_fread_f(void *buffer, long size, long count, Common::SeekableReadStream *stream);
 long fileio_fwrite_f(const void *buffer, long size, long count, Common::WriteStream *stream);
 long fileio_file_to_file(Common::SeekableReadStream *from, Common::WriteStream *to, long count);

@@ -50,24 +50,12 @@ extern FontPtr font_conv;               /* Font handle for conversations   */
 extern FontPtr font_menu;               /* Font handle for menu stuff      */
 extern FontPtr font_misc;               /* Font handle for symbols & icons */
 
-/* font_1.cpp */
-FontPtr font_load(const char *name);
 
-/* font_2.cpp */
-int font_write(FontPtr font, Buffer *target, const char *out_string, int x, int y,
-	int auto_spacing);
-
-/* font_3.cpp */
-void font_set_colors(int background,
-	int high_intense,
-	int med_intense,
-	int low_intense);
-
-/* font_4.cpp */
-int font_string_width(FontPtr font, const char *out_string, int auto_spacing);
-
-/* font_5.cpp */
-void font_init(FontPtr font);
+extern FontPtr font_load(const char *name);
+extern int font_write(FontPtr font, Buffer *target, const char *out_string,
+	int x, int y, int auto_spacing);
+extern void font_set_colors(int background, int high_intense, int med_intense, int low_intense);
+extern int font_string_width(FontPtr font, const char *out_string, int auto_spacing);
 
 } // namespace MADSV2
 } // namespace MADS

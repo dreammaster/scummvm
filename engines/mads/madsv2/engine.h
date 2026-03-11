@@ -22,6 +22,8 @@
 #ifndef MADSV2_ENGINE_H
 #define MADSV2_ENGINE_H
 
+#include "common/events.h"
+#include "common/list.h"
 #include "common/random.h"
 #include "engines/engine.h"
 #include "graphics/screen.h"
@@ -35,6 +37,9 @@ private:
 	const MADSGameDescription *_gameDescription;
 	Graphics::Screen *_screen = nullptr;
 	Common::RandomSource _random = Common::RandomSource("MADS");
+	Common::List<Common::Event> _events;
+
+	void pollEvents();
 
 public:
 	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
@@ -49,6 +54,10 @@ public:
 	Graphics::Screen *getScreen() const {
 		return _screen;
 	}
+
+	bool hasPendingKey();
+	int getKey();
+	void flushKeys();
 };
 
 extern MADSV2Engine *g_engine;

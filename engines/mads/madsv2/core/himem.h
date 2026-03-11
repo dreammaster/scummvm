@@ -43,11 +43,11 @@ typedef struct {
 } HimemDirectory;
 
 
-extern byte                himem_preload_ems_disabled;
-extern byte                himem_preload_xms_disabled;
+extern byte himem_preload_ems_disabled;
+extern byte himem_preload_xms_disabled;
 
-extern byte                himem_directory_allocation;
-extern HimemDirectory      himem_directory_save_area;
+extern byte himem_directory_allocation;
+extern HimemDirectory himem_directory_save_area;
 extern HimemDirectory *himem_directory;
 extern HimemDirectory *himem_directory_entry;
 extern HimemDirectory *himem_ems_directory;
@@ -59,34 +59,18 @@ extern int himem_active;
 extern int himem_ems_preloaded;
 extern int himem_xms_preloaded;
 
-/* himem_1.cpp */
-int himem_activate_directory(void);
 
-/* himem_2.cpp */
-int fastcall himem_get_directory_entry(int id);
-
-/* himem_3.cpp */
-int fastcall himem_put_directory_entry(int id);
-
-/* himem_4.cpp */
-int  himem_resident(char *filename);
-void himem_catalog(void);
-
-/* himem_5.cpp */
-int himem_directory_setup(void);
-
-/* himem_6.cpp */
-void himem_shutdown(void);
-void himem_startup(void);
-
-/* himem_7.cpp */
-int fastcall himem_preload(char *filename, int level);
-
-/* himem_8.cpp */
-int fastcall himem_preload_series(char *filename, int level);
-
-/* himem_9.cpp */
-void fastcall himem_flush(int level);
+extern int himem_activate_directory();
+extern int himem_get_directory_entry(int id);
+extern int himem_put_directory_entry(int id);
+extern int  himem_resident(const char *filename);
+extern void himem_catalog();
+extern int himem_directory_setup();
+extern void himem_shutdown();
+extern void himem_startup();
+extern int himem_preload(char *filename, int level);
+extern int himem_preload_series(char *filename, int level);
+extern void himem_flush(int level);
 
 } // namespace MADSV2
 } // namespace MADS

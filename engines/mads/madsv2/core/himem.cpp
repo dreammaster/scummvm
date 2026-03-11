@@ -107,10 +107,10 @@ done:
 	return error_flag;
 }
 
-int himem_resident(char *filename) {
+int himem_resident(const char *filename) {
 	int id = -1;
 	int count;
-	char *mark;
+	const char *mark;
 	long dir_size;
 	HimemDirectory *himem_xms_directory = NULL;
 

@@ -21,9 +21,32 @@
 
 #include "common/textconsole.h"
 #include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/error.h"
 
 namespace MADS {
 namespace MADSV2 {
+
+byte  mem_initialized = false;
+
+byte  mem_max_free_set = false;
+byte  umb_max_free_set = false;
+
+byte mem_last_alloc_failed = false;
+int  mem_last_alloc_loader = MODULE_MEMORY;
+long mem_last_alloc_size = 0;
+long mem_last_alloc_avail = 0;
+long mem_last_alloc_umb = 0;
+long mem_max_free = -1;
+long mem_min_free = 100000000;
+long umb_max_free = -1;
+long umb_min_free = 100000000;
+
+long mem_save_free_area;
+long umb_save_free_area;
+
+void (*mem_manager_update)() = NULL;
+int mem_manager_active = false;
+
 
 void *mem_get_name(long size, const char *) {
 	void *memory_block = nullptr;
@@ -62,6 +85,18 @@ void mem_save_free(void) {
 }
 
 void mem_restore_free(void) {
+	// No implementation
+}
+
+long fastcall mem_conv_get_avail() {
+	return 999999;
+}
+
+long mem_get_avail(void) {
+	return 999999;
+}
+
+void mem_set_video_mode(int mode) {
 	// No implementation
 }
 

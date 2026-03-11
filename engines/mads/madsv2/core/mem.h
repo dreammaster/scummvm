@@ -51,12 +51,14 @@ extern long umb_min_free;               /* Least UMB that was ever free    */
 extern void (*mem_manager_update)();    /* Called at memory updates        */
 extern int  mem_manager_active;         /* Flag if memory manager active   */
 
-/* mem_1.cpp */
 inline void *mem_normalize(void *in) {
 	return in;
 }
+inline void *mem_check_overflow(void *in) {
+	return in;
+}
 
-/* mem_2.cpp */
+
 extern void *mem_get(long size);
 
 /**
@@ -87,9 +89,6 @@ extern void mem_restore_free();
  * Returns the string label of the memory block
  */
 extern void mem_get_block_name(byte *block, char *block_name);
-
-/* mem_3.cpp */
-void *mem_check_overflow(void *in);
 
 /* mem_4.cpp */
 extern long mem_get_avail();

@@ -22,6 +22,7 @@
 #include "common/util.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/buffer.h"
+#include "mads/madsv2/core/ems.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/room.h"
 
@@ -806,6 +807,61 @@ void buffer_restore(Buffer *source, int preserve_handle, int target_ems_handle, 
 
 done:
 	;
+}
+
+bool buffer_to_ems(Buffer *source, int page_handle, int source_ems_handle,
+		int x, int y, int xs, int ys) {
+	int special_page_handle = 0;
+	Buffer ems_buffer = { video_y, video_x, NULL };
+
+	if (page_handle < 0) {
+		page_handle = ems_get_page_handle(4);
+		special_page_handle = BUFFER_CREATED_PAGE_HANDLE;
+	}
+	if (page_handle < 0) {
+		goto done;
+	}
+
+	if (source_ems_handle < 0) {
+		ems_map_buffer(page_handle);
+		ems_buffer.data = ems_page[0];
+
+		buffer_rect_copy_2(*source, ems_buffer, x, y, x, y, xs, ys);
+	} else {
+		ems_buffer_to_buffer(source_ems_handle, page_handle);
+	}
+
+	page_handle |= special_page_handle;
+
+	ems_unmap_all();
+
+done:
+	return page_handle;
+}
+
+bool buffer_from_ems(Buffer *source, int page_handle, int target_ems_handle,
+		int x, int y, int xs, int ys) {
+	Buffer ems_buffer = { video_y, video_x, NULL };
+	int special_page_handle;
+
+	special_page_handle = page_handle & BUFFER_CREATED_PAGE_HANDLE;
+
+	page_handle &= ~(BUFFER_CREATED_PAGE_HANDLE);
+
+	if (target_ems_handle < 0) {
+		ems_map_buffer(page_handle);
+		ems_buffer.data = ems_page[0];
+
+		buffer_rect_copy_2(ems_buffer, *source, x, y, x, y, xs, ys);
+	} else {
+		ems_buffer_to_buffer(page_handle, target_ems_handle);
+	}
+
+	if (special_page_handle) ems_free_page_handle(page_handle);
+
+	ems_unmap_all();
+
+	return page_handle;
 }
 
 } // namespace MADSV2

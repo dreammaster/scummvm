@@ -134,18 +134,32 @@ typedef struct {                        /* Video buffer structure         */
 
 #define sgn_in(x,s) ( ((s) >= 0) ? (x) : (neg(x)) )            /* Incorporate sign */
 
-inline void mads_strupr(char *s) {
-	for (; *s; ++s)
+inline char *mads_strupr(char *str) {
+	for (char *s = str; *s; ++s)
 		*s = toupper(*s);
+	return str;
 }
 
-inline void mads_strlwr(char *s) {
-	for (; *s; ++s)
+inline char *mads_strlwr(char *str) {
+	for (char *s = str; *s; ++s)
 		*s = tolower(*s);
+	return str;
 }
+
 inline char *mads_itoa(int value, char *buffer, int radix) {
 	assert(radix == 10);
 	Common::strcpy_s(buffer, 16, Common::String::format("%d", value).c_str());
+	return buffer;
+}
+
+inline void mads_chdir(const char *path) {}
+inline void mads_chdrive(int drive) {}
+inline int mads_getdrive() { return 3; }
+inline void mads_fullpath(char *buffer, const char *path, uint bufferCount) {
+	Common::strcpy_s(buffer, bufferCount, path);
+}
+inline char *mads_getcwd(char *buffer, int count) {
+	*buffer = '\0';
 	return buffer;
 }
 
