@@ -230,106 +230,48 @@ typedef struct {
 
 	Rail      rail[1];                  /* Rail nodes begin here...      */
 } Room;
-
 typedef Room *RoomPtr;
 
-
 extern RoomDef roomdef;
-
 extern int room_load_error;
 
-
-/* room_1.cpp */
-int room_read_def(int room_code, char *room_file,
-	char *picture_base, int mads_mode);
-
-int room_write_def(int room_code, char *room_file,
-	int mads_mode);
-
-/* room_2.cpp */
-RoomPtr room_load(int    id,
-	int    variant,
-	char *base_path,
-	Buffer *picture,
-	Buffer *depth,
-	Buffer *walk,
-	Buffer *special,
-	TileMapHeader *picture_map,
-	TileMapHeader *depth_map,
-	TileResource *picture_resource,
-	TileResource *depth_resource,
-	int    picture_ems_handle,
-	int    depth_ems_handle,
-	int    load_flags);
-
-
-/* room_2.cpp */
-void room_unload(RoomPtr room,
-	Buffer *picture,
-	Buffer *depth,
-	Buffer *walk,
-	Buffer *special,
-	TileMapHeader *picture_map,
-	TileMapHeader *depth_map);
-
-
-
-/* room_3.cpp */
 extern byte room_loaded_depth;
 extern byte room_loaded_walk;
 extern byte room_loaded_special;
 
-int room_load_variant(int id,
-	int variant,
-	char *base_path,
-	RoomPtr room,
-	Buffer *depth,
-	Buffer *walk,
-	Buffer *special,
-	TileMapHeader *depth_map,
-	TileResource *depth_resource,
-	int depth_ems_handle);
+/**
+ * Reads the .DEF file for the specified room into the "room" structure.
+ * @return	Returns 0 if successful, or -1 for error.
+ */
+extern int room_read_def(int room_code, char *room_file, char *picture_base, int mads_mode);
+extern int room_write_def(int room_code, const char *room_file, int mads_mode);
+extern RoomPtr room_load(int id, int variant, const char *base_path,
+	Buffer *picture, Buffer *depth, Buffer *walk, Buffer *special,
+	TileMapHeader *picture_map, TileMapHeader *depth_map,
+	TileResource *picture_resource, TileResource *depth_resource,
+	int picture_ems_handle, int depth_ems_handle, int load_flags);
+extern void room_unload(RoomPtr room, Buffer *picture, Buffer *depth, Buffer *walk,
+	Buffer *special, TileMapHeader *picture_map, TileMapHeader *depth_map);
 
-/* room_3.cpp */
-void room_dump_attribute(Buffer *depth,
-	Buffer *walk,
-	Buffer *special,
+/**
+ * Loads the specified variant for a room.
+ */
+extern int room_load_variant(int id, int variant, const char *base_path, RoomPtr room,
+	Buffer *depth, Buffer *walk, Buffer *special, TileMapHeader *depth_map,
+	TileResource *depth_resource, int depth_ems_handle);
+extern void room_dump_attribute(Buffer *depth, Buffer *walk, Buffer *special,
 	TileMapHeader *depth_map);
-
-/* room_4.cpp */
-int room_compile_hotspots(int id, int compression);
-
-/* room_5.cpp */
-HotPtr room_load_hotspots(int id, int *num_spots);
-
-/* room_6.cpp */
-int room_read_pict(int room_code, char *room_file,
-	int mads_mode);
-
-int room_write_pict(int room_code, char *room_file,
-	int mads_mode);
-
-/* room_7.cpp */
-void room_file_name(char *target, char *suffix,
-	int code, char *main_name, int mads_mode);
-
-
-/* room_8.cpp */
-void room_himem_preload(int room, int level);
-
-
-/* room_9.cpp */
-RoomPtr room_dummy_init(int xs, int ys);
-
-/* room_a.cpp */
-int room_picture_load(int room_id, Buffer *picture, int load_flags);
-
-/* room_b.cpp */
-void room_resolve_base(char *base, char *file, int id, char *base_path);
-
-
-/* room_c.cpp */
-int room_invert(void);
+extern int room_compile_hotspots(int id, int compression);
+extern HotPtr room_load_hotspots(int id, int *num_spots);
+extern int room_read_pict(int room_code, const char *room_file, int mads_mode);
+extern int room_write_pict(int room_code, const char *room_file, int mads_mode);
+extern void room_file_name(char *target, const char *suffix, int code,
+	char *main_name, int mads_mode);
+extern void room_himem_preload(int room, int level);
+extern RoomPtr room_dummy_init(int xs, int ys);
+extern int room_picture_load(int room_id, Buffer *picture, int load_flags);
+extern void room_resolve_base(char *base, const char *file, int id, const char *base_path);
+extern int room_invert(void);
 
 } // namespace MADSV2
 } // namespace MADS

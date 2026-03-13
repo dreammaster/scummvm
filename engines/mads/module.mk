@@ -89,6 +89,7 @@ MODULE_OBJS += \
 	madsv2/core/popup.o \
 	madsv2/core/quote_1.o \
 	madsv2/core/rail.o \
+	madsv2/core/room.o \
 	madsv2/core/screen.o \
 	madsv2/core/sort.o \
 	madsv2/core/speech.o \
