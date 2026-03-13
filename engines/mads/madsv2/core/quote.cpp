@@ -93,11 +93,7 @@ char *quote_load(int quote_id, ...) {
 			quote_error = 3;
 			goto done;
 		}
-		/*
-		if (!fileio_read_till_null(work, handle)) {
-		  goto done;
-		}
-		*/
+
 		if (now_reading == list[now_finding]) {
 			mem_needed = strlen(work) + 3;
 			total_mem_needed += mem_needed;
@@ -137,7 +133,50 @@ done:
 	fileio_suppress_unbuffering = false;
 
 	mem_restore_free();
-	return (result);
+	return result;
+}
+
+char *quote_string(char *quote_list, int quote_id) {
+	int id;
+	char *result = NULL;
+	char *search;
+	char *marker;
+
+	for (marker = quote_list; *marker && (result == NULL); marker = search + 2) {
+		for (search = marker; *search; search++);
+		search++;
+		id = *((int *)search);
+		if (id == quote_id) result = marker;
+	}
+
+	return result;
+}
+
+void quote_split_string(const char *source, char *target1, char *target2) {
+	int count, len, half;
+	const char *mark;
+
+	len = strlen(source);
+
+	mark = source;
+	half = len >> 1;
+
+	for (count = 0; count < half; count++) {
+		*(target1++) = *(mark++);
+	}
+
+	while (*mark && (*mark != ' ')) {
+		*(target1++) = *(mark++);
+	}
+
+	while (*mark == ' ') mark++;
+
+	/* *(target1++) = '"'; */
+	*(target1++) = 0;
+
+	do {
+		*(target2++) = *mark;
+	} while (*(mark++));
 }
 
 } // namespace MADSV2

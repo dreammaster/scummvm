@@ -146,5 +146,30 @@ short screen_show_wide(const char *outstring, short locx, short locy, short widt
 	return 0;
 }
 
+int screen_show(const char *outstring, int locx, int locy) {
+	locx = screen_put(outstring, screen_normal_color, screen_hilite_color, locx, locy);
+	return (locx);
+}
+
+int screen_printf(int x, int y, const char *string, ...) {
+	va_list va;
+	va_start(va, string);
+	Common::String msg = Common::String::vformat(string, va);
+	va_end(va);
+
+	screen_show(msg.c_str(), x, y);
+	return 0;
+}
+
+int screen_print(const char *string, ...) {
+	va_list va;
+	va_start(va, string);
+	Common::String msg = Common::String::vformat(string, va);
+	va_end(va);
+
+	screen_write(msg.c_str());
+	return 0;
+}
+
 } // namespace MADSV2
 } // namespace MADS

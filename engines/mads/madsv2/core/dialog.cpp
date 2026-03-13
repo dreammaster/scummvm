@@ -105,7 +105,7 @@ static int   dialog_server_installed = false;
 static dword dialog_old_24_server;
 
 
-int dialog_read_dir_to_list(ListPtr target, char *wild, int dirflag) {
+int dialog_read_dir_to_list(ListPtr target, const char *wild, int dirflag) {
 	warning("TODO: dialog_read_dir_to_list");
 	target->elements = 0;
 	return 0;

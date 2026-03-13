@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/popup.h"
 #include "mads/madsv2/core/kernel.h"
@@ -140,9 +141,12 @@ int popup_create(int horiz_pieces, int x, int y) {
 	error_flag = false;
 
 done:
-	return (error_flag);
+	return error_flag;
 }
 
+int popup_create(FontPtr font, int horiz_pieces, int x, int y) {
+	error("TODO: popup_create");
+}
 
 void popup_add_icon(SeriesPtr series, int id, int center) {
 	box->icon = series;
@@ -739,7 +743,7 @@ int popup_draw(int save_screen, int depth_code) {
 	error_flag = false;
 
 done:
-	return (error_flag);
+	return error_flag;
 }
 
 
@@ -847,7 +851,7 @@ int popup_and_wait(int save_screen) {
 	error_flag = false;
 
 done:
-	return (error_flag);
+	return error_flag;
 }
 
 
@@ -866,7 +870,7 @@ int popup_and_dont_wait(int save_screen) {
 	error_flag = false;
 
 done:
-	return (error_flag);
+	return error_flag;
 }
 
 
@@ -1020,7 +1024,7 @@ done:
 	keys_enable();
 	popup_destroy();
 	Common::strcpy_s(target, 65536, temp_buf);
-	return (error_flag);
+	return error_flag;
 }
 
 
@@ -1045,7 +1049,7 @@ int popup_ask_number(long *value, int maxlen, int save_screen) {
 
 done:
 	popup_asking_number = false;
-	return (error_flag);
+	return error_flag;
 }
 
 
@@ -1062,7 +1066,7 @@ int popup_estimate_pieces(int maxlen) {
 }
 
 
-int popup_get_string(char *target, char *top, char *left, int maxlen) {
+int popup_get_string(char *target, const char *top, const char *left, int maxlen) {
 	int result = -1;
 
 	if (!popup_create(popup_estimate_pieces(strlen(top) + 4), POPUP_CENTER, POPUP_CENTER)) {
@@ -1078,7 +1082,7 @@ int popup_get_string(char *target, char *top, char *left, int maxlen) {
 }
 
 
-int popup_get_long(long *value, char *top, char *left, int maxlen) {
+int popup_get_long(long *value, const char *top, const char *left, int maxlen) {
 	int error_flag = true;
 
 	if (!popup_create(popup_estimate_pieces(strlen(top) + 4), POPUP_CENTER, POPUP_CENTER)) {
@@ -1090,11 +1094,11 @@ int popup_get_long(long *value, char *top, char *left, int maxlen) {
 		error_flag = popup_ask_number(value, maxlen, true);
 	}
 
-	return (error_flag);
+	return error_flag;
 }
 
 
-int popup_get_number(int *value, char *top, char *left, int maxlen) {
+int popup_get_number(int *value, const char *top, const char *left, int maxlen) {
 	int result;
 	long temp;
 
@@ -1108,13 +1112,13 @@ int popup_get_number(int *value, char *top, char *left, int maxlen) {
 }
 
 
-int popup_alert(int width, char *message_line, ...) {
+int popup_alert(int width, const char *message_line, ...) {
 	int mykey = -1;
 	int error_flag = true;
 	int popup_created = false;
 	int first_time = true;
 	va_list marker;
-	char *my_message = message_line;
+	const char *my_message = message_line;
 
 	if (popup_create(popup_estimate_pieces(width), POPUP_CENTER, POPUP_CENTER)) goto done;
 	popup_created = true;
@@ -1132,9 +1136,8 @@ int popup_alert(int width, char *message_line, ...) {
 
 done:
 	if (error_flag && popup_created) popup_destroy();
-	return (mykey);
+	return mykey;
 }
-
 
 int popup_box_load(void) {
 	int error_flag = true;
@@ -1261,7 +1264,7 @@ done:
 	palette_low_search_limit = 0;
 	palette_high_search_limit = 256;
 
-	return (error_flag);
+	return error_flag;
 }
 
 

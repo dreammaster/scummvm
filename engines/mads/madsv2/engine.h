@@ -50,6 +50,9 @@ public:
 	uint getRandomNumber(uint max) {
 		return _random.getRandomNumber(max);
 	}
+	uint getRandomNumber(uint min, uint max) {
+		return min + _random.getRandomNumber(max - min);
+	}
 
 	Graphics::Screen *getScreen() const {
 		return _screen;
@@ -58,6 +61,22 @@ public:
 	bool hasPendingKey();
 	int getKey();
 	void flushKeys();
+
+	/* Callback routines in game-specific MAIN module */
+	int  main_cheating_key(int mykey) {
+		return 0;
+	}
+	int  main_normal_key(int mykey) {
+		return 0;
+	}
+	int  main_copy_verify(void) {
+		return 0;
+	}
+	void main_cold_data_init(void) {}
+	void main_false_start(void) {}
+	void main_global_init_code(void) {}
+	void section_music(int section_num) {}
+	void game_control_loop() {}
 };
 
 extern MADSV2Engine *g_engine;

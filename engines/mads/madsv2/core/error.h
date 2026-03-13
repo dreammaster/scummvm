@@ -140,7 +140,7 @@ extern void error_report(int error, int severity, int module, long data1, long d
 
 int error_scan(char *target, char *name, int number);
 
-extern void error_dump_file(char *file_name);
+extern void error_dump_file(const char *file_name);
 
 /* error_2.cpp */
 extern void error_break_point(int data1, int data2);

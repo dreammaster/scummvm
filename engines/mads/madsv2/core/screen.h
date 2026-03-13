@@ -106,9 +106,8 @@ void  screen_init_graphics(int which_mode);
 void  screen_shutdown_graphics(int clear_flag);
 void  screen_show_spot(const char *message, int wx, int wy, int class_, int num);
 
-/* DO NOT USE */
-//int  screen_printf(int x, int y, char *string, ...);
-//int  screen_print(char *string, ...);
+int screen_printf(int x, int y, const char *string, ...);
+int screen_print(const char *string, ...);
 
 void screen_init_text(int which_mode);
 void screen_shutdown_text(int clear_flag);

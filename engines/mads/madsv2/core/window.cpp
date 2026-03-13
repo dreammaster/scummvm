@@ -75,7 +75,7 @@ void window_line_across(WindowPtr window, int line_y) {
 	}
 }
 
-void window_color(WindowPtr window, short new_col) {
+void window_color(WindowPtr window, int new_col) {
 	short x_count, y_count;
 
 	for (y_count = window->ul_y; y_count <= window->lr_y; y_count++) {

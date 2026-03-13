@@ -214,6 +214,10 @@ long fileio_get_file_size(const char *filename) {
 	return result;
 }
 
+bool fileio_exist(const char *inp) {
+	return Common::File::exists(inp);
+}
+
 char *fileio_get_filetype(char *outp, char *inp) {
 	Common::File fcb;
 	char test[20];

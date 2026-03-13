@@ -410,6 +410,7 @@ extern BoxParam box_param;
 
 /* popup_1.c */
 int  popup_create(int horiz_pieces, int x, int y);
+int  popup_create(FontPtr font, int horiz_pieces, int x, int y);
 void popup_add_icon(SeriesPtr series, int id, int center);
 int  popup_draw(int save_screen, int depth_code);
 void popup_destroy(void);
@@ -436,16 +437,13 @@ int  popup_ask_number(long *value, int maxlen, int save_screen);
 
 
 /* popup_2.c */
-int  popup_estimate_pieces(int maxlen);
-int  popup_get_string(char *target, char *top,
-	char *left, int maxlen);
-int  popup_get_long(long *value, char *top,
-	char *left, int maxlen);
-int  popup_get_number(int *value, char *top,
-	char *left, int maxlen);
+int popup_estimate_pieces(int maxlen);
+int popup_get_string(char *target, const char *top, const char *left, int maxlen);
+int popup_get_long(long *value, const char *top, const char *left, int maxlen);
+int popup_get_number(int *value, const char *top, const char *left, int maxlen);
 
 /* popup_3.c */
-int popup_alert(int width, char *message_line, ...);
+int popup_alert(int width, const char *message_line, ...);
 
 /* popup_4.c */
 int popup_box_load(void);

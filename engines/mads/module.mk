@@ -60,8 +60,11 @@ MODULE_OBJS += \
 	forest/forest_scenes.o \
 	forest/globals_forest.o \
 	madsv2/engine.o \
+	madsv2/core/anim.o \
+	madsv2/core/attr.o \
 	madsv2/core/buffer.o \
 	madsv2/core/camera.o \
+	madsv2/core/copy.o \
 	madsv2/core/cursor.o \
 	madsv2/core/cycle.o \
 	madsv2/core/dialog.o \
@@ -70,8 +73,11 @@ MODULE_OBJS += \
 	madsv2/core/error.o \
 	madsv2/core/fileio.o \
 	madsv2/core/font.o \
+	madsv2/core/game.o \
+	madsv2/core/heap.o \
 	madsv2/core/himem.o \
 	madsv2/core/hspot.o \
+	madsv2/core/imath.o \
 	madsv2/core/inter.o \
 	madsv2/core/kernel.o \
 	madsv2/core/keys.o \
@@ -87,7 +93,7 @@ MODULE_OBJS += \
 	madsv2/core/pal.o \
 	madsv2/core/player.o \
 	madsv2/core/popup.o \
-	madsv2/core/quote_1.o \
+	madsv2/core/quote.o \
 	madsv2/core/rail.o \
 	madsv2/core/room.o \
 	madsv2/core/screen.o \

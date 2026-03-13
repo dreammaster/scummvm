@@ -67,7 +67,13 @@ long mouse_clock = 0;
 
 int mouse_hot_x = 0;
 int mouse_hot_y = 0;
+int mouse_video_mode = 0;
 
+
+int mouse_init(int driverflag, int videomode) {
+	// No implementation
+	return 0;
+}
 
 void mouse_show() {
 	if (!CursorMan.isVisible())

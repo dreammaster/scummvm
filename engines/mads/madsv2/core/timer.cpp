@@ -29,6 +29,10 @@ namespace MADSV2 {
 long *timer_address = dos_timer_address;
 word timer_rate = 20;
 int  timer_service_active = false;
+word timer_sound_on;
+word timer_noise_on;
+byte timer_copy_protect_in = 0;
+byte timer_copy_protect_out = 0;
 
 extern long timer_600_low;
 extern long timer_60_low;
@@ -85,6 +89,37 @@ void timer_set_rate(word count_down) {
 		sti; Interrupts come hither
 	}
 #endif
+}
+
+void timer_install() {
+	// No implementation in ScummVM
+}
+
+void timer_remove() {
+	// No implementation in ScummVM
+}
+
+void timer_set_sound_flag(int sound_flag) {
+	timer_sound_on = sound_flag;
+	timer_noise_on = sound_flag;
+}
+
+int timer_set_copy_protect(int protect) {
+	timer_copy_protect_in = protect;
+	timer_copy_protect_out = timer_copy_protect_in;
+	return protect;
+}
+
+int timer_get_copy_protect() {
+	return timer_copy_protect_out;
+}
+
+void timer_activate_low_priority(void (*(routine))()) {
+	warning("TODO: timer_activate_low_priority");
+}
+
+byte *timer_get_interrupt_stack(void) {
+	error("TODO: timer_get_interrupt_stack");
 }
 
 } // namespace MADSV2

@@ -27,13 +27,28 @@
 namespace MADS {
 namespace MADSV2 {
 
-int  imath_distance(int side_a, int side_b, int threshold);
-int  imath_hypot(int side_a, int side_b);
-word imath_isqrt(long square);
+/**
+ * Distance: fast approximate hypotenuse with exact fallback.
+ * Uses an octagonal approximation with a correction term.
+ * Guaranteed to be a lower bound (underestimates by at most ~3%).
+ * Falls through to exact hypot if the estimate is below thresh.
+ */
+extern int imath_distance(int side_a, int side_b, int threshold);
 
-void imath_circular_arc(word *buffer, int radius);
+/**
+ * Exact integer hypotenuse via sum of squares.
+ */
+extern int imath_hypot(int side_a, int side_b);
 
-int imath_random(int from, int unto);
+/**
+ * Integer square root (truncating).
+ * @return		Returns 0 for negative input.
+ */
+extern int imath_isqrt(long square);
+
+extern void imath_circular_arc(word *buffer, int radius);
+
+extern int imath_random(int from, int unto);
 
 } // namespace MADSV2
 } // namespace MADS

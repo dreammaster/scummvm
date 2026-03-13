@@ -1479,7 +1479,7 @@ void kernel_animation_init() {
 	}
 }
 
-int kernel_run_animation(char *name, int trigger_code) {
+int kernel_run_animation(const char *name, int trigger_code) {
 	int result = -1;
 	int found = -1;
 	int error_flag = true;

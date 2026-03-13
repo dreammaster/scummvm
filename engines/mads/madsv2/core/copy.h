@@ -19,21 +19,39 @@
  *
  */
 
-#ifndef MADS_CORE_QUOTE_H
-#define MADS_CORE_QUOTE_H
+#ifndef MADS_CORE_COPY_H
+#define MADS_CORE_COPY_H
 
+#include "common/stream.h"
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-#define QUOTE_MAX_LIST_LENGTH           200
+#define COPY_SUCCEED            0
+#define COPY_FAIL               1
+#define COPY_ESCAPE             2
 
-extern int quote_emergency;
+#define COPY_TRIES_ALLOWED      2
 
-char *quote_load(int quote_id, ...);
-char *quote_string(char *quote_list, int quote_id);
-void quote_split_string(const char *source, char *target1, char *target2);
+#define COPY_LENGTH             4096
+#define COPY_CHECK              256
+
+
+struct CopyProt {
+	char manual;
+	int  page;
+	int  line;
+	int  word_number;
+	char say[20];
+
+	void load(Common::SeekableReadStream *src);
+};
+
+extern void copy_mangle(CopyProt *copy_prot);
+extern int copy_load(CopyProt *copy_prot);
+extern int copy_pop_and_ask();
+extern int copy_verify();
 
 } // namespace MADSV2
 } // namespace MADS

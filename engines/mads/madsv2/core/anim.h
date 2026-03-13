@@ -468,7 +468,7 @@ int anim_load_background(AnimFile *anim_in,
 /* anim_2.cpp */
 void    anim_unload(AnimPtr anim);
 
-AnimPtr anim_load(char *file_name,
+AnimPtr anim_load(const char *file_name,
 	Buffer *orig, Buffer *depth,
 	TileMapHeader *picture_map,
 	TileMapHeader *depth_map,

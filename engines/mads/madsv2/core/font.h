@@ -22,7 +22,7 @@
 #ifndef MADS_CORE_FONT_H
 #define MADS_CORE_FONT_H
 
-#include "common/scummsys.h"
+#include "mads/madsv2/core/buffer.h"
 
 namespace MADS {
 namespace MADSV2 {

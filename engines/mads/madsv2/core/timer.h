@@ -53,17 +53,28 @@ long timer_read(void);
 long timer_read_dos(void);
 long timer_read_600(void);
 long timer_read_60(void);
-
-
-/* timer_2.c */
 void timer_set_rate(word count_down);
 
+/**
+ * Installs the timer interrupt handler
+ */
+void timer_install();
 
-/* timer_3.asm */
-void timer_install(void);
-void timer_remove(void);
+/**
+ * Removes timer interrupt handler
+ */
+void timer_remove();
+
+/**
+ * Activates or deactivates timer sound support.
+ */
 void timer_set_sound_flag(int sound_flag);
+
+/**
+ * Designates a low priority routine.  Pass NULL (0) to deactivate.
+ */
 void timer_activate_low_priority(void (*(routine))());
+
 byte *timer_get_interrupt_stack(void);
 
 int timer_set_copy_protect(int protect);

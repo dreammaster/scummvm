@@ -260,9 +260,11 @@ int global_copy_verify(void);
 /* game_1.c */
 void game_main(int argc, char **argv);
 
-
 /* game_2.c */
 void game_save_name(int id);
+
+/* game_3.c */
+void game_set_camera_speed(void);
 
 /* game_4.c */
 void game_exec_function(void (*(target))());
@@ -287,6 +289,15 @@ extern Popup *game_menu_popup;      /* Popup structure for menu */
 void game_write_save_directory(void);
 void game_menu_setup(void);
 void game_menu_shutdown(void);
+
+/* Callback routines in game-specific MAIN module */
+int  main_cheating_key(int mykey);
+int  main_normal_key(int mykey);
+int  main_copy_verify(void);
+void main_cold_data_init(void);
+void main_false_start(void);
+void main_global_init_code(void);
+
 
 } // namespace MADSV2
 } // namespace MADS

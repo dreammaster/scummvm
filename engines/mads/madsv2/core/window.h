@@ -112,12 +112,12 @@ extern void window_set(WindowPtr window, int ul_x, int ul_y, int lr_x, int lr_y)
 /**
  * Draws a line across a window, joining with the edges
  */
-extern void window_line_across(WindowPtr window, short line_y);
+extern void window_line_across(WindowPtr window, int line_y);
 
 /**
  * Sets the color byte for all characters in region
  */
-extern void window_color(WindowPtr window, short new_color);
+extern void window_color(WindowPtr window, int new_color);
 
 /**
  * Clears (sets to space) specified region
@@ -146,17 +146,17 @@ extern int window_vert_detect(WindowPtr window, int x, int y,
 /**
  * Draws up a horizontal scroll bar for the specified window
  */
-extern void window_horiz_scrollbar(WindowPtr window, short bar_color);
+extern void window_horiz_scrollbar(WindowPtr window, int bar_color);
 
 /**
  * Draws up a vertical scroll bar for the specified window
  */
-extern void window_vert_scrollbar(WindowPtr window, short bar_color);
+extern void window_vert_scrollbar(WindowPtr window, int bar_color);
 
 /**
  * Draws the title of the specified window
  */
-extern void window_title(WindowPtr window, const char *title, short title_color, short background_color);
+extern void window_title(WindowPtr window, const char *title, int title_color, int background_color);
 extern void window_abort(const char *message);
 extern byte *window_create(WindowPtr window);
 extern void window_destroy(WindowPtr window);

@@ -32,6 +32,13 @@
 namespace MADS {
 namespace MADSV2 {
 
+word rail_solution_stack_pointer;
+word rail_solution_stack_weight;
+byte rail_visited[RAIL_MAX_NODES];
+byte rail_working_stack[RAIL_MAX_NODES];
+byte rail_solution_stack[RAIL_MAX_NODES];
+word rail_num_nodes;
+byte *rail_base;
 byte rail_active[ROOM_MAX_RAILS + 2];
 
 void rail_connect_node(int id) {

@@ -32,52 +32,52 @@ namespace MADSV2 {
 extern bool fileio_suppress_unbuffering;
 
 
-void fileio_purge_trailing_spaces(char *myline);
-void fileio_name_new_ext(char *bakfile, char *mainfile, const char *new_ext);
-char *fileio_ffgets(char *mystring, int num, Common::SeekableReadStream *stream);
-int fileio_ffputs(const char *mystring, Common::WriteStream *stream);
-char *fileio_fix_lf_input(char *mystring);
-void fileio_fix_lf_output(char *mystring);
-int fileio_copy(const char *source, const char *dest);
-long fileio_setpos(Common::Stream *handle, long pos);
-long fileio_fread_f(void *buffer, long size, long count, Common::SeekableReadStream *stream);
-long fileio_fwrite_f(const void *buffer, long size, long count, Common::WriteStream *stream);
-long fileio_file_to_file(Common::SeekableReadStream *from, Common::WriteStream *to, long count);
-long fileio_get_file_size(const char *filename);
-int fileio_exist(const char *inp);
+extern void fileio_purge_trailing_spaces(char *myline);
+extern void fileio_name_new_ext(char *bakfile, char *mainfile, const char *new_ext);
+extern char *fileio_ffgets(char *mystring, int num, Common::SeekableReadStream *stream);
+extern int fileio_ffputs(const char *mystring, Common::WriteStream *stream);
+extern char *fileio_fix_lf_input(char *mystring);
+extern void fileio_fix_lf_output(char *mystring);
+extern int fileio_copy(const char *source, const char *dest);
+extern long fileio_setpos(Common::Stream *handle, long pos);
+extern long fileio_fread_f(void *buffer, long size, long count, Common::SeekableReadStream *stream);
+extern long fileio_fwrite_f(const void *buffer, long size, long count, Common::WriteStream *stream);
+extern long fileio_file_to_file(Common::SeekableReadStream *from, Common::WriteStream *to, long count);
+extern long fileio_get_file_size(const char *filename);
+extern bool fileio_exist(const char *inp);
 
 /**
  * Returns the identifying portion of the file header in OUTP string
  */
-char *fileio_get_filetype(char *outp, char *inp);
+extern char *fileio_get_filetype(char *outp, char *inp);
 
 /**
  * Returns the DOS time/date stamp for a given file.
  * @return	Returns 0 if file is not found. Returned 32 bit number contains
  * the date stamp in it's upper 16 bits, and the time stamp in it's lower.
  */
-long fileio_get_file_time(char *filename);
+extern long fileio_get_file_time(char *filename);
 
-char *fileio_read_header(char *target, Common::SeekableReadStream *handle);
-void fileio_write_header(char *text, Common::WriteStream *handle);
-char *fileio_get_line(char *target, Common::SeekableReadStream *handle);
-int fileio_put_line(char *source, Common::WriteStream *handle);
-long fileio_get_disk_free(char drive);
-void fileio_add_ext(char *name, const char *ext);
-void fileio_new_ext(char *target, const char *name, const char *ext);
-int fileio_logpath(const char *path);
-char *fileio_parse_filename(char *target, char *filepath);
-char *fileio_parse_path(char *target, const char *filepath);
-char *fileio_swap_path(char *target, const char *base, const char *file);
-char *fileio_join_path(char *target, const char *path, const char *file);
-void fileio_get_volume_label(char *volume_label, char drive_letter);
-int fileio_set_file_time(char *filename, long new_time);
-int fileio_get_file_attributes(const char *filename, word *attributes);
-int fileio_set_file_attributes(const char *filename, word attributes);
-int fileio_read_till_null(char *target, Common::Stream *handle);
-char *fileio_prepend(char *target, const char *source, const char *prepend);
-char *fileio_chop_ext(char *target, const char *source);
-void fileio_purge_all_spaces(char *text);
+extern char *fileio_read_header(char *target, Common::SeekableReadStream *handle);
+extern void fileio_write_header(char *text, Common::WriteStream *handle);
+extern char *fileio_get_line(char *target, Common::SeekableReadStream *handle);
+extern int fileio_put_line(char *source, Common::WriteStream *handle);
+extern long fileio_get_disk_free(char drive);
+extern void fileio_add_ext(char *name, const char *ext);
+extern void fileio_new_ext(char *target, const char *name, const char *ext);
+extern int fileio_logpath(const char *path);
+extern char *fileio_parse_filename(char *target, char *filepath);
+extern char *fileio_parse_path(char *target, const char *filepath);
+extern char *fileio_swap_path(char *target, const char *base, const char *file);
+extern char *fileio_join_path(char *target, const char *path, const char *file);
+extern void fileio_get_volume_label(char *volume_label, char drive_letter);
+extern int fileio_set_file_time(char *filename, long new_time);
+extern int fileio_get_file_attributes(const char *filename, word *attributes);
+extern int fileio_set_file_attributes(const char *filename, word attributes);
+extern int fileio_read_till_null(char *target, Common::Stream *handle);
+extern char *fileio_prepend(char *target, const char *source, const char *prepend);
+extern char *fileio_chop_ext(char *target, const char *source);
+extern void fileio_purge_all_spaces(char *text);
 
 } // namespace MADSV2
 } // namespace MADS
