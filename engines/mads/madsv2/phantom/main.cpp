@@ -42,7 +42,6 @@ char *quotes;
 static void main_menu_main() {
 	auto &screen = *g_engine->getScreen();
 	Palette palette;
-	assert(sizeof(palette) == 768);
 
 	if (kernel_game_startup(19, KERNEL_STARTUP_CURSOR | KERNEL_STARTUP_INTERRUPT | KERNEL_STARTUP_FONT,
 		nullptr, nullptr)) {

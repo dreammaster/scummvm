@@ -31,10 +31,12 @@ MADSV2Engine *g_engine;
 
 MADSV2Engine::MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc) :
 	Engine(syst), _gameDescription(gameDesc) {
+	g_engine = this;
 }
 
 MADSV2Engine::~MADSV2Engine() {
 	delete _screen;
+	g_engine = nullptr;
 }
 
 Common::Error MADSV2Engine::run() {
