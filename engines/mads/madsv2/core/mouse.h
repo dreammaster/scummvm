@@ -83,10 +83,30 @@ extern void mouse_refresh_done();
 extern void mouse_disable_scale();
 extern void mouse_hard_cursor_mode(int mode, Palette *mypal);
 extern const byte *mouse_get_stack();
+
+/**
+ * Returns true if the mouse is in the specified box
+ */
 extern int  mouse_in_box(int ul_x, int ul_y, int lr_x, int lr_y);
+
+/**
+ * Call at beginning of routine which will use double screen
+ * cursor interaction; initializes global variables.
+ */
 extern void mouse_init_cycle();
+
+/**
+ * Call once at beginning of each input loop.  Reads mouse cursor
+ * information, and checks double cursor status.
+ */
 extern void mouse_begin_cycle(int double_flag);
+
+/**
+ * Call once each loop at end of loop.  Clears cursor freedom
+ * semaphore, and performs any timing that might be necessary.
+ */
 extern void mouse_end_cycle(int double_flag, int timing_flag);
+
 extern void mouse_cursor_sprite(SeriesPtr series, int id);
 extern void mouse_video_init();
 extern void mouse_video_update(int from_x, int from_y,

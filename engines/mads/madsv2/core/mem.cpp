@@ -88,7 +88,7 @@ void mem_restore_free(void) {
 	// No implementation
 }
 
-long fastcall mem_conv_get_avail() {
+long mem_conv_get_avail() {
 	return 999999;
 }
 

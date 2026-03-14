@@ -75,18 +75,18 @@ extern char env_null[7];
 
 
 extern int env_verify(void);
-Common::SeekableReadStream *env_open(const char *file_path, const char *options);
-int env_exist(const char *file_name);
-long env_get_file_size(Common::Stream *handle);
-char *env_get_path(char *madspath, const char *infile);
-char *env_catint(char *out, int value, int digits);
-char *env_fill_path(char *path, int env_mode, int env_room);
-char *env_dos_error_name(char *error_buf);
-char *env_get_level_path(char *out, int item_type, const char *file_spec,
+extern Common::SeekableReadStream *env_open(const char *file_path, const char *options);
+extern int env_exist(const char *file_name);
+extern long env_get_file_size(Common::SeekableReadStream *handle);
+extern char *env_get_path(char *madspath, const char *infile);
+extern char *env_catint(char *out, int value, int digits);
+extern char *env_fill_path(char *path, int env_mode, int env_room);
+extern char *env_dos_error_name(char *error_buf);
+extern char *env_get_level_path(char *out, int item_type, const char *file_spec,
 	int first_level, int second_level);
-Common::SeekableReadStream *env_open_level(int item_type, const char *file_spec,
+extern Common::SeekableReadStream *env_open_level(int item_type, const char *file_spec,
 	int level_one, int level_two, const char *options);
-char *env_get(char *target, char *env);
+extern char *env_get(char *target, const char *env);
 
 /**
  * Given a pointer to an environment variable, returns a pointer

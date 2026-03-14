@@ -34,5 +34,19 @@ void video_update() {
 	screen.update();
 }
 
+void video_update(Buffer *from, int from_x, int from_y,
+		int unto_x, int unto_y,
+		int size_x, int size_y) {
+	auto &screen = *g_engine->getScreen();
+	Graphics::Surface subArea = screen.getSubArea(Common::Rect(unto_x, unto_y,
+		unto_x + size_x, unto_y + size_y));
+
+	for (int yp = 0; yp < size_y; ++yp) {
+		const byte *src = from->data + (from_y + yp) * from->x + from_x;
+		byte *dest = (byte *)subArea.getBasePtr(0, yp);
+		Common::copy(src, src + size_x, dest);
+	}
+}
+
 } // namespace MADSV2
 } // namespace MADS

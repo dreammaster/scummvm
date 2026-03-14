@@ -27,6 +27,10 @@
 namespace MADS {
 namespace MADSV2 {
 
+extern char global_release_name[];
+extern char global_release_version[];
+extern char global_release_date[];
+extern char global_release_copyright[];
 
 #define GLOBAL_LIST_SIZE        210     /* Global variables array size */
 
@@ -90,6 +94,34 @@ namespace MADSV2 {
 
 
 /* ================== Section 6  120 - 139 =================== */
+
+
+extern char global_release_name[];
+extern char global_release_version[];
+extern char global_release_date[];
+extern char global_release_copyright[];
+
+extern int global[];
+extern int global_list_size;
+
+void global_init_code(void);
+void global_daemon_code(void);
+void global_pre_parser_code(void);
+void global_parser_code(void);
+void global_error_code(void);
+void global_room_init(void);
+void global_verb_filter(void);
+void global_sound_driver(void);
+void global_section_constructor(void);
+void global_game_menu(void);
+void global_menu_system_init(void);
+void global_menu_system_shutdown(void);
+void global_emergency_save(void);
+void global_read_config_file(void);
+void global_write_config_file(void);
+void global_load_config_parameters(void);
+void global_unload_config_parameters(void);
+int global_copy_verify(void);
 
 } // namespace MADSV2
 } // namespace MADS

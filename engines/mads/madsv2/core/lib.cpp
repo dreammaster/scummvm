@@ -19,12 +19,19 @@
  *
  */
 
-#include "mads/madsv2/core/general.h"
+#include "common/debug.h"
+#include "mads/madsv2/core/lib.h"
 
 namespace MADS {
 namespace MADSV2 {
 
+char mads_dev_lib_version[5] = lib_version;
+char mads_dev_lib_date[11] = lib_date;
 
+void lib_show_version() {
+	debug(1, "(Mads development library version %s as of %s)\n",
+		mads_dev_lib_version, mads_dev_lib_date);
+}
 
 } // namespace MADSV2
 } // namespace MADS

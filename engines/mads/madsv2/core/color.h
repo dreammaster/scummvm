@@ -108,58 +108,91 @@ typedef struct {
 
 typedef ShadowList *ShadowListPtr;
 
+/**
+ * Given a main color (0-15, or 16 for "no translation") and a
+ * thatching color (0-15, same as main color for solid thatch),
+ * produces a valid "thatch" byte.
+ */
+extern byte color_thatch(int color, int thatching);
+extern void color_list_start_scan(byte *list_flags);
 
-/* color_1.c */
-byte color_thatch(int color, int thatching);
-
-void color_list_start_scan(byte *list_flags);
-
-int  color_list_update(ColorListPtr list, Buffer *scan_buf,
+/**
+ * Updates a color list <list>, based on colors used in <scan_buf>
+ * and defined in <scan_pal>.  Adds any colors used in picture but
+ * not defined in list to the list; sets the corresponding color flag
+ * for each color that is used in the buffer.
+ *
+ * @return		Returns # of colors in updated list, or negative for error.
+ */
+extern int color_list_update(ColorListPtr list, Buffer *scan_buf,
 	Palette *scan_pal, byte *list_flags,
 	byte *palette_map, CycleListPtr cycle);
 
-void color_list_purge(ColorListPtr list, byte *list_flags);
+/**
+ * Removes from color list "list" any colors whose corresponding
+ * flags are not set.  (Use after color_list_update to remove colors
+ * no longer being used).  Voids any previously existing palette_map.
+*/
+extern int color_list_purge(ColorListPtr list, byte *list_flags);
 
-int  color_list_palette(ColorListPtr list, Buffer *scan_buf,
+/**
+ * Adds the colors in the given list to the given palette, filling
+ * from the specified "base color".  Also generates a palette_map
+ * which can be used to map palette colors back into the color list.
+*/
+extern int color_list_palette(ColorListPtr list, Buffer *scan_buf,
 	Palette *scan_pal, int base_color,
 	byte *palette_map, CycleListPtr cycle);
 
-void color_list_conform(ColorListPtr list, Buffer *scan_buf,
+/**
+ * Used by roomedit when loading attribute buffers whose colors
+ * are often based on the main image, but which are not necessarily
+ * consistent and may contain additional, if irrelevant, colors.
+ * Conforms the incoming picture with the available palette.  Priority
+ * of actions for each color used is:
+ *         (1) Use equivalent color already existing in palette.
+ *         (2) Allocate a new palette color if available.
+ *         (3) Use "white".
+ */
+extern void color_list_conform(ColorListPtr list, Buffer *scan_buf,
 	Palette *scan_pal, Palette *main_pal,
 	int base_color);
 
-void color_trans_fill_buf(Buffer unto,
-	int unto_x, int unto_y,
-	int size_x, int size_y,
-	byte thatch_color);
+/**
+ * Fills the specified area of the specified buffer with the
+ * specified 16-color thatch (analogous to buffer_rect_fill).
+ */
+extern void color_trans_fill_buf(Buffer unto, int unto_x, int unto_y,
+	int size_x, int size_y, byte thatch_color);
 
-void color_trans_show_buf(Buffer from, Buffer unto,
-	int from_x, int from_y,
-	int unto_x, int unto_y,
-	int size_x, int size_y,
-	ColorListPtr list,
+/**
+ * Copies a rectangle of the buffer "from" into the buffer "unto",
+ * But uses the specified color list and palette map to perform
+ * 256-to-16 color translations.  If "mask_flag" is true, then
+ * displays "white" if a translation exists for a pixel, "black"
+ * otherwise.  If "mask_flag" is false, then translated color is
+ * displayed if available, and untranslated color is displayed
+ * otherwise.
+ *
+ *      Analogous to buffer_rect_copy();
+ */
+extern void color_trans_show_buf(Buffer from, Buffer unto,
+	int from_x, int from_y, int unto_x, int unto_y,
+	int size_x, int size_y, ColorListPtr list,
 	byte *palette_map, int mask_flag);
 
-void color_buffer_palette_to_list(ColorListPtr list,
-	Buffer *scan_buf,
-	byte *palette_map);
+extern void color_buffer_palette_to_list(ColorListPtr list,
+	Buffer *scan_buf, byte *palette_map);
+extern void color_buffer_list_to_palette(Buffer *scan_buf, int marker);
+extern void color_transparent_swap(Buffer *scan_buf, Palette *scan_pal, byte transparent);
+extern void color_buffer_list_to_main(ColorListPtr color_list, Buffer *scan_buf);
+extern void color_buffer_list_to_x16(ColorListPtr color_list, Buffer *scan_buf);
 
-void color_buffer_list_to_palette(Buffer *scan_buf, int marker);
-
-void color_transparent_swap(Buffer *scan_buf,
-	Palette *scan_pal,
-	byte transparent);
-
-
-/* color_2.c */
-void color_buffer_list_to_main(ColorListPtr color_list,
-	Buffer *scan_buf);
-
-/* color_3.c */
-void color_buffer_list_to_x16(ColorListPtr color_list,
-	Buffer *scan_buf);
-
-void color_split_thatch(int thatch, int *color, int *thatching);
+/**
+ * Given a valid thatch byte, returns a primary "color" and
+ * secondary "thatching" color.
+ */
+extern void color_split_thatch(int thatch, int *color, int *thatching);
 
 } // namespace MADSV2
 } // namespace MADS

@@ -88,7 +88,7 @@ void imath_circular_arc(word *buffer, int radius) {
 	}
 }
 
-int fastcall imath_random(int from, int unto) {
+int imath_random(int from, int unto) {
 	return g_engine->getRandomNumber(from, unto);
 }
 

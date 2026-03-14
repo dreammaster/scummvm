@@ -37,7 +37,8 @@
 namespace MADS {
 namespace MADSV2 {
 
-Player player;
+Player player = { 0 };
+Player2 player2 = { 0 };
 
 byte player_facing_to_series[10] = { 0, 7, 4, 3, 6, 0, 2, 5, 0, 1 };
 byte player_clockwise[10] = { 9, 4, 1, 2, 7, 9, 3, 8, 9, 6 };

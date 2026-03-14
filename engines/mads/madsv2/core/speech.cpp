@@ -28,6 +28,7 @@ namespace MADSV2 {
 bool speech_system_active = false;
 bool speech_on = false;
 int speech_ems_handle;
+SpeechBuffer speech_main_buffer;
 
 SpeechDirPtr speech_load(const char *resName, int id, bool) {
 	warning("TODO: speech_load");

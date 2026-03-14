@@ -51,6 +51,8 @@ static const byte cursor_mask[16][16] = {
 	  {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
 };
 
+Buffer mouse_cursor_buffer;
+
 int mouse_button = -1;
 int mouse_status = 0;
 int mouse_x = 0;
@@ -64,6 +66,7 @@ bool mouse_any_stroke = false;
 int mouse_old_x = 0;
 int mouse_old_y = 0;
 long mouse_clock = 0;
+byte mouse_showing = 0;
 
 int mouse_hot_x = 0;
 int mouse_hot_y = 0;
@@ -88,29 +91,12 @@ void mouse_force(int x, int y) {
 	g_system->warpMouse(x, y);
 }
 
-
-/*
-/*      mouse_in_box()
-/*
-/*      Returns true if the mouse is in the specified box
-/*
-*/
-int fastcall mouse_in_box(int ul_x, int ul_y, int lr_x, int lr_y) {
-	return (
-		((mouse_x >= ul_x) && (mouse_x <= lr_x)) &&
-		((mouse_y >= ul_y) && (mouse_y <= lr_y))
-		);
+int mouse_in_box(int ul_x, int ul_y, int lr_x, int lr_y) {
+	return ((mouse_x >= ul_x) && (mouse_x <= lr_x)) &&
+		((mouse_y >= ul_y) && (mouse_y <= lr_y));
 }
 
-
-
-/*
-/*      mouse_init_cycle()
-/*
-/*      Call at beginning of routine which will use double screen
-/*      cursor interaction; initializes global variables.
-*/
-void fastcall mouse_init_cycle(void) {
+void mouse_init_cycle() {
 	mouse_old_x = -1;
 	mouse_old_y = -1;
 
@@ -119,14 +105,7 @@ void fastcall mouse_init_cycle(void) {
 	mouse_start_stroke = false;
 }
 
-
-/*
-/*      mouse_begin_cycle()
-/*
-/*      Call once at beginning of each input loop.  Reads mouse cursor
-/*      information, and checks double cursor status.
-*/
-void fastcall mouse_begin_cycle(int double_flag) {
+void mouse_begin_cycle(int double_flag) {
 	if (double_flag) mouse_check_double();
 
 	mouse_old_x = mouse_x;
@@ -156,13 +135,7 @@ void fastcall mouse_begin_cycle(int double_flag) {
 	mouse_any_stroke = (mouse_stroke_going || mouse_stop_stroke);
 }
 
-/*
-/*      mouse_end_cycle()
-/*
-/*      Call once each loop at end of loop.  Clears cursor freedom
-/*      semaphore, and performs any timing that might be necessary.
-*/
-void fastcall mouse_end_cycle(int double_flag, int timing_flag) {
+void mouse_end_cycle(int double_flag, int timing_flag) {
 	if (double_flag) {
 		mouse_double_freedom(true);
 	}
@@ -222,6 +195,83 @@ void mouse_video_update(int from_x, int from_y, int unto_x, int unto_y,
 	if (refresh_flag) mouse_refresh_done();
 	mouse_thaw();
 }
+
+int mouse_set_hotspot(int spot_x, int spot_y) {
+	return 0;
+}
+
+void mouse_change_cursor_begin() {
+}
+
+void mouse_change_cursor_end() {
+}
+
+void mouse_screen_swap(int mode) {
+	mouse_video_mode = mode;
+}
+
+int mouse_get_video_mode() {
+	return mouse_video_mode;
+}
+
+void mouse_begin_double(int first_video_mode, int second_video_mode,
+	int mono_to_right, int auto_freedom) {
+}
+
+void mouse_check_double() {
+}
+
+void mouse_end_double() {
+}
+
+void mouse_double_freedom(int freedom_flag) {
+}
+
+int mouse_get_status(int *x, int *y) {
+	return 0;
+}
+
+void mouse_timing() {
+}
+
+void mouse_freeze() {
+}
+
+void mouse_thaw() {
+}
+
+void mouse_horiz_bound(int min_x, int max_x) {
+}
+
+void mouse_vert_bound(int min_y, int max_y) {
+}
+
+void mouse_set_work_buffer(byte *work_buffer, int wrap_value) {
+}
+
+void mouse_set_view_port_loc(int x1, int y1, int x2, int y2) {
+}
+
+void mouse_set_view_port(int dx, int dy) {
+}
+
+int mouse_refresh_view_port() {
+	return 0;
+}
+
+void mouse_refresh_done() {
+}
+
+void mouse_disable_scale() {
+}
+
+void mouse_hard_cursor_mode(int mode, Palette *mypal) {
+}
+
+const byte *mouse_get_stack() {
+	error("TODO: mouse_get_stack");
+}
+
 } // namespace MADSV2
 } // namespace MADS
 

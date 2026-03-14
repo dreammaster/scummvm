@@ -34,8 +34,16 @@ word timer_noise_on;
 byte timer_copy_protect_in = 0;
 byte timer_copy_protect_out = 0;
 
-extern long timer_600_low;
-extern long timer_60_low;
+word timer_low_priority;
+word timer_low_semaphore;
+word timer_low_stacking;
+word timer_low_deferred;
+void *timer_low_routine;
+
+long timer_600_low;
+long timer_60_low;
+long timer_dos_low;
+
 
 /*
 /*      Reads system clock, returns number of ticks since midnight.

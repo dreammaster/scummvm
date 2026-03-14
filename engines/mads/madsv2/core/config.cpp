@@ -19,26 +19,12 @@
  *
  */
 
-#include "mads/madsv2/core/general.h"
-#include "mads/madsv2/core/mem.h"
+#include "mads/madsv2/core/config.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-bool buffer_free(Buffer *buf) {
-	bool flag = false;
-
-	if (buf->data != NULL) {
-		mem_free(buf->data);
-		flag = true;
-	}
-
-	buf->data = NULL;
-	buf->x = 0;
-	buf->y = 0;
-
-	return flag;
-}
+ConfigFile config_file;
 
 } // namespace MADSV2
 } // namespace MADS

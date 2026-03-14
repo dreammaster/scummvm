@@ -19,30 +19,15 @@
  *
  */
 
-#ifndef MADS_CORE_DIGI_H
-#define MADS_CORE_DIGI_H
-
-#include "mads/madsv2/core/general.h"
+#include "common/textconsole.h"
+#include "mads/madsv2/core/sound.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern bool digi_trigger_dialog;
-extern bool digi_trigger_ambiance;
-extern bool digi_trigger_effect;
-
-
-void digi_install();
-void digi_play(char name[30], int slot);
-void digi_play_build(int room, char thing, int num, int slot);
-void digi_play_build_ii(char thing, int num, int slot);
-void digi_stop(int which_one);
-void digi_uninstall();
-void digi_read_another_chunk();
-void digi_initial_volume(int vol);
-void digi_set_volume(int vol, int slot);
+void sound_queue(int soundNum) {
+	error("TODO: sound_queue");
+}
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

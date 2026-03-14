@@ -33,6 +33,7 @@ namespace MADSV2 {
 
 extern int art_hags_are_on_hd;
 
+int env_privileges;
 int env_search_mode = ENV_SEARCH_MADS_PATH;
 int env_search_cd = false;
 char env_cd_drive = 'D';
@@ -60,6 +61,11 @@ static const char env_slash_string[3] = "\\";
 static const char env_speech1_string[8] = "SPEECH1";
 static const char env_speech2_string[8] = "SPEECH2";
 
+
+int env_verify() {
+	return 0;
+}
+
 char *env_catint(char *out, int value, int digits) {
 	int mark;
 	int power;
@@ -83,14 +89,11 @@ char *env_catint(char *out, int value, int digits) {
 	return (out);
 }
 
-
 static void path_concat(char *target, const char *string) {
 	Common::strcat_s(target, 65536, string);
 	Common::strcat_s(target, 65536, env_slash_string);
 }
 
-
-/* char *path = 'd322u001.rac' */
 char *env_fill_path(char *path, int env_mode, int env_room) {
 	Common::String madsptr;
 	char *infile;
@@ -185,13 +188,11 @@ char *env_fill_path(char *path, int env_mode, int env_room) {
 	return madspath;
 }
 
-char *env_get_path(char *madspath, char *infile) {
-	/* char *madsptr; */
+char *env_get_path(char *madspath, const char *infile) {
 	char *mark;
-	/* int  madslen;  */
-	int  env_mode;
-	int  env_room = 0;
-	int  env_sect = 0;
+	int env_mode;
+	int env_room = 0;
+	int env_sect = 0;
 	char temp_buf_1[80];
 	char temp_buf_2[80];
 
@@ -286,19 +287,20 @@ char *env_get_path(char *madspath, char *infile) {
 	return madspath;
 }
 
-Common::SeekableReadStream *env_open(char *file_path, const char *options) {
+Common::SeekableReadStream *env_open(const char *filename, const char *options) {
 	int error_flag = true;
 	int count;
 	int found;
 	int num_files;
 	long mem_to_get;
+	char file_path[80];
 	char index_file[80];
 	char temp_file[80];
 	char load_file[80];
 	char temp_buf[80];
 	char check_buf[80];
 
-	char *mark;
+	const char *mark;
 	Common::SeekableReadStream *index_handle = NULL;
 	Common::SeekableReadStream *handle = NULL;
 	Concat concat;
@@ -307,6 +309,7 @@ Common::SeekableReadStream *env_open(char *file_path, const char *options) {
 
 	if (env_get_path(load_file, file_path) == NULL) goto done;
 
+	Common::strcpy_s(file_path, filename);
 	mark = strchr(file_path, '*');
 
 	mads_strupr(file_path);
@@ -584,7 +587,7 @@ char *env_dos_error_name(char *error_buf) {
 	return error_buf;
 }
 
-char *env_get_level_path(char *out, int item_type, char *file_spec, int first_level, int second_level) {
+char *env_get_level_path(char *out, int item_type, const char *file_spec, int first_level, int second_level) {
 	char temp_buf[80];
 	char *result;
 

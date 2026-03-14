@@ -58,7 +58,7 @@ int magic_low_fade_bound = 1;
 int magic_high_fade_bound = 252;
 
 
-void fastcall magic_get_grey_values(Palette *pal, byte *grey_value,
+void magic_get_grey_values(Palette *pal, byte *grey_value,
 	int base_color, int num_colors) {
 	int i;
 	for (i = 0; i < num_colors; i++) {
@@ -66,7 +66,7 @@ void fastcall magic_get_grey_values(Palette *pal, byte *grey_value,
 	}
 }
 
-void fastcall magic_grey_palette(Palette *pal) {
+void magic_grey_palette(Palette *pal) {
 	byte grey[256];
 	int  count;
 
@@ -87,7 +87,7 @@ void fastcall magic_grey_palette(Palette *pal) {
 /*      produces a 64-byte "grey_table" containing the number of grey
 /*      values of each intensity level.
 */
-void fastcall magic_grey_popularity(byte *grey_list, byte *grey_table, int num_colors) {
+void magic_grey_popularity(byte *grey_list, byte *grey_table, int num_colors) {
 	int i;
 	memset(grey_table, 0, 64);
 	for (i = 0; i < num_colors; i++) {
@@ -95,19 +95,19 @@ void fastcall magic_grey_popularity(byte *grey_list, byte *grey_table, int num_c
 	}
 }
 
-void fastcall magic_set_color_flags(byte r, byte g, byte b) {
+void magic_set_color_flags(byte r, byte g, byte b) {
 	magic_color_flags[0] = r;
 	magic_color_flags[1] = g;
 	magic_color_flags[2] = b;
 }
 
-void fastcall magic_set_color_values(byte r, byte g, byte b) {
+void magic_set_color_values(byte r, byte g, byte b) {
 	magic_color_values[0] = r;
 	magic_color_values[1] = g;
 	magic_color_values[2] = b;
 }
 
-void fastcall magic_map_to_grey_ramp(Palette *pal,
+void magic_map_to_grey_ramp(Palette *pal,
 	int base_color, int num_colors,
 	int base_grey, int num_greys,
 	MagicGreyPtr magic_map) {
@@ -188,7 +188,7 @@ void fastcall magic_map_to_grey_ramp(Palette *pal,
 }
 
 
-void fastcall magic_grey_ramp_palette(Palette pal, int num_greys) {
+void magic_grey_ramp_palette(Palette pal, int num_greys) {
 	int base_grey;
 	int base_color, num_colors;
 	int count;
@@ -206,7 +206,7 @@ void fastcall magic_grey_ramp_palette(Palette pal, int num_greys) {
 }
 
 
-void fastcall magic_fade_to_grey(Palette pal, byte *map_pointer,
+void magic_fade_to_grey(Palette pal, byte *map_pointer,
 	int base_color, int num_colors,
 	int base_grey, int num_greys,
 	int tick_delay, int steps) {
@@ -307,7 +307,7 @@ done:
 }
 
 
-void fastcall magic_fade_from_grey(RGBcolor *pal, Palette target,
+void magic_fade_from_grey(RGBcolor *pal, Palette target,
 	int base_color, int num_colors,
 	int base_grey, int num_greys,
 	int tick_delay, int steps) {
@@ -413,7 +413,7 @@ done:
 /*      corners is pulled diagonally across the screen to bring in
 /*      the new view.
 */
-void fastcall magic_screen_change_corner(Buffer *new_screen, Palette pal,
+void magic_screen_change_corner(Buffer *new_screen, Palette pal,
 	int corner_id,
 	int buffer_base_x, int buffer_base_y,
 	int screen_base_x, int screen_base_y,
@@ -568,7 +568,7 @@ void fastcall magic_screen_change_corner(Buffer *new_screen, Palette pal,
 /*      Picture-to-picture transition in which the new picture sweeps
 /*      in from either the right or left edge.
 */
-void fastcall magic_screen_change_edge(Buffer *new_screen, Palette pal,
+void magic_screen_change_edge(Buffer *new_screen, Palette pal,
 	int edge_id,
 	int buffer_base_x, int buffer_base_y,
 	int screen_base_x, int screen_base_y,
@@ -678,7 +678,7 @@ void fastcall magic_screen_change_edge(Buffer *new_screen, Palette pal,
 /*      brought in with either expanding or contracting concentric
 *       circles.
 */
-void fastcall magic_screen_change_circle(Buffer *new_screen, Palette pal,
+void magic_screen_change_circle(Buffer *new_screen, Palette pal,
 	int inward_flag,
 	int buffer_base_x, int buffer_base_y,
 	int screen_base_x, int screen_base_y,
@@ -840,7 +840,7 @@ void fastcall magic_screen_change_circle(Buffer *new_screen, Palette pal,
 	mouse_show();
 }
 
-void fastcall magic_shrink_buffer(Buffer *from, Buffer *unto) {
+void magic_shrink_buffer(Buffer *from, Buffer *unto) {
 	char *from_ptr;
 	char *unto_ptr;
 	int x_count, y_count;
@@ -892,7 +892,7 @@ void fastcall magic_shrink_buffer(Buffer *from, Buffer *unto) {
 }
 
 
-int  fastcall magic_shrinking_buffer(Buffer *source, Buffer *rear,
+int  magic_shrinking_buffer(Buffer *source, Buffer *rear,
 	int grow_flag,
 	int buffer_base_x, int buffer_base_y,
 	int screen_base_x, int screen_base_y,
@@ -1066,7 +1066,7 @@ done:
 }
 
 
-void fastcall magic_swap_me_in_the_dark_baby(byte *swap,
+void magic_swap_me_in_the_dark_baby(byte *swap,
 	RGBcolor *pal,
 	int start) {
 	int static_start;
@@ -1095,7 +1095,7 @@ void fastcall magic_swap_me_in_the_dark_baby(byte *swap,
 }
 
 
-void fastcall magic_swap_foreground(byte *background_table,
+void magic_swap_foreground(byte *background_table,
 	Palette background_palette) {
 	int     count;
 	byte *old_palette;
@@ -1145,7 +1145,7 @@ done:
 	}
 }
 
-int fastcall magic_closest_color(RGBcolor *match_color,
+int magic_closest_color(RGBcolor *match_color,
 	byte *list,
 	int list_wrap,
 	int list_length) {

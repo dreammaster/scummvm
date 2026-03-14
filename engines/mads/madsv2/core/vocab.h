@@ -80,7 +80,7 @@ extern char *vocab_get_word(char *out, int inp);
  */
 extern int vocab_write_file(const char *last_word);
 
-extern int vocab_add_word(char *inp);
+extern int vocab_add_word(const char *inp);
 extern void vocab_report_error(int number);
 extern char *vocab_select_word(char *out, const char *prompt, const char *default_word);
 extern void vocab_maint(void);

@@ -27,6 +27,16 @@
 namespace MADS {
 namespace MADSV2 {
 
+#define CMP_BINARY             0
+#define CMP_ASCII              1
+
+#define CMP_NO_ERROR           0
+#define CMP_INVALID_DICTSIZE   1
+#define CMP_INVALID_MODE       2
+#define CMP_BAD_DATA           3
+#define CMP_ABORT              4
+
+
 extern word pFABcomp(
 	word (*read_buff)(char *buffer, word *size),
 	word (*write_buff)(char *buffer, word *size),
@@ -48,15 +58,6 @@ extern word pFABexp2(
 	byte *read_buf,
 	byte *write_buf,
 	char *work_buff);
-
-#define CMP_BINARY             0
-#define CMP_ASCII              1
-
-#define CMP_NO_ERROR           0
-#define CMP_INVALID_DICTSIZE   1
-#define CMP_INVALID_MODE       2
-#define CMP_BAD_DATA           3
-#define CMP_ABORT              4
 
 } // namespace MADSV2
 } // namespace MADS

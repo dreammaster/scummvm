@@ -304,7 +304,7 @@ static int get_keystroke(const char *prompt) {
 	return key_stroke;
 }
 
-ItemPtr dialog_add_button(DialogPtr dialog, int x, int y, char *prompt) {
+ItemPtr dialog_add_button(DialogPtr dialog, int x, int y, const char *prompt) {
 	ItemPtr item = NULL;
 	char *space;
 	int space_look;
@@ -395,7 +395,7 @@ void dialog_grey_checkbox(ItemPtr item) {
 	}
 }
 
-ItemPtr dialog_add_message(DialogPtr dialog, int x, int y, char *prompt) {
+ItemPtr dialog_add_message(DialogPtr dialog, int x, int y, const char *prompt) {
 	ItemPtr item = NULL;
 	char *space = NULL;
 
@@ -643,10 +643,10 @@ ItemPtr dialog_append_list(DialogPtr dialog, int x, int y, ItemPtr base_string,
 	return listitem;
 }
 
-ItemPtr dialog_add_filename(DialogPtr dialog, int x, int y, char *prompt,
-	char *default_val, char *path, int rows,
-	char *filebuf, int max_file_elements,
-	char *dirsbuf, int max_dirs_elements) {
+ItemPtr dialog_add_filename(DialogPtr dialog, int x, int y, const char *prompt,
+		const char *default_val, const char *path, int rows,
+		char *filebuf, int max_file_elements,
+		char *dirsbuf, int max_dirs_elements) {
 	ItemPtr item, listitem, dirsitem;
 	ListPtr list, dirs;
 	int list_num, dirs_num;
@@ -3323,9 +3323,8 @@ void dialog_set_alert_colors(int normal, int select, int hilite) {
 	alert_hilite_color = hilite;
 }
 
-int dialog_alert(int x, int y, int buttons,
-	char *string1, char *string2,
-	char *string3, char *string4) {
+int dialog_alert(int x, int y, int buttons, const char *string1,
+		const char *string2, const char *string3, const char *string4) {
 	DialogPtr dialog;
 	int num_buttons;
 	int button_width;
@@ -3497,8 +3496,8 @@ int dialog_alert_center(int buttons,
 	return dialog_alert(DD_CENTER, DD_CENTER, buttons, string1, string2, string3, string4);
 }
 
-int dialog_alert_ok(char *string1, char *string2,
-	char *string3, char *string4) {
+int dialog_alert_ok(const char *string1, const char *string2,
+		const char *string3, const char *string4) {
 	return dialog_alert(DD_CENTER, DD_CENTER, DD_OK_BUTTON, string1, string2, string3, string4);
 }
 
@@ -3507,7 +3506,7 @@ void dialog_newsay(int x, int y) {
 	dialog_create(say_dialog, x, y, DD_AUTO, DD_DEFAULT, DD_DEFAULT, DD_DEFAULT);
 }
 
-void dialog_say(char *message, int x) {
+void dialog_say(const char *message, int x) {
 	dialog_add_message(say_dialog, x, DD_IY_AUTOFILL, message);
 }
 
@@ -3548,19 +3547,19 @@ Window dialog_sayit(int saymode) {
 	return say_dialog->window;
 }
 
-ItemPtr dialog_left_message(DialogPtr dialog, char *prompt) {
+ItemPtr dialog_left_message(DialogPtr dialog, const char *prompt) {
 	return dialog_add_message(dialog, DD_IX_LEFT, DD_IY_AUTOFILL, prompt);
 }
 
-ItemPtr dialog_center_message(DialogPtr dialog, char *prompt) {
+ItemPtr dialog_center_message(DialogPtr dialog, const char *prompt) {
 	return dialog_add_message(dialog, DD_IX_CENTER, DD_IY_AUTOFILL, prompt);
 }
 
-ItemPtr dialog_left_string(DialogPtr dialog, char *prompt, char *string, int width) {
+ItemPtr dialog_left_string(DialogPtr dialog, const char *prompt, const char *string, int width) {
 	return dialog_add_string(dialog, DD_IX_LEFT, DD_IY_AUTOFILL, prompt, string, width);
 }
 
-ItemPtr dialog_left_button(DialogPtr dialog, char *prompt) {
+ItemPtr dialog_left_button(DialogPtr dialog, const char *prompt) {
 	return dialog_add_button(dialog, DD_IX_LEFT, DD_IY_BUTTON, prompt);
 }
 

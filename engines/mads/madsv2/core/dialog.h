@@ -433,7 +433,7 @@ extern int dialog_alert_center(int buttons, const char *string1,
 extern int dialog_alert_ok(const char *string1, const char *string2,
 	const char *string3, const char *string4);
 extern void dialog_newsay(int x, int y);
-extern void dialog_say(char *message, int x);
+extern void dialog_say(const char *message, int x);
 extern Window dialog_sayit(int saymode);
 
 extern ItemPtr dialog_left_message(DialogPtr dialog, const char *prompt);

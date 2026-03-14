@@ -19,30 +19,52 @@
  *
  */
 
-#ifndef MADS_CORE_DIGI_H
-#define MADS_CORE_DIGI_H
-
-#include "mads/madsv2/core/general.h"
+#include "common/textconsole.h"
+#include "mads/madsv2/core/digi.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern bool digi_trigger_dialog;
-extern bool digi_trigger_ambiance;
-extern bool digi_trigger_effect;
+bool digi_trigger_dialog;
+bool digi_trigger_ambiance;
+bool digi_trigger_effect;
 
 
-void digi_install();
-void digi_play(char name[30], int slot);
-void digi_play_build(int room, char thing, int num, int slot);
-void digi_play_build_ii(char thing, int num, int slot);
-void digi_stop(int which_one);
-void digi_uninstall();
-void digi_read_another_chunk();
-void digi_initial_volume(int vol);
-void digi_set_volume(int vol, int slot);
+void digi_install() {
+	// No implementation in ScummVM
+}
+
+void digi_uninstall() {
+	// No implementation in ScummVM
+}
+
+void digi_play(char name[30], int slot) {
+	warning("TODO: digi_play");
+}
+
+void digi_play_build(int room, char thing, int num, int slot) {
+	warning("TODO: digi_play_build");
+}
+
+void digi_play_build_ii(char thing, int num, int slot) {
+	warning("TODO: digi_play_build_ii");
+}
+
+void digi_stop(int which_one) {
+	warning("TODO: digi_stop");
+}
+
+void digi_read_another_chunk() {
+	warning("TODO: digi_read_another_chunk");
+}
+
+void digi_initial_volume(int vol) {
+	warning("TODO: digi_initial_volume");
+}
+
+void digi_set_volume(int vol, int slot) {
+	warning("TODO: digi_set_volume");
+}
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

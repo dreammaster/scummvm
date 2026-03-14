@@ -93,49 +93,22 @@ typedef struct {
 } TileMapHeader;
 
 extern ShadowList tile_shadow;
-
-
-/* tile_1.c */
-int tile_load(char *base,
-	int           tile_type,
-	TileResource *tile_resource,
-	TileMapHeader *map,
-	Buffer *picture,
-	ColorListPtr  color_list,
-	CycleListPtr  cycle_list,
-	int           ems_handle,
-	int           load_flags);
-
 extern int tile_load_error;
-
-/* tile_2.c */
-int tile_buffer(Buffer *target,
-	TileResource *tile_resource,
-	TileMapHeader *map,
-	int           tile_x,
-	int           tile_y);
-
-/* tile_3.c */
 extern int tile_ems_available;
 extern int tile_picture_handle;
 extern int tile_attribute_handle;
 
-int tile_setup(void);
 
-/* tile_4.c */
-void tile_map_free(TileMapHeader *map);
-
-/* tile_5.c */
-void tile_pan(TileMapHeader *tile_map,
-	int           x,
-	int           y);
-
-/* tile_6.c */
-int tile_fake_map(int tile_type,
-	TileMapHeader *tile_map,
-	Buffer *buffer,
-	int           x,
-	int           y);
+extern int tile_load(const char *base, int tile_type, TileResource *tile_resource,
+	TileMapHeader *map, Buffer *picture, ColorListPtr color_list,
+	CycleListPtr cycle_list, int ems_handle, int load_flags);
+extern int tile_buffer(Buffer *target, TileResource *tile_resource,
+	TileMapHeader *map, int tile_x, int tile_y);
+extern int tile_setup(void);
+extern void tile_map_free(TileMapHeader *map);
+extern void tile_pan(TileMapHeader *tile_map, int x, int y);
+extern int tile_fake_map(int tile_type, TileMapHeader *tile_map,
+	Buffer *buffer, int x, int y);
 
 } // namespace MADSV2
 } // namespace MADS

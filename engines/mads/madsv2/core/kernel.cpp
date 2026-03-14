@@ -69,7 +69,7 @@ namespace MADSV2 {
 extern int first_inven;
 
 #define OMR 40  /* OUAF_MAX_ROOMS in global.mac */
-extern int room_state[OMR];
+int room_state[OMR];
 
 byte video_mode;
 RoomPtr room     = NULL;

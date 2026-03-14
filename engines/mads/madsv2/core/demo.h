@@ -32,8 +32,8 @@ int demo_checksum(byte **source, int *pack_size, int *unpack_size);
 int demo_check(void);
 
 /* demo_2.cpp */
-void fastcall demo_log_in(char *release_version, char *release_date);
-void fastcall demo_verify(void);
+void demo_log_in(char *release_version, char *release_date);
+void demo_verify(void);
 
 } // namespace MADSV2
 } // namespace MADS

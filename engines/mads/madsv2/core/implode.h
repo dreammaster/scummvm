@@ -22,7 +22,7 @@
 #ifndef MADS_CORE_IMPLODE_H
 #define MADS_CORE_IMPLODE_H
 
-#include "common/scummsys.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {

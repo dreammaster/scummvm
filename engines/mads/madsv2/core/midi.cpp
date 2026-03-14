@@ -19,30 +19,39 @@
  *
  */
 
-#ifndef MADS_CORE_DIGI_H
-#define MADS_CORE_DIGI_H
-
-#include "mads/madsv2/core/general.h"
+#include "common/textconsole.h"
+#include "mads/madsv2/core/midi.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-extern bool digi_trigger_dialog;
-extern bool digi_trigger_ambiance;
-extern bool digi_trigger_effect;
+void midi_install() {
+	// No implementation in ScummVM
+}
 
+void midi_uninstall() {
+	// No implementation in ScummVM
+}
 
-void digi_install();
-void digi_play(char name[30], int slot);
-void digi_play_build(int room, char thing, int num, int slot);
-void digi_play_build_ii(char thing, int num, int slot);
-void digi_stop(int which_one);
-void digi_uninstall();
-void digi_read_another_chunk();
-void digi_initial_volume(int vol);
-void digi_set_volume(int vol, int slot);
+void midi_play(char name[30]) {
+	warning("TODO: midi_play");
+}
+
+void midi_stop() {
+	warning("TODO: midi_stop");
+}
+
+void midi_pause() {
+	warning("TODO: midi_pause");
+}
+
+void midi_resume() {
+	warning("TODO: midi_resume");
+}
+
+void midi_loop() {
+	warning("TODO: midi_loop");
+}
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

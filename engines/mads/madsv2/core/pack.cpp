@@ -36,6 +36,7 @@ namespace MADSV2 {
 byte *pack_special_buffer = NULL;
 void (*(pack_special_function))() = NULL;
 byte *pack_read_memory_ptr;
+byte *pack_write_memory_ptr;
 long pack_read_size;            /* Size left to read   */
 long pack_read_count;           /* Size read so far    */
 long pack_write_size;           /* Size left to write  */
@@ -102,7 +103,7 @@ word (*pack_pFABexp2_routine)(
 	char *work_buff) = NULL;
 
 
-word pack_read_memory(void *buffer, word *mysize) {
+word pack_read_memory(char *buffer, word *mysize) {
 	word cx = *mysize;
 	uint32 remaining = pack_read_size;
 	word return_value = 0;
@@ -182,7 +183,7 @@ done:
 	return read_this_time;
 }
 
-word pack_write_file(void *buffer, word *size) {
+word pack_write_file(char *buffer, word *size) {
 	word write_this_time;
 
 	if (pack_write_size >= 0) {

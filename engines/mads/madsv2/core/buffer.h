@@ -174,7 +174,7 @@ extern bool buffer_get_delta_bounds(Buffer buf1, Buffer buf2,
  * @param y		y
  * @return		Pointer
  */
-extern byte *fastcall buffer_pointer(Buffer *buf, int x, int y);
+extern byte *buffer_pointer(Buffer *buf, int x, int y);
 
 extern bool buffer_conform(Buffer *buffer, int *x, int *y,
 	int *xs, int *ys);

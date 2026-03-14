@@ -44,6 +44,7 @@
 namespace MADS {
 namespace MADSV2 {
 
+RoomDef roomdef;
 int room_load_error = 0;
 byte room_loaded_depth = false;
 byte room_loaded_walk = false;
@@ -325,77 +326,12 @@ done:
 		room_dump_attribute(depth, walk, special, depthMap);
 	}
 
-	return (error_flag);
+	return error_flag;
 }
-
 
 int room_compile_hotspots(int id, int compression) {
-	int error_flag;
-	int num_spots;
-	int loaded_it_here = false;
-	int count;
-	char temp_buf[80];
-	HotSpotEdit hotspotedit;
-	HotSpot hotspot[ROOM_MAX_HOTSPOTS];
-	Common::SeekableReadStream *handle;
-	Load load_handle;
-
-	error_flag = true;
-
-	handle = NULL;
-	load_handle.open = false;
-
-	if (vocab_allocation == 0) {
-		if (vocab_load(true) <= 0) {
-			if (vocab_load(false) <= 0) goto done;
-		}
-		loaded_it_here = true;
-	}
-
-	handle = env_open_level(ROOM, ".HOT", 0, id, "rb");
-	if (handle == NULL) goto done;
-
-	env_get_level_path(temp_buf, ROOM, ".HH", 0, id);
-	if (loader_open(&load_handle, temp_buf, "wb", compression)) goto done;
-	loader_set_priority(&load_handle, PACK_PRIORITY_ROOM_HOTSPOTS);
-
-	if (!fileio_fread_f(&num_spots, sizeof(int), 1, handle)) goto done;
-	if (!loader_write(&num_spots, sizeof(int), 1, &load_handle)) goto done;
-
-	for (count = 0; count < num_spots; count++) {
-		if (!fileio_fread_f(&hotspotedit, sizeof(HotSpotEdit), 1, handle)) goto done;
-		memcpy(&hotspot[count], &hotspotedit, sizeof(HotSpot));
-		hotspot[count].vocab = vocab_get_code(hotspotedit.vocab);
-		if (hotspot[count].vocab == 0) {
-			hotspot[count].vocab = vocab_add_word(hotspotedit.vocab);
-		}
-		if (strlen(hotspotedit.verb) == 0) {
-			hotspot[count].verb = 0;
-		} else {
-			hotspot[count].verb = vocab_get_code(hotspotedit.verb);
-			if (hotspot[count].verb == 0) {
-				hotspot[count].verb = vocab_add_word(hotspotedit.verb);
-			}
-		}
-		hotspot[count].cursor_number = hotspotedit.cursor_number;
-		hotspot[count].syntax = hotspotedit.syntax;
-		hotspot[count].active = true;
-	}
-	num_spots = MAX(num_spots, 1);
-	if (!loader_write(&hotspot[0], sizeof(HotSpot) * num_spots, 1, &load_handle)) goto done;
-
-	error_flag = false;
-
-done:
-	delete handle;
-	if (load_handle.open)
-		loader_close(&load_handle);
-	if (loaded_it_here) {
-		vocab_destroy();
-	}
-	return (error_flag);
+	error("TODO: room_compile_hotspots");
 }
-
 
 HotPtr room_load_hotspots(int id, int *num_spots) {
 	HotPtr spots;
@@ -438,14 +374,6 @@ done:
 	return result;
 }
 
-
-/*
-/*      room_read_pict()
-/*
-/*      Reads the . file for the specified room into the "room" structure.
-/*
-/*      Returns 0 if successful, or -1 for error.
-*/
 int room_read_pict(int room_code, char *room_file, int mads_mode) {
 	int result = -1;
 	int count;
@@ -531,7 +459,6 @@ void room_file_name(char *target, const char *suffix, int code, char *main_name,
 	}
 }
 
-
 void room_himem_preload(int roomNum, int level) {
 	himem_preload_series(kernel_full_name(roomNum, 0, -1, NULL, KERNEL_DAT), level);
 	himem_preload_series(kernel_full_name(roomNum, 0, -1, NULL, KERNEL_HH), level);
@@ -544,7 +471,6 @@ void room_himem_preload(int roomNum, int level) {
 	himem_preload_series(kernel_full_name(roomNum, 0, 0, NULL, KERNEL_MM), level);
 	himem_preload_series(kernel_full_name(roomNum, 0, 0, NULL, KERNEL_WW), level);
 }
-
 
 int room_picture_load(int roomId, Buffer *picture, int load_flags) {
 	int error_flag = true;
@@ -611,11 +537,11 @@ done:
 	if (load_handle.open) {
 		loader_close(&load_handle);
 	}
-	return (error_flag);
+
+	return error_flag;
 }
 
-
-void room_resolve_base(char *base, char *file, int id, char *base_path) {
+void room_resolve_base(char *base, char *file, int id, const char *base_path) {
 	int mads_mode;
 
 	mads_mode = !(id < 0);
@@ -742,8 +668,10 @@ int room_invert(void) {
 	error_flag = false;
 
 done:
-	if (work != NULL) mem_free(work);
-	return (error_flag);
+	if (work != NULL)
+		mem_free(work);
+
+	return error_flag;
 }
 
 } // namespace MADSV2

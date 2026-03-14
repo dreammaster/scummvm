@@ -32,6 +32,54 @@
 namespace MADS {
 namespace MADSV2 {
 
+ /* -------------------------------------------------------------------------
+  * Constants
+  * ---------------------------------------------------------------------- */
+
+#define RAIL_STRUCTURE_SIZE             48
+#define RAIL_STRUCTURE_WEIGHT_OFFSET    4   /* byte offset of weight[] within a rail node */
+
+#define RAIL_WEIGHT_MASK                0x3FFF
+#define RAIL_ALLOW_ILLEGAL              0xC000
+#define RAIL_ALLOW_LEGAL_ONLY           0x8000
+
+  /* -------------------------------------------------------------------------
+   * Rail node structure
+   *
+   * Each node is RAIL_STRUCTURE_SIZE (48) bytes.  The weight array starts at
+   * byte offset RAIL_STRUCTURE_WEIGHT_OFFSET (4), and is indexed by node
+   * number.  Each weight entry is one word (2 bytes).
+   *
+   * The upper two bits of each weight word encode legality:
+   *   RAIL_ALLOW_ILLEGAL    (0xC000) -- path exists, even through illegal area
+   *   RAIL_ALLOW_LEGAL_ONLY (0x8000) -- path exists, legal only
+   *   0x0000                         -- no path
+   * The lower 14 bits (RAIL_WEIGHT_MASK) hold the actual traversal weight.
+   *
+   * The struct below matches the 48-byte layout exactly:
+   *   4 bytes of header data before the weight array,
+   *   then RAIL_MAX_NODES (12) weight words = 24 bytes,
+   *   padding to reach 48 bytes total.
+   * ---------------------------------------------------------------------- */
+typedef struct {
+	unsigned char header[RAIL_STRUCTURE_WEIGHT_OFFSET];    /* 4 bytes */
+	uint16 weight[RAIL_MAX_NODES];                 /* 24 bytes (12 words) */
+	unsigned char padding[48 - 4 - 24];                   /* 20 bytes padding */
+} RailNode;
+
+/* -------------------------------------------------------------------------
+ * Global variables  (COMM in the original -- shared across modules)
+ * ---------------------------------------------------------------------- */
+uint16  _rail_solution_stack_pointer;
+uint16  _rail_solution_stack_weight;
+
+unsigned char   _rail_visited[RAIL_MAX_NODES];
+unsigned char   _rail_working_stack[RAIL_MAX_NODES];
+unsigned char   _rail_solution_stack[RAIL_MAX_NODES];
+
+uint16  _rail_num_nodes;
+RailNode *_rail_base;         /* far ptr in original; flat ptr here */
+
 word rail_solution_stack_pointer;
 word rail_solution_stack_weight;
 byte rail_visited[RAIL_MAX_NODES];
@@ -40,6 +88,7 @@ byte rail_solution_stack[RAIL_MAX_NODES];
 word rail_num_nodes;
 byte *rail_base;
 byte rail_active[ROOM_MAX_RAILS + 2];
+
 
 void rail_connect_node(int id) {
 	int count;
@@ -115,6 +164,106 @@ void rail_connect_all_nodes(void) {
 	for (count = 0; count < room->num_rails; count++) {
 		rail_connect_node(count);
 	}
+}
+
+
+/**
+ * Parameters (passed in registers in the original):
+ *   node_id      -- BX: node currently being evaluated
+ *   weight       -- DX: cumulative weight for this solution attempt
+ *   allow_mode   -- AX: RAIL_ALLOW_ILLEGAL or RAIL_ALLOW_LEGAL_ONLY
+ *
+ * Stack state:
+ *   working_sp   -- SI in the original: index into _rail_working_stack,
+ *                   acting as a simple push-down stack pointer.
+ *
+ * The function is recursive and modifies the globals directly.
+ */
+static void recursive_check_path(int node_id,
+	uint16 weight,
+	uint16 allow_mode,
+	int working_sp) {
+	/* visited[node_id] = true */
+	_rail_visited[node_id] = 1;
+
+	/* push(node_id) onto working stack */
+	_rail_working_stack[working_sp] = (unsigned char)node_id;
+	working_sp++;
+
+	/* Point at rail[node_id] */
+	RailNode *node = &_rail_base[node_id];
+
+	/* The source node is second-to-last: index = num_nodes - 2.
+	   We look up the weight from node_id to the source (from_node). */
+	int from_node = _rail_num_nodes - 2;
+	uint16 raw_weight = node->weight[from_node];
+
+	/* Check whether there is a direct legal path to the destination */
+	if (raw_weight & allow_mode) {
+		uint16 leg_weight = raw_weight & RAIL_WEIGHT_MASK;
+		uint16 total = weight + leg_weight;
+
+		if (total < _rail_solution_stack_weight) {
+			/* This is a better solution -- save it */
+			int stack_len = working_sp; /* number of bytes currently on stack */
+			memcpy(_rail_solution_stack, _rail_working_stack, stack_len);
+			_rail_solution_stack_pointer = (uint16)stack_len;
+			_rail_solution_stack_weight = total;
+		}
+	} else {
+		/*
+		 * No direct path -- recurse through every unvisited intermediate node.
+		 * Intermediate nodes are indices 0 .. (num_nodes - 3); the last two
+		 * entries in the array are the destination and source nodes.
+		 */
+		int num_intermediate = _rail_num_nodes - 2;
+
+		for (int i = 0; i < num_intermediate; i++) {
+			int test_node = i;          /* loop counter - 1 in the ASM    */
+
+			if (_rail_visited[test_node])
+				continue;
+
+			/* Check edge weight from current node to test_node */
+			uint16 edge_raw = node->weight[test_node];
+			uint16 edge_legal = edge_raw & allow_mode;
+
+			if (!edge_legal)
+				continue;               /* not a legal connection          */
+
+			uint16 edge_weight = edge_raw & RAIL_WEIGHT_MASK;
+
+			/* All further legs must be strictly legal once we step through
+			   an intermediate node (the ASM forces RAIL_ALLOW_LEGAL_ONLY) */
+			recursive_check_path(test_node,
+				weight + edge_weight,
+				RAIL_ALLOW_LEGAL_ONLY,
+				working_sp);
+		}
+	}
+
+	/* visited[node_id] = false  (unwind) */
+	_rail_visited[node_id] = 0;
+
+	/* pop() -- working_sp is a local copy so this just falls off the frame */
+}
+
+void rail_check_path(int allow_one_illegal) {
+	/* Clear the visited array */
+	memset(_rail_visited, 0, _rail_num_nodes);
+
+	/* Initialise solution state to "no solution yet" */
+	_rail_solution_stack_weight = RAIL_WEIGHT_MASK;
+	_rail_solution_stack_pointer = 0;
+
+	/* The last node in the array (index num_nodes - 1) is the starting
+	   node for the search (the destination, in path terms) */
+	int start_node = _rail_num_nodes - 1;
+
+	uint16 allow_mode = allow_one_illegal ? RAIL_ALLOW_ILLEGAL
+		: RAIL_ALLOW_LEGAL_ONLY;
+
+	recursive_check_path(start_node, 0, allow_mode, 0);
 }
 
 } // namespace MADSV2

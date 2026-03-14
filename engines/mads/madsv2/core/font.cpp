@@ -84,7 +84,7 @@ done:
 	return result;
 }
 
-int font_write(FontPtr font, Buffer *target, char *out_string,
+int font_write(FontPtr font, Buffer *target, const char *out_string,
 		int x, int y, int auto_spacing) {
 	int target_wrap;
 	int screen_loc;

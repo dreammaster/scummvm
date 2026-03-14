@@ -27,6 +27,28 @@
 namespace MADS {
 namespace MADSV2 {
 
+word keys_special_button;
+
+void keys_install() {
+	// No implementation in ScummVM
+}
+
+void keys_remove() {
+	// No implementation in ScummVM
+}
+
+int keys_check_install() {
+	error("TODO: keys_check_install");
+}
+
+void keys_enable() {
+	error("TODO: keys_enable");
+}
+
+void keys_disable() {
+	error("TODO: keys_disable");
+}
+
 int keys_any() {
 	return g_engine->hasPendingKey();
 }

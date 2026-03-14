@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/env.h"
@@ -272,6 +273,10 @@ char *vocab_get_word(char *word_buf, int word_code) {
 	}
 
 	return result;
+}
+
+int vocab_write_file(const char *last_word) {
+	error("TODO: vocab_write_file");
 }
 
 void vocab_report_error(int number) {

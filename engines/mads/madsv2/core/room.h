@@ -263,6 +263,12 @@ extern void room_dump_attribute(Buffer *depth, Buffer *walk, Buffer *special,
 	TileMapHeader *depth_map);
 extern int room_compile_hotspots(int id, int compression);
 extern HotPtr room_load_hotspots(int id, int *num_spots);
+
+/**
+ * Reads the . file for the specified room into the "room" structure.
+ *
+ * Returns 0 if successful, or -1 for error.
+ */
 extern int room_read_pict(int room_code, const char *room_file, int mads_mode);
 extern int room_write_pict(int room_code, const char *room_file, int mads_mode);
 extern void room_file_name(char *target, const char *suffix, int code,
@@ -270,7 +276,7 @@ extern void room_file_name(char *target, const char *suffix, int code,
 extern void room_himem_preload(int room, int level);
 extern RoomPtr room_dummy_init(int xs, int ys);
 extern int room_picture_load(int room_id, Buffer *picture, int load_flags);
-extern void room_resolve_base(char *base, const char *file, int id, const char *base_path);
+extern void room_resolve_base(char *base, char *file, int id, const char *base_path);
 extern int room_invert(void);
 
 } // namespace MADSV2

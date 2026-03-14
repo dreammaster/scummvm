@@ -65,37 +65,37 @@ extern int qual_words;
 extern char *qual;
 
 /* qual_1.cpp */
-int fastcall        qual_destroy(void);
+int        qual_destroy(void);
 
 /* qual_2.cpp */
-int fastcall        qual_load(int allocation_flag);
-int fastcall        qual_get_code(char *inp);
-char *fastcall qual_get_word(char *out, int inp);
+int        qual_load(int allocation_flag);
+int        qual_get_code(char *inp);
+char *qual_get_word(char *out, int inp);
 
 /* qual_3.cpp */
-int fastcall        qual_write_file(char *last_word);
-int fastcall        qual_add_word(char *inp);
+int        qual_write_file(char *last_word);
+int        qual_add_word(char *inp);
 
 /* qual_4.c */
-void fastcall       qual_report_error(int number);
+void       qual_report_error(int number);
 
 /* qual_5.cpp */
-char *fastcall qual_select_word(char *out,
+char *qual_select_word(char *out,
 	char *prompt,
 	char *default_word);
 
 /* qual_6.cpp */
-void fastcall       qual_maint(void);
+void       qual_maint(void);
 
 /* qual_7.cpp */
-int  fastcall       qual_build(void);
+int        qual_build(void);
 
 /* qual_8.cpp */
-void fastcall       qual_unload_active(void);
-void fastcall       qual_init_active(void);
-int  fastcall       qual_active_id(word id);
-int  fastcall       qual_make_active(word id);
-int  fastcall       qual_load_active(void);
+void       qual_unload_active(void);
+void       qual_init_active(void);
+int        qual_active_id(word id);
+int        qual_make_active(word id);
+int        qual_load_active(void);
 
 extern char *qual_text;
 extern word qual_active;

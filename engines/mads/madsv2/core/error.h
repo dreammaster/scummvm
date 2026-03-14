@@ -135,30 +135,13 @@ extern void (*error_service_routine)();
 extern void (*error_service_routine_2)();
 
 
-/* error_1.cpp */
 extern void error_report(int error, int severity, int module, long data1, long data2);
-
-int error_scan(char *target, char *name, int number);
-
+extern int error_scan(char *target, const char *name, int number);
 extern void error_dump_file(const char *file_name);
-
-/* error_2.cpp */
 extern void error_break_point(int data1, int data2);
-
-
-/* error_3.cpp */
 extern void error_watch_point(char *message, long data1, long data2);
-
-
-/* error_4.cpp */
 extern void error_check_memory(void);
-
-
-/* error_5.cpp */
 extern void error_file_point(char *message, long data1, long data2);
-
-
-/* error_6.cpp */
 extern void error_entry(char *name, char *message);
 extern void error_exit(char *name, char *message);
 extern void error_put(char *name, int item);

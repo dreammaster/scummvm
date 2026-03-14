@@ -27,6 +27,8 @@
 namespace MADS {
 namespace MADSV2 {
 
+int screen_normal_color;
+int screen_hilite_color;
 int screen_video_mode;
 int screen_max_x = 80;
 int screen_max_y = 25;

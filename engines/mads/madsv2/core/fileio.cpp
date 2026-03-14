@@ -310,12 +310,11 @@ int fileio_put_line(const char *source, Common::WriteStream *handle) {
 	return 0;
 }
 
-
 long fileio_get_disk_free(char drive) {
 	return 999999;
 }
 
-void fileio_add_ext(char *name, char *ext) {
+void fileio_add_ext(char *name, const char *ext) {
 	char *mark;
 
 	mark = strrchr(name, '.');
@@ -327,7 +326,7 @@ void fileio_add_ext(char *name, char *ext) {
 	mads_strupr(name);
 }
 
-void fileio_new_ext(char *target, char *name, char *ext) {
+void fileio_new_ext(char *target, const char *name, const char *ext) {
 	char *mark;
 
 	if (name != target) {

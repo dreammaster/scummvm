@@ -108,7 +108,7 @@ inline void ems_shutdown() {
  * Does not actually generate an EMS interrupt if the page is already
  * mapped. Call only if EMS memory was detected.
  */
-inline int ems_map_page(word physical, word logical);
+inline int ems_map_page(word physical, word logical) { return 0; }
 
 inline void ems_unmap_all() {}
 inline void ems_push() {}

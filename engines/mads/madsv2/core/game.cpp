@@ -71,9 +71,6 @@ namespace MADSV2 {
 
 extern long mem_used;
 extern long mem_avail_at_start;
-extern int digi_trigger_dialog;
-extern int digi_trigger_ambiance;
-extern int digi_trigger_effect;
 extern int room_state[40];
 
 
@@ -109,6 +106,7 @@ int debugger_memory_all = false;    /* Not showing ALL memory  */
 int debugger_memory_keywait = false;    /* Not waiting for memory  */
 void (*debugger_reset)() = NULL;     /* Debugger reset routine  */
 void (*debugger_update)() = NULL;     /* Debugger update routine */
+int int_sprite[6];
 int selected_intro = false;
 long correction_clock;
 

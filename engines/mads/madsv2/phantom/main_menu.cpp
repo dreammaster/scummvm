@@ -74,6 +74,7 @@ namespace Phantom {
 #define EYE_HOTSPOT     32
 #define EYE_MESSAGES    2
 
+#undef MESSAGE_COLOR
 #define MESSAGE_COLOR   1284
 
 

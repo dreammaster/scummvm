@@ -48,6 +48,64 @@ void (*error_service_routine_2)() = NULL;
 int  error_abort = WARNING;
 char error_string[80] = "";
 
+
+
+int error_scan(char *target, const char *name, int number) {
+	int count;
+	int error_flag = true;
+	Common::SeekableReadStream *handle = NULL;
+	char temp_buf[40];
+
+	handle = env_open(name, "rt");
+	if (handle == NULL) goto done;
+
+	for (count = 1; count <= number; count++) {
+		if (handle->eos()) goto done;
+		Common::String line = handle->readLine();
+		Common::strcpy_s(temp_buf, line.c_str());
+	}
+
+	for (count = 0; count < (int)strlen(temp_buf); count++) {
+		if (temp_buf[count] < 32) temp_buf[count] = 0;
+	}
+
+	Common::strcpy_s(target, 65536, temp_buf);
+
+	error_flag = false;
+
+done:
+	delete handle;
+	return error_flag;
+}
+
+void error_dump_file(const char *file_name) {
+	int count;
+	int going;
+	Common::SeekableReadStream *handle = NULL;
+	char temp_buf[80];
+
+	handle = env_open(file_name, "rt");
+	if (handle == NULL) goto done;
+
+	going = true;
+	while (going && !handle->eos()) {
+		Common::String line = handle->readLine();
+		Common::strcpy_s(temp_buf, line.c_str());
+
+		for (count = 0; count < (int)strlen(temp_buf); count++) {
+			if (temp_buf[count] < 32) temp_buf[count] = 0;
+		}
+		if (strncmp(temp_buf, "***", 3) == 0) {
+			going = false;
+		} else {
+			echo(temp_buf, true);
+		}
+	}
+
+done:
+	delete handle;
+}
+
 static void error_explode(char *error_buf, char *module_buf, char *data1_buf, char *data2_buf, long avail, int error) {
 	midi_uninstall();
 	digi_uninstall();

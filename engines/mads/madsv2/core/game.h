@@ -23,6 +23,7 @@
 #define MADS_CORE_GAME_H
 
 #include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/global.h"
 #include "mads/madsv2/core/player.h"
 #include "mads/madsv2/core/mads.h"
 #include "mads/madsv2/core/heap.h"
@@ -215,47 +216,6 @@ extern void (*room_pre_parser_code_pointer)();
 extern void (*room_parser_code_pointer)();
 extern void (*room_error_code_pointer)();
 extern void (*room_shutdown_code_pointer)();
-
-
-
-/* global.c */
-extern char global_release_name[];
-extern char global_release_version[];
-extern char global_release_date[];
-extern char global_release_copyright[];
-
-extern int global[];
-extern int global_list_size;
-
-/* global.c */
-void global_init_code(void);
-void global_daemon_code(void);
-void global_pre_parser_code(void);
-void global_parser_code(void);
-void global_error_code(void);
-
-void global_room_init(void);
-void global_verb_filter(void);
-
-void global_sound_driver(void);
-
-void global_section_constructor(void);
-
-/* global_4.c */
-void global_game_menu(void);
-void global_menu_system_init(void);
-void global_menu_system_shutdown(void);
-void global_emergency_save(void);
-
-/* global_5.c */
-void global_read_config_file(void);
-void global_write_config_file(void);
-void global_load_config_parameters(void);
-void global_unload_config_parameters(void);
-
-/* global_6.c */
-int global_copy_verify(void);
-
 
 /* game_1.c */
 void game_main(int argc, char **argv);

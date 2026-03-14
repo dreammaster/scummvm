@@ -19,10 +19,14 @@
  *
  */
 
+#include "common/system.h"
+#include "common/savefile.h"
 #include "common/util.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/buffer.h"
+#include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/ems.h"
+#include "mads/madsv2/core/fileio.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/room.h"
 
@@ -36,6 +40,10 @@ int buffer_restore_keep_flag = false;
 
 static word accum;                    /* Pattern accumulator */
 static Buffer buffer_preserve_conventional;
+
+char buffer_disk_filename[8] = "$MPOP.$";
+byte buffer_accum = 0;
+byte buffer_tracking[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 
 bool buffer_init(Buffer *buf, word x, word y) {
@@ -862,6 +870,105 @@ bool buffer_from_ems(Buffer *source, int page_handle, int target_ems_handle,
 	ems_unmap_all();
 
 	return page_handle;
+}
+
+bool buffer_rect_translate(Buffer from, Buffer unto, int from_x, int from_y,
+		int unto_x, int unto_y, int size_x, int size_y, byte *table) {
+	int from_wrap, unto_wrap;
+	int row_count;
+	int result;
+	byte *from_ptr;
+	byte *unto_ptr;
+
+	from_wrap = from.x - size_x;
+	unto_wrap = unto.x - size_x;
+
+	result = ((from.data != NULL) && (unto.data != NULL));
+	if (result) {
+		if (size_y == 0 || size_x == 0)
+			return result;
+
+		from_ptr = buffer_pointer(&from, from_x, from_y);
+		unto_ptr = buffer_pointer(&unto, unto_x, unto_y);
+
+		for (row_count = size_y; row_count > 0; row_count--) {
+			for (int col = 0; col < size_x; col++) {
+				*unto_ptr++ = table[*from_ptr++];
+			}
+			from_ptr += from_wrap;
+			unto_ptr += unto_wrap;
+		}
+	}
+
+	return result;
+}
+
+int buffer_to_disk(Buffer *source, int x, int y, int xs, int ys) {
+	int buffer_id = -1;
+	Common::OutSaveFile *handle = nullptr;
+	byte *scan;
+	int count;
+	int error_count = 0;
+	int a_ok = false;
+	char file_name[40];
+
+	do {
+		buffer_accum = (byte)((buffer_accum + 1) % 10);
+
+		Common::strcpy_s(file_name, buffer_disk_filename);
+		env_catint(file_name, buffer_accum, 1);
+
+		if (!buffer_tracking[buffer_accum]) {
+			a_ok = true;
+		} else {
+			error_count++;
+			if (error_count > 10) goto done;
+		}
+	} while (!a_ok);
+
+	buffer_tracking[buffer_accum] = true;
+
+	handle = g_system->getSavefileManager()->openForSaving(file_name, false);
+	if (handle = nullptr)
+		goto done;
+
+	for (count = 0; count < ys; count++) {
+		scan = buffer_pointer(source, x, y + count);
+		if (!fileio_fwrite_f(scan, xs, 1, handle)) goto done;
+	}
+
+	buffer_id = buffer_accum;
+
+done:
+	delete handle;
+	return buffer_id;
+}
+
+void buffer_from_disk(Buffer *source, int buffer_id, int keep_flag, int x, int y, int xs, int ys) {
+	Common::InSaveFile *handle = nullptr;
+	byte *scan;
+	int count;
+	char file_name[40];
+
+	Common::strcpy_s(file_name, buffer_disk_filename);
+	env_catint(file_name, buffer_id, 1);
+
+	handle = g_system->getSavefileManager()->openForLoading(file_name);
+	if (handle == NULL) goto done;
+
+	for (count = 0; count < ys; count++) {
+		scan = buffer_pointer(source, x, y + count);
+		if (!fileio_fread_f(scan, xs, 1, handle)) goto done;
+	}
+
+done:
+	if (handle != NULL) {
+		delete handle;
+		if (!keep_flag) {
+			buffer_tracking[buffer_id] = 0;
+			remove(file_name);
+		}
+	}
 }
 
 } // namespace MADSV2

@@ -52,7 +52,7 @@ namespace MADSV2 {
 
 #define disable_error_check
 
-extern int extra_display_object;
+int extra_display_object;
 
 int stroke_type = STROKE_NONE;          /* Current stroke type           */
 
