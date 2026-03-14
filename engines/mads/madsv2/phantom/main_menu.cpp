@@ -87,16 +87,14 @@ Buffer scr_live = { video_y, video_x, mcga_video };
 FontPtr font = NULL;
 int font_auto_spacing = -1;
 
-int new_background    = false;
+bool new_background   = false;
 int room_number       = 0;
 
 int win_status        = 0;
 
-int force_opening     = false;
-
-int dont_return       = false;
-
-int  white_bars       = true;
+bool force_opening    = false;
+bool dont_return      = false;
+bool white_bars       = true;
 byte white_border     = 2;
 
 char command_line[COMMAND_LINE_MAX][80];

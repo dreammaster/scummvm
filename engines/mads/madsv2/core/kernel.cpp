@@ -616,7 +616,7 @@ void kernel_room_shutdown() {
 	}
 }
 
-int kernel_room_startup(int newRoom, int initial_variant, char *interface, int new_palette) {
+int kernel_room_startup(int newRoom, int initial_variant, char *interface, bool new_palette) {
 	int error_flag = true;
 	int load_flags;
 #ifndef disable_error_check
@@ -631,8 +631,8 @@ int kernel_room_startup(int newRoom, int initial_variant, char *interface, int n
 	room_variant = initial_variant;
 
 	/* Start a brand new palette, reserving the proper # of colors */
-
-	if (new_palette) pal_init(KERNEL_RESERVED_LOW_COLORS, KERNEL_RESERVED_HIGH_COLORS);
+	if (new_palette)
+		pal_init(KERNEL_RESERVED_LOW_COLORS, KERNEL_RESERVED_HIGH_COLORS);
 
 	pal_white(master_palette);
 

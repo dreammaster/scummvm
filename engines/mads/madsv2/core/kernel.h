@@ -440,8 +440,8 @@ extern int kernel_section_startup(int new_section);
  */
 extern void kernel_room_shutdown();
 
-extern int kernel_room_startup(int new_room, int initial_variant,
-	char *interface, int new_palette);
+extern int kernel_room_startup(int new_room, int initial_variant = 0,
+	char *interface = nullptr, bool new_palette = true);
 
 /**
  * Unloads all room series.

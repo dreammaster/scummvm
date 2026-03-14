@@ -21,18 +21,29 @@
 
 #include "mads/madsv2/phantom/main.h"
 #include "mads/madsv2/core/kernel.h"
+#include "mads/madsv2/core/magic.h"
 #include "mads/madsv2/core/matte.h"
+#include "mads/madsv2/core/mcga.h"
 #include "mads/madsv2/core/mouse.h"
+#include "mads/madsv2/core/pal.h"
 #include "mads/madsv2/core/quote.h"
 #include "mads/madsv2/phantom/main_menu.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
 
+constexpr bool SHOW_LINES = true;
+constexpr byte LINE_COLOR = 2;
+
 char *quotes;
 
 static void main_menu_main() {
+	auto &screen = *g_engine->getScreen();
+	Palette palette;
+	assert(sizeof(palette) == 768);
+
 	if (kernel_game_startup(19, KERNEL_STARTUP_CURSOR | KERNEL_STARTUP_INTERRUPT | KERNEL_STARTUP_FONT,
 		nullptr, nullptr)) {
 		viewing_at_y = (200 - scr_work.y) >> 1;
@@ -58,10 +69,54 @@ static void main_menu_main() {
 			97, 98, 99, 0);
 
 		global_speech_load(9);
-#if 0
-		kernel_room_startup(922);
-#endif
+		bool valid = !kernel_room_startup(922);
+
+		master_palette[4].r = 63;
+		master_palette[4].g = 50;
+		master_palette[4].b = 0;
+		master_palette[5].r = 30;
+		master_palette[5].g = 15;
+		master_palette[5].b = 0;
+		mcga_setpal_range(&master_palette, 4, 2);
+
+		new_background = true;
+
+		if (valid) {
+			memset(&palette, 0, sizeof(palette));
+			mcga_setpal(&palette);
+			mouse_cursor_sprite(cursor, 1);
+
+			if (SHOW_LINES && viewing_at_y != 0) {
+				screen.hLine(0, viewing_at_y - 2, 319, LINE_COLOR);
+				screen.hLine(0, scr_work.y + viewing_at_y + 1, 319, LINE_COLOR);
+			}
+
+			kernel_load_sound_driver("*#SOUND.PH9", 'N', 544, 0, 49);
+
+			menu_control();
+
+			if (selected_item >= 0) {
+				// Zero out the first 3 entries of both magic color arrays
+				for (int i = 0; i < 3; i++) {
+					magic_color_values[i] = 0;
+					magic_color_flags[i] = 0;
+				}
+
+				mcga_getpal(&palette);
+
+				magic_fade_to_grey(palette, 0, 0x10, 1, 1, 0, 0, 0);
+			}
+		}
+
+		free(quotes);
+		kernel_unload_sound_driver();
+		kernel_game_shutdown();
 	}
+
+	mcga_reset();
+
+	// Handle menu item selection
+	warning("Selected item = %d", selected_item);
 }
 
 void phantom_main() {
