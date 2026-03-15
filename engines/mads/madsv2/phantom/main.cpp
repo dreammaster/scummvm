@@ -120,6 +120,7 @@ static void main_menu_main() {
 }
 
 void phantom_main() {
+	pack_enable_pfab_explode();
 	if (!env_verify())
 		env_search_mode = ENV_SEARCH_CONCAT_FILES;
 
