@@ -114,16 +114,11 @@ int loader_open(LoadHandle handle, const char *filename, const char *options, in
 
 		if (reading) {
 			base_position = handle->handle->pos();
-			if (!fileio_fread_f(&handle->pack, PACK_HEADER, 1, handle->handle)) goto done;
-			if (strncmp(handle->pack.id_string, PACK_ID_STRING, PACK_ID_CHECK) != 0) goto done;
-			if (!fileio_fread_f(&handle->pack.strategy[0], sizeof(PackStrategy) * handle->pack.num_records, 1, handle->handle)) goto done;
-			base_position += sizeof(PackList);
-			handle->handle->seek(base_position);
 
-			/*
-			if (!fileio_fread_f(&handle->pack, sizeof(PackList), 1, handle->handle)) goto done;
-			if (strncmp(handle->pack.id_string, PACK_ID_STRING, PACK_ID_CHECK) != 0) goto done;
-			*/
+			if (!handle->pack.load(handle->handle))
+				goto done;
+
+			base_position = handle->handle->pos();
 
 			handle->decompress_size = 0;
 			for (count = 0; count < (int)handle->pack.num_records; count++) {

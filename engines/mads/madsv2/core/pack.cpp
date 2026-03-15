@@ -103,6 +103,30 @@ word (*pack_pFABexp2_routine)(
 	char *work_buff) = NULL;
 
 
+void PackStrategy::load(Common::SeekableReadStream *src) {
+	type = src->readByte();
+	priority = src->readByte();
+	size = src->readUint32LE();
+	compressed_size = src->readUint32LE();
+}
+
+bool PackList::load(Common::SeekableReadStream *src) {
+	src->read(id_string, PACK_ID_LENGTH);
+	num_records = src->readUint16LE();
+
+	// Confirm that the ID is correct
+	if (strncmp(id_string, PACK_ID_STRING, PACK_ID_CHECK) != 0)
+		return false;
+
+	// Read in the index. Note that only num_records worth of entries are
+	// valid, but space is left in the file for the maximum amount of entries
+	for (int i = 0; i < PACK_MAX_LIST_LENGTH; ++i)
+		strategy[i].load(src);
+
+	return true;
+}
+
+
 word pack_read_memory(char *buffer, word *mysize) {
 	word cx = *mysize;
 	uint32 remaining = pack_read_size;

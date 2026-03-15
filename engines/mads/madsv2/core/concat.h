@@ -22,7 +22,7 @@
 #ifndef MADS_CORE_CONCAT_H
 #define MADS_CORE_CONCAT_H
 
-#include "common/scummsys.h"
+#include "common/stream.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -47,8 +47,8 @@ struct Concat {
 		src->read(name, 13);
 		src->skip(1);
 	}
-	static uint size() {
-		return 22;
+	static uint record_size() {
+		return 4 + 4 + 13 + 1;
 	}
 };
 
