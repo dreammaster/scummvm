@@ -59,6 +59,9 @@ int himem_activate_directory(void) {
 		himem_directory_ems_active = !ems_activate_page_map();
 
 		error_flag = !himem_directory_ems_active;
+	} else if (himem_directory_allocation == MEM_NONE) {
+		// Added for ScummVM, since we don't have EMS
+		error_flag = true;
 	}
 
 	return error_flag;
