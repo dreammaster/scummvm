@@ -316,6 +316,8 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 
 	himem_startup();
 
+	// ScummVM doesn't need EMS/XMS
+#if 0
 	ems_error = true;
 
 	if (ems_exists) {
@@ -334,7 +336,7 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 			error_report(ERROR_KERNEL_NO_EMS, SEVERE, MODULE_KERNEL, ems_exists, work_screen_ems_handle);
 		}
 	}
-
+#endif
 	if (ems_exists) {
 		if (load_flag & KERNEL_STARTUP_POPUP) {
 			object_ems_handle = ems_get_page_handle(4);

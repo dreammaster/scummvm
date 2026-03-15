@@ -117,8 +117,8 @@ inline int ems_activate_directory() { return 0; }
 inline int ems_activate_page_map() { return 0; }
 inline int ems_paging_setup() { return 0; }
 inline void ems_free_page_handle(word handle) {}
-inline int ems_get_page_handle(word pages_needed) { return 0; }
-inline int ems_next_handle_page(int handle, int page_marker) { return 0; }
+inline int ems_get_page_handle(word pages_needed) { return -1; }
+inline int ems_next_handle_page(int handle, int page_marker) { return -1; }
 inline void ems_paging_mode(int paging_mode) {}
 inline void ems_paging_shutdown() {}
 inline int ems_copy_it_up(int ems_paging_handle, int *ems_page_marker,

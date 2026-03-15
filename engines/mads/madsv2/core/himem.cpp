@@ -34,9 +34,9 @@
 namespace MADS {
 namespace MADSV2 {
 
-
-byte                himem_preload_ems_disabled = false;
-byte                himem_preload_xms_disabled = false;
+// EMS/XMS disabled in ScummVM
+byte                himem_preload_ems_disabled = true;
+byte                himem_preload_xms_disabled = true;
 
 byte                himem_directory_allocation = MEM_NONE;
 HimemDirectory      himem_directory_save_area;
@@ -61,9 +61,8 @@ int himem_activate_directory(void) {
 		error_flag = !himem_directory_ems_active;
 	}
 
-	return (error_flag);
+	return error_flag;
 }
-
 
 int himem_get_directory_entry(int id) {
 	int error_flag = true;
