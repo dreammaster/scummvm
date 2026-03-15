@@ -36,11 +36,21 @@ namespace MADSV2 {
 #define CONCAT_MAX_FILES                750
 #define CONCAT_MAX_OUT                  10
 
-typedef struct {
+struct Concat {
 	long file_offset;
 	long file_size;
 	char name[13];
-} Concat;
+
+	void load(Common::SeekableReadStream *src) {
+		file_offset = src->readSint32LE();
+		file_size = src->readSint32LE();
+		src->read(name, 13);
+		src->skip(1);
+	}
+	static uint size() {
+		return 22;
+	}
+};
 
 typedef Concat *ConcatPtr;
 

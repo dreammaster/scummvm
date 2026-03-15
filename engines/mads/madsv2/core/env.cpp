@@ -63,7 +63,18 @@ static const char env_speech2_string[8] = "SPEECH2";
 
 
 int env_verify() {
-	return 0;
+	Common::String str = ConfMan.get(MADS_PRIV_ENV);
+	str.toUppercase();
+
+	if (str.contains("ARTIST")) env_privileges |= MADS_PRIV_ARTIST;
+	if (str.contains("DESIGNER")) env_privileges |= MADS_PRIV_DESIGNER;
+	if (str.contains("PROGRAM")) env_privileges |= MADS_PRIV_PROGRAM;
+	if (str.contains("SYSTEM")) env_privileges |= MADS_PRIV_PROGRAM | MADS_PRIV_SYSTEM;
+
+	if (ConfMan.hasKey(MADS_SOUND_ENV))
+		env_sound_override = true;
+
+	return ConfMan.hasKey(MADS_ENV);
 }
 
 char *env_catint(char *out, int value, int digits) {
@@ -118,10 +129,8 @@ char *env_fill_path(char *path, int env_mode, int env_room) {
 		env_sect = env_room;
 	}
 
-	if (madsptr != NULL) {
-
+	if (!madsptr.empty()) {
 		madslen = strlen(madsptr.c_str());
-
 		Common::strcpy_s(madspath, 65536, madsptr.c_str());
 
 		if (madsptr[madslen - 1] != '\\') {
@@ -203,7 +212,6 @@ char *env_get_path(char *madspath, const char *infile) {
 		mads_strupr(madspath);
 
 	} else {
-		/* infile is '*d322u001.rac' */
 		infile++;
 		Common::strcpy_s(temp_buf_1, infile);
 		mads_strupr(temp_buf_1);
@@ -292,7 +300,6 @@ Common::SeekableReadStream *env_open(const char *filename, const char *options) 
 	int count;
 	int found;
 	int num_files;
-	long mem_to_get;
 	char file_path[80];
 	char index_file[80];
 	char temp_file[80];
@@ -305,8 +312,8 @@ Common::SeekableReadStream *env_open(const char *filename, const char *options) 
 	Common::SeekableReadStream *handle = NULL;
 	Concat concat;
 	concat.file_offset = concat.file_size = 0;
-	Concat *concat_array = NULL;
 
+	Common::strcpy_s(file_path, filename);
 	if (env_get_path(load_file, file_path) == NULL) goto done;
 
 	Common::strcpy_s(file_path, filename);
@@ -368,11 +375,9 @@ Common::SeekableReadStream *env_open(const char *filename, const char *options) 
 		}
 
 	} else if ((env_search_mode == ENV_SEARCH_CONCAT_FILES) && (mark != NULL)) {
-
 		mark++;
 		Common::strcpy_s(temp_buf, mark);
 		mads_strupr(temp_buf);
-
 
 		/* load_file = 'global.hag' */
 		if (art_hags_are_on_hd) {
@@ -383,12 +388,12 @@ Common::SeekableReadStream *env_open(const char *filename, const char *options) 
 		/* index_file = 'global.idx' */
 
 		if (env_search_cd && !art_hags_are_on_hd) {
-
 			if (fileio_exist(index_file)) {
 				/* if 'global.idx' exists */
 				Common::File *f = new Common::File();
 				f->open(index_file);
-				handle = f;
+				assert(f->isOpen());
+				index_handle = f;
 			}
 
 			Common::strcpy_s(temp_file, "X:\\");
@@ -409,9 +414,7 @@ Common::SeekableReadStream *env_open(const char *filename, const char *options) 
 
 		if (index_handle == NULL) {
 			Common::File *f = new Common::File();
-			f->open(load_file);
-
-			if (index_handle == NULL) {
+			if (!f->open(load_file)) {
 				delete f;
 				goto done;
 			}
@@ -422,46 +425,25 @@ Common::SeekableReadStream *env_open(const char *filename, const char *options) 
 		if (!fileio_fread_f(&check_buf, CONCAT_ID_LENGTH, 1, index_handle)) goto done;
 		if (strncmp(check_buf, CONCAT_ID_STRING, CONCAT_ID_CHECK) != 0) goto done;
 
-		if (!fileio_fread_f(&num_files, sizeof(int), 1, index_handle)) goto done;
+		num_files = index_handle->readUint16LE();
 
 		found = false;
 
-		mem_to_get = (long)num_files * sizeof(Concat);
-		concat_array = (Concat *)mem_get(mem_to_get);
+		for (count = 0; !found && (count < num_files); count++) {
+			concat.load(index_handle);
+			found = (strcmp(temp_buf, concat.name) == 0);
+		}
 
-		if (concat_array != NULL) {
-			if (!fileio_fread_f(concat_array, mem_to_get, 1, index_handle)) goto done;
-			for (count = 0; !found && (count < num_files); count++) {
-				found = (strcmp(temp_buf, concat_array[count].name) == 0);
-				if (found) {
-					concat = concat_array[count];
-				}
-			}
-		} else {
-			for (count = 0; !found && (count < num_files); count++) {
-				if (!fileio_fread_f(&concat, sizeof(Concat), 1, index_handle)) goto done;
-				found = (strcmp(temp_buf, concat.name) == 0);
-			}
+		if (found) {
+			if (!index_handle->seek(concat.file_offset))
+				error("Invalid hag entry offset");
+
+			handle = index_handle->readStream(concat.file_size);
+			env_concat_file_size = concat.file_size;
 		}
 
 		delete index_handle;
 		index_handle = NULL;
-
-		if (found) {
-			Common::File *f = new Common::File();
-			f->open(load_file);
-
-			if (handle == NULL) {
-				delete f;
-				goto done;
-			}
-
-			handle = f;
-
-			if (fileio_setpos(handle, concat.file_offset) != concat.file_offset) goto done;
-
-			env_concat_file_size = concat.file_size;
-		}
 
 	} else {
 		Common::File *f = new Common::File();
@@ -472,7 +454,6 @@ Common::SeekableReadStream *env_open(const char *filename, const char *options) 
 	error_flag = false;
 
 done:
-	if (concat_array != NULL) mem_free(concat_array);
 	delete index_handle;
 
 	if (error_flag) {

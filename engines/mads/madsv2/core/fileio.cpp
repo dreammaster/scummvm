@@ -171,9 +171,9 @@ long fileio_setpos(Common::Stream *handle, long pos) {
 	auto *ws = dynamic_cast<Common::SeekableWriteStream *>(handle);
 
 	if (rs)
-		return rs->pos();
+		return rs->seek(pos) ? pos : -1;
 	if (ws)
-		return ws->pos();
+		return ws->seek(pos) ? pos : -1;
 
 	return -1;
 }

@@ -20,6 +20,7 @@
  */
 
 #include "mads/madsv2/phantom/main.h"
+#include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/magic.h"
 #include "mads/madsv2/core/matte.h"
@@ -119,6 +120,9 @@ static void main_menu_main() {
 }
 
 void phantom_main() {
+	if (!env_verify())
+		env_search_mode = ENV_SEARCH_CONCAT_FILES;
+
 	main_menu_main();
 }
 

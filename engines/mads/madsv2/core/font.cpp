@@ -61,6 +61,7 @@ FontPtr font_load(const char *name) {
 	mark = temp_buf_2;
 	if (*mark == '*') mark++;
 	strncpy(block_name, mark, 8);
+	block_name[8] = '\0';
 
 	if (loader_open(&load_handle, temp_buf_2, "rb", true)) goto done;
 
