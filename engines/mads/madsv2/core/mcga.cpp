@@ -106,42 +106,18 @@ void mcga_close_window(byte *inp) {
 }
 
 void mcga_setpal(Palette *pal) {
-	byte tmpPal[Graphics::PALETTE_SIZE];
-	byte *entry = &tmpPal[0];
-
-	for (int i = 0; i < Graphics::PALETTE_COUNT; ++i, entry += 3) {
-		entry[0] = pal[i]->r;
-		entry[1] = pal[i]->g;
-		entry[2] = pal[i]->b;
-	}
-
-	g_system->getPaletteManager()->setPalette(tmpPal, 0, Graphics::PALETTE_COUNT);
+	const byte *colors = (byte *)&(*pal)[0];
+	g_system->getPaletteManager()->setPalette(colors, 0, Graphics::PALETTE_COUNT);
 }
 
 void mcga_getpal(Palette *pal) {
-	byte tmpPal[Graphics::PALETTE_SIZE];
-	byte *entry = &tmpPal[0];
-
-	g_system->getPaletteManager()->grabPalette(tmpPal, 0, Graphics::PALETTE_COUNT);
-
-	for (int i = 0; i < Graphics::PALETTE_COUNT; ++i, entry += 3) {
-		pal[i]->r = entry[0];
-		pal[i]->g = entry[1];
-		pal[i]->b = entry[2];
-	}
+	byte *colors = (byte *)&(*pal)[0];
+	g_system->getPaletteManager()->grabPalette(colors, 0, Graphics::PALETTE_COUNT);
 }
 
 void mcga_setpal_range(Palette *pal, int first_color, int num_colors) {
-	byte tmpPal[Graphics::PALETTE_SIZE];
-	byte *entry = &tmpPal[0];
-
-	for (int i = 0; i < num_colors; ++i, entry += 3) {
-		entry[0] = pal[i + first_color]->r;
-		entry[1] = pal[i + first_color]->g;
-		entry[2] = pal[i + first_color]->b;
-	}
-
-	g_system->getPaletteManager()->setPalette(tmpPal, first_color, num_colors);
+	byte *colors = (byte *)&(*pal)[first_color];
+	g_system->getPaletteManager()->setPalette(colors, first_color, num_colors);
 }
 
 
@@ -171,8 +147,8 @@ void mcga_compute_retrace_parameters(void) {
 	   modern graphics API there is no retrace constraint, so we set the
 	   maximums to the full 256-entry palette and mark the computation done. */
 	mcga_palette_fast = true;
-	mcga_retrace_max_colors = 256;
-	mcga_retrace_max_bytes = 256 * 3;
+	mcga_retrace_max_colors = Graphics::PALETTE_COUNT;
+	mcga_retrace_max_bytes = Graphics::PALETTE_SIZE;
 	mcga_retrace_computed = true;
 }
 

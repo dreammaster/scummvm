@@ -74,7 +74,7 @@ int mouse_video_mode = 0;
 
 
 int mouse_init(int driverflag, int videomode) {
-	// No implementation
+	// No implementation in ScummVM
 	return 0;
 }
 

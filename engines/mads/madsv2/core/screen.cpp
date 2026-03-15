@@ -100,19 +100,19 @@ void screen_clear(int clear_color) {
 }
 
 void screen_dominant_mode(int dominant_mode) {
-	warning("TODO: screen_set_colors");
+	// No implementation in ScummVM
 }
 
 void screen_init(int video_mode) {
-	warning("TODO: screen_init");
+	// No implementation in ScummVM
 }
 
 void screen_init_dual(int mono_left) {
-	warning("TODO: screen_init_dual");
+	error("TODO: screen_init_dual");
 }
 
 void screen_shutdown_dual(int clear_flag) {
-	warning("TODO: screen_shutdown_dual");
+	error("TODO: screen_shutdown_dual");
 }
 
 void screen_init_graphics(int which_mode) {
