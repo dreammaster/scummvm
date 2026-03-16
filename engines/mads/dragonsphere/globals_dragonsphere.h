@@ -22,8 +22,8 @@
 #ifndef MADS_GLOBALS_DRAGONSPHERE_H
 #define MADS_GLOBALS_DRAGONSPHERE_H
 
-#include "mads/game.h"
-#include "mads/resources.h"
+#include "mads/core/game.h"
+#include "mads/core/resources.h"
 
 namespace MADS {
 namespace Dragonsphere {

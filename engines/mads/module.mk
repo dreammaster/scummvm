@@ -1,6 +1,8 @@
 MODULE := engines/mads
 
 MODULE_OBJS := \
+	nebular/nebular.o \
+	nebular/debugger.o \
 	nebular/dialogs_nebular.o \
 	nebular/game_nebular.o \
 	nebular/globals_nebular.o \
@@ -15,40 +17,40 @@ MODULE_OBJS := \
 	nebular/nebular_scenes6.o \
 	nebular/nebular_scenes7.o \
 	nebular/nebular_scenes8.o \
-	action.o \
-	animation.o \
-	assets.o \
-	audio.o \
-	camera.o \
-	compression.o \
-	conversations.o \
-	debugger.o \
-	dialogs.o \
-	events.o \
-	font.o \
-	game.o \
-	game_data.o \
-	globals.o \
-	hotspots.o \
-	inventory.o \
-	mads.o \
-	menu_views.o \
-	messages.o \
-	msurface.o \
+	core/action.o \
+	core/animation.o \
+	core/assets.o \
+	core/audio.o \
+	core/camera.o \
+	core/compression.o \
+	core/conversations.o \
+	core/dialogs.o \
+	core/events.o \
+	core/font.o \
+	core/game.o \
+	core/game_data.o \
+	core/globals.o \
+	core/hotspots.o \
+	core/inventory.o \
+	core/mads.o \
+	core/menu_views.o \
+	core/messages.o \
+	core/msurface.o \
+	core/mps_installer.o \
+	core/palette.o \
+	core/player.o \
+	core/rails.o \
+	core/resources.o \
+	core/scene.o \
+	core/scene_data.o \
+	core/screen.o \
+	core/sequence.o \
+	core/sound.o \
+	core/sprites.o \
+	core/staticres.o \
+	core/user_interface.o \
 	metaengine.o \
-	mps_installer.o \
-	palette.o \
-	player.o \
-	rails.o \
-	resources.o \
-	scene.o \
-	scene_data.o \
-	screen.o \
-	sequence.o \
-	sound.o \
-	sprites.o \
-	staticres.o \
-	user_interface.o
+	mads.o
 
 ifdef ENABLE_MADSV2
 MODULE_OBJS += \

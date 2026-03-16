@@ -30,13 +30,13 @@ namespace MADSV2 {
 MADSV2Engine *g_engine;
 
 MADSV2Engine::MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc) :
-	Engine(syst), _gameDescription(gameDesc) {
+		MADSEngine(syst, gameDesc) {
 	g_engine = this;
 }
 
 MADSV2Engine::~MADSV2Engine() {
-	delete _screen;
 	g_engine = nullptr;
+	delete _screen;
 }
 
 Common::Error MADSV2Engine::run() {

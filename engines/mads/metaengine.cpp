@@ -20,7 +20,7 @@
  *
  */
 
-#include "mads/mads.h"
+#include "mads/nebular/nebular.h"
 
 #include "base/plugins.h"
 #include "engines/advancedDetector.h"
@@ -36,8 +36,8 @@
 #include "common/translation.h"
 #include "graphics/surface.h"
 
-#include "mads/events.h"
-#include "mads/game.h"
+#include "mads/core/events.h"
+#include "mads/core/game.h"
 #include "mads/detection.h"
 #ifdef ENABLE_MADSV2
 #include "mads/madsv2/engine.h"
@@ -208,7 +208,7 @@ Common::Error MADSMetaEngine::createInstance(OSystem *syst, Engine **engine, con
 	else
 #endif
 
-	*engine = new MADS::MADSEngine(syst,desc);
+	*engine = new MADS::RexNebularEngine(syst,desc);
 	return Common::kNoError;
 }
 

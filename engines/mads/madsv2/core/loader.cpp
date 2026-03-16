@@ -208,11 +208,7 @@ long loader_read(void *target, long record_size, long record_count, LoadHandle h
 	if (!record_size)
 		return 0;
 
-	if (record_count == 1) {
-		total_size = record_size;
-	} else {
-		total_size = record_size * record_count;
-	}
+	total_size = record_size * record_count;
 	total_left = total_size;
 
 	marker = handle->pack_list_marker++;
@@ -285,11 +281,13 @@ long loader_read(void *target, long record_size, long record_count, LoadHandle h
 #endif
 
 done:
-	if (decompress_buffer != NULL) mem_free(decompress_buffer);
+	if (decompress_buffer != NULL)
+		mem_free(decompress_buffer);
+
 	if (result == record_size) {
-		return (1);
+		return 1;
 	} else {
-		return (result / record_size);
+		return result / record_size;
 	}
 }
 

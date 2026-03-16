@@ -25,18 +25,15 @@
 #include "common/events.h"
 #include "common/list.h"
 #include "common/random.h"
-#include "engines/engine.h"
 #include "graphics/screen.h"
-#include "mads/detection.h"
+#include "mads/mads.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-class MADSV2Engine : public Engine {
+class MADSV2Engine : public MADSEngine {
 private:
-	const MADSGameDescription *_gameDescription;
 	Graphics::Screen *_screen = nullptr;
-	Common::RandomSource _random = Common::RandomSource("MADS");
 	Common::List<Common::Event> _events;
 
 	void pollEvents();
@@ -46,13 +43,6 @@ public:
 	~MADSV2Engine() override;
 
 	Common::Error run() override;
-
-	uint getRandomNumber(uint max) {
-		return _random.getRandomNumber(max);
-	}
-	uint getRandomNumber(uint min, uint max) {
-		return min + _random.getRandomNumber(max - min);
-	}
 
 	Graphics::Screen *getScreen() const {
 		return _screen;
