@@ -30,6 +30,7 @@ MODULE_OBJS := \
 	core/game.o \
 	core/game_data.o \
 	core/globals.o \
+	core/hag.o \
 	core/hotspots.o \
 	core/inventory.o \
 	core/mads.o \
