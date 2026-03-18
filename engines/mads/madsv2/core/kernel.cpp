@@ -301,7 +301,6 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 	int error_flag = true;
 	int count, count2;
 	int ems_temp;
-	int ems_error;
 	int pages;
 	int reserve[EMS_PAGING_CLASSES];
 	byte *interrupt_stack;
@@ -318,7 +317,7 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 
 	// ScummVM doesn't need EMS/XMS
 #if 0
-	ems_error = true;
+	int ems_error = true;
 
 	if (ems_exists) {
 		work_screen_ems_handle = ems_get_page_handle(4);
@@ -423,8 +422,7 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 
 	buffer_fill(scr_main, 0);
 
-	/* Load the main interface fonts */
-
+	// Load the main interface fonts
 	if (load_flag & KERNEL_STARTUP_FONT) {
 		font_main = font_load("*FONTMAIN.FF");
 		font_inter = font_load("*FONTINTR.FF");
@@ -443,8 +441,7 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 	}
 
 
-	/* Install timer handler & low priority cycling interrupt */
-
+	// Install timer handler & low priority cycling interrupt
 	if (load_flag & KERNEL_STARTUP_INTERRUPT) {
 		timer_install();
 
@@ -486,10 +483,8 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 	}
 #endif
 
-	/* Load the objects list */
-
+	// Load the objects list
 	if (load_flag & KERNEL_STARTUP_OBJECTS) {
-		/* inter_allocate_objects(); */
 		if (object_load()) {
 #ifndef disable_error_check
 			error_code = ERROR_KERNEL_NO_OBJECTS;
@@ -501,34 +496,28 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 		}
 	}
 
-	/* Allow packing routines to use lower interrupt stack */
-
+	// Allow packing routines to use lower interrupt stack
 	interrupt_stack = timer_get_interrupt_stack();
 	pack_set_special_buffer(interrupt_stack, NULL);
 
-	/* Initialize player data structures */
-
-	if (load_flag & KERNEL_STARTUP_PLAYER) player_init();
+	// Initialize player data structures
+	if (load_flag & KERNEL_STARTUP_PLAYER)
+		player_init();
 
 	popup_available = true;
-
-	/* video_update (&scr_main, 0, 0, 0, 0, video_x, video_y); */
 
 	Common::strcpy_s(box_param.name, "*BOX.SS");
 
 	if (load_flag & KERNEL_STARTUP_CURSOR) {
-
-		/* Wipe palette & prepare for cursor */
-
+		// Wipe palette & prepare for cursor
 		pal_init(KERNEL_RESERVED_LOW_COLORS, KERNEL_RESERVED_HIGH_COLORS);
 		pal_white(master_palette);
 		if (video_mode == mcga_mode) {
 			mcga_setpal_range(&master_palette, 0, 4);
 		}
 
-		/* Load cursor sprite series */
-
-		cursor = sprite_series_load("*CURSOR.SS", PAL_MAP_RESERVED | PAL_MAP_DEFINE_RESERVED);
+		// Load cursor sprite series
+		cursor = sprite_series_load("*CURSOR.SS", PAL_MAP_RESERVED /* | PAL_MAP_DEFINE_RESERVED*/);
 		if (cursor == NULL) {
 #ifndef disable_error_check
 			error_code = ERROR_KERNEL_NO_CURSOR;
@@ -536,8 +525,7 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 			goto done;
 		}
 
-		/* Activate main cursor sprite as mouse cursor */
-
+		// Activate main cursor sprite as mouse cursor
 		cursor_last = cursor_id = (cursor->num_sprites > 1) ? 2 : 1;
 		mouse_cursor_sprite(cursor, cursor_id);
 	}
@@ -564,7 +552,9 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 	error_flag = false;
 
 done:
-	if (load_flag & KERNEL_STARTUP_CURSOR_SHOW) mouse_show();
+	if (load_flag & KERNEL_STARTUP_CURSOR_SHOW)
+		mouse_show();
+
 	if (error_flag) {
 #ifndef disable_error_check
 		error_check_memory();

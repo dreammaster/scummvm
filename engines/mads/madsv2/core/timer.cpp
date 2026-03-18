@@ -34,6 +34,9 @@ word timer_noise_on;
 byte timer_copy_protect_in = 0;
 byte timer_copy_protect_out = 0;
 
+constexpr int interrupt_stack_size = 12800;
+byte _interrupt_stack[interrupt_stack_size];
+
 word timer_low_priority;
 word timer_low_semaphore;
 word timer_low_stacking;
@@ -127,7 +130,7 @@ void timer_activate_low_priority(void (*(routine))()) {
 }
 
 byte *timer_get_interrupt_stack(void) {
-	error("TODO: timer_get_interrupt_stack");
+	return _interrupt_stack;
 }
 
 } // namespace MADSV2
