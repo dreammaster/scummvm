@@ -82,8 +82,8 @@ namespace MADSV2 {
    *  I/O callback typedefs (match the original Pascal calling convention
    *  signatures translated to plain C function pointers)
    * ====================================================================== */
-typedef word (*ReadFn) (char *buffer, word *size);
-typedef word (*WriteFn)(char *buffer, word *size);
+typedef word(*ReadFn) (char *buffer, word *size);
+typedef word(*WriteFn)(char *buffer, word *size);
 
 
 /* =========================================================================
@@ -481,7 +481,7 @@ lz_exit:
  *  Public API: pFABcomp
  * ---------------------------------------------------------------------- */
 word pFABcomp(ReadFn read_buff, WriteFn write_buff, char *work_buff,
-		word *type, word *dsize) {
+	word *type, word *dsize) {
 	/* If work_buff is NULL, return required buffer size                   */
 	if (!work_buff)
 		return comp_work_size();
@@ -626,33 +626,42 @@ static unsigned long fab_explode(ExpIO *io) {
 	if (exp_getbyte(io) != 'F') return 0;
 	if (exp_getbyte(io) != 'A') return 0;
 	if (exp_getbyte(io) != 'B') return 0;
-	byte dict_bits = exp_getbyte(io);    /* e.g. 12              */
+	byte shiftVal = exp_getbyte(io);    /* dict bits, e.g. 12             */
 
-	int lempel = 1 << dict_bits;               /* 4096                  */
-	int zbits = 16 - dict_bits;               /* 4                     */
-	int zmax_len = (1 << zbits) - 1;             /* 15  (max short len-2) */
-	//byte umask = (byte)(0xFF << (dict_bits - 8));  /* offset hi mask */
+	/*
+	 * Derive the same masks FabDecompressor uses:
+	 *   copyOfsShift = 16 - shiftVal          (e.g. 4)
+	 *   copyOfsMask  = 0xFF << (shiftVal - 8) (e.g. 0xF0) -- sign-extends
+	 *                                          the high offset nibble
+	 *   copyLenMask  = (1 << copyOfsShift) - 1 (e.g. 0x0F)
+	 */
+	byte copyOfsShift = (byte)(16 - shiftVal);
+	byte copyOfsMask = (byte)(0xFF << (shiftVal - 8));
+	byte copyLenMask = (byte)((1 << copyOfsShift) - 1);
+	byte copyLen;
+	unsigned long copyOfs;
 
-	unsigned ctrl = 0;
-	int      cbits = 0;                          /* bits left in ctrl word */
+	// Setup initial control bits word
+	uint ctrl = exp_getword(io);
+	int  cbits = 16;
 
 	auto get_ctrl_bit = [&]() -> int {
-		if (cbits == 0) {
-			ctrl = exp_getword(io);
+		if (--cbits == 0) {
+			ctrl = (exp_getword(io) << 1) | (ctrl & 1);
 			cbits = 16;
 		}
+
 		int bit = (int)(ctrl & 1);
 		ctrl >>= 1;
-		cbits--;
 		return bit;
-		};
+	};
 
 	/* ---- Decode loop ------------------------------------------------- */
 	for (;;) {
 		int bit0 = get_ctrl_bit();
 
 		if (bit0 == 1) {
-			/* LITERAL */
+			/* LITERAL: copy one byte straight through */
 			byte c = exp_getbyte(io);
 			exp_putbyte(io, c);
 			continue;
@@ -662,65 +671,41 @@ static unsigned long fab_explode(ExpIO *io) {
 		int bit1 = get_ctrl_bit();
 
 		if (bit1 == 0) {
-			/* SHORT COPY: 2 more control bits = length 2-5, 1 byte dist 1-255 */
+			// Short copy
 			int lb = get_ctrl_bit();
 			int la = get_ctrl_bit();
-			int enc_len = (lb << 1) | la;       /* 0..3 = len - 2        */
-			int cplen = enc_len + 2;           /* 2..5                  */
-			byte off_byte = exp_getbyte(io);
-			int dist = (int)(byte)(-((int)(byte)off_byte));
-			if (dist == 0) dist = 256;           /* 0 encodes as 256      */
+			copyLen = ((lb << 1) | la) + 2;
+			copyOfs = exp_getbyte(io) | 0xFFFFFF00;
+		} else {
+			// Long copy
+			int lb = exp_getbyte(io);
+			int la = exp_getbyte(io);
+			copyOfs = (((la >> copyOfsShift) | copyOfsMask) << 8) | lb;
+			copyLen = la & copyLenMask;
 
-			for (int i = 0; i < cplen; i++) {
-				byte c = exp_readback(io, dist, io->out_count);
-				exp_putbyte(io, c);
+			if (copyLen == 0) {
+				copyLen = exp_getbyte(io);
+				if (copyLen == 0)
+					// End of decompression
+					break;
+				else if (copyLen == 1)
+					continue;
+				else
+					copyLen++;
+			} else {
+				copyLen += 2;
 			}
-			continue;
+			copyOfs |= 0xFFFF0000;
 		}
 
-		/* bit1 == 1 -> LONG COPY (or NORMALIZE / EXIT) */
-		{
-			byte lo_off = exp_getbyte(io);
-			byte packed = exp_getbyte(io);
-
-			/* High bits of offset: upper zbits of packed, shifted down   */
-			unsigned hi_off = (unsigned)(packed >> zbits);
-			unsigned dist = ((unsigned)hi_off << 8) | lo_off;
-
-			/* Length: lower (DICT-4) = zbits-1... actually lower zbits bits */
-			int enc_len = packed & zmax_len;
-
-			if (dist == 0) {
-				if (enc_len == 0) {
-					/* NORMALIZE marker - continue */
-					continue;
-				}
-				if (enc_len == 1) {
-					/* EXIT */
-					break;
-				}
-			}
-
-			int cplen;
-			if (enc_len == zmax_len) {
-				/* Extra length byte follows */
-				byte ext = exp_getbyte(io);
-				cplen = (int)ext + 1;
-			} else {
-				cplen = enc_len + 2;
-			}
-
-			/* dist is the back-reference distance (positive)             */
-			unsigned actual_dist = dist ? dist : lempel; /* 0 => lempel   */
-
-			for (int i = 0; i < cplen; i++) {
-				byte c = exp_readback(io, (int)actual_dist, io->out_count);
-				exp_putbyte(io, c);
-			}
+		int dist = ABS((signed int)copyOfs);
+		while (copyLen-- > 0) {
+			byte c = exp_readback(io, dist, io->out_count);
+			exp_putbyte(io, c);
 		}
 	}
 
-	/* Flush any remaining output                                         */
+	// Flush any remaining output                                         */
 	if (io->to_file)
 		exp_flush_wbuf(io, 1);
 
