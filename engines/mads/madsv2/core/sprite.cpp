@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/memstream.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/sprite.h"
 #include "mads/madsv2/core/mem.h"
@@ -291,6 +292,60 @@ void sprite_draw_3d_scaled_mono(SeriesPtr series, int id,
 
 //====================================================================
 
+void WalkerInfo::load(Load &load_handle) {
+	// Load in the needed data
+	byte buffer[SIZE];
+	loader_read(buffer, SIZE, 1, &load_handle);
+
+	Common::MemoryReadStream src(buffer, SIZE);
+	load(&src);
+}
+
+void WalkerInfo::load(Common::SeekableReadStream *src) {
+	// Read in the fields
+	num_primary = src->readUint16LE();
+	num_secondary = src->readUint16LE();
+	src->readMultipleLE(sequence_start);
+	src->readMultipleLE(sequence_stop);
+	src->readMultipleLE(sequence_chance);
+
+	velocity = src->readSint16LE();
+	frame_rate = src->readByte();
+	center_of_gravity = src->readByte();
+}
+
+
+bool FileSeries::loadHeader(Load &load_handle) {
+	// Load in the needed data
+	byte buffer[HEADER_SIZE];
+	if (!loader_read(buffer, HEADER_SIZE, 1, &load_handle))
+		return false;
+
+	// Wrap it in a memory stream for reading convenience
+	Common::MemoryReadStream src(buffer, HEADER_SIZE);
+
+	// Read in the fields
+	pack_by_sprite = src.readByte();
+	compression = src.readByte();
+	delta_series = src.readUint16LE();
+	base_mode = src.readUint16LE();
+	src.readMultipleLE(misc);
+	num_sprites = src.readUint16LE();
+	walker.load(&src);
+
+	offset_x_view = src.readUint16LE();
+	offset_y_view = src.readUint16LE();
+	total_data_size = src.readUint32LE();
+
+	return true;
+}
+
+void FileSprite::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(file_offset, memory_needed, x, y, xs, ys);
+}
+
+//====================================================================
+
 SeriesPtr sprite_series_load(const char *filename, int load_flags) {
 	register int count;
 	int len;
@@ -348,10 +403,11 @@ SeriesPtr sprite_series_load(const char *filename, int load_flags) {
 	/* Determine length of header, and read it */
 
 	len = sizeof(FileSeries) - sizeof(FileSprite);
+	if (!header.loadHeader(load_handle))
+		goto done;
 
-	if (!loader_read(&header, len, 1, &load_handle)) goto done;
-
-	if (header.misc_is_a_walker) load_flags |= SPRITE_LOAD_WALKER_INFO;
+	if (header.misc_is_a_walker)
+		load_flags |= SPRITE_LOAD_WALKER_INFO;
 
 	/* Determine length of index record array */
 
@@ -400,15 +456,23 @@ SeriesPtr sprite_series_load(const char *filename, int load_flags) {
 	target->page_table = NULL;
 	target->arena = NULL;
 
-	/* Read the index record array */
+	// Read the sprites array
+	{
+		byte *buffer = (byte *)malloc(header.num_sprites * FileSprite::SIZE);
+		if (!loader_read(buffer, FileSprite::SIZE, header.num_sprites, &load_handle)) {
+			free(buffer);
+			sprite_error = SS_ERR_READFILE;
+			goto done;
+		}
 
-	if (!loader_read(sprite, len2, 1, &load_handle)) {
-		sprite_error = SS_ERR_READFILE;
-		goto done;
+		Common::MemoryReadStream src(buffer, header.num_sprites * FileSprite::SIZE);
+		for (int i = 0; i < header.num_sprites; ++i)
+			sprite[i].load(&src);
+
+		free(buffer);
 	}
 
-	/* Read the color list */
-
+	// Read the color list
 	total_color_size = load_handle.pack.strategy[load_handle.pack_list_marker].size;
 
 	color_list = (ColorListPtr)mem_get_name(total_color_size, "$color$");
@@ -417,7 +481,8 @@ SeriesPtr sprite_series_load(const char *filename, int load_flags) {
 		goto done;
 	}
 
-	if (!loader_read(color_list, total_color_size, 1, &load_handle)) goto done;
+	if (!color_list->load(load_handle, total_color_size))
+		goto done;
 
 	/* Copy relevant header data to target header */
 

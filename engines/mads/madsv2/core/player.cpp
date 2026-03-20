@@ -126,7 +126,7 @@ void player_select_series() {
 
 	id = player.series_base + player.series;
 
-	player.velocity = MAX(series_list[id]->walker->velocity, 100);
+	player.velocity = MAX<int>(series_list[id]->walker->velocity, 100);
 
 	player_set_base_frame_rate();
 

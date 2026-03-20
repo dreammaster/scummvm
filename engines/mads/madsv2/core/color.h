@@ -22,7 +22,8 @@
 #ifndef MADS_CORE_COLOR_H
 #define MADS_CORE_COLOR_H
 
-#include "mads/madsv2/core/general.h"
+#include "common/stream.h"
+#include "mads/madsv2/core/loader.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -59,22 +60,27 @@ namespace MADSV2 {
 /* A fully parameterized color (in contrast to a plain RGBcolor as */
 /* defined in general.mac)                                         */
 
-typedef struct {
+struct Color {
 	byte r, g, b;         /* RGB values                  */
 	byte x16;           /* 16 color dither translation */
 	byte cycle;         /* Color cycling handle        */
 	byte group;         /* Color grouping flags        */
-} Color;
+
+	static constexpr int SIZE = 1 + 1 + 1 + 1 + 1 + 1;
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef Color *ColorPtr;
 
 
 /* Palette-independent color list; ready to map into palette */
 
-typedef struct {
-	int   num_colors;
+struct ColorList {
+	uint16 num_colors;
 	Color table[COLOR_MAX_USER_COLORS];
-} ColorList;
+
+	bool load(Load &load_handle, int size);
+};
 
 typedef ColorList *ColorListPtr;
 

@@ -24,6 +24,7 @@
 
 #include "common/stream.h"
 #include "mads/madsv2/core/color.h"
+#include "mads/madsv2/core/loader.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -92,17 +93,21 @@ namespace MADSV2 {
 
 /* STRUCTURES FOR ALL SPRITE LEVELS           */
 
-typedef struct {
-	int  num_primary;                   /* Number of primary sequence frames */
-	int  num_secondary;                 /* Number of secondary sequences     */
-	int  sequence_start[MAX_SECONDARY]; /* Secondary sequence start frames   */
-	int  sequence_stop[MAX_SECONDARY];  /* Secondary sequence stop frames    */
-	int  sequence_chance[MAX_SECONDARY];/* Secondary sequence probability    */
+struct WalkerInfo {
+	uint16  num_primary;                   /* Number of primary sequence frames */
+	uint16  num_secondary;                 /* Number of secondary sequences     */
+	uint16  sequence_start[MAX_SECONDARY]; /* Secondary sequence start frames   */
+	uint16  sequence_stop[MAX_SECONDARY];  /* Secondary sequence stop frames    */
+	uint16  sequence_chance[MAX_SECONDARY];/* Secondary sequence probability    */
 
-	int  velocity;                      /* Pixel velocity for walker         */
-	byte frame_rate;                    /* Frame rate for walker             */
-	byte center_of_gravity;             /* Center of gravity displacement    */
-} WalkerInfo;
+	int16  velocity;                      /* Pixel velocity for walker         */
+	byte   frame_rate;                    /* Frame rate for walker             */
+	byte   center_of_gravity;             /* Center of gravity displacement    */
+
+	static constexpr int SIZE = 2 + 2 + (2 + 2 + 2) * MAX_SECONDARY + 2 + 1 + 1;
+	void load(Load &load_handle);
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef WalkerInfo *WalkerInfoPtr;
 
@@ -164,38 +169,47 @@ typedef HagSeries *HagSeriesPtr;
 
 /* LOADABLE FILE STRUCTURES (.SS files) */
 
-/* Loadable sprite record */
+/**
+ * Loadable sprite record
+ */
+struct FileSprite {
+	uint32 file_offset;           /* Location of sprite data in file   */
+	uint32 memory_needed;         /* Memory needed to hold sprite data */
+	int16 x, y;
+	int16 xs, ys;
 
-typedef struct {
-	long file_offset;           /* Location of sprite data in file   */
-	long memory_needed;         /* Memory needed to hold sprite data */
-	int x, y;
-	int xs, ys;
-} FileSprite;
+	static constexpr int SIZE = 4 + 4 + 2 + 2 + 2 + 2;
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef FileSprite *FileSpritePtr;
 
 
-/* Loadable sprite series record */
-
-typedef struct FileSeriesBuf {
+/**
+ * Loadable sprite series record
+ */
+struct FileSeries {
 	byte pack_by_sprite;                /* Overall series packing strategy   */
 	byte compression;                   /* Type of compression               */
-	int delta_series;                   /* Flag if series is a delta series  */
-	int base_mode;                      /* Base mode optimization type       */
+	uint16 delta_series;                   /* Flag if series is a delta series  */
+	uint16 base_mode;                      /* Base mode optimization type       */
 
-	int misc[16];                       /* Miscellaneous data for updates    */
+	uint16 misc[16];                       /* Miscellaneous data for updates    */
 
-	int num_sprites;                    /* Number of sprites in series       */
+	uint16 num_sprites;                    /* Number of sprites in series       */
 
 	WalkerInfo walker;                  /* Walker information                */
 
-	int offset_x_view;                  /* View offsets for sprites intended */
-	int offset_y_view;                  /* for extra-wide animations         */
+	uint16 offset_x_view;                  /* View offsets for sprites intended */
+	uint16 offset_y_view;                  /* for extra-wide animations         */
 
-	long total_data_size;               /* Total uncompressed data size      */
+	uint32 total_data_size;               /* Total uncompressed data size      */
 	FileSprite index[1];                /* Sprite records begin here         */
-} FileSeries;
+
+	static constexpr int HEADER_SIZE = 1 + 1 + 2 + 2 + 2 * 16 + 2 +
+		WalkerInfo::SIZE + 2 + 2 + 4;
+	bool loadHeader(Load &load_handle);
+};
 
 typedef FileSeries *FileSeriesPtr;
 

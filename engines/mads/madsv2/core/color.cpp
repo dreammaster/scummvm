@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/memstream.h"
 #include "mads/madsv2/core/color.h"
 #include "mads/madsv2/core/screen.h"
 #include "mads/madsv2/core/sort.h"
@@ -26,6 +27,28 @@
 
 namespace MADS {
 namespace MADSV2 {
+
+void Color::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(r, g, b, x16, cycle, group);
+}
+
+bool ColorList::load(Load &load_handle, int size) {
+	// Load in the needed data
+	byte *buffer = (byte *)malloc(size);
+	bool result = loader_read(buffer, size, 1, &load_handle);
+
+	if (result) {
+		Common::MemoryReadStream src(buffer, size);
+
+		num_colors = src.readUint16LE();
+		for (int i = 0; i < num_colors; ++i)
+			table[i].load(&src);
+	}
+
+	free(buffer);
+	return result;
+}
+
 
 byte color_thatch(int color, int thatching) {
 	byte thatch;
