@@ -44,7 +44,7 @@ static void main_menu_main() {
 	auto &screen = *g_engine->getScreen();
 	Palette palette;
 
-	if (kernel_game_startup(19, KERNEL_STARTUP_CURSOR | KERNEL_STARTUP_INTERRUPT | KERNEL_STARTUP_FONT,
+	if (!kernel_game_startup(19, KERNEL_STARTUP_CURSOR | KERNEL_STARTUP_INTERRUPT | KERNEL_STARTUP_FONT,
 		nullptr, nullptr)) {
 		viewing_at_y = (200 - scr_work.y) >> 1;
 

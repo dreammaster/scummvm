@@ -20,6 +20,7 @@
  */
 
 #include "common/file.h"
+#include "common/memstream.h"
 #include "mads/madsv2/core/room.h"
 #include "mads/madsv2/core/attr.h"
 #include "mads/madsv2/core/env.h"
@@ -52,6 +53,26 @@ byte room_loaded_special = false;
 RoomPict roompict;
 
 static const char room_file_extension[5] = ".DAT";
+
+
+void Rail::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(x, y);
+	src->readMultipleLE(weight);
+}
+
+void RoomFile::load(Common::SeekableReadStream *src) {
+	src->read(picture_base, 80);
+	src->readMultipleLE(misc);
+	src->readMultipleLE(num_variants, num_hotspots, num_rails, front_y, back_y, front_scale, back_scale);
+	src->readMultipleLE(depth_table);
+
+	for (int i = 0; i < ROOM_MAX_RAILS; ++i)
+		rail[i].load(src);
+
+	shadow.load(src);
+}
+
+//====================================================================
 
 int room_read_def(int room_code, char *room_file, char *picture_base, int mads_mode) {
 	int result = -1;
@@ -148,10 +169,15 @@ RoomPtr room_load(int id, int variant, const char *base_path, Buffer *picture,
 	}
 
 	/* Load room header block */
+	{
+		byte buffer[RoomFile::SIZE];
+		if (!loader_read(buffer, RoomFile::SIZE, 1, &load_handle)) {
+			room_load_error = 2;
+			goto done;
+		}
 
-	if (!loader_read(&roomfile, sizeof(RoomFile), 1, &load_handle)) {
-		room_load_error = 2;
-		goto done;
+		Common::MemoryReadStream src(buffer, RoomFile::SIZE);
+		roomfile.load(&src);
 	}
 
 	Common::strcpy_s(block_name, "$ROOM");

@@ -79,7 +79,9 @@ struct ColorList {
 	uint16 num_colors;
 	Color table[COLOR_MAX_USER_COLORS];
 
+	static constexpr int SIZE = 2 + (Color::SIZE * COLOR_MAX_USER_COLORS);
 	bool load(Load &load_handle, int size);
+	void load(Common::SeekableReadStream *src);
 };
 
 typedef ColorList *ColorListPtr;
@@ -87,30 +89,39 @@ typedef ColorList *ColorListPtr;
 
 /* Palette-independent color cycling range & timing information */
 
-typedef struct {
+struct Cycle {
 	byte num_colors;                    /* Number of colors in the cycle */
 	byte first_list_color;              /* First color in color list     */
 	byte first_palette_color;           /* First color in final palette  */
 	byte ticks;                         /* 60/s ticks between cycles     */
-} Cycle;
+
+	static constexpr int SIZE = 1 + 1 + 1 + 1;
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef Cycle *CyclePtr;
 
 
 /* List of color cycling ranges */
 
-typedef struct {
+struct CycleList {
 	int   num_cycles;
 	Cycle table[COLOR_MAX_CYCLES];
-} CycleList;
+
+	static constexpr int SIZE = 2 + (Cycle::SIZE * COLOR_MAX_CYCLES);
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef CycleList *CycleListPtr;
 
 
-typedef struct {
-	int   num_shadow_colors;
-	int   shadow_color[COLOR_MAX_SHADOW_COLORS];
-} ShadowList;
+struct ShadowList {
+	uint16 num_shadow_colors;
+	int shadow_color[COLOR_MAX_SHADOW_COLORS];
+
+	static constexpr int SIZE = 2 + (2 * COLOR_MAX_SHADOW_COLORS);
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef ShadowList *ShadowListPtr;
 

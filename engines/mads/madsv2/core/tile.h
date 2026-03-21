@@ -45,52 +45,58 @@ namespace MADSV2 {
 #define tile_ems_page           0
 #define tile_ems_address        ems_page[tile_ems_page]
 
-typedef struct {
-	int num_tiles;                /* Number of tiles in resource      */
-	int tile_x;                   /* Tile X size                      */
-	int tile_y;                   /* Tile Y size                      */
-	int compression;              /* Compression in resource file     */
-	int ems_handle;               /* EMS handle of resource           */
-	int num_pages;                /* Number of pages needed           */
-	int tiles_per_page;           /* Tiles stored per page            */
-	long chunk_size;              /* Tile size in bytes (x*y)         */
-	int color_handle;             /* Color handle for loaded resource */
-} TileResource;
+struct TileResource {
+	uint16 num_tiles;                /* Number of tiles in resource      */
+	int16 tile_x;                   /* Tile X size                      */
+	int16 tile_y;                   /* Tile Y size                      */
+	int16 compression;              /* Compression in resource file     */
+	int16 ems_handle;               /* EMS handle of resource           */
+	uint16 num_pages;                /* Number of pages needed           */
+	uint16 tiles_per_page;           /* Tiles stored per page            */
+	uint32 chunk_size;              /* Tile size in bytes (x*y)         */
+	int16 color_handle;             /* Color handle for loaded resource */
+
+	static constexpr int SIZE = 2 + 2 + 2 + 2 + 2 + 2 + 2 + 4 + 2;
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef struct {
-	long file_offset;
+	int32 file_offset;
 } Tile;
 
-typedef struct {
-	int tile_type;                /* Type of tile                     */
-	int one_to_one;               /* One-to-one ratio with scr_orig   */
-	int num_x_tiles;              /* Number of X tiles in map         */
-	int num_y_tiles;              /* Number of Y tiles in map         */
-	int tile_x_size;              /* Tile X size                      */
-	int tile_y_size;              /* Tile Y size                      */
-	int viewport_x;               /* Viewport X size                  */
-	int viewport_y;               /* Viewport Y size                  */
-	int orig_x_size;              /* Orig buffer X pixel size         */
-	int orig_y_size;              /* Orig buffer Y pixel size         */
-	int orig_x_tiles;             /* Orig buffer X tile size          */
-	int orig_y_tiles;             /* Orig buffer Y tile size          */
-	int total_x_size;             /* Total picture X size (pixels)    */
-	int total_y_size;             /* Total picture Y size (pixels)    */
+struct TileMapHeader {
+	uint16 tile_type;             /* Type of tile                     */
+	uint16 one_to_one;            /* One-to-one ratio with scr_orig   */
+	uint16 num_x_tiles;           /* Number of X tiles in map         */
+	uint16 num_y_tiles;           /* Number of Y tiles in map         */
+	uint16 tile_x_size;           /* Tile X size                      */
+	uint16 tile_y_size;           /* Tile Y size                      */
+	uint16 viewport_x;            /* Viewport X size                  */
+	uint16 viewport_y;            /* Viewport Y size                  */
+	uint16 orig_x_size;           /* Orig buffer X pixel size         */
+	uint16 orig_y_size;           /* Orig buffer Y pixel size         */
+	uint16 orig_x_tiles;          /* Orig buffer X tile size          */
+	uint16 orig_y_tiles;          /* Orig buffer Y tile size          */
+	uint16 total_x_size;          /* Total picture X size (pixels)    */
+	uint16 total_y_size;          /* Total picture Y size (pixels)    */
 
-	int pan_x;                    /* Panned to pixel X value          */
-	int pan_y;                    /* Panned to pixel Y value          */
-	int pan_tile_x;               /* Panned to tile X value           */
-	int pan_tile_y;               /* Panned to tile Y value           */
-	int pan_base_x;               /* Base orig screen pixel X value   */
-	int pan_base_y;               /* Base orig screen pixel Y value   */
-	int pan_offset_x;             /* Panning orig offset to work X    */
-	int pan_offset_y;             /* Panning orig offset to work Y    */
+	int16 pan_x;                  /* Panned to pixel X value          */
+	int16 pan_y;                  /* Panned to pixel Y value          */
+	int16 pan_tile_x;             /* Panned to tile X value           */
+	int16 pan_tile_y;             /* Panned to tile Y value           */
+	int16 pan_base_x;             /* Base orig screen pixel X value   */
+	int16 pan_base_y;             /* Base orig screen pixel Y value   */
+	int16 pan_offset_x;           /* Panning orig offset to work X    */
+	int16 pan_offset_y;           /* Panning orig offset to work Y    */
 
 	TileResource *resource;       /* Resource pointer                 */
 	Buffer *buffer;               /* Buffer pointer                   */
 
-	int *map;                     /* Picture tile map pointer         */
-} TileMapHeader;
+	int16 *map;                   /* Picture tile map pointer (not in size) */
+
+	static constexpr int SIZE = (14 * 2) + (8 * 2) + 4 + 4;
+	void load(Common::SeekableReadStream *src);
+};
 
 extern ShadowList tile_shadow;
 extern int tile_load_error;

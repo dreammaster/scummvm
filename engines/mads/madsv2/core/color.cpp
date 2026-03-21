@@ -49,6 +49,31 @@ bool ColorList::load(Load &load_handle, int size) {
 	return result;
 }
 
+void ColorList::load(Common::SeekableReadStream *src) {
+	num_colors = src->readUint16LE();
+
+	for (int i = 0; i < COLOR_MAX_USER_COLORS; ++i)
+		table[i].load(src);
+}
+
+void Cycle::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(num_colors, first_list_color, first_palette_color, ticks);
+}
+
+void CycleList::load(Common::SeekableReadStream *src) {
+	num_cycles = src->readUint16LE();
+
+	for (int i = 0; i < COLOR_MAX_CYCLES; ++i)
+		table[i].load(src);
+}
+
+void ShadowList::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(num_shadow_colors);
+	for (int i = 0; i < COLOR_MAX_SHADOW_COLORS; ++i)
+		shadow_color[i] = src->readSint16LE();
+}
+
+//====================================================================
 
 byte color_thatch(int color, int thatching) {
 	byte thatch;

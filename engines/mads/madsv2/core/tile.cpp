@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/memstream.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/anim.h"
 #include "mads/madsv2/core/ems.h"
@@ -48,6 +49,24 @@ int tile_ems_available = false;
 int tile_picture_handle = -1;
 int tile_attribute_handle = -1;
 
+
+void TileMapHeader::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(tile_type, one_to_one, num_x_tiles, num_y_tiles,
+		tile_x_size, tile_y_size, viewport_x, viewport_y, orig_x_size, orig_y_size,
+		orig_x_tiles, orig_y_tiles, total_x_size, total_y_size);
+	src->readMultipleLE(pan_x, pan_y, pan_tile_x, pan_tile_y, pan_base_x, pan_base_y,
+		pan_offset_x, pan_offset_y);
+	src->skip(8);	// skip resource and buffer pointers
+
+	resource = nullptr;
+	buffer = nullptr;
+	map = nullptr;
+}
+
+void TileResource::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(num_tiles, tile_x, tile_y, compression, ems_handle,
+		num_pages, tiles_per_page, chunk_size, color_handle);
+}
 
 
 int tile_load(const char *base, int tile_type, TileResource *tile_resource,
@@ -118,27 +137,42 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 	}
 
 	/* Read map header record */
+	{
+		byte buffer[TileMapHeader::SIZE];
+		if (!loader_read(buffer, TileMapHeader::SIZE, 1, &load_handle)) {
+			tile_load_error = 2;
+			map->map = NULL;
+			goto done;
+		}
 
-	if (!loader_read(map, sizeof(TileMapHeader), 1, &load_handle)) {
-		tile_load_error = 2;
-		map->map = NULL;
-		goto done;
+		Common::MemoryReadStream src(buffer, TileMapHeader::SIZE);
+		map->load(&src);
 	}
 
 	/* Compute map size and read map */
 
 	map->tile_type = tile_type;
 
-	map_size = (map->num_x_tiles * map->num_y_tiles) * sizeof(int);
-	map->map = (int *)mem_get_name(map_size, "$map$");
+	map_size = (map->num_x_tiles * map->num_y_tiles) * sizeof(int16);
+	map->map = (int16 *)mem_get_name(map_size, "$map$");
 	if (map->map == NULL) {
 		tile_load_error = 3;
 		goto done;
 	}
 
-	if (!loader_read(map->map, map_size, 1, &load_handle)) {
-		tile_load_error = 4;
-		goto done;
+	{
+		byte *buffer = (byte *)malloc(map_size);
+
+		if (!loader_read(buffer, map_size, 1, &load_handle)) {
+			free(buffer);
+			tile_load_error = 4;
+			goto done;
+		}
+
+		const int16 *src = (const int16 *)buffer;
+		for (int i = 0; i < map_size / 2; ++i, ++src)
+			map->map[i] = READ_LE_INT16(src);
+		free(buffer);
 	}
 
 	loader_close(&load_handle);
@@ -158,10 +192,15 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 	}
 
 	/* Read tile resource header record */
+	{
+		byte buffer[TileResource::SIZE];
+		if (!loader_read(buffer, TileResource::SIZE, 1, &load_handle)) {
+			tile_load_error = 6;
+			goto done;
+		}
 
-	if (!loader_read(tile_resource, sizeof(TileResource), 1, &load_handle)) {
-		tile_load_error = 6;
-		goto done;
+		Common::MemoryReadStream src(buffer, TileResource::SIZE);
+		tile_resource->load(&src);
 	}
 
 	/* Initialize map structure parameters */
@@ -239,10 +278,17 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 	}
 
 	if (tile_space) {
-		if (!loader_read(tile, tile_space, 1, &load_handle)) {
+		byte *buffer = (byte *)malloc(tile_space);
+		if (!loader_read(buffer, tile_space, 1, &load_handle)) {
+			free(buffer);
 			tile_load_error = 10;
 			goto done;
 		}
+
+		Common::MemoryReadStream src(buffer, tile_space);
+		Tile *dest = tile;
+		for (int i = 0; i < tile_space / 4; ++i, ++dest)
+			dest->file_offset = src.readSint32LE();
 	}
 
 	/* For background pictures, load color lists and allocate palette space */
@@ -267,14 +313,26 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 			}
 		}
 
-		if (!loader_read(my_color_list, sizeof(ColorList), 1, &load_handle)) {
-			tile_load_error = 13;
-			goto done;
+		{
+			byte buffer[ColorList::SIZE];
+			if (!loader_read(buffer, ColorList::SIZE, 1, &load_handle)) {
+				tile_load_error = 13;
+				goto done;
+			}
+
+			Common::MemoryReadStream src(buffer, ColorList::SIZE);
+			my_color_list->load(&src);
 		}
 
-		if (!loader_read(my_cycle_list, sizeof(CycleList), 1, &load_handle)) {
-			tile_load_error = 14;
-			goto done;
+		{
+			byte buffer[CycleList::SIZE];
+			if (!loader_read(buffer, CycleList::SIZE, 1, &load_handle)) {
+				tile_load_error = 14;
+				goto done;
+			}
+
+			Common::MemoryReadStream src(buffer, ColorList::SIZE);
+			my_cycle_list->load(&src);
 		}
 
 		if (load_flags & TILE_MAP_SHADOW) {

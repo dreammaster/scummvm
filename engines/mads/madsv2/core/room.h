@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_ROOM_H
 #define MADS_CORE_ROOM_H
 
+#include "common/stream.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/vocab.h"
 #include "mads/madsv2/core/color.h"
@@ -108,10 +109,13 @@ typedef HotSpot *HotPtr;
 
 /* "Rail" nodes for smart walk */
 
-typedef struct Rail {
-	int x, y;                           /* Screen location of node         */
+struct Rail {
+	int16 x, y;                           /* Screen location of node         */
 	word weight[ROOM_MAX_RAILS + 2];    /* Distance to other nodes in room */
-} Rail;
+
+	static constexpr int SIZE = 2 + 2 + 2 * (ROOM_MAX_RAILS + 2);
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef Rail *RailPtr;
 
@@ -156,7 +160,7 @@ typedef RoomPict RoomPictPtr;
 
 /* Room definition structure (.DEF files) */
 
-typedef struct {
+struct RoomDef {
 
 	char picture_base[80];      /* Picture base                         */
 
@@ -174,36 +178,28 @@ typedef struct {
 	Rail rail[ROOM_MAX_RAILS + 2];/* Smart walk rails                     */
 
 	ShadowList shadow;          /* Shadow list                          */
-
-} RoomDef;
+};
 
 
 
 /* Loadable Room definition (.DAT files) */
+struct RoomFile {
+	char picture_base[80];           /* Picture base name             */
+	uint16 misc[10];                 /* Padding for future updates    */
+	uint16 num_variants;             /* Number of attribute variants  */
+	uint16 num_hotspots;             /* Number of hot spots           */
+	uint16 num_rails;                /* Number of rail nodes          */
+	uint16 front_y, back_y;          /* Player scaling baselines      */
+	uint16 front_scale, back_scale;  /* Player scaling factors        */
+	uint16 depth_table[16];          /* Player depth table            */
+	Rail rail[ROOM_MAX_RAILS];       /* Rail nodes for room           */
 
-typedef struct {
-	/* int       id;                       Room number                   */
-	/* int       picture_id;               Room whose ART file is needed */
-	/* int       format;                   Room format (panning/normal)  */
-	/* int       xs, ys;                   X and Y size of room picture  */
-	char      picture_base[80];         /* Picture base name             */
-	int       misc[10];                 /* Padding for future updates    */
-	int       num_variants;             /* Number of attribute variants  */
-	int       num_hotspots;             /* Number of hot spots           */
-	int       num_rails;                /* Number of rail nodes          */
-	int       front_y, back_y;          /* Player scaling baselines      */
-	int       front_scale, back_scale;  /* Player scaling factors        */
-	int       depth_table[16];          /* Player depth table            */
-	Rail      rail[ROOM_MAX_RAILS];     /* Rail nodes for room           */
+	ShadowList shadow;               /* Shadow list                   */
 
-	/* int       num_series;               Number of background series   */
-	/* int       num_images;               Number of background images   */
-
-	/* char      series_name[ROOM_MAX_SERIES][64]; Sprite series needed  */
-	/* Image     image_list [ROOM_MAX_IMAGES];     Images to be drawn    */
-
-	ShadowList shadow;                  /* Shadow list                   */
-} RoomFile;
+	static constexpr int SIZE = 80 + (2 * 10) + 2 + 2 + 2 + (2 + 2) + (2 + 2) + 2 * 16 +
+		(Rail::SIZE * ROOM_MAX_RAILS) + ShadowList::SIZE;
+	void load(Common::SeekableReadStream *src);
+};
 
 
 
