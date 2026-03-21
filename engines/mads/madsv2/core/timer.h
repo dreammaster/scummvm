@@ -48,11 +48,16 @@ extern long timer_dos_low;
 /* extern byte *interrupt_stack_pointer; */
 /* extern word interrupt_stack_size;         */
 
-/* timer_1.c */
-long timer_read(void);
-long timer_read_dos(void);
-long timer_read_600(void);
-long timer_read_60(void);
+/**
+ * Reads system clock, returns number of ticks since startup (1 tick = 54.9ms)
+ */
+long timer_read();
+inline long timer_read_dos() {
+	return timer_read();
+}
+
+long timer_read_600();
+long timer_read_60();
 void timer_set_rate(word count_down);
 
 /**
@@ -75,10 +80,10 @@ void timer_set_sound_flag(int sound_flag);
  */
 void timer_activate_low_priority(void (*(routine))());
 
-byte *timer_get_interrupt_stack(void);
+byte *timer_get_interrupt_stack();
 
 int timer_set_copy_protect(int protect);
-int timer_get_copy_protect(void);
+int timer_get_copy_protect();
 
 } // namespace MADSV2
 } // namespace MADS

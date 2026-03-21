@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/system.h"
 #include "common/textconsole.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/timer.h"
@@ -43,64 +44,6 @@ word timer_low_stacking;
 word timer_low_deferred;
 void *timer_low_routine;
 
-long timer_600_low;
-long timer_60_low;
-long timer_dos_low;
-
-
-/*
-/*      Reads system clock, returns number of ticks since midnight.
-*/
-long timer_read(void) {
-	return (*timer_address);
-}
-
-
-long timer_read_dos(void) {
-	return (*dos_timer_address);
-}
-
-
-long timer_read_600(void) {
-	return (timer_600_low);
-}
-
-long timer_read_60(void) {
-	return (timer_60_low);
-}
-
-/*
-/*      This works around annoying MASM problem requiring us to make
-/*      reference to code segment in order to get data segment stuff
-/*      linked from an OBJ.  This routine does not exist to be called
-/*      but rather to make the required references in case the main
-/*      program does not.
-*/
-void timer_hack(void) {
-	timer_install();
-	/* pl sound_manager(); */
-	/* pl sound_driver_null(); */
-	timer_remove();
-}
-
-
-void timer_set_rate(word count_down) {
-	warning("TODO: timer_set_rate");
-#ifdef TODO
-	_asm {
-		cli; Interrupts begone
-
-		mov al, 00110110b; Timer chanel 0
-		out 43h, al; Declare our intention to reprogram
-		mov ax, count_down; Get new countdown value
-		out 40h, al; Send low part
-		mov al, ah
-		out 40h, al; Send high part
-
-		sti; Interrupts come hither
-	}
-#endif
-}
 
 void timer_install() {
 	// No implementation in ScummVM
@@ -108,6 +51,21 @@ void timer_install() {
 
 void timer_remove() {
 	// No implementation in ScummVM
+}
+
+long timer_read() {
+	unsigned long ms = g_system->getMillis();
+	return ms * 1193 / 65536;
+}
+
+long timer_read_600() {
+	unsigned long ms = g_system->getMillis();
+	return ms * 600 / 1000;
+}
+
+long timer_read_60() {
+	unsigned long ms = g_system->getMillis();
+	return ms * 60 / 1000;
 }
 
 void timer_set_sound_flag(int sound_flag) {
@@ -129,7 +87,7 @@ void timer_activate_low_priority(void (*(routine))()) {
 	warning("TODO: timer_activate_low_priority");
 }
 
-byte *timer_get_interrupt_stack(void) {
+byte *timer_get_interrupt_stack() {
 	return _interrupt_stack;
 }
 
