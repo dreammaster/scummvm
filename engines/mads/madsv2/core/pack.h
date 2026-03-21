@@ -79,7 +79,7 @@ namespace MADSV2 {
 #define PACK_PRIORITY_INTERFACES      10
 #define PACK_PRIORITY_ROOM_ART        11
 
-#define PACK_OVERHEAD                 sizeof(PackList)
+#define PACK_OVERHEAD                 PackList::SIZE
 
 struct PackStrategy {
 	byte type;
@@ -88,13 +88,12 @@ struct PackStrategy {
 	long compressed_size;
 
 	void load(Common::SeekableReadStream *src);
-	static uint SIZE() {
-		return 1 + 1 + 4 + 4;
-	}
+	static constexpr int SIZE = 1 + 1 + 4 + 4;
 };
 
 typedef PackStrategy *PackStrategyPtr;
 
+#define PACK_HEADER   (PACK_ID_LENGTH + 2)
 
 struct PackList {
 	char id_string[PACK_ID_LENGTH];
@@ -102,12 +101,8 @@ struct PackList {
 	PackStrategy strategy[PACK_MAX_LIST_LENGTH];
 
 	bool load(Common::SeekableReadStream *src);
-	static uint SIZE() {
-		return PACK_ID_LENGTH + 2 + (PackStrategy::SIZE() * PACK_MAX_LIST_LENGTH);
-	}
+	static constexpr int SIZE = PACK_HEADER + PackStrategy::SIZE * PACK_MAX_LIST_LENGTH;
 };
-
-#define PACK_HEADER   (PACK_ID_LENGTH + 2)
 
 typedef PackList *PackListPtr;
 

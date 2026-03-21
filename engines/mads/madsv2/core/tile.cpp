@@ -481,7 +481,7 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 
 					if (pack_data(packing_flag, tile_resource->chunk_size,
 						FROM_MEMORY, decompress_buffer,
-						TO_MEMORY, tile_buffer.data) != tile_resource->chunk_size) {
+						TO_MEMORY, tile_buffer.data) != (long)tile_resource->chunk_size) {
 						tile_load_error = 51;
 						goto done;
 					}
@@ -496,7 +496,7 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 			if (!already_unpacked) {
 				if (pack_data(packing_flag, tile_resource->chunk_size,
 					FROM_DISK, load_handle.handle,
-					TO_MEMORY, tile_buffer.data) != tile_resource->chunk_size) {
+					TO_MEMORY, tile_buffer.data) != (long)tile_resource->chunk_size) {
 					tile_load_error = 19;
 					goto done;
 				}
