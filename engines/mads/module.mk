@@ -85,6 +85,7 @@ MODULE_OBJS += \
 	madsv2/core/heap.o \
 	madsv2/core/himem.o \
 	madsv2/core/hspot.o \
+	madsv2/core/image.o \
 	madsv2/core/imath.o \
 	madsv2/core/implode.o \
 	madsv2/core/inter.o \

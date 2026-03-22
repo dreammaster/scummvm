@@ -19,34 +19,14 @@
  *
  */
 
-#ifndef MADS_CORE_IMAGE_H
-#define MADS_CORE_IMAGE_H
-
-#include "common/stream.h"
+#include "mads/madsv2/core/image.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-struct Image {
-	int16  flags;         /* refers to the index of the corresponding frame in the anim struct */
-	/* ^^ only true for images which have been anim_loaded...            */
-	/* anim_view dumps these images into lists using flags to tell       */
-	/* when they should be put; the flags then become actual flags       */
-	/* like IMAGE_INCOMING, IMAGE_STATIC, or about to be erased, or ...  */
-	byte segment_id;    /* i'm a part of this segment                                        */
-	byte series_id;     /* this is my series                                                 */
-	int16  sprite_id;     /* sprite within the series                                          */
-	int16  x, y;
-	byte depth;
-	byte scale;
-
-	static constexpr int SIZE = 2 + 1 + 1 + 2 + 2 + 2 + 1 + 1;
-	void load(Common::SeekableReadStream *src);
-};
-
-typedef Image *ImagePtr;
+void Image::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(flags, segment_id, series_id, sprite_id, x, y, depth, scale);
+}
 
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

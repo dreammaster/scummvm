@@ -22,6 +22,8 @@
 #ifndef MADS_CORE_ANIM_H
 #define MADS_CORE_ANIM_H
 
+#include "common/stream.h"
+#include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/font.h"
 #include "mads/madsv2/core/image.h"
 #include "mads/madsv2/core/room.h"
@@ -228,15 +230,17 @@ struct ImageEditBuf {
 typedef struct ImageEditBuf ImageEdit;
 typedef ImageEdit *ImageEditPtr;
 
-struct ImageInterBuf {
-	int  flags;
+struct ImageInter {
+	int16 flags;
 	byte segment_id;
 	byte series_id;
 	byte sprite_id;
-	int  x;
+	int16 x;
 	byte y;
+
+	static constexpr int SIZE = 2 + 1 + 1 + 1 + 2 + 1;
+	void load(Common::SeekableReadStream *src);
 };
-typedef struct ImageInterBuf ImageInter;
 typedef ImageInter *ImageInterPtr;
 
 
@@ -270,53 +274,58 @@ typedef struct FrameEditBuf FrameEdit;
 typedef FrameEdit *FrameEditPtr;
 
 
-struct FrameBuf {
+struct Frame {
 	byte sound;         /* what sound cue to play                             */
 	byte speech;        /* what speech record to activate                     */
 	word ticks;         /* how many ticks for this frame (before? after?)     */
 	word view_x;        /* where the pan set currently                        */
 	word view_y;
-	char yank_x;        /* for backgrounds which wrap around, like starfields */
-	char yank_y;
-};
+	int8 yank_x;        /* for backgrounds which wrap around, like starfields */
+	int8 yank_y;
 
-typedef struct FrameBuf Frame;
+	static constexpr int SIZE = 1 + 1 + 2 + 2 + 2 + 1 + 1;
+	void load(Common::SeekableReadStream *src);
+};
 typedef Frame *FramePtr;
 
 
-struct SegmentInterBuf {
-	int probability;
-	int num_images;
-	int first_image;
-	int last_image;
-	int counter;
+struct SegmentInter {
+	int16 probability;
+	int16 num_images;
+	int16 first_image;
+	int16 last_image;
+	int16 counter;
 	byte spawn[AA_MAX_SPAWNED];
-	int spawn_frame[AA_MAX_SPAWNED];
+	int16 spawn_frame[AA_MAX_SPAWNED];
 	byte sound;
-	int sound_frame;
-};
+	int16 sound_frame;
 
-typedef struct SegmentInterBuf SegmentInter;
+	static constexpr int SIZE = 5 * 2 + AA_MAX_SPAWNED + AA_MAX_SPAWNED * 2 + 1 + 2;
+	void load(Common::SeekableReadStream *src);
+};
 typedef SegmentInter *SegmentInterPtr;
 
 
-typedef struct {
-	int resource_id;            /* Speech segment id in resource file */
-	char text[60];              /* Text to be displayed     */
-	byte misc[3];               /* 3 extra bonus bytes      */
-	byte sound;                 /* Sound to be used         */
+struct Speech {
+	int16 resource_id;            /* Speech segment id in resource file */
+	char text[60];                /* Text to be displayed     */
+	byte misc[3];                 /* 3 extra bonus bytes      */
+	byte sound;                   /* Sound to be used         */
 	/* pl SpeechDirPtr speech;  */      /* Binary speech pointer    */
-	int x, y;                   /* Text coordinates         */
-	int display_condition;      /* Condition for display    */
-	RGBcolor color[2];          /* Colors for text display  */
-	word flags;                 /* Segment flags            */
-	int speech_loops;           /* Loops if speech active   */
-	int non_speech_loops;       /* Loops if speech inactive */
-	int segment_to_loop;        /* Segment ID to be looped  */
-	int first_frame;            /* First frame of segment   */
-	int last_frame;             /* Last frame of segment    */
-	int first_image;            /* First image number       */
-} Speech;
+	int16 x, y;                   /* Text coordinates         */
+	int16 display_condition;      /* Condition for display    */
+	RGBcolor color[2];            /* Colors for text display  */
+	word flags;                   /* Segment flags            */
+	int16 speech_loops;           /* Loops if speech active   */
+	int16 non_speech_loops;       /* Loops if speech inactive */
+	int16 segment_to_loop;        /* Segment ID to be looped  */
+	int16 first_frame;            /* First frame of segment   */
+	int16 last_frame;             /* Last frame of segment    */
+	int16 first_image;            /* First image number       */
+
+	static constexpr int SIZE = 2 + 60 + 3 + 1 + 2 + 2 + 2 + 2 * RGBcolor::SIZE + 7 * 2;
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef Speech *SpeechPtr;
 
@@ -361,92 +370,55 @@ typedef AnimDef *AnimDefPtr;
 
 /* aa file header */
 
-struct AnimFileBuf {
-	int num_series;
-	int num_frames;
-	int num_images;
-	int num_speech;
+struct AnimFile {
+	uint16 num_series;
+	uint16 num_frames;
+	uint16 num_images;
+	uint16 num_speech;
 	word load_flags;
-	int font_auto_spacing;
-	int background_type;                 /* black, or room, or whatever    */
-	int background_room;                 /* room number to load            */
-	int misc[10];                        /* see MISC_ defines above        */
+	uint16 font_auto_spacing;
+	uint16 background_type;                 /* black, or room, or whatever    */
+	uint16 background_room;                 /* room number to load            */
+	uint16 misc[10];                        /* see MISC_ defines above        */
 	char background_name[13];            /* if needed                      */
 	char series_name[AA_MAX_SERIES][13]; /* filenames for all your series  */
 	char sound_file_name[13];
 	char background_depth[13];
 	char speech_file[13];
 	char font_file[13];
-};
 
-typedef struct AnimFileBuf AnimFile;
+	static constexpr int SIZE = (8 * 2) + (10 * 2) + 13 +
+		(AA_MAX_SERIES * 13) + 13 + 13 + 13 + 13 +
+		1; // structure padding
+	void load(Common::SeekableReadStream *src);
+};
 
 /* runtime memory image for an animation */
 
-struct AnimBuf {
-	int num_series;
-	int num_frames;
-	int num_images;
-	int num_speech;
-	word load_flags;
-	int font_auto_spacing;
-	int background_type;
-	int background_room;
-	int misc[10];
-
-	char background_name[13];
-	char series_name[AA_MAX_SERIES][13];
-
-	char sound_file_name[13];
-	char background_depth[13];
-	char speech_file[13];
-	char font_file[13];
-
-	FontPtr   font;
+struct Anim : public AnimFile {
+	FontPtr font;
 	SpeechPtr speech;
 
-	ImagePtr  image;                    /* to the array of images */
-	FramePtr  frame;                    /* to the array of frames */
-	SeriesPtr series[AA_MAX_SERIES];    /* pointers to series     */
+	ImagePtr image;						/* to the array of images */
+	FramePtr frame;						/* to the array of frames */
+	SeriesPtr series[AA_MAX_SERIES];	/* pointers to series     */
 
-	int       series_id[AA_MAX_SERIES];
+	int series_id[AA_MAX_SERIES];
 };
-
-typedef struct AnimBuf Anim;
 typedef Anim *AnimPtr;
 
 /* the interface version of the above */
 
-struct AnimInterBuf {
-	int num_series;
-	int num_segments;
-	int num_images;
-	int num_speech;
-	word load_flags;
-	int font_auto_spacing;
-	int background_type;
-	int background_room;
-	int misc[10];
-
-	char background_name[13];
-	char series_name[AA_MAX_SERIES][13];
-
-	char sound_file_name[13];
-	char background_depth[13];
-	char speech_file[13];
-	char font_file[13];
-
-	FontPtr   font;
+struct AnimInter : public AnimFile {
+	FontPtr font;
 	SpeechPtr speech;
 
-	ImageInterPtr   image;
+	ImageInterPtr image;
 	SegmentInterPtr segment;
-	SeriesPtr       series[AA_MAX_SERIES];
+	SeriesPtr series[AA_MAX_SERIES];
 
-	int             series_id[AA_MAX_SERIES];
+	int series_id[AA_MAX_SERIES];
 };
-
-typedef struct AnimInterBuf AnimInter;
 typedef AnimInter *AnimInterPtr;
 
 

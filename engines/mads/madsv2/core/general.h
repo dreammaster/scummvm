@@ -22,7 +22,7 @@
 #ifndef MADS_CORE_GENERAL_H
 #define MADS_CORE_GENERAL_H
 
-#include "common/str.h"
+#include "common/stream.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -39,9 +39,17 @@ typedef uint16  word;            /* generic 16 bit data */
 
 /* vertical data types */
 
-typedef struct {
+/* A single palette color    */
+struct RGBcolor {
 	byte r, g, b;
-} RGBcolor;  /* A single palette color    */
+
+	static constexpr int SIZE = 3;
+	inline void load(Common::SeekableReadStream *src) {
+		r = src->readByte();
+		g = src->readByte();
+		b = src->readByte();
+	}
+};
 typedef RGBcolor Palette[256];          /* An entire Mcga palette    */
 typedef byte PaletteMap[256][3];        /* An entire Mcga palette #2 */
 

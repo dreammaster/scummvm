@@ -19,6 +19,8 @@
  *
  */
 
+#include "common/algorithm.h"
+#include "common/memstream.h"
 #include "mads/madsv2/core/anim.h"
 #include "mads/madsv2/core/himem.h"
 #include "mads/madsv2/core/env.h"
@@ -41,6 +43,51 @@ namespace MADSV2 {
 ShadowList anim_shadow = { 0 };
 int anim_error;
 
+void AnimFile::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(num_series, num_frames, num_images, num_speech,
+		load_flags, font_auto_spacing, background_type, background_room);
+	src->readMultipleLE(misc);
+	src->read(background_name, 13);
+
+	for (int i = 0; i < AA_MAX_SERIES; ++i)
+		src->read(&series_name[i][0], 13);
+
+	src->read(sound_file_name, 13);
+	src->read(background_depth, 13);
+	src->read(speech_file, 13);
+	src->read(font_file, 13);
+}
+
+void Speech::load(Common::SeekableReadStream *src) {
+	resource_id = src->readSint16LE();
+	src->read(text, 60);
+	src->read(misc, 3);
+	src->readMultipleLE(sound, x, y, display_condition);
+
+	for (int i = 0; i < 2; ++i)
+		color[i].load(src);
+
+	src->readMultipleLE(flags, speech_loops, non_speech_loops, segment_to_loop,
+		first_frame, last_frame, first_image);
+}
+
+void ImageInter::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(flags, segment_id, series_id, sprite_id, x, y);
+}
+
+void Frame::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(sound, speech, ticks, view_x, view_y, yank_x, yank_y);
+}
+
+void SegmentInter::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(probability, num_images, first_image, last_image, counter);
+	src->read(spawn, AA_MAX_SPAWNED);
+	src->readMultipleLE(spawn_frame);
+	src->readMultipleLE(sound, sound_frame);
+}
+
+
+//====================================================================
 
 int anim_load_background(AnimFile *anim_in, Buffer *this_orig,
 		Buffer *this_depth, TileMapHeader *pictureMap, TileMapHeader *depthMap,
@@ -171,7 +218,7 @@ AnimPtr anim_load(const char *file_name, Buffer *orig, Buffer *depth,
 	word *color_slaves = (word *)temp_buf;
 	word num_color_slaves;
 	long image_size, frame_size, speech_size, anim_size;
-	AnimPtr      anim = NULL;
+	AnimPtr anim = NULL;
 	AnimInterPtr anim2 = NULL;
 	AnimFile anim_in;
 	Load load_handle;
@@ -188,10 +235,18 @@ AnimPtr anim_load(const char *file_name, Buffer *orig, Buffer *depth,
 	star_search = (temp_buf[0] == '*');
 
 	anim_error = 1;
-	if (loader_open(&load_handle, temp_buf, "rb", true)) goto done;
+	if (loader_open(&load_handle, temp_buf, "rb", true))
+		goto done;
 
-	anim_error = 2;
-	if (!loader_read(&anim_in, sizeof(AnimFile), 1, &load_handle)) goto done;
+	{
+		anim_error = 2;
+		byte buffer[AnimFile::SIZE];
+		if (!loader_read(buffer, sizeof(AnimFile), 1, &load_handle))
+			goto done;
+
+		Common::MemoryReadStream src(buffer, AnimFile::SIZE);
+		anim_in.load(&src);
+	}
 
 	if (anim_in.background_type == AA_INTERFACE) {
 		load_flags |= PAL_MAP_RESERVED;
@@ -257,20 +312,33 @@ AnimPtr anim_load(const char *file_name, Buffer *orig, Buffer *depth,
 	}
 
 	// get ready for loading some series
-	for (count = 0; count < AA_MAX_SERIES; count++) {
-		anim->series[count] = NULL;
-	}
+	Common::fill(anim->series, anim->series + AA_MAX_SERIES, (SeriesPtr)nullptr);
+	Common::fill(anim->series_id, anim->series_id + AA_MAX_SERIES, -1);
 
 	// we read the header before, now get it into our new structure
 	memcpy(anim, &anim_in, sizeof(AnimFile));
 
-	for (count = 0; count < anim->num_series; count++) {
-		anim->series_id[count] = -1;
-	}
-
 	if (speech_size > 0) {
 		anim_error = 5;
-		if (!loader_read(anim->speech, speech_size, 1, &load_handle)) goto done;
+
+		size_t size = Speech::SIZE * anim_in.num_speech;
+		byte *buffer = (byte *)malloc(size);
+		if (!loader_read(buffer, speech_size, 1, &load_handle)) {
+			free(buffer);
+			goto done;
+		}
+
+		Common::MemoryReadStream src(buffer, size);
+
+		if (anim_in.background_type == AA_INTERFACE) {
+			for (int i = 0; i < anim_in.num_speech; ++i)
+				anim2->speech[i].load(&src);
+		} else {
+			for (int i = 0; i < anim_in.num_speech; ++i)
+				anim->speech[i].load(&src);
+		}
+
+		free(buffer);
 	}
 
 	// x, y, depth, s, series and sprite id comprise an image
@@ -278,7 +346,25 @@ AnimPtr anim_load(const char *file_name, Buffer *orig, Buffer *depth,
 
 	if (image_size > 0) {
 		anim_error = 6;
-		if (!loader_read(anim->image, image_size, 1, &load_handle)) goto done;
+
+		size_t size = (anim_in.background_type == AA_INTERFACE ? ImageInter::SIZE : Image::SIZE) * anim_in.num_images;
+		byte *buffer = (byte *)malloc(size);
+		if (!loader_read(buffer, size, 1, &load_handle)) {
+			free(buffer);
+			goto done;
+		}
+
+		Common::MemoryReadStream src(buffer, size);
+
+		if (anim_in.background_type == AA_INTERFACE) {
+			for (int i = 0; i < anim_in.num_images; ++i)
+				anim2->image[i].load(&src);
+		} else {
+			for (int i = 0; i < anim_in.num_images; ++i)
+				anim->image[i].load(&src);
+		}
+
+		free(buffer);
 	}
 
 	// a frame contains timing information and sound effect information
@@ -286,9 +372,26 @@ AnimPtr anim_load(const char *file_name, Buffer *orig, Buffer *depth,
 
 	if (frame_size > 0) {
 		anim_error = 7;
-		if (!loader_read(anim->frame, frame_size, 1, &load_handle)) goto done;
-	}
 
+		size_t size = (anim_in.background_type == AA_INTERFACE ? SegmentInter::SIZE : Frame::SIZE) * anim_in.num_frames;
+		byte *buffer = (byte *)malloc(size);
+		if (!loader_read(buffer, size, 1, &load_handle)) {
+			free(buffer);
+			goto done;
+		}
+
+		Common::MemoryReadStream src(buffer, size);
+
+		if (anim_in.background_type == AA_INTERFACE) {
+			for (int i = 0; i < anim_in.num_frames; ++i)
+				anim2->segment[i].load(&src);
+		} else {
+			for (int i = 0; i < anim_in.num_frames; ++i)
+				anim->frame[i].load(&src);
+		}
+
+		free(buffer);
+	}
 
 	loader_close(&load_handle);
 

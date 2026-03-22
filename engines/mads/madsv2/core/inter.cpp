@@ -1883,7 +1883,7 @@ static void inter_background_animation(void) {
 
 	inter_no_segments_active = !inter_some_segments_active;
 	inter_some_segments_active = false;
-	for (count = 0; count < inter_anim->num_segments; count++) {
+	for (count = 0; count < inter_anim->num_series /* num_segments */; count++) {
 		if (inter_anim->segment[count].counter < 0) {
 			if (inter_anim->segment[count].counter == -1) {
 				prob_check = imath_random(1, 30000);
@@ -1925,7 +1925,7 @@ static void inter_background_animation(void) {
 		}
 	}
 
-	for (count = 0; count < inter_anim->num_segments; count++) {
+	for (count = 0; count < inter_anim->num_series; count++) {
 		image_scan = inter_anim->segment[count].counter;
 		if (image_scan >= 0) {
 			if (image_inter_marker < IMAGE_INTER_LIST_SIZE) {
