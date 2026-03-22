@@ -48,6 +48,78 @@ void (*error_service_routine_2)() = NULL;
 int  error_abort = WARNING;
 char error_string[80] = "";
 
+static const char *ERROR_MESSAGES[] = {
+	nullptr,
+	"ERROR_SERIES_LIST_FULL",
+	"ERROR_MESSAGE_LIST_FULL",
+	"ERROR_IMAGE_LIST_FULL",
+	"ERROR_IMAGE_INTER_LIST_FULL",
+	"ERROR_NO_MORE_PALETTE_FLAGS",
+	"ERROR_NO_MORE_COLORS",
+	"ERROR_SERIES_LOAD_FAILED",
+	"ERROR_NO_MORE_MEMORY",
+	"ERROR_WRONG_SERIES_UNLOAD_ORDER",
+	"ERROR_PLAYER_INVENTORY_FULL    ",
+
+	"ERROR_SEQUENCE_LIST_FULL",
+	"ERROR_VOCAB_ACTIVE_LIST_FULL",
+	"ERROR_NO_SUCH_OBJECT",
+	"ERROR_NO_SUCH_MESSAGE",
+	"ERROR_POPUP_TOO_MANY_LINES",
+	"ERROR_KERNEL_MESSAGE_LIST_FULL",
+	"ERROR_MESSAGE_TOO_LONG",
+	"ERROR_DEMO_PROTECTION",
+	"ERROR_BEEN_IN_TOO_MANY_ROOMS",
+	"ERROR_COPY_PROTECTION",
+
+	"ERROR_QUOTE_LOAD_FAILED",
+	"ERROR_TIME_LIMIT_EXPIRED",
+	"ERROR_QUOTE_DUPLICATE_LOAD",
+	"ERROR_DYNAMIC_HOTSPOT_OVERFLOW",
+	"ERROR_SPRITE_DATA_LOAD_FAILED",
+	"ERROR_CHAIN_FAILURE",
+	"ERROR_RESTORE_GAME_FAILURE",
+	"ERROR_EXPLODER_EXPLODED",
+	"ERROR_EXPLODER_NULL",
+	"ERROR_ANIMATION_LOAD_FAILURE",
+
+	"ERROR_BREAK_POINT",
+	"ERROR_KERNEL_NO_FONTS",
+	"ERROR_KERNEL_NO_CURSOR",
+	"ERROR_KERNEL_NO_OBJECTS",
+	"ERROR_KERNEL_NO_ROOM",
+	"ERROR_KERNEL_NO_HOTSPOTS",
+	"ERROR_KERNEL_NO_VOCAB",
+	"ERROR_KERNEL_NO_INTERFACE",
+	"ERROR_KERNEL_NO_ANIMATION",
+	"ERROR_KERNEL_NO_EMS",
+
+	"ERROR_KERNEL_NO_POPUP",
+	nullptr, nullptr, nullptr, nullptr,
+	nullptr, nullptr, nullptr, nullptr,
+	"ERROR_CONV_BAD_PCODE",
+
+	"ERROR_CONV_BAD_OPERATOR",
+	"ERROR_CONV_VARIABLE_RANGE",
+	"ERROR_POPUP_OVERFLOW",
+	"ERROR_CONV_FLUSH",
+	"ERROR_CONV_GET",
+	"ERROR_CONV_RUN",
+	"ERROR_CONV_MENU",
+	"ERROR_CONV_NO_TEXT_LINE",
+	"ERROR_NO_MORE_EMS",
+	"ERROR_HEAP_REQUEST_FAILED",
+
+	"ERROR_NO_MORE_HEAP",
+	"ERROR_ORPHANED_TRIGGER",
+	"ERROR_PEELING_DISABLED",
+	"ERROR_POPUP_NO_ITEMS",
+	"ERROR_WRITE_SAVE_DIRECTORY",
+	"ERROR_MEMORY_CHAIN_CORRUPT",
+	"ERROR_POPUP_PRESERVE_FAILURE",
+	"ERROR_TOO_MANY_DAMN_HOTSPOTS",
+	"ERROR_VARIANT_LOAD_FAILURE"
+};
 
 
 int error_scan(char *target, const char *name, int number) {
@@ -106,7 +178,8 @@ done:
 	delete handle;
 }
 
-static void error_explode(char *error_buf, char *module_buf, char *data1_buf, char *data2_buf, long avail, int error) {
+static void error_explode(const char *error_buf, const char *module_buf,
+		const char *data1_buf, const char *data2_buf, long avail, int error) {
 	midi_uninstall();
 	digi_uninstall();
 
@@ -117,23 +190,12 @@ static void error_explode(char *error_buf, char *module_buf, char *data1_buf, ch
 	mouse_init(false, 3);
 	screen_dominant_mode(text_mode);
 
-	::error("Execution aborted");
+	::error("Error %s", error_buf);
 }
 
 void error_report(int error, int severity, int module, long data1, long data2) {
-	char error_buf[40], module_buf[40], data1_buf[12], data2_buf[12];
-	int handled = false;
-
-	if (severity >= error_abort) {
-		mads_itoa(error, error_buf, 10);
-		mads_itoa(module, module_buf, 10);
-		ltoa(data1, data1_buf, 10);
-		ltoa(data2, data2_buf, 10);
-
-		if (!handled) {
-			error_explode(error_buf, module_buf, data1_buf, data2_buf, mem_get_avail(), error);
-		}
-	}
+	const char *msg = error < -1 ? ERROR_MESSAGES[ABS(error)] : "General Error";
+	error_explode(msg, nullptr, nullptr, nullptr, mem_get_avail(), error);
 }
 
 void error_break_point(int data1, int data2) {
