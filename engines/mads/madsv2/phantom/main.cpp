@@ -69,7 +69,7 @@ static void main_menu_main() {
 			97, 98, 99, 0);
 
 		global_speech_load(9);
-		bool valid = !kernel_room_startup(922);
+		bool valid = !kernel_room_startup(922, 0, nullptr, true, true);
 
 		master_palette[4].r = 63;
 		master_palette[4].g = 50;

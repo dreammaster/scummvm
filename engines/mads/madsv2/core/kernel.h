@@ -441,7 +441,7 @@ extern int kernel_section_startup(int new_section);
 extern void kernel_room_shutdown();
 
 extern int kernel_room_startup(int new_room, int initial_variant = 0,
-	char *interface = nullptr, bool new_palette = true);
+	const char *interface = nullptr, bool new_palette = true, bool barebones = false);
 
 /**
  * Unloads all room series.

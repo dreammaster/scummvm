@@ -608,7 +608,8 @@ void kernel_room_shutdown() {
 	}
 }
 
-int kernel_room_startup(int newRoom, int initial_variant, char *interface, bool new_palette) {
+int kernel_room_startup(int newRoom, int initial_variant, const char *interface,
+		bool new_palette, bool barebones) {
 	int error_flag = true;
 	int load_flags;
 #ifndef disable_error_check
@@ -689,16 +690,6 @@ int kernel_room_startup(int newRoom, int initial_variant, char *interface, bool 
 
 	rail_connect_all_nodes();
 
-	/* Load up the room's hotspot table */
-
-	room_spots = room_load_hotspots(room_id, &room_num_spots);
-	if (room_spots == NULL) {
-#ifndef disable_error_check
-		error_code = ERROR_KERNEL_NO_HOTSPOTS;
-#endif
-		goto done;
-	}
-
 	inter_anim = NULL;
 
 	/* Make preliminary scaling computations */
@@ -721,15 +712,27 @@ int kernel_room_startup(int newRoom, int initial_variant, char *interface, bool 
 
 	kernel_room_series_marker = series_list_marker;
 
-	/* Set up interface background screen */
+	if (barebones) {
+		room_spots = nullptr;
 
-	kernel_set_interface_mode(inter_input_mode);
+	} else {
+		// Load up the room's hotspot table
+		room_spots = room_load_hotspots(room_id, &room_num_spots);
+		if (room_spots == NULL) {
+#ifndef disable_error_check
+			error_code = ERROR_KERNEL_NO_HOTSPOTS;
+#endif
+			goto done;
+		}
 
-	/* Mouse cursor on */
+		// Set up interface background screen
+		kernel_set_interface_mode(inter_input_mode);
 
-	while ((char)mouse_showing > 0) mouse_show();
+		// Mouse cursor on
+		mouse_show();
 
-	inter_allocate_objects();
+		inter_allocate_objects();
+	}
 
 	error_flag = false;
 
