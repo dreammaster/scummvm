@@ -92,17 +92,20 @@ typedef HotSpotEdit *HotEditPtr;
 
 /* Run-time structure for hotspots (.HH files) */
 
-typedef struct {
-	int ul_x, ul_y, lr_x, lr_y;         /* Hotspot screen coordinates    */
-	int feet_x, feet_y;                 /* Walk-to target for player     */
+struct HotSpot {
+	int16 ul_x, ul_y, lr_x, lr_y;         /* Hotspot screen coordinates    */
+	int16 feet_x, feet_y;                 /* Walk-to target for player     */
 	byte facing;                        /* Direction player should face  */
 	byte prep;                          /* Preposition                   */
 	byte active;                        /* Flag if hotspot is active     */
 	byte cursor_number;                 /* Mouse cursor number           */
 	byte syntax;                        /* Syntax                        */
-	int vocab;                          /* Vocabulary id of hotspot name */
-	int verb;                           /* Vocabulary id of default verb */
-} HotSpot;
+	int16 vocab;                          /* Vocabulary id of hotspot name */
+	int16 verb;                           /* Vocabulary id of default verb */
+
+	static constexpr int SIZE = 6 * 2 + (5 * 1) + 2 + 2;
+	void load(Common::SeekableReadStream *src);
+};
 
 typedef HotSpot *HotPtr;
 

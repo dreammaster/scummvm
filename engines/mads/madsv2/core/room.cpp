@@ -72,6 +72,11 @@ void RoomFile::load(Common::SeekableReadStream *src) {
 	shadow.load(src);
 }
 
+void HotSpot::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(ul_x, ul_y, lr_x, lr_y, feet_x, feet_y,
+		facing, prep, active, cursor_number, syntax, vocab, verb);
+}
+
 //====================================================================
 
 int room_read_def(int room_code, char *room_file, char *picture_base, int mads_mode) {
@@ -371,21 +376,42 @@ HotPtr room_load_hotspots(int id, int *num_spots) {
 
 	spots = NULL;
 
-	/* env_get_level_path (temp_buf, ROOM, ".HH", 0, id); */
 	Common::strcpy_s(temp_buf, "*RM");
 	env_catint(temp_buf, id, 3);
 	Common::strcat_s(temp_buf, ".HH");
-	if (loader_open(&load_handle, temp_buf, "rb", true)) goto done;
+	if (loader_open(&load_handle, temp_buf, "rb", true))
+		goto done;
 
-	if (!loader_read(num_spots, sizeof(int), 1, &load_handle)) goto done;
+	{
+		byte buffer[2];
+		if (!loader_read(buffer, sizeof(int), 1, &load_handle))
+			goto done;
+
+		*num_spots = READ_LE_UINT16(buffer);
+	}
 
 	num_to_read = MAX(*num_spots, 1);
 	memory_needed = (num_to_read * sizeof(HotSpot));
 
 	spots = (HotPtr)mem_get_name(memory_needed, "$hotspot");
-	if (spots == NULL) goto done;
+	if (spots == NULL)
+		goto done;
 
-	if (!loader_read(spots, memory_needed, 1, &load_handle)) goto done;
+	// Read in the hotspot list
+	{
+		size_t bytes_to_read = num_to_read * HotSpot::SIZE;
+		byte *buffer = (byte *)malloc(bytes_to_read);
+		if (!loader_read(spots, memory_needed, 1, &load_handle)) {
+			free(buffer);
+			goto done;
+		}
+
+		Common::MemoryReadStream src(buffer, bytes_to_read);
+		for (int i = 0; i < num_to_read; ++i)
+			spots[i].load(&src);
+
+		free(buffer);
+	}
 
 	result = spots;
 
