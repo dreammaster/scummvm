@@ -31,28 +31,6 @@
 namespace MADS {
 namespace MADSV2 {
 
-static const byte cursor_mask[16][16] = {
-	/*  0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15  */
-	  {255,   0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,   0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,   7,   0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,  15,   7,   0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,  15,  15,   7,   0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,  15,  15,  15,   7,   0, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,  15,  15,  15,  15,   7,   0, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,  15,  15,  15,  15,  15,   7,   0, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,  15,  15,  15,  15,   7,   7,   7,   0, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,  15,   7,  15,  15,   0,   0,   0, 255, 255, 255, 255, 255, 255, 255},
-	  {  0,   7,   7,   0,   7,  15,   7,   0, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {255,   0,   0, 255,   0,   7,  15,   0, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {255, 255, 255, 255,   0,   7,  15,   0, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {255, 255, 255, 255, 255,   0,   0, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-	  {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-};
-
-Buffer mouse_cursor_buffer;
-
 int mouse_button = -1;
 int mouse_status = 0;
 int mouse_x = 0, mouse_y = 0;
@@ -67,9 +45,6 @@ int mouse_old_x = 0;
 int mouse_old_y = 0;
 long mouse_clock = 0;
 byte mouse_showing = 0;
-
-int mouse_hot_x = 0;
-int mouse_hot_y = 0;
 int mouse_video_mode = 0;
 
 
@@ -162,19 +137,12 @@ void mouse_cursor_sprite(SeriesPtr series, int id) {
 		if (work_area[16][count] != 255) hot_x = count;
 	}
 
-	if ((hot_x != mouse_hot_x) || (hot_y != mouse_hot_y)) {
-		mouse_hot_x = hot_x;
-		mouse_hot_y = hot_y;
-
-		mouse_hide();
-		mouse_set_hotspot(hot_x, hot_y);
-		buffer_rect_copy(load_buffer, mouse_cursor_buffer, 0, 0, 16, 16);
-		mouse_show();
-	} else {
-		mouse_change_cursor_begin();
-		buffer_rect_copy(load_buffer, mouse_cursor_buffer, 0, 0, 16, 16);
-		mouse_change_cursor_end();
+	if (work_area[0][16] == 9 && work_area[16][0] == 9) {
+		work_area[0][16] = work_area[16][0] = 0xff;
 	}
+
+	CursorMan.replaceCursor(load_buffer.data, load_buffer.x, load_buffer.y, hot_x, hot_y, 0xff);
+	CursorMan.disableCursorPalette(true);
 }
 
 void mouse_video_init() {

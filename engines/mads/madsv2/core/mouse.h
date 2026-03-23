@@ -34,8 +34,6 @@ namespace MADSV2 {
 #define MOUSE_DOUBLE_TIMING     5       /* Double click threshold (ticks) */
 #define MOUSE_BALLISTIC_TIMING  36      /* Ballistic threshold    (ticks) */
 
-extern Buffer mouse_cursor_buffer;      /* Points at cursor pixel map     */
-
 extern word mouse_driver;       /* True if mouse driver is currently active  */
 extern word mouse_known_mode;   /* True if mouse in a 320x200 graphics mode  */
 extern int  mouse_video_mode;   /* Rom BIOS video mode # of current cursor   */
