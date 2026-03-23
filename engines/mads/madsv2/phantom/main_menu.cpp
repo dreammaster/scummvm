@@ -19,6 +19,7 @@
  *
  */
 
+#include "mads/madsv2/engine.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/config.h"
 #include "mads/madsv2/core/font.h"
@@ -103,7 +104,7 @@ int  command_line_size = 0;
 
 int  use_mouse_cursor_fix = false;
 
-int  going;
+bool going;
 int  menu_mode;
 int  must_perform_matte;
 
@@ -454,7 +455,7 @@ void menu_control(void) {
 
 	mouse_init_cycle();
 
-	while (going) {
+	while (going && !g_engine->shouldQuit()) {
 		if (keys_any()) {
 			mykey = keys_get();
 			switch (toupper(mykey)) {

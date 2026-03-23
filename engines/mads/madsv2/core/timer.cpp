@@ -19,10 +19,10 @@
  *
  */
 
-#include "common/system.h"
 #include "common/textconsole.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/timer.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -54,17 +54,17 @@ void timer_remove() {
 }
 
 long timer_read() {
-	unsigned long ms = g_system->getMillis();
+	unsigned long ms = g_engine->getMillis();
 	return ms * 1193 / 65536;
 }
 
 long timer_read_600() {
-	unsigned long ms = g_system->getMillis();
+	unsigned long ms = g_engine->getMillis();
 	return ms * 600 / 1000;
 }
 
 long timer_read_60() {
-	unsigned long ms = g_system->getMillis();
+	unsigned long ms = g_engine->getMillis();
 	return ms * 60 / 1000;
 }
 

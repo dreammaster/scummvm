@@ -27,6 +27,9 @@
 namespace MADS {
 namespace MADSV2 {
 
+constexpr int GAME_FRAME_RATE = 50;
+constexpr int GAME_FRAME_TIME = 1000 / GAME_FRAME_RATE;
+
 MADSV2Engine *g_engine;
 
 MADSV2Engine::MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc) :
@@ -49,9 +52,22 @@ Common::Error MADSV2Engine::run() {
 }
 
 void MADSV2Engine::pollEvents() {
-	Common::Event e;
-	while (g_system->getEventManager()->pollEvent(e) && !shouldQuit())
-		_events.push_back(e);
+       // Check for screen update time
+       uint32 time = g_system->getMillis();
+       if (time >= _nextFrameTime) {
+               _screen->update();
+               _nextFrameTime = time + GAME_FRAME_TIME;
+       }
+
+       // Poll for events
+       Common::Event e;
+       while (g_system->getEventManager()->pollEvent(e) && !shouldQuit()) {
+               if (e.type == Common::EVENT_MOUSEMOVE && (!_events.empty() && _events.back().type == Common::EVENT_MOUSEMOVE))
+                       _events.back().mouse = e.mouse;
+               else
+                       _events.push_back(e);
+       }
+
 }
 
 bool MADSV2Engine::hasPendingKey() {
@@ -91,6 +107,12 @@ void MADSV2Engine::flushKeys() {
 		}
 	}
 }
+
+uint32 MADSV2Engine::getMillis() {
+	pollEvents();
+	return g_system->getMillis();
+}
+
 
 } // namespace MADSV2
 } // namespace MADS

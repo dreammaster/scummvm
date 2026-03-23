@@ -35,6 +35,7 @@ class MADSV2Engine : public MADSEngine {
 private:
 	Graphics::Screen *_screen = nullptr;
 	Common::List<Common::Event> _events;
+	uint32 _nextFrameTime = 0;
 
 	void pollEvents();
 
@@ -51,6 +52,11 @@ public:
 	bool hasPendingKey();
 	int getKey();
 	void flushKeys();
+
+	/**
+	 * Get the elapsed time in milliseconds
+	 */
+	uint32 getMillis();
 
 	/* Callback routines in game-specific MAIN module */
 	int  main_cheating_key(int mykey) {
