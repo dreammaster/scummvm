@@ -1094,14 +1094,6 @@ pixel_IRLE_image_next:
 
 		/* row_next: advance to next row */
 
-		/* row_finish: if this line wasn't completed (e.g. right-clipped early),
-		   consume the rest of the sprite row stream until SS_EOL. */
-row_finish:
-		if (!line_finished) {
-			while (*sprite_ptr++ != SS_EOL)
-				;
-		}
-
 		/* Advance target row pointer by one scanline */
 		target_row += target_wrap;
 
@@ -1109,6 +1101,14 @@ row_finish:
 		/* Advance attr row pointer by one scanline */
 		attr_row += attr_wrap;
 #endif
+
+		/* row_finish: if this line wasn't completed (e.g. right-clipped early),
+		   consume the rest of the sprite row stream until SS_EOL. */
+row_finish:
+		if (!line_finished) {
+			while (*sprite_ptr++ != SS_EOL)
+				;
+		}
 
 	} /* end while(1) row_loop */
 }
