@@ -105,21 +105,29 @@ void mcga_close_window(byte *inp) {
 	mem_free(inp);
 }
 
-void mcga_setpal(Palette *pal) {
-	const byte *colors = (byte *)&(*pal)[0];
-	g_system->getPaletteManager()->setPalette(colors, 0, Graphics::PALETTE_COUNT);
-}
-
 void mcga_getpal(Palette *pal) {
-	byte *colors = (byte *)&(*pal)[0];
-	g_system->getPaletteManager()->grabPalette(colors, 0, Graphics::PALETTE_COUNT);
+	byte tmp[Graphics::PALETTE_COUNT * 3];
+	g_system->getPaletteManager()->grabPalette(tmp, 0, Graphics::PALETTE_COUNT);
+	for (int i = 0; i < Graphics::PALETTE_COUNT; i++) {
+		(*pal)[i].r = tmp[i * 3 + 0] * 63 / 255;
+		(*pal)[i].g = tmp[i * 3 + 1] * 63 / 255;
+		(*pal)[i].b = tmp[i * 3 + 2] * 63 / 255;
+	}
 }
 
 void mcga_setpal_range(Palette *pal, int first_color, int num_colors) {
-	byte *colors = (byte *)&(*pal)[first_color];
-	g_system->getPaletteManager()->setPalette(colors, first_color, num_colors);
+	byte tmp[Graphics::PALETTE_COUNT * 3];
+	for (int i = 0; i < num_colors; i++) {
+		tmp[i * 3 + 0] = (*pal)[first_color + i].r * 255 / 63;
+		tmp[i * 3 + 1] = (*pal)[first_color + i].g * 255 / 63;
+		tmp[i * 3 + 2] = (*pal)[first_color + i].b * 255 / 63;
+	}
+	g_system->getPaletteManager()->setPalette(tmp, first_color, num_colors);
 }
 
+void mcga_setpal(Palette *pal) {
+	mcga_setpal_range(pal, 0, Graphics::PALETTE_COUNT);
+}
 
 void mcga_cls(byte inp) {
 	g_engine->getScreen()->clear(inp);
