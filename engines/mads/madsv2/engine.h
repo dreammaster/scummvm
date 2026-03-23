@@ -23,7 +23,7 @@
 #define MADSV2_ENGINE_H
 
 #include "common/events.h"
-#include "common/list.h"
+#include "common/stack.h"
 #include "common/random.h"
 #include "graphics/screen.h"
 #include "mads/mads.h"
@@ -34,7 +34,7 @@ namespace MADSV2 {
 class MADSV2Engine : public MADSEngine {
 private:
 	Graphics::Screen *_screen = nullptr;
-	Common::List<Common::Event> _events;
+	Common::Stack<Common::Event> _keyEvents;
 	uint32 _nextFrameTime = 0;
 
 	void pollEvents();

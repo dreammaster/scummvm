@@ -22,6 +22,7 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "mads/madsv2/engine.h"
+#include "mads/madsv2/core/mouse.h"
 #include "mads/madsv2/phantom/main.h"
 
 namespace MADS {
@@ -52,44 +53,68 @@ Common::Error MADSV2Engine::run() {
 }
 
 void MADSV2Engine::pollEvents() {
-       // Check for screen update time
-       uint32 time = g_system->getMillis();
-       if (time >= _nextFrameTime) {
-               _screen->update();
-               _nextFrameTime = time + GAME_FRAME_TIME;
-       }
+	// Check for screen update time
+	uint32 time = g_system->getMillis();
+	if (time >= _nextFrameTime) {
+		_screen->update();
+		_nextFrameTime = time + GAME_FRAME_TIME;
+	}
 
-       // Poll for events
-       Common::Event e;
-       while (g_system->getEventManager()->pollEvent(e) && !shouldQuit()) {
-               if (e.type == Common::EVENT_MOUSEMOVE && (!_events.empty() && _events.back().type == Common::EVENT_MOUSEMOVE))
-                       _events.back().mouse = e.mouse;
-               else
-                       _events.push_back(e);
-       }
+	// Poll for events
+	Common::Event e;
+	while (g_system->getEventManager()->pollEvent(e) && !shouldQuit()) {
+		bool isMouse = false;
+		switch (e.type) {
+		case Common::EVENT_LBUTTONDOWN:
+			mouse_buttons |= 1;
+			isMouse = true;
+			break;
+		case Common::EVENT_LBUTTONUP:
+			mouse_buttons &= ~1;
+			isMouse = true;
+			break;
+		case Common::EVENT_RBUTTONDOWN:
+			mouse_buttons |= 2;
+			isMouse = true;
+			break;
+		case Common::EVENT_RBUTTONUP:
+			mouse_buttons &= ~2;
+			isMouse = true;
+			break;
+		case Common::EVENT_MBUTTONDOWN:
+			mouse_buttons |= 4;
+			isMouse = true;
+			break;
+		case Common::EVENT_MBUTTONUP:
+			mouse_buttons &= ~4;
+			isMouse = true;
+			break;
+		default:
+			break;
+		}
 
+		if (isMouse) {
+			mouse_x = e.mouse.x;
+			mouse_y = e.mouse.y;
+		}
+
+		if (e.type == Common::EVENT_KEYDOWN)
+			_keyEvents.push(e);
+	}
 }
 
 bool MADSV2Engine::hasPendingKey() {
 	pollEvents();
 
-	for (auto it = _events.begin(); it != _events.end(); ++it) {
-		if (it->type == Common::EVENT_KEYDOWN)
-			return true;
-	}
-
-	return false;
+	return !_keyEvents.empty();
 }
 
 int MADSV2Engine::getKey() {
 	pollEvents();
 
-	for (auto it = _events.begin(); it != _events.end(); ++it) {
-		if (it->type == Common::EVENT_KEYDOWN) {
-			Common::Event e = *it;
-			_events.erase(it);
-			return (e.kbd.keycode & 0xff) | 0x100;
-		}
+	if (!_keyEvents.empty()) {
+		Common::Event e = _keyEvents.pop();
+		return (e.kbd.keycode & 0xff) | 0x100;
 	}
 
 	return 0;
@@ -98,14 +123,7 @@ int MADSV2Engine::getKey() {
 void MADSV2Engine::flushKeys() {
 	pollEvents();
 
-	for (auto it = _events.begin(); it != _events.end(); ) {
-		if (it->type == Common::EVENT_KEYDOWN) {
-			Common::Event e = *it;
-			it = _events.erase(it);
-		} else {
-			++it;
-		}
-	}
+	_keyEvents.clear();
 }
 
 uint32 MADSV2Engine::getMillis() {

@@ -44,6 +44,7 @@ extern byte mouse_showing;      /* Mouse cursor showing status (0 = show)    */
 extern int mouse_button;        /* Last button pressed (0 = left, 1 = right) */
 extern int mouse_status;        /* Button status flags                       */
 extern int mouse_x, mouse_y;    /* Most recent cursor position               */
+extern int mouse_buttons;		/* Most recent button state                  */
 extern bool mouse_start_stroke;  /* True if new button press this round       */
 extern bool mouse_stroke_going;  /* True if any button currently down         */
 extern bool mouse_changed;       /* True if position or any button changed    */

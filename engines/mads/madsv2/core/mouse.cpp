@@ -55,8 +55,8 @@ Buffer mouse_cursor_buffer;
 
 int mouse_button = -1;
 int mouse_status = 0;
-int mouse_x = 0;
-int mouse_y = 0;
+int mouse_x = 0, mouse_y = 0;
+int mouse_buttons = 0;
 bool mouse_start_stroke = false;
 bool mouse_stroke_going = false;
 bool mouse_changed = false;
@@ -228,7 +228,10 @@ void mouse_double_freedom(int freedom_flag) {
 }
 
 int mouse_get_status(int *x, int *y) {
-	return 0;
+	*x = mouse_x;
+	*y = mouse_y;
+
+	return mouse_buttons;
 }
 
 void mouse_timing() {
