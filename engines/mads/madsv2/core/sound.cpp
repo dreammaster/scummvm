@@ -29,5 +29,9 @@ void sound_queue(int soundNum) {
 	error("TODO: sound_queue");
 }
 
+void sound_queue_flush() {
+	error("TODO: sound_queue_flush");
+}
+
 } // namespace MADSV2
 } // namespace MADS

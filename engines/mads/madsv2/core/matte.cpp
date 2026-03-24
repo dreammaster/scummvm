@@ -1067,7 +1067,7 @@ void matte_frame(int special_effect, int full_screen) {
 #endif
 		} else {
 			matte_special_effect(special_effect, full_screen);
-			/* pl sound_queue_flush(); */
+			sound_queue_flush();
 		}
 	}
 
