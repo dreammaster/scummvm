@@ -20,6 +20,7 @@
  */
 
 #include "common/md5.h"
+#include "common/textconsole.h"
 #include "mads/madsv2/phantom/sound_phantom.h"
 
 namespace MADS {
@@ -29,21 +30,21 @@ namespace Phantom {
 void PhantomSoundManager::validate() {
 	Common::File f;
 	static const char *const MD5[] = {
-		"205398468de2c8873b7d4d73d5be8ddc",
-		"f9b2d944a2fb782b1af5c0ad592306d3",
-		"7431f8dad77d6ddfc24e6f3c0c4ac7df",
-		"eb1f3f5a4673d3e73d8ac1818c957cf4",
-		"f936dd853073fa44f3daac512e91c476",
+		"8edcb79a8c3514eac0835496326a72ae",
+		"4b81a46440f8404d9eda1ce5ae2c5579",
+		"11d8d441e47ad1ccd8faafd6572a17d0",
+		"4cd5c4d45126e60ca701690489ab8afa",
+		"588357d711bbcdabdf7d7e5d96013ce5",
 		nullptr,
 		nullptr,
 		nullptr,
-		"a31e4783e098f633cbb6689adb41dd4f"
+		"3d4843074c1dcbfd7919179c58aec9bc"
 	};
 
 	for (int i = 1; i <= 9; ++i) {
 		if (i >= 6 && i <= 8)
 			continue;
-		Common::Path filename(Common::String::format("ASOUND.00%d", i));
+		Common::Path filename(Common::String::format("asound.ph%d", i));
 		if (!f.open(filename))
 			error("Could not process - %s", filename.toString().c_str());
 		Common::String md5str = Common::computeStreamMD5AsString(f, 8192);
@@ -92,7 +93,7 @@ int ASound1::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound2::ASound2(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph1", 0) {
+ASound2::ASound2(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph2", 0) {
 }
 
 int ASound2::command(int commandId, int param) {
@@ -102,7 +103,7 @@ int ASound2::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound3::ASound3(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph1", 0) {
+ASound3::ASound3(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph3", 0) {
 }
 
 int ASound3::command(int commandId, int param) {
@@ -112,7 +113,7 @@ int ASound3::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound4::ASound4(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph1", 0) {
+ASound4::ASound4(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph4", 0) {
 }
 
 int ASound4::command(int commandId, int param) {
@@ -122,7 +123,7 @@ int ASound4::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound5::ASound5(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph1", 0) {
+ASound5::ASound5(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph5", 0) {
 }
 
 int ASound5::command(int commandId, int param) {
@@ -132,7 +133,7 @@ int ASound5::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph1", 0) {
+ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph9", 0) {
 }
 
 int ASound9::command(int commandId, int param) {

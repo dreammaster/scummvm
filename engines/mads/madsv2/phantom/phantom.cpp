@@ -32,6 +32,7 @@ Common::Error PhantomEngine::run() {
 	initGraphics(320, 200);
 	_screen = new Graphics::Screen();
 	_soundManager = new PhantomSoundManager(_mixer, _soundFlag);
+	_soundManager->validate();
 
 	Phantom::phantom_main();
 

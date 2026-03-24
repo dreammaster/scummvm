@@ -107,6 +107,7 @@ void RexNebularEngine::initialize() {
 
 	loadOptions();
 
+	_sound->validate();
 	_screen->clear();
 }
 
