@@ -26,6 +26,7 @@
 #include "common/text-to-speech.h"
 #include "engines/util.h"
 #include "mads/nebular/nebular.h"
+#include "mads/nebular/sound_nebular.h"
 #include "mads/core/game.h"
 #include "mads/core/screen.h"
 #include "mads/core/msurface.h"
@@ -46,7 +47,6 @@ RexNebularEngine::RexNebularEngine(OSystem *syst, const MADSGameDescription *gam
 	_textWindowStill = false;
 	_screenFade = SCREEN_FADE_SMOOTH;
 	_musicFlag = true;
-	_soundFlag = true;
 	_dithering = false;
 	_disableFastwalk = false;
 
@@ -100,7 +100,7 @@ void RexNebularEngine::initialize() {
 	Font::init(this);
 	_font = new Font();
 	_screen = new Screen();
-	_sound = new SoundManager(this, _mixer);
+	_sound = new Nebular::RexSoundManager(_mixer, _soundFlag);
 	_audio = new AudioPlayer(_mixer, getGameID());
 	_game = Game::init(this);
 	_gameConv = new GameConversations(this);
