@@ -19,19 +19,25 @@
  *
  */
 
-#include "common/textconsole.h"
-#include "mads/madsv2/core/sound.h"
+#include "engines/util.h"
+#include "mads/madsv2/phantom/phantom.h"
+#include "mads/madsv2/phantom/main.h"
+#include "mads/madsv2/phantom/sound_phantom.h"
 
 namespace MADS {
 namespace MADSV2 {
+namespace Phantom {
 
-void sound_queue(int soundNum) {
-	// TODO: sound_queue
+Common::Error PhantomEngine::run() {
+	initGraphics(320, 200);
+	_screen = new Graphics::Screen();
+	_soundManager = new PhantomSoundManager(_mixer, _soundFlag);
+
+	Phantom::phantom_main();
+
+	return Common::kNoError;
 }
 
-void sound_queue_flush() {
-	// TODO: sound_queue_flush
-}
-
+} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS

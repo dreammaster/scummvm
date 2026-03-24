@@ -40,7 +40,7 @@
 #include "mads/core/game.h"
 #include "mads/detection.h"
 #ifdef ENABLE_MADSV2
-#include "mads/madsv2/engine.h"
+#include "mads/madsv2/phantom/phantom.h"
 #endif
 
 #define MAX_SAVES 99
@@ -204,7 +204,7 @@ bool MADS::MADSEngine::hasFeature(EngineFeature f) const {
 Common::Error MADSMetaEngine::createInstance(OSystem *syst, Engine **engine, const MADS::MADSGameDescription *desc) const {
 #ifdef ENABLE_MADSV2
 	if (desc->gameID == MADS::GType_Phantom)
-		*engine = new MADS::MADSV2::MADSV2Engine(syst, desc);
+		*engine = new MADS::MADSV2::Phantom::PhantomEngine(syst, desc);
 	else
 #endif
 

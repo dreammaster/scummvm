@@ -19,19 +19,29 @@
  *
  */
 
-#include "common/textconsole.h"
-#include "mads/madsv2/core/sound.h"
+#ifndef MADS_PHANTOM_PHANTOM_H
+#define MADS_PHANTOM_PHANTOM_H
+
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
+namespace Phantom {
 
-void sound_queue(int soundNum) {
-	// TODO: sound_queue
-}
+class PhantomEngine : public MADSV2Engine {
+private:
+	bool _soundFlag = true;
 
-void sound_queue_flush() {
-	// TODO: sound_queue_flush
-}
+public:
+	PhantomEngine(OSystem *syst, const MADSGameDescription *gameDesc) :
+		MADSV2Engine(syst, gameDesc) {}
+	~PhantomEngine() override {}
 
+	Common::Error run() override;
+};
+
+} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
+
+#endif

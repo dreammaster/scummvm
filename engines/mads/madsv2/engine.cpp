@@ -24,6 +24,7 @@
 #include "mads/madsv2/engine.h"
 #include "mads/madsv2/core/mouse.h"
 #include "mads/madsv2/phantom/main.h"
+#include "mads/core/sound.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -41,15 +42,7 @@ MADSV2Engine::MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc) :
 MADSV2Engine::~MADSV2Engine() {
 	g_engine = nullptr;
 	delete _screen;
-}
-
-Common::Error MADSV2Engine::run() {
-	initGraphics(320, 200);
-	_screen = new Graphics::Screen();
-
-	Phantom::phantom_main();
-
-	return Common::kNoError;
+	delete _soundManager;
 }
 
 void MADSV2Engine::pollEvents() {

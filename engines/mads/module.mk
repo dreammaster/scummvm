@@ -121,6 +121,7 @@ MODULE_OBJS += \
 	madsv2/core/vocab.o \
 	madsv2/core/window.o \
 	madsv2/phantom/mads/mads.o \
+	madsv2/phantom/phantom.o \
 	madsv2/phantom/main_menu.o \
 	madsv2/phantom/main.o \
 	madsv2/phantom/sound_phantom.o

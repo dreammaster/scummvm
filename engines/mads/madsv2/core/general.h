@@ -122,8 +122,8 @@ typedef struct {                        /* Video buffer structure         */
 #define false                 0
 #endif
 
-#define none                    0
-#define stop                    99
+constexpr int none = 0;
+constexpr int stop = 99;
 
 
 /* misc functional defines */

@@ -27,13 +27,16 @@
 #include "common/random.h"
 #include "graphics/screen.h"
 #include "mads/mads.h"
+#include "mads/core/sound.h"
 
 namespace MADS {
+
 namespace MADSV2 {
 
 class MADSV2Engine : public MADSEngine {
-private:
+protected:
 	Graphics::Screen *_screen = nullptr;
+	MADS::SoundManager *_soundManager = nullptr;
 	Common::Stack<Common::Event> _keyEvents;
 	uint32 _nextFrameTime = 0;
 
@@ -42,8 +45,6 @@ private:
 public:
 	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
 	~MADSV2Engine() override;
-
-	Common::Error run() override;
 
 	Graphics::Screen *getScreen() const {
 		return _screen;
