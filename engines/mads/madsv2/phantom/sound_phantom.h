@@ -81,6 +81,47 @@ public:
 };
 
 class ASound9 : public ASound {
+private:
+	typedef int (ASound9:: *CommandPtr)();
+	int command0();
+	int command1();
+	int command2();
+	int command3();
+	int command4();
+	int command5();
+	int command6();
+	int command7();
+	int command8();
+
+	int command16() {
+		return command24();
+	}
+
+	int command24();
+	int command25();
+	int command26();
+	int command27();
+
+	int command32();
+	int command33();
+	int command34();
+	int command35();
+	int command36();
+	int command37();
+	int command38();
+	int command39();
+
+	int command64();
+	int command65();
+	int command66();
+	int command67();
+	int command68();
+	int command69();
+	int command70();
+	int command71();
+
+	static const CommandPtr _commandList[72];
+
 public:
 	ASound9(Audio::Mixer *mixer, OPL::OPL *opl);
 	~ASound9() override {
