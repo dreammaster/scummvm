@@ -83,7 +83,7 @@ void PhantomSoundManager::loadDriver(int sectionNumber) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound1::ASound1(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph1", 0) {
+ASound1::ASound1(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph1", 0x21e0) {
 }
 
 int ASound1::command(int commandId, int param) {
@@ -93,7 +93,7 @@ int ASound1::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound2::ASound2(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph2", 0) {
+ASound2::ASound2(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph2", 0x2040) {
 }
 
 int ASound2::command(int commandId, int param) {
@@ -103,7 +103,7 @@ int ASound2::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound3::ASound3(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph3", 0) {
+ASound3::ASound3(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph3", 0x20c0) {
 }
 
 int ASound3::command(int commandId, int param) {
@@ -113,7 +113,7 @@ int ASound3::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound4::ASound4(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph4", 0) {
+ASound4::ASound4(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph4", 0x1f90) {
 }
 
 int ASound4::command(int commandId, int param) {
@@ -123,7 +123,7 @@ int ASound4::command(int commandId, int param) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound5::ASound5(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph5", 0) {
+ASound5::ASound5(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph5", 0x2140) {
 }
 
 int ASound5::command(int commandId, int param) {
@@ -154,7 +154,7 @@ const ASound9::CommandPtr ASound9::_commandList[72] = {
 	&ASound9::command68, &ASound9::command69, &ASound9::command70, &ASound9::command71
 };
 
-ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph9", 0) {
+ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) : ASound(mixer, opl, "asound.ph9", 0x20c0) {
 }
 
 int ASound9::command(int commandId, int param) {
@@ -199,10 +199,6 @@ int ASound9::command7() {
 }
 
 int ASound9::command8() {
-	return 0;
-}
-
-int ASound9::command16() {
 	return 0;
 }
 
