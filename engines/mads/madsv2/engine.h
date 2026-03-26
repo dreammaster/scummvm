@@ -36,11 +36,13 @@ namespace MADSV2 {
 class MADSV2Engine : public MADSEngine {
 protected:
 	Graphics::Screen *_screen = nullptr;
-	MADS::SoundManager *_soundManager = nullptr;
 	Common::Stack<Common::Event> _keyEvents;
 	uint32 _nextFrameTime = 0;
 
 	void pollEvents();
+
+public:
+	MADS::SoundManager *_soundManager = nullptr;
 
 public:
 	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);

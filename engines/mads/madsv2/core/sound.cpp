@@ -21,16 +21,17 @@
 
 #include "common/textconsole.h"
 #include "mads/madsv2/core/sound.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
 
 void sound_queue(int soundNum) {
-	// TODO: sound_queue
+	g_engine->_soundManager->command(soundNum);
 }
 
 void sound_queue_flush() {
-	// TODO: sound_queue_flush
+	g_engine->_soundManager->startQueuedCommands();
 }
 
 } // namespace MADSV2
