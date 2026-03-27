@@ -29,8 +29,8 @@ namespace MADSV2 {
 
 constexpr int sound_board_roland = 1;
 
-extern void sound_play(int soundNum);
-extern void sound_queue(int soundNum);
+extern int sound_play(int soundNum);
+extern int sound_queue(int soundNum);
 extern void sound_queue_flush();
 
 } // namespace MADSV2

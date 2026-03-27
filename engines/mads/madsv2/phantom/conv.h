@@ -28,6 +28,35 @@ namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
 
+
+enum {
+	conv001_speech_talk = 0,
+	conv001_continue_abc = 1,
+	conv001_what_one = 4,
+	conv001_yesno_yes = 8,
+	conv001_everything_byebye = 10,
+	conv001_everything_copycat = 12,
+	conv001_speak_byebye = 18,
+	conv001_saytwo_1 = 22,
+	conv001_instructions_three = 24,
+	conv001_point_two_abc = 27,
+};
+
+enum {
+	conv012_hello_one = 1,
+	conv012_hello_four = 4,
+	conv012_byebye_first = 6,
+	conv012_questions_three = 7,
+	conv012_questions_one = 8,
+	conv012_seen_byebye = 10,
+	conv012_seen_mask = 12,
+	conv012_tell_byebye = 19,
+	conv012_tell_knewhim = 29,
+	conv012_nomore_first = 30,
+
+	conv012_var_questions_done = 26
+};
+
 struct ConvData {
 	int16 node_count;
 	int16 dialog_count;
@@ -67,6 +96,8 @@ extern void conv_export_pointer(int *ptr);
 extern void conv_abort();
 extern void conv_me_trigger(int trigger);
 extern void conv_you_trigger(int trigger);
+extern int *conv_get_variable(int varNum);
+extern void conv_export_value(int varNum);
 
 } // namespace Phantom
 } // namespace MADSV2

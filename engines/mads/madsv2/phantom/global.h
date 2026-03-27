@@ -29,19 +29,6 @@ namespace MADSV2 {
 namespace Phantom {
 
 enum {
-	conv001_speech_talk = 0,
-	conv001_continue_abc = 1,
-	conv001_what_one = 4,
-	conv001_yesno_yes = 8,
-	conv001_everything_byebye = 10,
-	conv001_everything_copycat = 12,
-	conv001_speak_byebye = 18,
-	conv001_saytwo_1 = 22,
-	conv001_instructions_three = 24,
-	conv001_point_two_abc = 27
-};
-
-enum {
 	/* --- System / all-sections (0–19) --- */
 	kWalkerTiming             = 0,
 	kWalkerTiming2            = 1,
@@ -175,8 +162,10 @@ enum {
 #define AFTER_CONVS_0_AND_1			2
 
 // jacques_status values
-#define JACQUES_IS_DEAD				1
-#define JACQUES_IS_DEAD_RICH_GONE	2
+#define JACQUES_IS_ALIVE				0
+#define JACQUES_IS_DEAD					1
+#define JACQUES_IS_DEAD_RICH_GONE		2
+#define JAC_DEAD_RICH_GONE_SEEN_BODY	3
 
 // walker_converse values
 #define CONVERSE_NONE           0
@@ -189,6 +178,24 @@ enum {
 #define FAR_PIT     0
 #define MIDDLE_PIT  1
 #define NEAR_PIT    2
+
+// jacques_name_is_known
+#define YES_AND_END_CONV 2
+
+// trap_door_status
+#define TRAP_DOOR_IS_OPEN   0
+#define TRAP_DOOR_IS_CLOSED 1
+
+// prompter_stand_status
+#define PROMPT_LEFT			0
+#define PROMPT_RIGHT		1
+
+// room_103_104_transition
+#define PEEK_THROUGH		0
+#define NEW_ROOM			1
+
+// player_score_flags
+#define SCORE_TRAP_DOOR		1
 
 } // namespace Phantom
 } // namespace MADSV2

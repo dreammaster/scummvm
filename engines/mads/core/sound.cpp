@@ -98,16 +98,19 @@ void SoundManager::setVolume(int volume) {
 		_driver->setVolume(volume);
 }
 
-void SoundManager::command(int commandId, int param) {
+int SoundManager::command(int commandId, int param) {
 	if (_newSoundsPaused) {
 		if (_queuedCommands.size() < 8)
 			_queuedCommands.push(commandId);
+		return _queuedCommands.size() - 1;
 	} else if (_driver) {
 		// Note: I don't know any way to identify music commands versus sfx
 		// commands, so if sfx is mute, then so is music
 		if (_soundFlag)
 			_driver->command(commandId, param);
 	}
+
+	return 0;
 }
 
 void SoundManager::stop() {

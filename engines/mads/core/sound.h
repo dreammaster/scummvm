@@ -108,7 +108,7 @@ public:
 	 * @param commandid		Command Id to execute
 	 * @param param			Optional paramater specific to a few commands
 	 */
-	void command(int commandId, int param = 0);
+	int command(int commandId, int param = 0);
 
 	/**
 	 * Stops any currently playing sound

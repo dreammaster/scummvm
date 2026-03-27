@@ -40,6 +40,9 @@ extern char global_release_copyright[];
 
 /* Global macros */
 
+#define YES   1
+#define NO    0
+
 #define SCORE_LOOK_SPHERE_106           1
 #define SCORE_READ_BOOK_101             2
 #define SCORE_SHIFT_INTO_SEAL_113       4   

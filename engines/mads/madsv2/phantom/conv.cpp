@@ -93,6 +93,15 @@ void conv_abort() {}
 void conv_me_trigger(int trigger) {}
 void conv_you_trigger(int trigger) {}
 
+int *conv_get_variable(int varNum) {
+	// TODO
+	return nullptr;
+}
+
+void conv_export_value(int varNum) {
+	// TODO
+}
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
