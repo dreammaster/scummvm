@@ -305,3 +305,7 @@ scummvm.prg
 
 #Ignore Python generated files
 __pycache__/
+
+#Ignore Claude instruction files
+CLAUDE.md
+.claude
