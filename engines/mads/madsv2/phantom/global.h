@@ -41,12 +41,133 @@ enum {
 	conv001_point_two_abc = 27
 };
 
+enum {
+	/* --- System / all-sections (0–19) --- */
+	kWalkerTiming             = 0,
+	kWalkerTiming2            = 1,
+	stop_walker_disabled      = 2,
+	temp_interface            = 3,
+	walker_converse           = 4,
+	walker_converse_state     = 5,
+	walker_converse_now       = 6,
+	_007                      = 7,
+	_008                      = 8,
+	_009                      = 9,
+	current_year              = 10,
+	music_selected            = 11,
+	player_score              = 12,
+	player_score_flags        = 13,
+	done_brie_conv_203        = 14,
+	lantern_status            = 15,
+	_016                      = 16,
+	_017                      = 17,
+	_018                      = 18,
+	leave_angel_music_on      = 19,
 
-// Global indices
-#define walker_converse		 4
-#define current_year		10
-#define brie_talk_status	24
-#define jacques_status		31
+	/* --- Section 1 (20–59) --- */
+	trap_door_status          = 20,
+	christine_door_status     = 21,
+	sandbag_status            = 22,
+	chris_f_status            = 23,
+	brie_talk_status          = 24,
+	julies_door               = 25,
+	prompter_stand_status     = 26,
+	chris_d_status            = 27,
+	julie_name_is_known       = 28,
+	chris_kicked_raoul_out    = 29,
+	jacques_name_is_known     = 30,
+	jacques_status            = 31,
+	florent_name_is_known     = 32,
+	charles_name_is_known     = 33,
+	room_103_104_transition   = 34,
+	observed_phan_104         = 35,
+	death_location            = 36,
+	make_brie_leave_203       = 37,
+	hint_that_daae_is_home_1  = 38,
+	hint_that_daae_is_home_2  = 39,
+
+	/* --- Section 2 (40–59) --- */
+	christine_told_envelope   = 40,
+	read_book                 = 41,
+	scanned_bookcase          = 42,
+	ran_conv_in_205           = 43,
+	doors_in_205              = 44,
+	panel_in_206              = 45,
+	madame_name_is_known      = 46,
+	madame_giry_loc           = 47,
+	looked_at_case            = 48,
+	madame_giry_shows_up      = 49,
+	done_rich_conv_203        = 50,
+	came_from_fade            = 51,
+	ticket_people_here        = 52,
+	degas_name_is_known       = 53,
+	temp_var                  = 54,
+	flicked_1                 = 55,
+	flicked_2                 = 56,
+	flicked_3                 = 57,
+	flicked_4                 = 58,
+	_059                      = 59,
+
+	/* --- Section 3 (60–79) --- */
+	top_floor_locked          = 60,
+	field_7A                  = 61,
+	field_7C                  = 62,
+	field_7E                  = 63,
+	field_80                  = 64,
+	field_82                  = 65,
+	field_84                  = 66,
+	field_86                  = 67,
+	field_88                  = 68,
+	field_8A                  = 69,
+	_070                      = 70,
+	field_8E                  = 71,
+	field_90                  = 72,
+	field_92                  = 73,
+	field_94                  = 74,
+	field_96                  = 75,
+	field_98                  = 76,
+	field_9A                  = 77,
+	field_9C                  = 78,
+	field_9E                  = 79,
+
+	/* --- Section 4 / Catacombs (80–99) --- */
+	catacombs_room            = 80,
+	catacombs_misc            = 81,
+	catacombs_flag            = 82,
+	catacombs_from            = 83,
+	catacombs_309             = 84,
+	catacombs_409a            = 85,
+	catacombs_409b            = 86,
+	catacombs_501             = 87,
+	catacombs_309_from        = 88,
+	catacombs_409a_from       = 89,
+	catacombs_409b_from       = 90,
+	catacombs_501_from        = 91,
+	catacombs_next_room       = 92,
+	door_in_409_is_open       = 93,
+	priest_piston_puke        = 94,
+	cob_web_is_cut            = 95,
+	field_C0                  = 96,
+	field_C2                  = 97,
+	field_C4                  = 98,
+	_099                      = 99,
+
+	/* --- Section 5 (100–112) --- */
+	christine_is_in_boat      = 100,
+	chris_will_take_seat      = 101,
+	right_door_is_open_504    = 102,
+	coffin_status             = 103,
+	chris_left_505            = 104,
+	knocked_over_head         = 105,
+	fight_status              = 106,
+	he_listened               = 107,
+	can_find_book_library     = 108,
+	ring_is_on_finger         = 109,
+	looked_at_skull_face      = 110,
+	cable_hook_was_seperate   = 111,
+	make_rich_leave_203       = 112
+};
+
 
 // brie_talk_status values
 #define BEFORE_BRIE_MOTIONS			0
@@ -63,6 +184,11 @@ enum {
 #define CONVERSE_HAND_WAVE      2
 #define CONVERSE_HAND_WAVE_2    3
 #define CONVERSE_HAND_CHIN      4
+
+// death_location values
+#define FAR_PIT     0
+#define MIDDLE_PIT  1
+#define NEAR_PIT    2
 
 } // namespace Phantom
 } // namespace MADSV2

@@ -70,12 +70,14 @@ extern char global_release_copyright[];
 
 /* ================= Global to all sections ================== */
 
+#if 0
 #define player_score                    10  /* player's score of the game   */
 #define player_score_flags              11  /* 16 flags for checking if player increased score */
 #define dont_load_walker                12  /* if T, will not load walker in section code */
 #define perform_displacements           13  /* if T, will do displacements */
 #define intro                           14  /* if T, Intro is in progress */
 #define outro                           15  /* if T, Outro is in progress */
+#endif
 
 /* =================== Section 1  20 - 39 ==================== */
 

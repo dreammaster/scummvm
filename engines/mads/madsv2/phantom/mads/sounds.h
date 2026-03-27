@@ -30,6 +30,7 @@ namespace Phantom {
 
 enum {
 	N_AllFade = 1,
+	N_BackgroundMus = 16,
 	N_PlayerFalls = 67
 };
 

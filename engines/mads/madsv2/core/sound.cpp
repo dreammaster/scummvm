@@ -26,6 +26,10 @@
 namespace MADS {
 namespace MADSV2 {
 
+void sound_play(int soundNum) {
+	sound_queue(soundNum);
+}
+
 void sound_queue(int soundNum) {
 	g_engine->_soundManager->command(soundNum);
 }

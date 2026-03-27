@@ -29,6 +29,7 @@
 #include "mads/madsv2/core/camera.h"
 #include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/text.h"
+#include "mads/madsv2/phantom/mads/text.h"
 #include "mads/madsv2/core/inter.h"
 
 namespace MADS {
