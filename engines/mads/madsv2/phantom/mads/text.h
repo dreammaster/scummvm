@@ -19,31 +19,32 @@
  *
  */
 
-#ifndef MADS_CORE_VOCABH_H
-#define MADS_CORE_VOCABH_H
+#ifndef MADS_PHANTOM_MADS_TEXT_H
+#define MADS_PHANTOM_MADS_TEXT_H
 
-#include "mads/madsv2/core/general.h"
+#include "common/scummsys.h"
 
 namespace MADS {
 namespace MADSV2 {
+namespace Phantom {
 
-/* Hardcoded vocabulary words */
 enum {
-	words_game                        =  1,
-	words_qsave                       =  2,
-	words_look                        =  3,
-	words_take                        =  4,
-	words_push                        =  5,
-	words_open                        =  6,
-	words_put                         =  7,
-	words_talk_to                     =  8,
-	words_give                        =  9,
-	words_pull                        = 10,
-	words_close                       = 11,
-	words_throw                       = 12,
-	words_walk_to                     = 13
+	text_101_10 = 10110,
+	text_101_11 = 10111,
+	text_101_12 = 10112,
+	text_101_13 = 10113,
+	text_101_14 = 10114,
+	text_101_15 = 10115,
+	text_101_16 = 10116,
+	text_101_17 = 10117,
+	text_101_18 = 10118,
+	text_101_19 = 10119,
+	text_101_20 = 10120,
+	text_101_21 = 10121,
+	text_101_22 = 10122
 };
 
+} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 

@@ -19,31 +19,56 @@
  *
  */
 
-#ifndef MADS_CORE_VOCABH_H
-#define MADS_CORE_VOCABH_H
+#ifndef MADS_PHANTOM_CONV_H
+#define MADS_PHANTOM_CONV_H
 
-#include "mads/madsv2/core/general.h"
+#include "common/scummsys.h"
 
 namespace MADS {
 namespace MADSV2 {
+namespace Phantom {
 
-/* Hardcoded vocabulary words */
-enum {
-	words_game                        =  1,
-	words_qsave                       =  2,
-	words_look                        =  3,
-	words_take                        =  4,
-	words_push                        =  5,
-	words_open                        =  6,
-	words_put                         =  7,
-	words_talk_to                     =  8,
-	words_give                        =  9,
-	words_pull                        = 10,
-	words_close                       = 11,
-	words_throw                       = 12,
-	words_walk_to                     = 13
+struct ConvData {
+	int16 node_count;
+	int16 dialog_count;
+	int16 message_count;
+	int16 text_line_count;
+	int16 num_variables;
+
+	int16 max_imports;
+	int16 speaker_count;
+	char speaker_portraits[5][16];
+	int16 speaker_frame[5];
+	char speech_file[14];
+	uint32 text_length;
+
+	uint32 commands_length;
+	void *text_ptr;
+	void *scripts_ptr;
+	void *nodes_ptr;
+	void *dialogs_ptr;
+	void *messages_ptr;
+	void *text_lines_ptr;
 };
 
+struct ConvControl {
+	int running;
+};
+
+extern int conv_restore_running;
+extern ConvControl conv_control;
+
+extern void conv_system_init();
+extern void conv_system_cleanup();
+
+extern void conv_get(int convNum);
+extern void conv_run(int convNum);
+extern void conv_export_pointer(int *ptr);
+extern void conv_abort();
+extern void conv_me_trigger(int trigger);
+extern void conv_you_trigger(int trigger);
+
+} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 

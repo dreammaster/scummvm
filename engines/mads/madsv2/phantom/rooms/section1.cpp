@@ -19,32 +19,23 @@
  *
  */
 
-#ifndef MADS_CORE_VOCABH_H
-#define MADS_CORE_VOCABH_H
-
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/phantom/rooms/section1.h"
 
 namespace MADS {
 namespace MADSV2 {
+namespace Phantom {
+namespace Rooms {
 
-/* Hardcoded vocabulary words */
-enum {
-	words_game                        =  1,
-	words_qsave                       =  2,
-	words_look                        =  3,
-	words_take                        =  4,
-	words_push                        =  5,
-	words_open                        =  6,
-	words_put                         =  7,
-	words_talk_to                     =  8,
-	words_give                        =  9,
-	words_pull                        = 10,
-	words_close                       = 11,
-	words_throw                       = 12,
-	words_walk_to                     = 13
-};
+void section_1_music() {
+}
 
+void section_1_walker() {
+}
+
+void section_1_interface() {
+}
+
+} // namespace Rooms
+} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
-
-#endif

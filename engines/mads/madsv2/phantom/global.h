@@ -19,31 +19,52 @@
  *
  */
 
-#ifndef MADS_CORE_VOCABH_H
-#define MADS_CORE_VOCABH_H
+#ifndef MADS_PHANTOM_GLOBAL_H
+#define MADS_PHANTOM_GLOBAL_H
 
-#include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/vocabh.h"
 
 namespace MADS {
 namespace MADSV2 {
+namespace Phantom {
 
-/* Hardcoded vocabulary words */
 enum {
-	words_game                        =  1,
-	words_qsave                       =  2,
-	words_look                        =  3,
-	words_take                        =  4,
-	words_push                        =  5,
-	words_open                        =  6,
-	words_put                         =  7,
-	words_talk_to                     =  8,
-	words_give                        =  9,
-	words_pull                        = 10,
-	words_close                       = 11,
-	words_throw                       = 12,
-	words_walk_to                     = 13
+	conv001_speech_talk = 0,
+	conv001_continue_abc = 1,
+	conv001_what_one = 4,
+	conv001_yesno_yes = 8,
+	conv001_everything_byebye = 10,
+	conv001_everything_copycat = 12,
+	conv001_speak_byebye = 18,
+	conv001_saytwo_1 = 22,
+	conv001_instructions_three = 24,
+	conv001_point_two_abc = 27
 };
 
+
+// Global indices
+#define walker_converse		 4
+#define current_year		10
+#define brie_talk_status	24
+#define jacques_status		31
+
+// brie_talk_status values
+#define BEFORE_BRIE_MOTIONS			0
+#define BEFORE_CHANDELIER_CONV		1
+#define AFTER_CONVS_0_AND_1			2
+
+// jacques_status values
+#define JACQUES_IS_DEAD				1
+#define JACQUES_IS_DEAD_RICH_GONE	2
+
+// walker_converse values
+#define CONVERSE_NONE           0
+#define CONVERSE_LEAN           1
+#define CONVERSE_HAND_WAVE      2
+#define CONVERSE_HAND_WAVE_2    3
+#define CONVERSE_HAND_CHIN      4
+
+} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 
