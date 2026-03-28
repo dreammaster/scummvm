@@ -28,6 +28,7 @@
 #include "mads/madsv2/core/mouse.h"
 #include "mads/madsv2/core/pal.h"
 #include "mads/madsv2/core/quote.h"
+#include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/phantom/main_menu.h"
 #include "mads/madsv2/engine.h"
 

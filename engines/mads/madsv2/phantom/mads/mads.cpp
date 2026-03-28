@@ -22,3 +22,5 @@
 #include "mads/madsv2/phantom/mads/quotes.h"
 #include "mads/madsv2/phantom/mads/sounds.h"
 #include "mads/madsv2/phantom/mads/speeches.h"
+#include "mads/madsv2/phantom/mads/text.h"
+#include "mads/madsv2/phantom/mads/words.h"

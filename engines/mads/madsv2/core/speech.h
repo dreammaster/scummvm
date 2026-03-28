@@ -44,6 +44,8 @@ extern void speech_ems_play(const char *resName, int id);
 extern void speech_all_off();
 extern void speech_sample_rate(int rate);
 extern void speech_ems_go(int handle, int size);
+extern void global_speech_load(int id);
+extern void global_speech_go(int id);
 
 } // namespace MADSV2
 } // namespace MADS

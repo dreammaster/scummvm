@@ -50,8 +50,6 @@ typedef struct {
 extern bool new_background;
 extern int selected_item;
 
-
-extern void global_speech_load(int id);
 extern void menu_control();
 
 } // namespace Phantom

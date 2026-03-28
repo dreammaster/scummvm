@@ -30,15 +30,19 @@ namespace Phantom {
 
 enum {
 	key = 0,
+	lantern = 1,
 	red_frame = 2,
 	sandbag = 3,
 	yellow_frame = 4,
 	small_note = 6,
+	rope = 7,
 	parchment = 12,
 	book = 15,
 	blue_frame = 17,
 	large_note = 18,
-	green_frame = 19
+	green_frame = 19,
+	cable_hook = 22,
+	rope_with_hook = 23
 };
 
 } // namespace Phantom
