@@ -19,8 +19,6 @@
  *
  */
 
-/*      room107.mac      by Paul Lahaise      8-Jan-93 */
-
 #ifndef MADS_PHANTOM_ROOM107_H
 #define MADS_PHANTOM_ROOM107_H
 
