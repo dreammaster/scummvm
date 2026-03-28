@@ -40,6 +40,7 @@ enum {
 	N_SqueakyDoor = 66,
 	N_PlayerFalls = 67,
 	N_EchoSteps = 68,
+	N_SandbagThud = 70,
 	N_DoorHandle = 73
 };
 

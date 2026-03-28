@@ -42,6 +42,8 @@ enum {
 	words_climb_through = 35,
 	words_column_prop = 36,
 	words_conductor_s_stand = 37,
+	words_crate = 41,
+	words_cyclorama = 44,
 	words_door = 46,
 	words_elephant_prop = 50,
 	words_exit = 52,
@@ -75,6 +77,7 @@ enum {
 	words_props = 118,
 	words_proscenium_arch = 119,
 	words_red_frame = 123,
+	words_sandbag = 127,
 	words_seats = 129,
 	words_side_wall = 130,
 	words_stage = 132,
@@ -93,9 +96,20 @@ enum {
 	words_prop = 164,
 	words_climb_up = 165,
 	words_door_to_pit = 170,
+	words_boxes = 172,
+	words_box = 175,
 	words_grand_foyer = 180,
 	words_back_wall = 181,
+	words_stage_right_wing = 193,
+	words_stage_left_wing = 194,
+	words_pedestal = 195,
+	words_plant_prop = 196,
+	words_statue = 197,
+	words_batten = 198,
+	words_big_prop = 199,
+	words_ventilation_duct = 200,
 	words_chandelier = 201,
+	words_prop_case = 247,
 	words_Monsieur_Brie = 258,
 	words_prompter_s_stand = 270,
 	words_Jacques = 280,
@@ -103,7 +117,8 @@ enum {
 	words_climb = 288,
 	words_prompter_s_seat = 300,
 	words_lever = 301,
-	words_Monsieur_Richard = 302
+	words_Monsieur_Richard = 302,
+	words_cable_hook = 304
 };
 
 } // namespace Phantom

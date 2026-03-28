@@ -200,6 +200,9 @@ enum {
 // ticket_people_here
 #define SELLER				1
 
+// sandbag_status
+#define SANDBAG_DROPPED		1
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
