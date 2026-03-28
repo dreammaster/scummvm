@@ -215,6 +215,11 @@ enum {
 #define CHRIS_DOOR_CLOSED	1
 #define CHRIS_DOOR_CHOPPED	2
 
+// julie_name_is_known
+#define JULIE_NO			0
+#define NO_AND_QUIT_CONV	1
+#define JULIE_YES			2
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS

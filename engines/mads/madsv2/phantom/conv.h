@@ -61,6 +61,25 @@ enum {
 };
 
 enum {
+	conv003_bon_jour_hello = 0,
+	conv003_first_howdy = 1,
+	conv003_second_aloha = 2,
+	conv003_name_i_am = 3,
+	conv003_name_form = 4,
+	conv003_name_oops = 5,
+	conv003_adios_byebye= 6,
+	conv003_nomore_byebye = 7,
+	conv003_questions_three = 10,
+	conv003_knowghost_see = 13,
+	conv003_knowghost_look = 14,
+	conv003_return_dreams = 15,
+	conv003_return_she = 16,
+	conv003_return_giry = 18,
+	conv003_return_byebye = 23,
+	conv003_yourself_byebye = 27
+};
+
+enum {
 	conv007_richard_intro_b = 2,
 	conv007_daaeb_intro_c = 3,
 	conv007_where_pushed = 8,
