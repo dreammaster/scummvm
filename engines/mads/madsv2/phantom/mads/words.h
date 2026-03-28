@@ -53,6 +53,7 @@ enum {
 	words_exit_sign = 54,
 	words_exit_to = 55,
 	words_exposed_brick = 67,
+	words_fire_axe = 69,
 	words_flats = 72,
 	words_floor = 73,
 	words_folding_chairs = 74,
@@ -78,6 +79,7 @@ enum {
 	words_orchestra_pit = 108,
 	words_pipe = 112,
 	words_pit = 113,
+	words_plant = 114,
 	words_poster = 115,
 	words_prompter_s_box = 116,
 	words_prop_table = 117,
@@ -97,6 +99,7 @@ enum {
 	words_staircase = 138,
 	words_stairwell = 139,
 	words_stool = 140,
+	words_table = 143,
 	words_thunder_machine = 145,
 	words_trap_ceiling = 147,
 	words_trap_door = 148,
@@ -130,7 +133,11 @@ enum {
 	words_big_prop = 199,
 	words_ventilation_duct = 200,
 	words_chandelier = 201,
+	words_light = 245,
 	words_prop_case = 247,
+	words_handle = 248,
+	words_axe = 249,
+	words_door_chunks = 250,
 	words_bulletin_board = 252,
 	words_Monsieur_Brie = 258,
 	words_prompter_s_stand = 270,
@@ -142,6 +149,7 @@ enum {
 	words_lever = 301,
 	words_Monsieur_Richard = 302,
 	words_cable_hook = 304,
+	words_hook = 390,
 	words_paper = 399
 };
 

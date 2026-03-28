@@ -34,6 +34,7 @@ enum {
 	red_frame = 2,
 	sandbag = 3,
 	yellow_frame = 4,
+	fire_axe = 5,
 	small_note = 6,
 	rope = 7,
 	parchment = 12,

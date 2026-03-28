@@ -58,7 +58,9 @@ enum {
 	conv002_interrogate_giry = 22,
 	conv002_nomore_first = 25,
 	conv002_saytwo_abc = 26,
+};
 
+enum {
 	conv007_richard_intro_b = 2,
 	conv007_daaeb_intro_c = 3,
 	conv007_where_pushed = 8,
@@ -77,7 +79,9 @@ enum {
 	conv007_office_abc = 28,
 	conv007_solo_alone = 30,
 	conv007_pinch_wait_b_nothing_b = 32,
+};
 
+enum {
 	conv012_hello_one = 1,
 	conv012_hello_four = 4,
 	conv012_byebye_first = 6,
@@ -89,6 +93,11 @@ enum {
 	conv012_var_questions_done = 26,
 	conv012_tell_knewhim = 29,
 	conv012_nomore_first = 30
+};
+
+enum {
+	conv014_second_angel = 1,
+	conv014_eighth_inside = 7
 };
 
 struct ConvData {

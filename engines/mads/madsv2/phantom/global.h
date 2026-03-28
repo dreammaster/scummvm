@@ -210,6 +210,11 @@ enum {
 // chris_f_status
 #define CHRIS_F_IS_ALIVE	1
 
+// christine_door_status
+#define CHRIS_IS_IN			0
+#define CHRIS_DOOR_CLOSED	1
+#define CHRIS_DOOR_CHOPPED	2
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
