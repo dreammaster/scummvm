@@ -78,6 +78,7 @@ enum {
 	words_orchestra_pit = 108,
 	words_pipe = 112,
 	words_pit = 113,
+	words_poster = 115,
 	words_prompter_s_box = 116,
 	words_prop_table = 117,
 	words_props = 118,
@@ -94,6 +95,7 @@ enum {
 	words_stagemanager_s_post = 136,
 	words_stair_unit = 137,
 	words_staircase = 138,
+	words_stairwell = 139,
 	words_stool = 140,
 	words_thunder_machine = 145,
 	words_trap_ceiling = 147,
@@ -103,15 +105,19 @@ enum {
 	words_walk_down = 154,
 	words_walk_through = 155,
 	words_wall = 157,
+	words_waste_basket = 159,
 	words_water_pipe = 160,
 	words_yellow_frame = 163,
 	words_prop = 164,
 	words_climb_up = 165,
 	words_walk_onto = 166,
 	words_walk = 167,
+	words_left_door = 168,
+	words_right_door = 169,
 	words_door_to_pit = 170,
 	words_boxes = 172,
 	words_box = 175,
+	words_trash_bucket = 177,
 	words_headset = 179,
 	words_grand_foyer = 180,
 	words_back_wall = 181,
@@ -125,6 +131,7 @@ enum {
 	words_ventilation_duct = 200,
 	words_chandelier = 201,
 	words_prop_case = 247,
+	words_bulletin_board = 252,
 	words_Monsieur_Brie = 258,
 	words_prompter_s_stand = 270,
 	words_Jacques = 280,
@@ -134,7 +141,8 @@ enum {
 	words_prompter_s_seat = 300,
 	words_lever = 301,
 	words_Monsieur_Richard = 302,
-	words_cable_hook = 304
+	words_cable_hook = 304,
+	words_paper = 399
 };
 
 } // namespace Phantom

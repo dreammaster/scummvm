@@ -203,6 +203,13 @@ enum {
 // sandbag_status
 #define SANDBAG_DROPPED		1
 
+// julies_door
+#define FULLY_OPEN			0
+#define CRACKED_OPEN		1
+
+// chris_f_status
+#define CHRIS_F_IS_ALIVE	1
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
