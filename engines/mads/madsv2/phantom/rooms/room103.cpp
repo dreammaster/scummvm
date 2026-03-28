@@ -31,6 +31,7 @@
 #include "mads/madsv2/phantom/mads/words.h"
 #include "mads/madsv2/phantom/mads/sounds.h"
 #include "mads/madsv2/phantom/mads/text.h"
+#include "mads/madsv2/phantom/mads/inventory.h"
 #include "mads/madsv2/phantom/conv.h"
 #include "mads/madsv2/phantom/rooms/section1.h"
 #include "mads/madsv2/phantom/rooms/room103.h"
@@ -39,8 +40,6 @@ namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
 namespace Rooms {
-
-constexpr int key = 0;
 
 void room_103_adjust_rails(int variant) {
 	switch (variant) {

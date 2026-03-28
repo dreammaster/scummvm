@@ -197,6 +197,9 @@ enum {
 // player_score_flags
 #define SCORE_TRAP_DOOR		1
 
+// ticket_people_here
+#define SELLER				1
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS

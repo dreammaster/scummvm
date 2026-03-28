@@ -39,11 +39,14 @@ enum {
 	words_climb_through = 35,
 	words_conductor_s_stand = 37,
 	words_door = 46,
+	words_exit = 52,
 	words_exit_to = 55,
 	words_exposed_brick = 67,
 	words_floor = 73,
 	words_folding_chairs = 74,
 	words_garbage_can = 75,
+	words_house = 80,
+	words_jump_into = 82,
 	words_junk = 84,
 	words_key = 85,
 	words_leg = 90,
@@ -60,6 +63,8 @@ enum {
 	words_seats = 129,
 	words_side_wall = 130,
 	words_stage = 132,
+	words_stage_left = 134,
+	words_stage_right = 135,
 	words_stair_unit = 137,
 	words_trap_ceiling = 147,
 	words_trap_door = 148,
@@ -79,7 +84,8 @@ enum {
 	words_gentleman = 281,
 	words_climb = 288,
 	words_prompter_s_seat = 300,
-	words_lever = 301
+	words_lever = 301,
+	words_Monsieur_Richard = 302
 };
 
 } // namespace Phantom

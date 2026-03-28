@@ -102,6 +102,14 @@ void conv_export_value(int varNum) {
 	// TODO
 }
 
+void conv_hold() {
+	// TODO
+}
+
+void conv_release() {
+	// TODO
+}
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS

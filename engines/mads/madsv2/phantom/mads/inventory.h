@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MADS_SOUNDS_H
-#define MADS_PHANTOM_MADS_SOUNDS_H
+#ifndef MADS_PHANTOM_MADS_INVENTORY_H
+#define MADS_PHANTOM_MADS_INVENTORY_H
 
 #include "common/scummsys.h"
 
@@ -29,18 +29,16 @@ namespace MADSV2 {
 namespace Phantom {
 
 enum {
-	N_AllFade = 1,
-	N_IsAnySoundOn = 8,
-	N_BackgroundMus = 16,
-	N_DoorOpens = 24,
-	N_DoorCloses = 25,
-	N_TakeObjectSnd = 26,
-	N_BackMus1stTime = 38,
-	N_TrapDoor001 = 64,
-	N_SqueakyDoor = 66,
-	N_PlayerFalls = 67,
-	N_EchoSteps = 68,
-	N_DoorHandle = 73
+	key = 0,
+	red_frame = 2,
+	sandbag = 3,
+	yellow_frame = 4,
+	small_note = 6,
+	parchment = 12,
+	book = 15,
+	blue_frame = 17,
+	large_note = 18,
+	green_frame = 19
 };
 
 } // namespace Phantom

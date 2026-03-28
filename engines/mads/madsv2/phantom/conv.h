@@ -54,7 +54,26 @@ enum {
 	conv012_tell_knewhim = 29,
 	conv012_nomore_first = 30,
 
-	conv012_var_questions_done = 26
+	conv012_var_questions_done = 26,
+
+	conv007_richard_intro_b = 2,
+	conv007_daaeb_intro_c = 3,
+	conv007_where_pushed = 8,
+	conv007_where_killed = 10,
+	conv007_badfall_abc = 11,
+	conv007_youraoul_abc = 12,
+	conv007_kiss_abc = 13,
+	conv007_afterkiss_abc = 14,
+	conv007_delirious_abc = 16,
+	conv007_long_abc = 20,
+	conv007_worry_abc = 21,
+	conv007_dashing_tuxedo = 22,
+	conv007_dashing_london = 23,
+	conv007_answers_abc = 24,
+	conv007_final_goaway = 25,
+	conv007_office_abc = 28,
+	conv007_solo_alone = 30,
+	conv007_pinch_wait_b_nothing_b = 32
 };
 
 struct ConvData {
@@ -98,6 +117,8 @@ extern void conv_me_trigger(int trigger);
 extern void conv_you_trigger(int trigger);
 extern int *conv_get_variable(int varNum);
 extern void conv_export_value(int varNum);
+extern void conv_hold();
+extern void conv_release();
 
 } // namespace Phantom
 } // namespace MADSV2
