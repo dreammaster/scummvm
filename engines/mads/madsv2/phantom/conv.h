@@ -32,6 +32,7 @@ namespace Phantom {
 enum {
 	conv001_speech_talk = 0,
 	conv001_continue_abc = 1,
+	conv002_questions_one = 2,
 	conv001_what_one = 4,
 	conv001_yesno_yes = 8,
 	conv001_everything_byebye = 10,
@@ -43,18 +44,20 @@ enum {
 };
 
 enum {
-	conv012_hello_one = 1,
-	conv012_hello_four = 4,
-	conv012_byebye_first = 6,
-	conv012_questions_three = 7,
-	conv012_questions_one = 8,
-	conv012_seen_byebye = 10,
-	conv012_seen_mask = 12,
-	conv012_tell_byebye = 19,
-	conv012_tell_knewhim = 29,
-	conv012_nomore_first = 30,
-
-	conv012_var_questions_done = 26,
+	conv002_sayone_abc = 1,
+	conv002_answers_job = 5,
+	conv002_answers_please = 6,
+	conv002_answers_house = 8,
+	conv002_answers_go_on = 9,
+	conv002_answers_prison = 10,
+	conv002_answers_building = 11,
+	conv002_answers_catacombs = 12,
+	conv002_interrogate_mishap = 15,
+	conv002_interrogate_chandelier = 16,
+	conv002_interrogate_phantom = 19,
+	conv002_interrogate_giry = 22,
+	conv002_nomore_first = 25,
+	conv002_saytwo_abc = 26,
 
 	conv007_richard_intro_b = 2,
 	conv007_daaeb_intro_c = 3,
@@ -73,7 +76,19 @@ enum {
 	conv007_final_goaway = 25,
 	conv007_office_abc = 28,
 	conv007_solo_alone = 30,
-	conv007_pinch_wait_b_nothing_b = 32
+	conv007_pinch_wait_b_nothing_b = 32,
+
+	conv012_hello_one = 1,
+	conv012_hello_four = 4,
+	conv012_byebye_first = 6,
+	conv012_questions_three = 7,
+	conv012_questions_one = 8,
+	conv012_seen_byebye = 10,
+	conv012_seen_mask = 12,
+	conv012_tell_byebye = 19,
+	conv012_var_questions_done = 26,
+	conv012_tell_knewhim = 29,
+	conv012_nomore_first = 30
 };
 
 struct ConvData {
