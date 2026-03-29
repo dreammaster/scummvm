@@ -116,6 +116,7 @@ typedef struct {        /* Room local variables */
 
 #define PUSH_X                  256
 #define PUSH_Y                  130
+
 } // namespace Rooms
 } // namespace Phantom
 } // namespace MADSV2

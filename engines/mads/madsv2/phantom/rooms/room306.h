@@ -19,42 +19,44 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MADS_SOUNDS_H
-#define MADS_PHANTOM_MADS_SOUNDS_H
+#ifndef MADS_PHANTOM_ROOM306_H
+#define MADS_PHANTOM_ROOM306_H
 
-#include "common/scummsys.h"
+#include "mads/madsv2/phantom/phantom.h"
 
 namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
+namespace Rooms {
 
-enum {
-	N_AllFade = 1,
-	N_MusicFade = 3,
-	N_IsAnySoundOn = 8,
-	N_BackgroundMus = 16,
-	N_DoorOpens = 24,
-	N_DoorCloses = 25,
-	N_TakeObjectSnd = 26,
-	N_AngelMus001 = 34,
-	N_BackMus1stTime = 38,
-	N_TrapDoor001 = 64,
-	N_WomanScream002 = 65,
-	N_SqueakyDoor = 66,
-	N_PlayerFalls = 67,
-	N_EchoSteps = 68,
-	N_Applause002 = 69,
-	N_SandbagThud = 70,
-	N_KeyTurnSnd = 71,
-	N_DoorHandle002 = 72,
-	N_DoorHandle = 73,
-	N_WomanScream003 = 74,
+#define local ((Scratch *)(&game.scratch[0]))
+#define ss    local->sprite
+#define seq   local->sequence
+#define aa    local->animation
 
-	N_Crash003 = 66
-};
+typedef struct {        /* Room local variables */
 
+	int16 sprite[15];       /* Sprite series handles */
+	int16 sequence[15];     /* Sequence handles      */
+	int16 animation[4];     /* Animation handles     */
+	int16 prevent;
+
+} Scratch;
+
+
+/* ========================= Sprite Series =================== */
+
+#define fx_fall                 0       /* rm306a0  */
+
+
+/* ========================= Triggers ======================== */
+
+#define ROOM_306_END            60 
+#define ROOM_306_BREAK_LOOSE    70
+
+} // namespace Rooms
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
 
-#endif
+#endif // MADS_PHANTOM_ROOM250_H
