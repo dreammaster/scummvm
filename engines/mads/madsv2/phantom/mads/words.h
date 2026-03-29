@@ -267,6 +267,8 @@ enum {
 	words_Edgar_Degas = 385,
 	words_chandelier_cable = 386,
 	words_hook = 390,
+	words_cane = 392,
+	words_mask = 393,
 	words_paper = 399
 };
 

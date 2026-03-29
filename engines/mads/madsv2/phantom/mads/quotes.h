@@ -42,7 +42,8 @@ enum {
 	quote_score_rank_7 = 64,
 	quote_score_rank_8 = 65,
 	quote_mainmenu_phantom_1 = 66,
-
+	quote_305a0 = 100,
+	quote_305a1 = 101,
 	quote_204a0 = 117
 #if 0
 	quote_menu_done,
