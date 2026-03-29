@@ -719,6 +719,9 @@ enum {
 	text_307_25 = 30725,
 	text_307_26 = 30726,
 
+	/* Room 308 */
+	text_308_10 = 30810,
+	text_308_11 = 30811
 };
 
 } // namespace Phantom

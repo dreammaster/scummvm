@@ -31,6 +31,7 @@ namespace Phantom {
 enum {
 	speech_woman_scream = 1,
 	speech_applause = 2,
+	speech_christine_scream = 4,
 	speech_raoul_strangle = 5,
 	speech_raoul_catwalk = 6,
 	speech_christine_scales = 8,
