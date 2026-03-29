@@ -29,6 +29,18 @@ namespace MADSV2 {
 namespace Phantom {
 
 enum {
+	quote_score_1 = 54,
+	quote_score_2 = 55,
+	quote_score_3 = 56,
+	quote_score_4 = 57,
+	quote_score_rank_1 = 58,
+	quote_score_rank_2 = 59,
+	quote_score_rank_3 = 60,
+	quote_score_rank_4 = 61,
+	quote_score_rank_5 = 62,
+	quote_score_rank_6 = 63,
+	quote_score_rank_7 = 64,
+	quote_score_rank_8 = 65,
 	quote_mainmenu_phantom_1 = 66,
 
 	quote_204a0 = 117
