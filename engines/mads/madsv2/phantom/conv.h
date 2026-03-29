@@ -80,6 +80,22 @@ enum {
 };
 
 enum {
+	conv004_bon_jour_hello = 0,
+	conv004_who_who_are = 1,
+	conv004_monsieur_again = 2,
+	conv004_name_raoul = 3,
+	conv004_name_dear = 4,
+	conv004_name_sorry = 5,
+	conv004_anything_take = 19,
+	conv004_imgone_bye = 25,
+	conv004_dontleave_help = 26,
+	conv004_promises_continue = 27,
+	conv004_promises_return = 28,
+	conv004_promises_cant = 29,
+	conv004_promises_safe = 30
+};
+
+enum {
 	conv007_richard_intro_b = 2,
 	conv007_daaeb_intro_c = 3,
 	conv007_where_pushed = 8,
@@ -112,6 +128,16 @@ enum {
 	conv012_var_questions_done = 26,
 	conv012_tell_knewhim = 29,
 	conv012_nomore_first = 30
+};
+
+enum {
+	conv013_intro_hello = 0,
+	conv013_returned_abc = 1,
+	conv013_again_abc = 2,
+	conv013_dreams_romantic = 19,
+	conv013_lovescene_openline = 21,
+	conv013_practice_first = 27,
+	conv013_biteme_b_b = 31
 };
 
 enum {

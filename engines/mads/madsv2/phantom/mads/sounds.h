@@ -35,6 +35,7 @@ enum {
 	N_DoorOpens = 24,
 	N_DoorCloses = 25,
 	N_TakeObjectSnd = 26,
+	N_AngelMus001 = 34,
 	N_BackMus1stTime = 38,
 	N_TrapDoor001 = 64,
 	N_SqueakyDoor = 66,

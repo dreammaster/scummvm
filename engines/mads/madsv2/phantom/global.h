@@ -196,6 +196,7 @@ enum {
 
 // player_score_flags
 #define SCORE_TRAP_DOOR		1
+#define SCORE_DEAD_FLORENT	4
 
 // ticket_people_here
 #define SELLER				1
@@ -219,6 +220,13 @@ enum {
 #define JULIE_NO			0
 #define NO_AND_QUIT_CONV	1
 #define JULIE_YES			2
+
+// done_brie_conv_203
+#define YES_AND_CHASE		3
+
+// chris_kicked_raoul_out
+#define CHRIS_KICKED_YES		-1
+#define CAME_INTO_EMPTY_113		3
 
 } // namespace Phantom
 } // namespace MADSV2

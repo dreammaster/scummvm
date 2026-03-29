@@ -134,6 +134,7 @@ MODULE_OBJS += \
 	madsv2/phantom/rooms/room110.o \
 	madsv2/phantom/rooms/room111.o \
 	madsv2/phantom/rooms/room112.o \
+	madsv2/phantom/rooms/room113.o \
 	madsv2/phantom/phantom.o \
 	madsv2/phantom/conv.o \
 	madsv2/phantom/main_menu.o \

@@ -38,6 +38,7 @@ extern bool speech_system_active;
 extern bool speech_on;
 extern int speech_ems_handle;
 extern SpeechBuffer speech_main_buffer;
+extern int global_speech_ready;
 
 extern SpeechDirPtr speech_load(const char *resName, int id, bool);
 extern void speech_ems_play(const char *resName, int id);
