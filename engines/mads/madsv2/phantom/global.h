@@ -251,6 +251,13 @@ enum {
 #define PANEL_LOCKED		2
 #define PANEL_UNLOCKED		3
 
+// lantern_status
+#define LANTERN_IS_OFF		0
+#define LANTERN_IS_ON		1
+
+
+extern void global_enter_catacombs(int special);
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
