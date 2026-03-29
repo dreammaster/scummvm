@@ -36,6 +36,7 @@ enum {
 	words_apron = 19,
 	words_backstage = 21,
 	words_bear_prop = 22,
+	words_blue_frame = 23,
 	words_book = 24,
 	words_bust = 25,
 	words_cable = 26,
