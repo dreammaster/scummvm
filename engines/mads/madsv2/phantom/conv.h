@@ -155,6 +155,38 @@ enum {
 };
 
 enum {
+	conv010_hasthem_abc = 4,
+	conv010_noyoudont_abc = 5,
+	conv010_unlock_b_box_5 = 7,
+	conv010_gethem_abc = 8,
+	conv010_beginning_who = 9,
+	conv010_beginning_you = 10,
+	conv010_beginning_pardon = 11,
+	conv010_nomore_abc = 13,
+	conv010_byebye_first = 14,
+	conv010_dialogue_three = 16,
+	conv010_dialogue_one = 17,
+	conv010_ghost_byebye = 19,
+	conv010_trance_b_box_5 = 21,
+	conv010_box_b_b = 23,
+	conv010_box_d_d = 25,
+	conv010_box_byebye = 40,
+	conv010_ghost_interest = 45,
+	conv010_bye_two_solong = 46
+};
+
+enum {
+	conv011_has_b_ticket = 5,
+	conv011_has_abc = 6,
+	conv011_enter_b_a = 8,
+	conv011_hasnot_abc = 9,
+	conv011_boxoffice_abc = 10,
+	conv011_enter_it_abc = 12,
+	conv011_enjoy_abc = 13,
+	conv011_five_nono = 14
+};
+
+enum {
 	conv012_hello_one = 1,
 	conv012_hello_four = 4,
 	conv012_byebye_first = 6,
@@ -205,6 +237,12 @@ enum {
 	conv017_ticket_block = 0,
 	conv017_hasit_first = 3,
 	conv017_hasnot_first = 4
+};
+
+enum {
+	conv018_begin_first = 0,
+	conv018_adieu_bye = 4,
+	conv018_nomore_huh = 5
 };
 
 enum {

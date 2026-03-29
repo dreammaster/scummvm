@@ -199,6 +199,7 @@ enum {
 #define SCORE_DEAD_FLORENT	4
 
 // ticket_people_here
+#define NEITHER				0
 #define SELLER				1
 #define USHER_AND_SELLER	2
 
@@ -230,6 +231,17 @@ enum {
 // chris_kicked_raoul_out
 #define CHRIS_KICKED_YES		-1
 #define CAME_INTO_EMPTY_113		3
+
+// madame_giry_loc
+#define LEFT				0
+#define MIDDLE				1
+#define RIGHT				2
+
+// doors_in_205
+#define BOTH_LOCKED			0
+#define LEFT_OPEN			1
+#define RIGHT_OPEN			2
+#define BOTH_OPEN			3
 
 } // namespace Phantom
 } // namespace MADSV2
