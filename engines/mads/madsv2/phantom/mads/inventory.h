@@ -38,6 +38,7 @@ enum {
 	small_note = 6,
 	rope = 7,
 	envelope = 9,
+	ticket = 10,
 	parchment = 12,
 	book = 15,
 	blue_frame = 17,

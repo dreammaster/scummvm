@@ -117,6 +117,14 @@ enum {
 };
 
 enum {
+	conv009_dialogue_one = 1,
+	conv009_dialogue_paint = 2,
+	conv009_dialogue_three = 10,
+	conv009_lips_abc = 11,
+	conv009_wink_abc = 12
+};
+
+enum {
 	conv012_hello_one = 1,
 	conv012_hello_four = 4,
 	conv012_byebye_first = 6,
@@ -151,6 +159,12 @@ enum {
 	conv016_kind_five = 12,
 	conv016_money_cash = 13,
 	conv016_money_lend = 14
+};
+
+enum {
+	conv017_ticket_block = 0,
+	conv017_hasit_first = 3,
+	conv017_hasnot_first = 4
 };
 
 struct ConvData {

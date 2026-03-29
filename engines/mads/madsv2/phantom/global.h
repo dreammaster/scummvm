@@ -200,6 +200,7 @@ enum {
 
 // ticket_people_here
 #define SELLER				1
+#define USHER_AND_SELLER	2
 
 // sandbag_status
 #define SANDBAG_DROPPED		1
