@@ -197,6 +197,7 @@ enum {
 // player_score_flags
 #define SCORE_TRAP_DOOR		1
 #define SCORE_DEAD_FLORENT	4
+#define SCORE_HOLLOW_COLUMN	8
 
 // ticket_people_here
 #define NEITHER				0
@@ -242,6 +243,12 @@ enum {
 #define LEFT_OPEN			1
 #define RIGHT_OPEN			2
 #define BOTH_OPEN			3
+
+// panel_in_206
+#define PANEL_UNDISCOVERED	0
+#define PANEL_DISCOVERED	1
+#define PANEL_LOCKED		2
+#define PANEL_UNLOCKED		3
 
 } // namespace Phantom
 } // namespace MADSV2

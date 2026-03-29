@@ -43,6 +43,7 @@ enum {
 	N_PlayerFalls = 67,
 	N_EchoSteps = 68,
 	N_SandbagThud = 70,
+	N_KeyTurnSnd = 71,
 	N_DoorHandle002 = 72,
 	N_DoorHandle = 73
 };

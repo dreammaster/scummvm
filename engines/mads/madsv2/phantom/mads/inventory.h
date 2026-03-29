@@ -43,6 +43,7 @@ enum {
 	letter = 13,
 	notice = 14,
 	book = 15,
+	crumpled_note = 16,
 	blue_frame = 17,
 	large_note = 18,
 	green_frame = 19,
