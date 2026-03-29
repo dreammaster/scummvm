@@ -37,6 +37,7 @@ enum {
 	fire_axe = 5,
 	small_note = 6,
 	rope = 7,
+	sword = 8,
 	envelope = 9,
 	ticket = 10,
 	parchment = 12,

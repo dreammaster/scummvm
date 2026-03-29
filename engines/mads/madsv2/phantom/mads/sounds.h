@@ -47,7 +47,8 @@ enum {
 	N_SandbagThud = 70,
 	N_KeyTurnSnd = 71,
 	N_DoorHandle002 = 72,
-	N_DoorHandle = 73
+	N_DoorHandle = 73,
+	N_WomanScream003 = 74
 };
 
 } // namespace Phantom
