@@ -264,6 +264,13 @@ enum {
 	conv022_leave_b_b = 29
 };
 
+enum {
+	conv023_unhand_b_b = 3,
+	conv023_okay_b_b = 6,
+	conv023_okay_abc = 7,
+	conv023_die_b_b = 12
+};
+
 struct ConvData {
 	int16 node_count;
 	int16 dialog_count;
