@@ -19,34 +19,24 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MADS_INVENTORY_H
-#define MADS_PHANTOM_MADS_INVENTORY_H
+#ifndef MADS_PHANTOM_SECTION2_H
+#define MADS_PHANTOM_SECTION2_H
 
-#include "common/scummsys.h"
+#include "mads/madsv2/phantom/global.h"
+#include "mads/madsv2/phantom/mads/text.h"
+#include "mads/madsv2/phantom/mads/words.h"
+#include "mads/madsv2/core/vocabh.h"
 
 namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
+namespace Rooms {
 
-enum {
-	key = 0,
-	lantern = 1,
-	red_frame = 2,
-	sandbag = 3,
-	yellow_frame = 4,
-	fire_axe = 5,
-	small_note = 6,
-	rope = 7,
-	envelope = 9,
-	parchment = 12,
-	book = 15,
-	blue_frame = 17,
-	large_note = 18,
-	green_frame = 19,
-	cable_hook = 22,
-	rope_with_hook = 23
-};
+extern void section_2_music();
+extern void section_2_walker();
+extern void section_2_interface();
 
+} // namespace Rooms
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS

@@ -145,6 +145,14 @@ enum {
 	conv014_eighth_inside = 7
 };
 
+enum {
+	conv016_buy_four = 4,
+	conv016_take_b_b = 6,
+	conv016_kind_five = 12,
+	conv016_money_cash = 13,
+	conv016_money_lend = 14
+};
+
 struct ConvData {
 	int16 node_count;
 	int16 dialog_count;
