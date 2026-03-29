@@ -195,9 +195,10 @@ enum {
 #define NEW_ROOM			1
 
 // player_score_flags
-#define SCORE_TRAP_DOOR		1
-#define SCORE_DEAD_FLORENT	4
-#define SCORE_HOLLOW_COLUMN	8
+#define SCORE_TRAP_DOOR		0x01
+#define SCORE_DEAD_FLORENT	0x04
+#define SCORE_HOLLOW_COLUMN	0x08
+#define SCORE_CHASE_CATWALK 0x10
 
 // ticket_people_here
 #define NEITHER				0
