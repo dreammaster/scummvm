@@ -44,7 +44,24 @@ enum {
 	quote_mainmenu_phantom_1 = 66,
 	quote_305a0 = 100,
 	quote_305a1 = 101,
+
+	quote_310a0 = 102,
+	quote_310a1 = 103,
+	quote_310a2 = 104,
+	quote_310b0 = 105,
+	quote_310b1 = 106,
+	quote_310b2 = 107,
+	quote_310c0 = 108,
+	quote_310c1 = 109,
+	quote_310d0 = 110,
+	quote_310d1 = 111,
+	quote_310d2 = 112,
+	quote_310e0 = 113,
+	quote_310e1 = 114,
+	quote_310e2 = 115,
+	quote_310f0 = 116,
 	quote_204a0 = 117
+
 #if 0
 	quote_menu_done,
 	quote_menu_cancel,
