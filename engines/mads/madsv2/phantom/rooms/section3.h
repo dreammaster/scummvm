@@ -19,23 +19,24 @@
  *
  */
 
-#ifndef MADS_PHANTOM_MADS_SPEECHES_H
-#define MADS_PHANTOM_MADS_SPEECHES_H
+#ifndef MADS_PHANTOM_SECTION3_H
+#define MADS_PHANTOM_SECTION3_H
 
-#include "common/scummsys.h"
+#include "mads/madsv2/phantom/global.h"
+#include "mads/madsv2/phantom/mads/text.h"
+#include "mads/madsv2/phantom/mads/words.h"
+#include "mads/madsv2/core/vocabh.h"
 
 namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
+namespace Rooms {
 
-enum {
-	speech_woman_scream = 1,
-	speech_applause = 2,
-	speech_raoul_catwalk = 6,
-	speech_christine_scales = 8,
-	speech_phantom_cackle = 9
-};
+extern void section_3_music();
+extern void section_3_walker();
+extern void section_3_interface();
 
+} // namespace Rooms
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
