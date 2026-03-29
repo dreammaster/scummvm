@@ -29,8 +29,9 @@ namespace MADSV2 {
 namespace Phantom {
 
 enum {
-	quote_mainmenu_phantom_1 = 66
+	quote_mainmenu_phantom_1 = 66,
 
+	quote_204a0 = 117
 #if 0
 	quote_menu_done,
 	quote_menu_cancel,

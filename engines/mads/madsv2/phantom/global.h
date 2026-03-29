@@ -203,6 +203,7 @@ enum {
 #define USHER_AND_SELLER	2
 
 // sandbag_status
+#define SANDBAG_SECURE		0
 #define SANDBAG_DROPPED		1
 
 // julies_door

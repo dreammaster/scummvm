@@ -207,6 +207,25 @@ enum {
 	conv017_hasnot_first = 4
 };
 
+enum {
+	conv022_second_next = 1,
+	conv022_resolution_florent = 6,
+	conv022_resolution_fall = 7,
+	conv022_resolution_alone = 8,
+	conv022_dead_strangled = 9,
+	conv022_object_abc = 13,
+	conv022_do_abc = 15,
+	conv022_kiss_b_b = 17,
+	conv022_kiss_abc = 18,
+	conv022_notes_hadany = 19,
+	conv022_notes_here = 20,
+	conv022_notes_chandelier = 21,
+	conv022_notes_audience = 22,
+	conv022_look_abc = 23,
+	conv022_notes_b_b = 25,
+	conv022_leave_b_b = 29
+};
+
 struct ConvData {
 	int16 node_count;
 	int16 dialog_count;
