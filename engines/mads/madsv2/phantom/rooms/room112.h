@@ -19,8 +19,6 @@
  *
  */
 
-/*      room112.mac      by Paul Lahaise      8-Jan-93 */
-
 #ifndef MADS_PHANTOM_ROOM112_H
 #define MADS_PHANTOM_ROOM112_H
 
@@ -39,20 +37,20 @@ namespace Rooms {
 
 typedef struct {        /* Room local variables */
 
-	int sprite[15];         /* Sprite series handles                   */
-	int sequence[15];       /* Sequence handles                        */
-	int animation[4];       /* Animation handles                       */
-	int dynamic_julie;      /* For dynamic HS of Julie                 */
-	int anim_0_running;     /* T if Julie's practicing anim is running */
-	int anim_1_running;     /* T if Raoul's chair movement anim is running */
-	int just_did_option;
-	int julie_frame;
-	int julie_action;
-	int julie_talk_count;
-	int raoul_frame;
-	int raoul_action;
-	int raoul_talk_count;
-	int display_wait;       /* for getting up out of the chair */
+	int16 sprite[15];         /* Sprite series handles                   */
+	int16 sequence[15];       /* Sequence handles                        */
+	int16 animation[4];       /* Animation handles                       */
+	int16 dynamic_julie;      /* For dynamic HS of Julie                 */
+	int16 anim_0_running;     /* T if Julie's practicing anim is running */
+	int16 anim_1_running;     /* T if Raoul's chair movement anim is running */
+	int16 just_did_option;
+	int16 julie_frame;
+	int16 julie_action;
+	int16 julie_talk_count;
+	int16 raoul_frame;
+	int16 raoul_action;
+	int16 raoul_talk_count;
+	int16 display_wait;       /* for getting up out of the chair */
 
 } Scratch;
 

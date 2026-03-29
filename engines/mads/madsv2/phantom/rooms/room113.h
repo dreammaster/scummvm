@@ -19,8 +19,6 @@
  *
  */
 
-/*      room113.mac      by Paul Lahaise      8-Jan-93 */
-
 #ifndef MADS_PHANTOM_ROOM113_H
 #define MADS_PHANTOM_ROOM113_H
 
@@ -39,42 +37,42 @@ namespace Rooms {
 
 typedef struct {        /* Room local variables */
 
-	int sprite[15];         /* Sprite series handles                          */
-	int sequence[15];       /* Sequence handles                               */
-	int animation[5];       /* Animation handles [0=Daae, 1=Raoul13/Raoul4's  */
-	                        /*   proxy, 2=Florent, 3=Raoul4, 4=Julie]         */
+	int16 sprite[15];         /* Sprite series handles                          */
+	int16 sequence[15];       /* Sequence handles                               */
+	int16 animation[5];       /* Animation handles [0=Daae, 1=Raoul13/Raoul4's  */
+	                          /*   proxy, 2=Florent, 3=Raoul4, 4=Julie]         */
 
-	int chris_daae_dynamic; /* Dynamic HS for Christine (love scene)          */
-	int chris_flor_dynamic; /* Dynamic HS for Christine/Florent (1993)        */
+	int16 chris_daae_dynamic; /* Dynamic HS for Christine (love scene)          */
+	int16 chris_flor_dynamic; /* Dynamic HS for Christine/Florent (1993)        */
 
-	int standing_talking;   /* T once Daae & Raoul are standing face-to-face  */
-	int day_wants_to_talk;  /* T if Daae should start talking at next idle pt  */
-	int music_is_playing;   /* T once angel music has been triggered           */
-	int right_after_kiss;   /* T once kiss frame (165) has been reached        */
-	int anim_0_running;     /* T if Daae animation is active                  */
-	int anim_1_running;     /* T if Raoul-13 animation is active              */
-	int anim_2_running;     /* T if Florent animation is active               */
-	int anim_3_running;     /* T if Raoul-4 animation is active               */
-	int anim_4_running;     /* T if Julie animation is active                 */
-	int prevent_1;          /* Prevent first-time code from repeating         */
-	int prevent_2;          /* Prevent first-time code from repeating         */
-	int raoul_is_up;        /* T once Raoul has stood up from couch           */
-	int arms_are_out;       /* T once Daae has arms outstretched (frame 95)   */
+	int16 standing_talking;   /* T once Daae & Raoul are standing face-to-face  */
+	int16 day_wants_to_talk;  /* T if Daae should start talking at next idle pt  */
+	int16 music_is_playing;   /* T once angel music has been triggered           */
+	int16 right_after_kiss;   /* T once kiss frame (165) has been reached        */
+	int16 anim_0_running;     /* T if Daae animation is active                  */
+	int16 anim_1_running;     /* T if Raoul-13 animation is active              */
+	int16 anim_2_running;     /* T if Florent animation is active               */
+	int16 anim_3_running;     /* T if Raoul-4 animation is active               */
+	int16 anim_4_running;     /* T if Julie animation is active                 */
+	int16 prevent_1;          /* Prevent first-time code from repeating         */
+	int16 prevent_2;          /* Prevent first-time code from repeating         */
+	int16 raoul_is_up;        /* T once Raoul has stood up from couch           */
+	int16 arms_are_out;       /* T once Daae has arms outstretched (frame 95)   */
 
-	int day_frame;
-	int day_action;
-	int day_talk_count;
-	int stand_talk_count;
-	int florent_frame;
-	int florent_action;
-	int florent_talk_count;
-	int raoul_frame;
-	int raoul_action;
-	int raoul_talk_count;
-	int julie_frame;
-	int julie_action;
-	int julie_talk_count;
-	int just_did_option;
+	int16 day_frame;
+	int16 day_action;
+	int16 day_talk_count;
+	int16 stand_talk_count;
+	int16 florent_frame;
+	int16 florent_action;
+	int16 florent_talk_count;
+	int16 raoul_frame;
+	int16 raoul_action;
+	int16 raoul_talk_count;
+	int16 julie_frame;
+	int16 julie_action;
+	int16 julie_talk_count;
+	int16 just_did_option;
 
 } Scratch;
 

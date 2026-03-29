@@ -19,8 +19,6 @@
  *
  */
 
-/*      room111.mac      by Paul Lahaise      8-Jan-93 */
-
 #ifndef MADS_PHANTOM_ROOM111_H
 #define MADS_PHANTOM_ROOM111_H
 
@@ -39,15 +37,15 @@ namespace Rooms {
 
 typedef struct {        /* Room local variables */
 
-	int sprite[15];         /* Sprite series handles */
-	int sequence[15];       /* Sequence handles      */
-	int animation[4];       /* Animation handles     */
-	int delete_axe;         /* true if axe was deleted */
-	int anim_0_running;
-	int anim_1_running;
-	int listen_frame;
-	int listen_action;
-	int it_is_closed;
+	int16 sprite[15];         /* Sprite series handles */
+	int16 sequence[15];       /* Sequence handles      */
+	int16 animation[4];       /* Animation handles     */
+	int16 delete_axe;         /* true if axe was deleted */
+	int16 anim_0_running;
+	int16 anim_1_running;
+	int16 listen_frame;
+	int16 listen_action;
+	int16 it_is_closed;
 
 } Scratch;
 

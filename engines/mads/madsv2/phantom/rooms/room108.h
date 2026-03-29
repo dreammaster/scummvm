@@ -37,20 +37,20 @@ namespace Rooms {
 
 typedef struct {        /* Room local variables */
 
-	int sprite[15];         /* Sprite series handles */
-	int sequence[15];       /* Sequence handles      */
-	int animation[4];       /* Animation handles     */
-	int anim_0_running;
+	int16 sprite[15];         /* Sprite series handles */
+	int16 sequence[15];       /* Sequence handles      */
+	int16 animation[4];       /* Animation handles     */
+	int16 anim_0_running;
 
-	int char_action;        /* action Charles is going to perform */
-	int char_frame;
-	int char_talk_count;
-	int char_shut_up_count;
-	int dynamic_char;       /* Dynamic HS for Charles */
-	int prev_shut_up_frame;
-	int max_talk_count;     /* max talking count for Charles */
-	int did_raise_hand;     /* true, when if talking, did raise hand */
-	int converse_counter;   /* counter for talking displacements */
+	int16 char_action;        /* action Charles is going to perform */
+	int16 char_frame;
+	int16 char_talk_count;
+	int16 char_shut_up_count;
+	int16 dynamic_char;       /* Dynamic HS for Charles */
+	int16 prev_shut_up_frame;
+	int16 max_talk_count;     /* max talking count for Charles */
+	int16 did_raise_hand;     /* true, when if talking, did raise hand */
+	int16 converse_counter;   /* counter for talking displacements */
 
 } Scratch;
 

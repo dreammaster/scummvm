@@ -54,7 +54,7 @@ typedef struct {        /* Room local variables */
 	int16 anim_0_running;           /* T if aa[0] is running */
 	int16 anim_1_running;           /* T if aa[1] is running */
 
-	int converse_counter; /* counter for talking displacements */
+	int16 converse_counter; /* counter for talking displacements */
 
 } Scratch;
 

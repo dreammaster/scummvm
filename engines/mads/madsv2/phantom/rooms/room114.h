@@ -19,8 +19,6 @@
  *
  */
 
-/*      room114.mac      by Paul Lahaise      8-Jan-93 */
-
 #ifndef MADS_PHANTOM_ROOM114_H
 #define MADS_PHANTOM_ROOM114_H
 
@@ -38,7 +36,6 @@ namespace Rooms {
 #define aa    local->animation
 
 typedef struct {        /* Room local variables */
-
 	int sprite[15];     /* Sprite series handles */
 	int sequence[15];   /* Sequence handles      */
 	int animation[4];   /* Animation handles     */
