@@ -96,6 +96,21 @@ enum {
 };
 
 enum {
+	conv005_nowhere_nothing = 9,
+	conv005_report_adieu = 12,
+	conv005_lets_see_b_what_have_b = 14,
+	conv005_anyone_b_sign_it_b = 17,
+	conv005_crime_missing = 20,
+	conv005_rumors_sandbag = 24,
+	conv005_rumors_accident = 25,
+	conv005_goman_abc = 35,
+	conv005_murder_b_aa = 37,
+	conv005_scream_help = 41,
+	conv005_readbook_two_abc = 42,
+	conv005_point_one_b_abc = 44
+};
+
+enum {
 	conv007_richard_intro_b = 2,
 	conv007_daaeb_intro_c = 3,
 	conv007_where_pushed = 8,
@@ -114,6 +129,21 @@ enum {
 	conv007_office_abc = 28,
 	conv007_solo_alone = 30,
 	conv007_pinch_wait_b_nothing_b = 32,
+};
+
+enum {
+	conv008_things_two = 4,
+	conv008_things_three = 5,
+	conv008_actions_b_b = 7,
+	conv008_actions_d_d = 13,
+	conv008_actions_byebye = 15,
+	conv008_tellabout_have = 17,
+	conv008_tellabout_rumor = 19,
+	conv008_later_final = 20,
+	conv008_nomore_first = 21,
+	conv008_var_actions_done = 24,
+	conv008_var_christine_done = 26,
+	conv008_christine_three = 27
 };
 
 enum {
@@ -151,6 +181,16 @@ enum {
 enum {
 	conv014_second_angel = 1,
 	conv014_eighth_inside = 7
+};
+
+enum {
+	conv015_daae_b_b = 5,
+	conv015_next_second = 7,
+	conv015_professional_fourth = 9,
+	conv015_damned_b_b = 11,
+	conv015_exchange_ticket = 13,
+	conv015_exchange_relief = 14,
+	conv015_exchange_opera = 15
 };
 
 enum {

@@ -29,6 +29,7 @@ namespace MADSV2 {
 namespace Phantom {
 
 enum {
+	speech_woman_scream = 1,
 	speech_christine_scales = 8,
 	speech_phantom_cackle = 9
 };

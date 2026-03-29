@@ -40,6 +40,8 @@ enum {
 	envelope = 9,
 	ticket = 10,
 	parchment = 12,
+	letter = 13,
+	notice = 14,
 	book = 15,
 	blue_frame = 17,
 	large_note = 18,

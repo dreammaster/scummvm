@@ -38,6 +38,7 @@ enum {
 	N_AngelMus001 = 34,
 	N_BackMus1stTime = 38,
 	N_TrapDoor001 = 64,
+	N_WomanScream002 = 65,
 	N_SqueakyDoor = 66,
 	N_PlayerFalls = 67,
 	N_EchoSteps = 68,

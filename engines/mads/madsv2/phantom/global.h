@@ -210,6 +210,7 @@ enum {
 #define CRACKED_OPEN		1
 
 // chris_f_status
+#define CHRIS_F_IS_DEAD		0
 #define CHRIS_F_IS_ALIVE	1
 
 // christine_door_status

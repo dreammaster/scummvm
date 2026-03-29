@@ -28,6 +28,7 @@ namespace MADS {
 namespace MADSV2 {
 
 constexpr int sound_board_roland = 1;
+constexpr bool global_prefer_roland = false;
 
 extern int sound_play(int soundNum);
 extern int sound_queue(int soundNum);
