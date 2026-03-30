@@ -46,6 +46,7 @@ constexpr int MAZE_STONE              = 0x0200;        /* 453             */
 constexpr int MAZE_BLOCK              = 0x0400;        /* 404             */
 constexpr int MAZE_FALLEN_BLOCK       = 0x0800;        /* 404             */
 
+extern void global_catacombs_setup();
 extern void global_catacombs_init();
 extern void global_enter_catacombs(int special);
 extern int global_catacombs_exit(int exit);

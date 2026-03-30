@@ -36,7 +36,7 @@ char global_release_copyright[] = { "ScummVM" };
 
 
 void global_init_code() {
-	error("TODO: void global_init_code(void);");
+	g_engine->global_init_code();
 }
 
 void global_daemon_code() {

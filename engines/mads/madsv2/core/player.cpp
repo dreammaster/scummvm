@@ -643,7 +643,7 @@ void player_preserve_palette() {
 	}
 }
 
-void player_himem_preload(char *name, int level) {
+void player_himem_preload(const char *name, int level) {
 	char temp_buf[80];
 	int count;
 

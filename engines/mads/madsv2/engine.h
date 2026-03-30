@@ -73,8 +73,7 @@ public:
 	}
 
 	virtual void main_cold_data_init() = 0;
-	void main_false_start() {}
-	void main_global_init_code() {}
+	virtual void global_init_code() = 0;
 	void section_music(int section_num) {}
 	void game_control_loop() {}
 

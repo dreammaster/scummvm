@@ -46,6 +46,7 @@
 #include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/error.h"
 #include "mads/madsv2/core/extra.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -2096,9 +2097,14 @@ void inter_spin_object(int object_id) {
 	inter_object_series = matte_load_series(temp_buf,
 		SPRITE_LOAD_SPINNING_OBJECT,
 		SERIES_BONUS_OBJECT);
-	stamp_sprite_to_interface(OUAF_OBJECT_X, OUAF_OBJECT_Y, 1, inter_object_series);
-	paul_object_showing = object_id;
-	if (inter_object_series < 0) goto done;
+
+	if (g_engine->getGameID() == GType_Forest) {
+		stamp_sprite_to_interface(OUAF_OBJECT_X, OUAF_OBJECT_Y, 1, inter_object_series);
+		paul_object_showing = object_id;
+	}
+
+	if (inter_object_series < 0)
+		goto done;
 
 	mcga_setpal_range(&master_palette, 7, 1);
 	mcga_setpal_range(&master_palette, 246, 6);

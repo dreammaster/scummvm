@@ -255,8 +255,6 @@ int  main_cheating_key(int mykey);
 int  main_normal_key(int mykey);
 int  main_copy_verify(void);
 void main_cold_data_init(void);
-void main_false_start(void);
-void main_global_init_code(void);
 
 
 } // namespace MADSV2

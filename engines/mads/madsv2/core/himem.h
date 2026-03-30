@@ -69,7 +69,7 @@ extern int himem_directory_setup();
 extern void himem_shutdown();
 extern void himem_startup();
 extern int himem_preload(char *filename, int level);
-extern int himem_preload_series(char *filename, int level);
+extern int himem_preload_series(const char *filename, int level);
 extern void himem_flush(int level);
 
 } // namespace MADSV2

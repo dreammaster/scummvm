@@ -1341,7 +1341,6 @@ void game_control() {
 	if ((result != COPY_FAIL) && (result != COPY_ESCAPE)) {
 		ems_paging_mode(EMS_PAGING_GLOBAL);
 		global_init_code();
-		main_global_init_code();
 	}
 
 	if (game_restore_flag && (result != COPY_FAIL) && (result != COPY_ESCAPE)) {
@@ -1612,9 +1611,7 @@ void game_control() {
 			player_stationary_update();
 
 			if (active_inven >= 0) {
-				/* keep inventory turned off until selected */
-				inter_turn_off_object(); /* delete this and uncomment below to return system to original */
-				/* inter_spin_object (inven[active_inven]); */
+				inter_spin_object(inven[active_inven]);
 			} else {
 				inter_turn_off_object();
 			}
@@ -3336,14 +3333,6 @@ int main_copy_verify() {
 
 void main_cold_data_init() {
 	g_engine->main_cold_data_init();
-}
-
-void main_false_start() {
-	g_engine->main_cold_data_init();
-}
-
-void main_global_init_code() {
-	g_engine->main_global_init_code();
 }
 
 } // namespace MADSV2

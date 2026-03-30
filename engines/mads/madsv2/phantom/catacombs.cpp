@@ -176,7 +176,7 @@ Catacombs hard_catacombs[62] = {
 	{ 404, { 34, 43, 60, 44 }, { NORTH, WEST, NORTH, EAST }, 0 }
 };
 
-static void global_catacombs_setup() {
+void global_catacombs_setup() {
 	if (game.difficulty == HARD_MODE) {
 		catacombs = hard_catacombs;
 		global[catacombs_309_from] = 3;

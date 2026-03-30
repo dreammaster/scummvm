@@ -360,7 +360,7 @@ done:
 	return preload_handle;
 }
 
-int himem_preload_series(char *filename, int level) {
+int himem_preload_series(const char *fname, int level) {
 	int preload_handle = -1;
 	int new_handle = -1;
 	int page_marker = -1;
@@ -395,8 +395,8 @@ int himem_preload_series(char *filename, int level) {
 
 	handle.open = false;
 
-	Common::strcpy_s(file_buf, filename);
-	filename = file_buf;
+	Common::strcpy_s(file_buf, fname);
+	char *filename = file_buf;
 
 	fileio_add_ext(filename, "SS"); /* Default to Sprite Series */
 

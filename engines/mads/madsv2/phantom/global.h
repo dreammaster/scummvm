@@ -265,6 +265,15 @@ enum {
 #define COFFIN_UNLOCKED		1
 #define COFFIN_OPEN			2
 
+// chris_d_status
+#define BEFORE_LOVE			0
+
+/* Random music generated at start of each game */
+#define TOCCATA_FUGUE_D_MINOR     1
+#define LITTLE_FUGUE_G_MINOR      2
+#define FUGUE_B_MINOR             3
+#define FUGUE_C_MINOR             4
+
 
 extern void global_section_constructor();
 

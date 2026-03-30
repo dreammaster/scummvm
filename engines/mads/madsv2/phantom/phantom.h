@@ -32,6 +32,8 @@ class PhantomEngine : public MADSV2Engine {
 private:
 	bool _soundFlag = true;
 
+	static void global_object_sprite();
+
 public:
 	PhantomEngine(OSystem *syst, const MADSGameDescription *gameDesc) :
 		MADSV2Engine(syst, gameDesc) {}
@@ -40,6 +42,7 @@ public:
 	Common::Error run() override;
 
 	void main_cold_data_init() override;
+	void global_init_code() override;
 	void global_section_constructor() override;
 };
 
