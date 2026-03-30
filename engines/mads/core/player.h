@@ -256,6 +256,6 @@ public:
 
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_PLAYER_H */

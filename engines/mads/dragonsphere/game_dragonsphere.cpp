@@ -155,5 +155,5 @@ void GameDragonsphere::synchronize(Common::Serializer &s, bool phase1) {
 	}
 }
 
-} // End of namespace Dragonsphere
-} // End of namespace MADS
+} // namespace Dragonsphere
+} // namespace MADS

@@ -625,6 +625,6 @@ void SceneTeleporter::teleporterStep() {
 	}
 }
 
-} // End of namespace Nebular
+} // namespace Nebular
 
-} // End of namespace MADS
+} // namespace MADS

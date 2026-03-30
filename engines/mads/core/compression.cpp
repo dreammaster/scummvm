@@ -191,4 +191,4 @@ int FabDecompressor::getBit() {
 	return bit;
 }
 
-} // End of namespace MADS
+} // namespace MADS

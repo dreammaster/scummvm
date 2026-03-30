@@ -29,4 +29,4 @@ void Globals::reset() {
 		(*this)[i] = 0;
 }
 
-} // End of namespace MADS
+} // namespace MADS

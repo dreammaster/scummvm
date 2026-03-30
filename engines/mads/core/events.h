@@ -190,6 +190,6 @@ public:
 	Common::CustomEventType getAction() { return _pendingActions.pop(); }
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_EVENTS_H */

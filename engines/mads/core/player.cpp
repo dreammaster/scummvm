@@ -867,4 +867,4 @@ void Player::resetFacing(Facing facing) {
 	selectSeries();
 }
 
-} // End of namespace MADS
+} // namespace MADS

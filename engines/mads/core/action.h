@@ -170,6 +170,6 @@ public:
 	void synchronize(Common::Serializer &s);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_ACTION_H */

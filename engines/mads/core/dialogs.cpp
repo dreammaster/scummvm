@@ -547,4 +547,4 @@ void FullScreenDialog::display() {
 		scene._spriteSlots.fullRefresh();
 }
 
-} // End of namespace MADS
+} // namespace MADS

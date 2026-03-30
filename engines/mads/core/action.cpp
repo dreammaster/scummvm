@@ -702,4 +702,4 @@ void MADSAction::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_inProgress);
 }
 
-} // End of namespace MADS
+} // namespace MADS

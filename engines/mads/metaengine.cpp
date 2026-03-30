@@ -161,7 +161,7 @@ Common::Platform MADSEngine::getPlatform() const {
 	return _gameDescription->desc.platform;
 }
 
-} // End of namespace MADS
+} // namespace MADS
 
 class MADSMetaEngine : public AdvancedMetaEngine<MADS::MADSGameDescription> {
 public:

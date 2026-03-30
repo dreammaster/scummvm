@@ -263,4 +263,4 @@ void Hotspots::activateAtPos(int vocabId, bool active, Common::Point pos) {
 	}
 }
 
-} // End of namespace MADS
+} // namespace MADS

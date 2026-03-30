@@ -111,6 +111,6 @@ public:
 	bool isBackground() const { return _isBackground; }
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_ASSETS_H */

@@ -177,7 +177,7 @@ public:
 	void actions() override;
 };
 
-} // End of namespace Dragonsphere
-} // End of namespace MADS
+} // namespace Dragonsphere
+} // namespace MADS
 
 #endif

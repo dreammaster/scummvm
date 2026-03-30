@@ -404,4 +404,4 @@ bool Debugger::Cmd_SetCamera(int argc, const char **argv) {
 		return false;
 	}
 }
-} // End of namespace MADS
+} // namespace MADS

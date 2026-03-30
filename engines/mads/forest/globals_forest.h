@@ -52,7 +52,7 @@ public:
 	virtual void synchronize(Common::Serializer &s);
 };
 
-} // End of namespace Forest
-} // End of namespace MADS
+} // namespace Forest
+} // namespace MADS
 
 #endif

@@ -158,7 +158,7 @@ public:
 	void actions() override {};
 };
 
-} // End of namespace Nebular
-} // End of namespace MADS
+} // namespace Nebular
+} // namespace MADS
 
 #endif /* MADS_NEBULAR_SCENES8_H */

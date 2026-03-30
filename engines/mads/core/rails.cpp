@@ -287,4 +287,4 @@ void Rails::disableLine(int from, int to) {
 	_nodes[to]._distances[from] = 0x3FFF;
 }
 
-} // End of namespace MADS
+} // namespace MADS

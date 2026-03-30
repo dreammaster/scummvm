@@ -82,6 +82,6 @@ public:
 	void decompress(const byte *srcData, int srcSize, byte *destData, int destSize);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif

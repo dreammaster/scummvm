@@ -135,6 +135,6 @@ public:
 
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif	/* MADS_HOTSPOTS_H */

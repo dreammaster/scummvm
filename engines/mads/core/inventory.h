@@ -136,6 +136,6 @@ public:
 	int getIdFromDesc(int objectId);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_INVENTORY_H */

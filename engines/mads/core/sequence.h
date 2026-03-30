@@ -129,6 +129,6 @@ public:
 	void setSeqPlayer(int idx, bool flag);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_SEQUENCE_H */

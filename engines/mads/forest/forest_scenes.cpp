@@ -171,5 +171,5 @@ void SceneInfoForest::loadCodes(BaseSurface &depthSurface, Common::SeekableReadS
 	delete[] walkMap;
 }
 
-} // End of namespace Forest
-} // End of namespace MADS
+} // namespace Forest
+} // namespace MADS

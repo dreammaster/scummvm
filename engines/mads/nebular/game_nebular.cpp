@@ -904,6 +904,6 @@ void GameNebular::synchronize(Common::Serializer &s, bool phase1) {
 	}
 }
 
-} // End of namespace Nebular
+} // namespace Nebular
 
-} // End of namespace MADS
+} // namespace MADS

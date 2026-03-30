@@ -525,4 +525,4 @@ SceneLogic::SceneLogic(RexNebularEngine *vm) : _vm(vm) {
 	_scene = &_vm->_game->_scene;
 }
 
-} // End of namespace MADS
+} // namespace MADS

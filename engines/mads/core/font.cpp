@@ -243,4 +243,4 @@ int Font::getBpp(int charWidth) {
 		return 1;
 }
 
-} // End of namespace MADS
+} // namespace MADS

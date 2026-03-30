@@ -917,4 +917,4 @@ int Palette::closestColor(const byte *matchColor, const byte *refPalette,
 }
 
 
-} // End of namespace MADS
+} // namespace MADS

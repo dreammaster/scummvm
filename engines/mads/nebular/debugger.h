@@ -59,6 +59,6 @@ public:
 	~Debugger() override {}
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif	/* MADS_DEBUGGER_H */

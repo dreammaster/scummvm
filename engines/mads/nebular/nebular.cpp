@@ -208,4 +208,4 @@ Common::Error RexNebularEngine::saveGameState(int slot, const Common::String &de
 	return Common::kNoError;
 }
 
-} // End of namespace MADS
+} // namespace MADS

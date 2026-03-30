@@ -227,6 +227,6 @@ public:
 	~AnimationView() override;
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_MENU_VIEWS_H */

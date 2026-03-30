@@ -149,4 +149,4 @@ void SynchronizedList::synchronize(Common::Serializer &s) {
 	}
 }
 
-} // End of namespace MADS
+} // namespace MADS

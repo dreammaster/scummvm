@@ -260,6 +260,6 @@ public:
 	}
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_SCREEN_H */

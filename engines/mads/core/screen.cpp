@@ -813,4 +813,4 @@ void Screen::resetClipBounds() {
 	setClipBounds(Common::Rect(0, 0, MADS_SCREEN_WIDTH, MADS_SCREEN_HEIGHT));
 }
 
-} // End of namespace MADS
+} // namespace MADS

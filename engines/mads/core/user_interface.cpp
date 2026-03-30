@@ -1113,4 +1113,4 @@ void UserInterface::synchronize(Common::Serializer &s) {
 		s.syncAsSint16LE(_categoryIndexes[i]);
 }
 
-} // End of namespace MADS
+} // namespace MADS

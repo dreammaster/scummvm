@@ -500,6 +500,6 @@ public:
 	ConversationMode currentMode() const { return _currentMode; }
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_CONVERSATIONS_H */

@@ -155,5 +155,5 @@ void GameForest::synchronize(Common::Serializer &s, bool phase1) {
 	}
 }
 
-} // End of namespace Forest
-} // End of namespace MADS
+} // namespace Forest
+} // namespace MADS

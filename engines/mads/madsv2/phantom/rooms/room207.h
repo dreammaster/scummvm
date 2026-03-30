@@ -75,4 +75,4 @@ void room_207_parser();
 } // namespace MADSV2
 } // namespace MADS
 
-#endif // MADS_PHANTOM_ROOM207_H
+#endif

@@ -303,6 +303,6 @@ public:
 	void refresh();
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_USER_INTERFACE_H */

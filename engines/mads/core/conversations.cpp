@@ -1019,4 +1019,4 @@ int ScriptEntry::Conditional::get(int paramNum) const {
 /*------------------------------------------------------------------------*/
 
 
-} // End of namespace MADS
+} // namespace MADS

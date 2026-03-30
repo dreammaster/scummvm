@@ -271,4 +271,4 @@ void EventsManager::clearEvents() {
 }
 
 
-} // End of namespace MADS
+} // namespace MADS

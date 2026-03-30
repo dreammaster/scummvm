@@ -41,6 +41,6 @@ public:
 	void reset();
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_GLOBALS_H */

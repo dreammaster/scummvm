@@ -581,4 +581,4 @@ void TextDisplayList::expire(int idx) {
 	(*this)[idx]._expire = -1;
 }
 
-} // End of namespace MADS
+} // namespace MADS

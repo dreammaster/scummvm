@@ -319,6 +319,6 @@ public:
 		int paletteInc, int count);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_PALETTE_H */

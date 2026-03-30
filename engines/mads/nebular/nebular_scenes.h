@@ -1411,7 +1411,7 @@ protected:
 	SceneTeleporter(RexNebularEngine *vm);
 };
 
-} // End of namespace Nebular
-} // End of namespace MADS
+} // namespace Nebular
+} // namespace MADS
 
 #endif /* MADS_NEBULAR_SCENES_H */

@@ -173,7 +173,7 @@ public:
 	virtual void synchronize(Common::Serializer &s);
 };
 
-} // End of namespace Dragonsphere
-} // End of namespace MADS
+} // namespace Dragonsphere
+} // namespace MADS
 
 #endif

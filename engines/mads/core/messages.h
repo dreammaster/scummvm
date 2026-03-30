@@ -187,6 +187,6 @@ public:
 	void cleanUp();
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_MESSAGES_H */

@@ -59,6 +59,6 @@ public:
 	Common::Array<DSREntry> _dsrEntries;
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif

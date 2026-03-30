@@ -136,4 +136,4 @@ void AudioPlayer::stop() {
 	_mixer->stopHandle(_handle);
 }
 
-} // End of namespace M4
+} // namespace M4

@@ -132,6 +132,6 @@ public:
 
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_RAILS_H */

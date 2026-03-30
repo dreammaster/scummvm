@@ -221,4 +221,4 @@ int InventoryObjects::getIdFromDesc(int descId) {
 	return -1;
 }
 
-} // End of namespace MADS
+} // namespace MADS

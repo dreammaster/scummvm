@@ -224,4 +224,4 @@ SpriteSetCharInfo::SpriteSetCharInfo(Common::SeekableReadStream *s) {
 	_centerOfGravity = s->readByte();
 }
 
-} // End of namespace MADS
+} // namespace MADS

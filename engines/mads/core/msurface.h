@@ -203,6 +203,6 @@ public:
 	int getDepthHighBit(const Common::Point &pt);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_MSURFACE_H */

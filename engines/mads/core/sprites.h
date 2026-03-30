@@ -236,6 +236,6 @@ public:
 	SpriteAsset *&operator[](int idx);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_SPRITES_H */

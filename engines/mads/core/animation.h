@@ -240,6 +240,6 @@ public:
 	Common::Point getFramePosAdjust(int idx);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_ANIMATION_H */

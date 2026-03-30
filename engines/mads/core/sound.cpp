@@ -1008,4 +1008,4 @@ int ASound::command8() {
 	return result;
 }
 
-} // End of namespace MADS
+} // namespace MADS

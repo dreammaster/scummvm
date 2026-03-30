@@ -54,4 +54,4 @@ const uint32 DEFAULT_VGA_HIGH_PALETTE[16] = {
 	0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000
 };
 
-} // End of namespace MADS
+} // namespace MADS

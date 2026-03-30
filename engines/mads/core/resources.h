@@ -83,6 +83,6 @@ public:
 	void synchronize(Common::Serializer &s);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif

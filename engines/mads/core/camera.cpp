@@ -188,4 +188,4 @@ bool Camera::camPan(int16 *picture_view, int16 *player_loc, int display_size, in
 	return (panningFl);
 }
 
-} // End of namespace MADS
+} // namespace MADS

@@ -447,8 +447,8 @@ public:
 	int command(int commandId, int param) override;
 };
 
-} // End of namespace Nebular
+} // namespace Nebular
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_SOUND_NEBULAR_H */

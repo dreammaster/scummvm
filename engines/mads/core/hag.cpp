@@ -244,4 +244,4 @@ ResourceType HagArchive::getResourceType(const Common::String &resourceName) con
 	return RESTYPE_NO_EXT;
 }
 
-} // End of namespace MADS
+} // namespace MADS

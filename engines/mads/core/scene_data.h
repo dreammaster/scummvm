@@ -220,6 +220,6 @@ public:
 	virtual void loadCodes(BaseSurface &depthSurface, Common::SeekableReadStream *stream) = 0;
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_SCENE_DATA_H */

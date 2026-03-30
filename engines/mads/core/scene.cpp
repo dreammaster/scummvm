@@ -893,4 +893,4 @@ void Scene::animations_tick() {
 	}
 }
 
-} // End of namespace MADS
+} // namespace MADS

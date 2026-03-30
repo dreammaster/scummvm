@@ -628,4 +628,4 @@ Common::Point Animation::getFramePosAdjust(int idx) {
 
 	return Common::Point(0, 0);
 }
-} // End of namespace MADS
+} // namespace MADS

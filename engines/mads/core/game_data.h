@@ -67,6 +67,6 @@ public:
 	virtual void step() {}
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_GAME_DATA_H */

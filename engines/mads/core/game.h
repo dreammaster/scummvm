@@ -255,6 +255,6 @@ public:
 	void camUpdate();
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_GAME_H */

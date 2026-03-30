@@ -497,4 +497,4 @@ int DepthSurface::getDepthHighBit(const Common::Point &pt) {
 	}
 }
 
-} // End of namespace MADS
+} // namespace MADS

@@ -229,7 +229,7 @@ public:
 	void actions() override {}
 };
 
-} // End of namespace Forest
-} // End of namespace MADS
+} // namespace Forest
+} // namespace MADS
 
 #endif

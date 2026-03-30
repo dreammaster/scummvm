@@ -267,6 +267,6 @@ public:
 	int _speechReady;
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_SCENE_H */

@@ -834,4 +834,4 @@ int AnimationView::scanResourceIndex(const Common::String &resourceName) {
 	return -1;
 }
 
-} // End of namespace MADS
+} // namespace MADS

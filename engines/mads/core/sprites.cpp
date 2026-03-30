@@ -420,4 +420,4 @@ SpriteAsset *&SpriteSets::operator[](int idx) {
 		Common::Array<SpriteAsset *>::operator[](idx);
 }
 
-} // End of namespace MADS
+} // namespace MADS

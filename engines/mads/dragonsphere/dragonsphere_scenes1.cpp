@@ -3686,5 +3686,5 @@ void Scene105::handleConversation() {
 
 /*------------------------------------------------------------------------*/
 
-} // End of namespace Dragonsphere
-} // End of namespace MADS
+} // namespace Dragonsphere
+} // namespace MADS

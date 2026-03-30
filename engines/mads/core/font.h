@@ -89,6 +89,6 @@ public:
 		int spaceWidth = 0, int width = 0);
 };
 
-} // End of namespace MADS
+} // namespace MADS
 
 #endif /* MADS_FONT_H */

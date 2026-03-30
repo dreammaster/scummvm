@@ -232,5 +232,5 @@ void SceneInfoDragonsphere::loadCodes(BaseSurface &depthSurface, Common::Seekabl
 	delete[] walkMap;
 }
 
-} // End of namespace Dragonsphere
-} // End of namespace MADS
+} // namespace Dragonsphere
+} // namespace MADS
