@@ -32,6 +32,7 @@
 #include "mads/madsv2/phantom/mads/sounds.h"
 #include "mads/madsv2/phantom/rooms/section4.h"
 #include "mads/madsv2/phantom/rooms/room408.h"
+#include "mads/madsv2/phantom/catacombs.h"
 
 namespace MADS {
 namespace MADSV2 {

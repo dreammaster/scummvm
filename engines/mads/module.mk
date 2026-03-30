@@ -176,6 +176,7 @@ MODULE_OBJS += \
 	madsv2/phantom/rooms/room505.o \
 	madsv2/phantom/rooms/room506.o \
 	madsv2/phantom/phantom.o \
+	madsv2/phantom/catacombs.o \
 	madsv2/phantom/conv.o \
 	madsv2/phantom/global.o \
 	madsv2/phantom/main_menu.o \

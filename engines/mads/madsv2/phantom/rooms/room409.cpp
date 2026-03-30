@@ -34,6 +34,7 @@
 #include "mads/madsv2/phantom/mads/speeches.h"
 #include "mads/madsv2/phantom/rooms/section4.h"
 #include "mads/madsv2/phantom/rooms/room409.h"
+#include "mads/madsv2/phantom/catacombs.h"
 
 namespace MADS {
 namespace MADSV2 {
