@@ -62,11 +62,11 @@ public:
 	uint32 getMillis();
 
 	/* Callback routines in game-specific MAIN module */
-	int  main_cheating_key(int mykey) {
-		return 0;
+	int main_cheating_key(int mykey) const {
+		return mykey;
 	}
-	int  main_normal_key(int mykey) {
-		return 0;
+	int main_normal_key(int mykey) const {
+		return mykey;
 	}
 	int  main_copy_verify() {
 		return 0;
