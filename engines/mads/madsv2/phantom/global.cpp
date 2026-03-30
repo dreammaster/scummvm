@@ -20,6 +20,9 @@
  */
 
 #include "mads/madsv2/phantom/global.h"
+#include "mads/madsv2/core/game.h"
+#include "mads/madsv2/core/kernel.h"
+#include "mads/madsv2/core/error.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -172,14 +175,28 @@ Catacombs hard_catacombs[62] = {
 	{ 404, { 34, 43, 60, 44 }, { NORTH, WEST, NORTH, EAST }, 0 }
 };
 
-void global_catacombs_init() {
-}
-
-void global_enter_catacombs(int special) {
-}
-
-int global_catacombs_exit(int exit) {
-	return catacombs[global[catacombs_room]].exit[exit];
+static void global_catacombs_setup() {
+	if (game.difficulty == HARD_MODE) {
+		catacombs = hard_catacombs;
+		global[catacombs_309_from] = 3;
+		global[catacombs_409a] = 37;
+		global[catacombs_409a_from] = 0;
+		global[catacombs_409b] = 39;
+		global[catacombs_309] = 2;
+		global[catacombs_409b_from] = 2;
+		global[catacombs_501] = 56;
+		global[catacombs_501_from] = 1;
+	} else {
+		catacombs = easy_catacombs;
+		global[catacombs_309_from] = 3;
+		global[catacombs_409a] = 30;
+		global[catacombs_309] = 2;
+		global[catacombs_409b_from] = 2;
+		global[catacombs_409b] = 31;
+		global[catacombs_501] = 31;
+		global[catacombs_409a_from] = 0;
+		global[catacombs_501_from] = 0;
+	}
 }
 
 static void global_catacombs_new_room(int catacomb_node, int from) {
@@ -219,6 +236,18 @@ static void global_catacombs_new_room(int catacomb_node, int from) {
 		new_room = newRoom;
 		kernel.force_restart = true;
 	}
+}
+
+void global_catacombs_init() {
+	global_catacombs_setup();
+	global[catacombs_next_room] = global[catacombs_room];
+}
+
+void global_enter_catacombs(int special) {
+}
+
+int global_catacombs_exit(int exit) {
+	return catacombs[global[catacombs_room]].exit[exit];
 }
 
 } // namespace Phantom
