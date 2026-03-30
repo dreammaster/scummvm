@@ -272,6 +272,7 @@ enum {
 	words_Madame_Giry = 323,
 	words_more_catacombs = 325,
 	words_blocked_archway = 326,
+	words_grate = 327,
 	words_catacombs = 328,
 	words_ticket_seller = 329,
 	words_usher = 330,
