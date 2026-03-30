@@ -41,8 +41,7 @@ namespace MADSV2 {
 
 #define PLAYER_MAX_STOP         12              /* Max items in stop-walker stack */
 
-
-typedef struct {
+struct Player {
 	int walking;                  /* Player is "on the move"                 */
 	int x, y;                     /* Player's current screen location        */
 	int target_x, target_y;       /* Player's screen destination             */
@@ -140,8 +139,7 @@ typedef struct {
 	int walk_trigger_words[3];    /* Vocabulary words for reactivating parser*/
 
 	int enable_at_target;         /* Enable commands at walk target          */
-
-} Player;
+};
 
 
 typedef struct {

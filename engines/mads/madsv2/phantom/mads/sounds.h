@@ -29,37 +29,57 @@ namespace MADSV2 {
 namespace Phantom {
 
 enum {
+	/* Shared */
 	N_AllFade = 1,
 	N_MusicOff = 2,
 	N_MusicFade = 3,
+	N_NoiseFade = 5,
 	N_IsAnySoundOn = 8,
 	N_BackgroundMus = 16,
 	N_DoorOpens = 24,
 	N_DoorCloses = 25,
 	N_TakeObjectSnd = 26,
 	N_PlayerDies = 27,
+
+	/* Section 1 */
+	N_JacquesDeadMus = 32,
+	N_1881Music = 33,
 	N_AngelMus001 = 34,
+	N_Christine1881_001 = 35,
+	N_Christine1993 = 36,
+	N_PhantomAppears001 = 37,
 	N_BackMus1stTime = 38,
-	N_PoisonGas = 61,
+	N_ChaseMusic001 = 39,
 	N_TrapDoor001 = 64,
-	N_WomanScream002 = 65,
 	N_SqueakyDoor = 66,
 	N_PlayerFalls = 67,
 	N_EchoSteps = 68,
-	N_Applause002 = 69,
 	N_SandbagThud = 70,
+	N_DoorHandle = 73,
+
+	/* Section 2 */
+	N_IsabelWedding = 34,
+	N_WomanScream002 = 65,
+	N_Applause002 = 69,
 	N_KeyTurnSnd = 71,
 	N_DoorHandle002 = 72,
-	N_DoorHandle = 73,
+
+	/* Section 3 */
+	N_FightMusic304 = 33,
+	N_LakeMusic = 36,
+	N_Crash003 = 66,
 	N_WomanScream003 = 74,
 
-	N_Crash003 = 66,
-	N_DoorHandle004 = 70,
-
+	/* Section 4 */
+	N_PoisonGas = 61,
 	N_LeverSnap = 65,
 	N_LeverBing = 66,
 	N_DoorGong = 67,
+	N_DoorHandle004 = 70,
+	N_DoorHandle501 = 74,
 
+	/* Section 5 */
+	N_FightMusic504 = 33,
 	N_Bach_dm = 34,
 	N_Gigue = 35,
 	N_Canon = 36,

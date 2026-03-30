@@ -421,7 +421,7 @@ void room_501_parser() {
 					kernel_synch(KERNEL_SERIES, seq[fx_take_6], KERNEL_SERIES, temp);
 					kernel_seq_player(seq[fx_take_6], false);
 					kernel_timing_trigger(QUARTER_SECOND, 2);
-					sound_play(N_DoorHandle);
+					sound_play(N_DoorHandle501);
 					break;
 
 				case 2:
