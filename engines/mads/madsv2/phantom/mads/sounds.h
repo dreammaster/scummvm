@@ -36,8 +36,10 @@ enum {
 	N_DoorOpens = 24,
 	N_DoorCloses = 25,
 	N_TakeObjectSnd = 26,
+	N_PlayerDies = 27,
 	N_AngelMus001 = 34,
 	N_BackMus1stTime = 38,
+	N_PoisonGas = 61,
 	N_TrapDoor001 = 64,
 	N_WomanScream002 = 65,
 	N_SqueakyDoor = 66,
@@ -50,7 +52,8 @@ enum {
 	N_DoorHandle = 73,
 	N_WomanScream003 = 74,
 
-	N_Crash003 = 66
+	N_Crash003 = 66,
+	N_DoorHandle004 = 70
 };
 
 } // namespace Phantom
