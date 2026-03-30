@@ -34,6 +34,7 @@ enum {
 	words_act_curtain = 17,
 	words_aisle = 18,
 	words_apron = 19,
+	words_attack = 20,
 	words_backstage = 21,
 	words_bear_prop = 22,
 	words_blue_frame = 23,
@@ -298,6 +299,7 @@ enum {
 	words_hook = 390,
 	words_cane = 392,
 	words_mask = 393,
+	words_cobweb = 397,
 	words_paper = 399
 };
 
