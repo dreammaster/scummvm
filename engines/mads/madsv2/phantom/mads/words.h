@@ -288,6 +288,7 @@ enum {
 	words_puddle = 350,
 	words_web = 351,
 	words_plank = 352,
+	words_block = 353,
 	words_rat_s_nest = 354,
 	words_broken_pot = 355,
 	words_Edgar_Degas = 385,
