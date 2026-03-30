@@ -68,12 +68,13 @@ public:
 	int  main_normal_key(int mykey) {
 		return 0;
 	}
-	int  main_copy_verify(void) {
+	int  main_copy_verify() {
 		return 0;
 	}
-	void main_cold_data_init(void) {}
-	void main_false_start(void) {}
-	void main_global_init_code(void) {}
+
+	virtual void main_cold_data_init() = 0;
+	void main_false_start() {}
+	void main_global_init_code() {}
 	void section_music(int section_num) {}
 	void game_control_loop() {}
 
