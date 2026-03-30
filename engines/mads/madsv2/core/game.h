@@ -217,25 +217,6 @@ extern void (*room_parser_code_pointer)();
 extern void (*room_error_code_pointer)();
 extern void (*room_shutdown_code_pointer)();
 
-/* game_1.c */
-void game_main(int argc, char **argv);
-
-/* game_2.c */
-void game_save_name(int id);
-
-/* game_3.c */
-void game_set_camera_speed(void);
-
-/* game_4.c */
-void game_exec_function(void (*(target))());
-
-
-/* game_6.c */
-void game_debugger_reset(void);
-void game_debugger(void);
-
-
-/* game_5.c */
 extern char game_save_file[13];     /* Save directory file      */
 extern char *game_save_directory;   /* Save directory pointer   */
 
@@ -243,19 +224,31 @@ extern int  game_preserve_handle;       /* scr_depth preserve       */
 
 extern Heap game_menu_heap;             /* Custom heap for menu     */
 extern Popup *game_menu_popup;      /* Popup structure for menu */
+extern int  report_version;
+extern int art_hags_are_on_hd;
 
+extern void game_save_name(int id);
+extern void game_set_camera_speed(void);
+extern void game_exec_function(void (*(target))());
+extern void game_debugger_reset(void);
+extern void game_debugger(void);
+extern void game_write_save_directory(void);
+extern void game_menu_setup(void);
+extern void game_menu_shutdown(void);
+extern int  main_cheating_key(int mykey);
+extern int  main_normal_key(int mykey);
+extern int  main_copy_verify(void);
+extern void game_cold_data_init();
+extern void game_control();
 
-/* game_5.c */
-void game_write_save_directory(void);
-void game_menu_setup(void);
-void game_menu_shutdown(void);
-
-/* Callback routines in game-specific MAIN module */
-int  main_cheating_key(int mykey);
-int  main_normal_key(int mykey);
-int  main_copy_verify(void);
-void main_cold_data_init(void);
-
+/*
+/*      flag_parse()
+/*
+/*      Routine to parse command line flags.
+*/
+extern void flag_parse(const char **myscan);
+extern void show_logo();
+extern void show_version();
 
 } // namespace MADSV2
 } // namespace MADS

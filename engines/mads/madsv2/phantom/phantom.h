@@ -41,7 +41,6 @@ public:
 
 	Common::Error run() override;
 
-	void main_cold_data_init() override;
 	void global_init_code() override;
 	void section_music(int section_num) override;
 	void global_section_constructor() override;

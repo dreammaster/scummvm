@@ -21,12 +21,17 @@
 
 #include "mads/madsv2/phantom/main.h"
 #include "mads/madsv2/core/env.h"
+#include "mads/madsv2/core/error.h"
+#include "mads/madsv2/core/fileio.h"
+#include "mads/madsv2/core/game.h"
+#include "mads/madsv2/core/himem.h"
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/magic.h"
 #include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/mcga.h"
 #include "mads/madsv2/core/mouse.h"
 #include "mads/madsv2/core/pal.h"
+#include "mads/madsv2/core/player.h"
 #include "mads/madsv2/core/quote.h"
 #include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/phantom/main_menu.h"
@@ -118,6 +123,152 @@ static void main_menu_main() {
 
 	// Handle menu item selection
 	warning("Selected item = %d", selected_item);
+}
+
+static void main_cold_data_init() {
+#if 0
+	debugger_reset = game_debugger_reset;
+	debugger_update = game_debugger;
+
+	game_menu_routine = global_game_menu;
+	game_menu_init = global_menu_system_init;
+	game_menu_exit = global_menu_system_shutdown;
+	game_emergency_save = global_emergency_save;
+#endif
+	Common::strcpy_s(config_file_name, "config.pha");
+	Common::strcpy_s(save_game_key, "phan");
+	Common::strcpy_s(restart_game_key, "phantom");
+
+	Common::strcpy_s(player.series_name, "RAL");
+	player.walker_must_reload = true;
+	player.walker_loads_first = false;
+	player.walker_visible = true;
+	player.scaling_velocity = true;
+
+	Common::strcpy_s(kernel_cheating_password, "WIDECHEW");
+	kernel_cheating_allowed = strlen(kernel_cheating_password);
+
+	kernel.cheating = (byte)kernel_cheating_allowed;
+}
+
+static void game_main(int argc, const char **argv) {
+	int count;
+	int mads_mode;
+	const char *scan;
+	long mem_you_got;
+	long mem_required;
+
+	pack_enable_pfab_explode();
+
+	mads_mode = env_verify();
+
+	new_section = 9;
+	new_room = 901;
+
+	player.x = 160;
+	player.y = 78;
+
+	player.target_facing = FACING_NORTH;
+
+	game_cold_data_init();
+	main_cold_data_init();
+	global_read_config_file();
+	global_load_config_parameters();
+
+	if (argc >= 2) {
+		for (count = 1; count < argc; count++) {
+			if (strchr("-/", argv[count][0]) != NULL) {
+				for (scan = argv[count] + 1; *scan != 0; scan++) {
+					flag_parse(&scan);
+				}
+			} else if (argv[count][0] == '?') {
+				show_logo();
+
+				if (!mads_mode) env_search_mode = ENV_SEARCH_CONCAT_FILES;
+				error_dump_file("*warn2.dat");
+				goto done;
+			}
+		}
+	}
+
+	if (report_version) {
+		show_version();
+		goto done;
+	}
+
+	if (fileio_exist("global.hag")) {
+		art_hags_are_on_hd = true;
+	} else {
+		art_hags_are_on_hd = false;
+	}
+
+#if 0
+	if (config_file.cd_version_installed) {
+		strcpy(temp_buf_2, "x:\\forest.exe");
+		temp_buf_2[0] = env_cd_drive;
+		if (!fileio_exist(temp_buf_2)) {
+			problem();
+			printf("Please throw the Once Upon A Forest CD into drive %c:\n", (char)env_cd_drive);
+			printf("and type 'OUAF'. If your CD-ROM drive letter has changed, run\n");
+			printf("INSTALL to reconfigure this option.\n\n");
+			goto done;
+		}
+	}
+
+	if (!fileio_exist("config.for")) {
+		problem();
+		printf("Before you can run Once Upon A Forest, you need to run 'INSTALL' to configure\n");
+		printf("the game for you your hardware.  Type 'INSTALL' and hit 'ENTER' when you have\n");
+		printf("finished reading this.\n\n");
+		goto done;
+	}
+
+	mem_you_got = mem_used + mem_avail_at_start;
+
+	if (mem_you_got < 569000) {
+		need_to_free = 569000 - mem_you_got;
+		problem();
+		printf("You need at least 588,000 bytes of conventional memory to play\n");
+		printf("Once Upon A Forest. You'll need to free up another %6ld bytes.\n\n", need_to_free);
+		/* printf("to play this game.\n\n"); */
+		goto done;
+	}
+#endif
+	himem_startup();
+
+	mem_required = 30L * 16384L;
+	mem_you_got = mem_required * 2;
+
+	himem_shutdown();
+
+	if (!mads_mode && (env_search_mode == ENV_SEARCH_MADS_PATH))
+		error("false start");
+
+	game_control();
+
+	if (!win_status) {
+		if (!chain_flag || !(win_status || force_chain) || !(key_abort_level < 2)) {
+			error_dump_file("*warn4.dat");
+		}
+
+		if (game_autosaved) {
+			error_dump_file("*warn5.dat");
+		}
+	}
+
+done:
+	global_unload_config_parameters();
+
+	if (fileio_exist("config.for")) {
+		global_write_config_file();
+	}
+	if (chain_flag && (win_status || force_chain) && (key_abort_level < 2)) {
+		warning("TODO: chain_execute");
+	} else {
+		if (win_status) {
+			debug("(Ending: %d)", win_status);
+		}
+	}
 }
 
 void phantom_main() {

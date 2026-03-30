@@ -72,7 +72,6 @@ public:
 		return 0;
 	}
 
-	virtual void main_cold_data_init() = 0;
 	virtual void global_init_code() = 0;
 	virtual void section_music(int section_num) = 0;
 

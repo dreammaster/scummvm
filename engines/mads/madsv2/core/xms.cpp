@@ -24,6 +24,8 @@
 namespace MADS {
 namespace MADSV2 {
 
+bool xms_exists = false;
+bool xms_disabled = false;
 word xms_version = 0;
 dword xms_controller = 0;
 word xms_chain_seg = 0;

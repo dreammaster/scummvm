@@ -120,6 +120,7 @@ MODULE_OBJS += \
 	madsv2/core/video.o \
 	madsv2/core/vocab.o \
 	madsv2/core/window.o \
+	madsv2/core/xms.o \
 	madsv2/phantom/mads/mads.o \
 	madsv2/phantom/rooms/section1.o \
 	madsv2/phantom/rooms/room101.o \

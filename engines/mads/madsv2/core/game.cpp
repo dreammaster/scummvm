@@ -174,7 +174,7 @@ int debugger_watch_index[DEBUGGER_MAX_WATCH];
 static void game_control_loop();
 
 
-static void game_cold_data_init() {
+void game_cold_data_init() {
 	game.going = true;
 
 	kernel.fx = 0;
@@ -211,7 +211,7 @@ static void game_cold_data_init() {
 }
 
 
-static int scan_past(char **myscan, char scan) {
+static int scan_past(const char **myscan, char scan) {
 	int found = false;
 
 	while (**myscan && (**myscan != scan)) (*myscan)++;
@@ -226,14 +226,7 @@ static int scan_past(char **myscan, char scan) {
 	return found;
 }
 
-
-
-/*
-/*      flag_parse()
-/*
-/*      Routine to parse command line flags.
-*/
-static void flag_parse(char **myscan) {
+void flag_parse(const char **myscan) {
 	long mem_max;
 	/* long mem_avail; */
 
@@ -434,9 +427,7 @@ done:
 	;
 }
 
-
-
-static void show_version() {
+void show_version() {
 	echo(" ", true);
 	echo(global_release_name, true);
 	echo("  Release Version ", false);
@@ -456,7 +447,7 @@ static void show_version() {
 }
 
 
-static void show_logo() {
+void show_logo() {
 	show_version();
 }
 
@@ -3331,10 +3322,6 @@ int main_normal_key(int mykey) {
 
 int main_copy_verify() {
 	return g_engine->main_copy_verify();
-}
-
-void main_cold_data_init() {
-	g_engine->main_cold_data_init();
 }
 
 } // namespace MADSV2

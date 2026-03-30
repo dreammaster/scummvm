@@ -22,7 +22,7 @@
 #ifndef MADS_CORE_XMS_H
 #define MADS_CORE_XMS_H
 
-#include "common/scummsys.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -31,8 +31,8 @@ namespace MADSV2 {
 
 #define XMS             byte *      /* XMS fake pointer type      */
 
-extern int   xms_exists;           /* Flag if we've got some XMS memory  */
-extern int   xms_disabled;         /* Flag to disable XMS altogether     */
+extern bool  xms_exists;           /* Flag if we've got some XMS memory  */
+extern bool  xms_disabled;         /* Flag to disable XMS altogether     */
 extern word  xms_version;          /* XMS driver version #               */
 extern dword xms_controller;       /* XMS controller address             */
 extern word  xms_chain_seg;        /* First UMB MCB segment for us       */
