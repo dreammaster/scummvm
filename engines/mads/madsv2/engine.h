@@ -74,7 +74,7 @@ public:
 
 	virtual void main_cold_data_init() = 0;
 	virtual void global_init_code() = 0;
-	void section_music(int section_num) {}
+	virtual void section_music(int section_num) = 0;
 	void game_control_loop() {}
 
 	virtual void global_section_constructor() = 0;

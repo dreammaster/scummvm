@@ -31,6 +31,11 @@
 #include "mads/madsv2/phantom/sound_phantom.h"
 #include "mads/madsv2/phantom/catacombs.h"
 #include "mads/madsv2/phantom/global.h"
+#include "mads/madsv2/phantom/rooms/section1.h"
+#include "mads/madsv2/phantom/rooms/section2.h"
+#include "mads/madsv2/phantom/rooms/section3.h"
+#include "mads/madsv2/phantom/rooms/section4.h"
+#include "mads/madsv2/phantom/rooms/section5.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -163,6 +168,16 @@ void PhantomEngine::global_init_code() {
 	himem_preload_series("*RTK_6", GLOBAL);
 	himem_preload_series("*RTK_9", GLOBAL);
 	himem_preload_series("*RALRH_9", GLOBAL);
+}
+
+void PhantomEngine::section_music(int section_num) {
+	switch (section_num) {
+	case 1: Rooms::section_1_music(); break;
+	case 2: Rooms::section_2_music(); break;
+	case 3: Rooms::section_3_music(); break;
+	case 4: Rooms::section_4_music(); break;
+	case 5: Rooms::section_5_music(); break;
+	}
 }
 
 void PhantomEngine::global_object_sprite() {
