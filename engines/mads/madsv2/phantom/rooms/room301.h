@@ -122,4 +122,4 @@ typedef struct {        /* Room local variables */
 } // namespace MADSV2
 } // namespace MADS
 
-#endif // MADS_PHANTOM_ROOM250_H
+#endif

@@ -19,40 +19,24 @@
  *
  */
 
-#ifndef MADS_PHANTOM_ROOM306_H
-#define MADS_PHANTOM_ROOM306_H
+#ifndef MADS_PHANTOM_SECTION5_H
+#define MADS_PHANTOM_SECTION5_H
 
-#include "mads/madsv2/phantom/phantom.h"
+#include "mads/madsv2/phantom/mads/inventory.h"
+#include "mads/madsv2/phantom/mads/quotes.h"
+#include "mads/madsv2/phantom/mads/sounds.h"
+#include "mads/madsv2/phantom/mads/words.h"
+#include "mads/madsv2/phantom/mads/text.h"
+#include "mads/madsv2/phantom/global.h"
 
 namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
 namespace Rooms {
 
-#define local ((Scratch *)(&game.scratch[0]))
-#define ss    local->sprite
-#define seq   local->sequence
-#define aa    local->animation
-
-typedef struct {        /* Room local variables */
-
-	int16 sprite[15];       /* Sprite series handles */
-	int16 sequence[15];     /* Sequence handles      */
-	int16 animation[4];     /* Animation handles     */
-	int16 prevent;
-
-} Scratch;
-
-
-/* ========================= Sprite Series =================== */
-
-#define fx_fall                 0       /* rm306a0  */
-
-
-/* ========================= Triggers ======================== */
-
-#define ROOM_306_END            60 
-#define ROOM_306_BREAK_LOOSE    70
+extern void section_5_music();
+extern void section_5_walker();
+extern void section_5_interface();
 
 } // namespace Rooms
 } // namespace Phantom

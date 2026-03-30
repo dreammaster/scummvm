@@ -48,8 +48,11 @@ enum {
 	blue_frame = 17,
 	large_note = 18,
 	green_frame = 19,
+	music_score = 20,
+	wedding_ring = 21,
 	cable_hook = 22,
-	rope_with_hook = 23
+	rope_with_hook = 23,
+	oar = 24
 };
 
 } // namespace Phantom

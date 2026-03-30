@@ -35,6 +35,7 @@ enum {
 	speech_christine_scream = 4,
 	speech_raoul_strangle = 5,
 	speech_raoul_catwalk = 6,
+	speech_raoul_fire = 7,
 	speech_christine_scales = 8,
 	speech_phantom_cackle = 9
 };

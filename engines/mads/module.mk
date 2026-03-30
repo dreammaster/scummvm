@@ -147,6 +147,7 @@ MODULE_OBJS += \
 	madsv2/phantom/rooms/room207.o \
 	madsv2/phantom/rooms/room208.o \
 	madsv2/phantom/rooms/room250.o \
+	madsv2/phantom/rooms/section3.o \
 	madsv2/phantom/rooms/room301.o \
 	madsv2/phantom/rooms/room302.o \
 	madsv2/phantom/rooms/room303.o \
@@ -157,6 +158,7 @@ MODULE_OBJS += \
 	madsv2/phantom/rooms/room308.o \
 	madsv2/phantom/rooms/room309.o \
 	madsv2/phantom/rooms/room310.o \
+	madsv2/phantom/rooms/section4.o \
 	madsv2/phantom/rooms/room401.o \
 	madsv2/phantom/rooms/room403.o \
 	madsv2/phantom/rooms/room404.o \
@@ -167,6 +169,12 @@ MODULE_OBJS += \
 	madsv2/phantom/rooms/room410.o \
 	madsv2/phantom/rooms/room453.o \
 	madsv2/phantom/rooms/room456.o \
+	madsv2/phantom/rooms/section5.o \
+	madsv2/phantom/rooms/room501.o \
+	madsv2/phantom/rooms/room502.o \
+	madsv2/phantom/rooms/room504.o \
+	madsv2/phantom/rooms/room505.o \
+	madsv2/phantom/rooms/room506.o \
 	madsv2/phantom/phantom.o \
 	madsv2/phantom/conv.o \
 	madsv2/phantom/global.o \

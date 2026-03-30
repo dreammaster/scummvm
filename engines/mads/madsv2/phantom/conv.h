@@ -246,6 +246,30 @@ enum {
 };
 
 enum {
+	conv019_talk_b_b = 2,
+	conv019_exit_b_b = 12
+};
+
+enum {
+	conv020_where_a = 2,
+	conv020_exit_b_b = 5,
+	conv020_dialogue_b_b = 8,
+	conv020_bye_b_b = 14,
+	conv020_story_b_b = 22
+};
+
+enum {
+	conv021_fight_b_b = 3,
+	conv021_ending_b_b = 8,
+	conv021_outtahere_first = 10,
+	conv021_outtahere_second = 11,
+	conv021_outtahere_third = 12,
+	conv021_hasit_b_b = 14,
+	conv021_score_abc = 15,
+	conv021_score_b_b = 17,
+};
+
+enum {
 	conv022_second_next = 1,
 	conv022_resolution_florent = 6,
 	conv022_resolution_fall = 7,
@@ -269,6 +293,15 @@ enum {
 	conv023_okay_b_b = 6,
 	conv023_okay_abc = 7,
 	conv023_die_b_b = 12
+};
+
+enum {
+	conv027_choices_one = 2,
+	conv027_choices_two = 3,
+	conv027_choices_three = 4,
+	conv027_choices_four = 5,
+	conv027_choices_five = 6,
+	conv027_exit_a_a = 7
 };
 
 struct ConvData {
@@ -300,6 +333,7 @@ struct ConvControl {
 
 extern int conv_restore_running;
 extern ConvControl conv_control;
+extern int *conv_my_next_start;
 
 extern void conv_system_init();
 extern void conv_system_cleanup();

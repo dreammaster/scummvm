@@ -30,6 +30,7 @@ namespace Phantom {
 
 enum {
 	N_AllFade = 1,
+	N_MusicOff = 2,
 	N_MusicFade = 3,
 	N_IsAnySoundOn = 8,
 	N_BackgroundMus = 16,
@@ -57,7 +58,20 @@ enum {
 
 	N_LeverSnap = 65,
 	N_LeverBing = 66,
-	N_DoorGong = 67
+	N_DoorGong = 67,
+
+	N_Bach_dm = 34,
+	N_Gigue = 35,
+	N_Canon = 36,
+	N_Bach_gm = 37,
+	N_AngelMus505 = 39,
+	N_PanelClank = 65,
+	N_HeatHiss = 67,
+	N_LassoThrow = 69,
+	N_SecretDoor = 73,
+	N_DoorHandle005 = 74,
+	N_CoffinUnlocks = 76,
+	N_PushSkull = 77
 };
 
 } // namespace Phantom

@@ -29,7 +29,7 @@ namespace Phantom {
 
 int conv_restore_running;
 ConvControl conv_control;
-
+int *conv_my_next_start;
 
 constexpr int CONV_MAX_SLOTS = 40;
 constexpr int CONV_MAX_DATA = 5;

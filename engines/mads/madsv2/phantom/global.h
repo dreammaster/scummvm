@@ -255,6 +255,16 @@ enum {
 #define LANTERN_IS_OFF		0
 #define LANTERN_IS_ON		1
 
+// fight_status
+#define FIGHT_NOT_HAPPENED	0
+#define FIGHT_TALKING		1
+#define FIGHT_PARTED		2
+
+// coffin_status
+#define COFFIN_CLOSED		0
+#define COFFIN_UNLOCKED		1
+#define COFFIN_OPEN			2
+
 // Catacomb defines
 constexpr int NORTH = 0;
 constexpr int EAST = 1;

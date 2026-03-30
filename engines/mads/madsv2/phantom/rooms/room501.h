@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef MADS_PHANTOM_ROOM309_H
-#define MADS_PHANTOM_ROOM309_H
+#ifndef MADS_PHANTOM_ROOM501_H
+#define MADS_PHANTOM_ROOM501_H
 
-#include "mads/madsv2/phantom/phantom.h"
+#include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -39,58 +39,71 @@ typedef struct {        /* Room local variables */
 	int16 sprite[15];       /* Sprite series handles */
 	int16 sequence[15];     /* Sequence handles      */
 	int16 animation[4];     /* Animation handles     */
-
-	int16 boat_action;      /* pulling up in boat */
-	int16 boat_frame;
 	int16 anim_0_running;
-
-	int chris_talk_count;
+	int16 prevent_2;
 
 } Scratch;
 
 
 /* ========================= Sprite Series =================== */
 
-#define fx_door                 0       /* rm309x0  */
-#define fx_take_9               1       /* rdr_9    */
-#define fx_boat                 2       /* rm309x1  */
+#define fx_flame                0       /* rm501x0  */
+#define fx_door                 1       /* rm501x1  */
+#define fx_left_door            2       /* rm501x2  */
+#define fx_take_6               3       /* rdrr_6   */
+#define fx_boat                 4       /* rm501x3  */
+#define fx_shove_off            5       /* rm501a1  */
+#define fx_christine            6       /* *chr_6   */
+										/* *chr_9   */
+										/* *chr_8   */
+
+
 
 /* ========================= Triggers ======================== */
 
-#define ROOM_309_DOOR_OPENS     60
-#define ROOM_309_DOOR_CLOSES    65
-#define ROOM_309_OUT_OF_BOAT    70
+#define ROOM_501_LEFT_DOOR_CLOSES 55 
+#define ROOM_501_DOOR_CLOSES      60 
+#define ROOM_501_DOOR_OPENS       65 
+#define ROOM_501_FROM_506         80
+#define ROOM_501_SHOVE_OFF        90
+#define ROOM_501_START_ROWING     100
 
 /* ========================= Other Macros ==================== */
 
-#define PLAYER_X_FROM_404       319
-#define PLAYER_Y_FROM_404       136
+#define PLAYER_X_FROM_506       305
+#define PLAYER_Y_FROM_506       112
 
-#define WALK_TO_X_FROM_404      281
-#define WALK_TO_Y_FROM_404      148
+#define WALK_TO_X_FROM_506      260
+#define WALK_TO_Y_FROM_506      112
 
-#define PLAYER_X_FROM_308       0
-#define PLAYER_Y_FROM_308       121
+#define PLAYER_X_FROM_502       319
+#define PLAYER_Y_FROM_502       116
 
-#define WALK_TO_X_FROM_308      28
-#define WALK_TO_Y_FROM_308      142
+#define WALK_TO_X_FROM_502      286
+#define WALK_TO_Y_FROM_502      119
 
-#define PLAYER_X_FROM_310       209
-#define PLAYER_Y_FROM_310       144
+#define WEST_X                  -20
+#define WEST_Y                  109
 
-#define DYNAMIC_CHR_WALK_TO_X   62
-#define DYNAMIC_CHR_WALK_TO_Y   146
+#define WALK_TO_WEST_X          24
+#define WALK_TO_WEST_Y          109
+
+#define DOOR_LEFT_X             266
+#define DOOR_LEFT_Y             112
+
+#define DOOR_RIGHT_X            287
+#define DOOR_RIGHT_Y            118
+
+#define CHRIS_X_LEFT            113
+#define CHRIS_Y_LEFT            93
+
+#define CHRIS_X_RIGHT           125
+#define CHRIS_Y_RIGHT           94
 
 #define CONV_MISC               26
 
-#define ACTION_TALK             0
-#define ACTION_OTHER            1
-
-#define WALK_TO_CAT_NO_X        285
-#define WALK_TO_CAT_NO_Y        147
-
-#define DOOR_X                  16
-#define DOOR_Y                  139
+#define WALK_TO_CAT_NO_X        24
+#define WALK_TO_CAT_NO_Y        110
 
 } // namespace Rooms
 } // namespace Phantom
