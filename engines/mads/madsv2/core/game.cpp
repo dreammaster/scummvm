@@ -171,6 +171,8 @@ int debugger_previous = DEBUGGER_NONE;
 int debugger_watch = 0;
 int debugger_watch_index[DEBUGGER_MAX_WATCH];
 
+static void game_control_loop();
+
 
 static void game_cold_data_init() {
 	game.going = true;
@@ -1636,7 +1638,7 @@ void game_control() {
 				game_any_emergency = false;
 			}
 
-			g_engine->game_control_loop();
+			game_control_loop();
 
 			/* ********************************************************************************************** */
 
@@ -2541,7 +2543,7 @@ skip_frame:
 }
 
 
-void game_control_loop() {
+static void game_control_loop() {
 	game_any_keystroke = false;
 
 	digi_trigger_dialog = true;
