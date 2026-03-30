@@ -53,7 +53,11 @@ enum {
 	N_WomanScream003 = 74,
 
 	N_Crash003 = 66,
-	N_DoorHandle004 = 70
+	N_DoorHandle004 = 70,
+
+	N_LeverSnap = 65,
+	N_LeverBing = 66,
+	N_DoorGong = 67
 };
 
 } // namespace Phantom
