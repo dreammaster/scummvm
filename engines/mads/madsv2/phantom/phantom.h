@@ -38,6 +38,8 @@ public:
 	~PhantomEngine() override {}
 
 	Common::Error run() override;
+
+	void global_section_constructor() override;
 };
 
 } // namespace Phantom

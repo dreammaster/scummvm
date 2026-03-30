@@ -265,6 +265,9 @@ enum {
 #define COFFIN_UNLOCKED		1
 #define COFFIN_OPEN			2
 
+
+extern void global_section_constructor();
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS

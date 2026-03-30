@@ -28,6 +28,7 @@ namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
 
+namespace Rooms {
 extern void section_1_preload();
 extern void section_2_preload();
 extern void section_3_preload();
@@ -36,7 +37,7 @@ extern void section_5_preload();
 extern void section_6_preload();
 extern void section_7_preload();
 extern void section_8_preload();
-
+} // namespace Rooms
 
 void global_section_constructor() {
 	section_preload_code_pointer = NULL;
@@ -55,19 +56,19 @@ void global_section_constructor() {
 
 	switch (new_section) {
 	case 1:
-		section_preload_code_pointer = section_1_preload;
+		section_preload_code_pointer = Rooms::section_1_preload;
 		break;
 	case 2:
-		section_preload_code_pointer = section_2_preload;
+		section_preload_code_pointer = Rooms::section_2_preload;
 		break;
 	case 3:
-		section_preload_code_pointer = section_3_preload;
+		section_preload_code_pointer = Rooms::section_3_preload;
 		break;
 	case 4:
-		section_preload_code_pointer = section_4_preload;
+		section_preload_code_pointer = Rooms::section_4_preload;
 		break;
 	case 5:
-		section_preload_code_pointer = section_5_preload;
+		section_preload_code_pointer = Rooms::section_5_preload;
 		break;
 	}
 }

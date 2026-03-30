@@ -76,6 +76,8 @@ public:
 	void main_global_init_code(void) {}
 	void section_music(int section_num) {}
 	void game_control_loop() {}
+
+	virtual void global_section_constructor() = 0;
 };
 
 extern MADSV2Engine *g_engine;

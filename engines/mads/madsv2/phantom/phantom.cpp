@@ -23,6 +23,7 @@
 #include "mads/madsv2/phantom/phantom.h"
 #include "mads/madsv2/phantom/main.h"
 #include "mads/madsv2/phantom/sound_phantom.h"
+#include "mads/madsv2/phantom/global.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -37,6 +38,10 @@ Common::Error PhantomEngine::run() {
 	Phantom::phantom_main();
 
 	return Common::kNoError;
+}
+
+void PhantomEngine::global_section_constructor() {
+	Phantom::global_section_constructor();
 }
 
 } // namespace Phantom

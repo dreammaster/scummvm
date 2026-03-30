@@ -21,6 +21,7 @@
 
 #include "common/textconsole.h"
 #include "mads/madsv2/core/global.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -67,7 +68,7 @@ void global_sound_driver() {
 }
 
 void global_section_constructor() {
-	error("TODO: void global_section_constructor(void);");
+	g_engine->global_section_constructor();
 }
 
 void global_game_menu() {
