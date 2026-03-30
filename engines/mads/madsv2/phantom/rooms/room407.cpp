@@ -31,14 +31,14 @@
 #include "mads/madsv2/phantom/mads/inventory.h"
 #include "mads/madsv2/phantom/mads/sounds.h"
 #include "mads/madsv2/phantom/rooms/section4.h"
-#include "mads/madsv2/phantom/rooms/room406.h"
+#include "mads/madsv2/phantom/rooms/room407.h"
 
 namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
 namespace Rooms {
 
-void room_406_init() {
+void room_407_init() {
 	global_catacombs_init();
 
 	/* =================== Load sprites series =================== */
@@ -49,22 +49,44 @@ void room_406_init() {
 	ss[fx_blue_frame] = kernel_load_series(kernel_name('f', 2), false);
 	ss[fx_yellow_frame] = kernel_load_series(kernel_name('f', 3), false);
 
+	if (global_catacombs_exit(WEST) == -1) {
+		kernel_flip_hotspot_loc(words_more_catacombs, false, CAT_LEFT_1_X, CAT_LEFT_1_Y);
+		kernel_flip_hotspot_loc(words_more_catacombs, false, CAT_LEFT_2_X, CAT_LEFT_2_Y);
+		kernel_flip_hotspot_loc(words_more_catacombs, false, CAT_LEFT_3_X, CAT_LEFT_3_Y);
+		kernel_flip_hotspot_loc(words_more_catacombs, false, CAT_LEFT_4_X, CAT_LEFT_4_Y);
+	}
+
+	if (global_catacombs_exit(EAST) == -1) {
+		kernel_flip_hotspot_loc(words_more_catacombs, false, CAT_RIGHT_1_X, CAT_RIGHT_1_Y);
+		kernel_flip_hotspot_loc(words_more_catacombs, false, CAT_RIGHT_2_X, CAT_RIGHT_2_Y);
+		kernel_flip_hotspot_loc(words_more_catacombs, false, CAT_RIGHT_3_X, CAT_RIGHT_3_Y);
+		kernel_flip_hotspot_loc(words_more_catacombs, false, CAT_RIGHT_4_X, CAT_RIGHT_4_Y);
+	}
+
 	if (previous_room != KERNEL_RESTORING_GAME) {
 
 		switch (global[catacombs_from]) {
 
-		case EAST:
-			player.x = EAST_X;
-			player.y = EAST_Y;
+		case NORTH:
+			player.x = NORTH_X;
+			player.y = NORTH_Y;
 			player.facing = FACING_WEST;
-			player_walk(WALK_TO_EAST_X, WALK_TO_EAST_Y, FACING_WEST);
+			player_walk(WALK_TO_NORTH_X, WALK_TO_NORTH_Y, FACING_WEST);
+			break;
+
+		case SOUTH:
+			player.x = SOUTH_X;
+			player.y = SOUTH_Y;
+			player.facing = FACING_EAST;
+			player_walk(WALK_TO_SOUTH_X, WALK_TO_SOUTH_Y, FACING_EAST);
+			break;
+
+		case EAST:
+			player_first_walk(EAST_X, EAST_Y, FACING_WEST, WALK_TO_EAST_X, WALK_TO_EAST_Y, FACING_WEST, true);
 			break;
 
 		case WEST:
-			player.x = WEST_X;
-			player.y = WEST_Y;
-			player.facing = FACING_SOUTH;
-			player_walk(WALK_TO_WEST_X, WALK_TO_WEST_Y, FACING_EAST);
+			player_first_walk(WEST_X, WEST_Y, FACING_WEST, WALK_TO_WEST_X, WALK_TO_WEST_Y, FACING_WEST, true);
 			break;
 		}
 	}
@@ -111,7 +133,25 @@ void room_406_init() {
 	section_4_music();
 }
 
-void room_406_pre_parser() {
+void room_407_pre_parser() {
+	if (player_said_2(exit_to, more_catacombs)) {
+		if (player.y > 30) {
+			if (inter_point_x < 100) {
+				global_catacombs_move(WEST);
+			} else {
+				global_catacombs_move(EAST);
+			}
+		} else {
+			player.need_to_walk = false;
+		}
+	}
+
+	if (player_said_1(walk_through)) {
+		if (player.y > 30) {
+			player.need_to_walk = false;
+		}
+	}
+
 	local->frame_is_here = false;
 	local->frame_here_for_taking = false;
 
@@ -148,7 +188,7 @@ void room_406_pre_parser() {
 			player_said_1(blue_frame) ||
 			player_said_1(yellow_frame) ||
 			player_said_1(green_frame)) {
-			if (local->frame_is_here) {
+			if ((local->frame_is_here) || (player.y < 30) || (inter_point_y < 30)) {
 				player.need_to_walk = false;
 
 			} else {
@@ -157,16 +197,93 @@ void room_406_pre_parser() {
 			}
 		}
 	}
+
+	if (player_said_1(take)) {
+		if (player_said_1(red_frame) || player_said_1(green_frame) ||
+			player_said_1(blue_frame) || player_said_1(yellow_frame)) {
+
+			if (local->frame_here_for_taking) {
+				if (player.y < 30) {
+					player.need_to_walk = false;
+				}
+			}
+		}
+	}
+
+	if (player_said_2(walk_across, floor)) {
+		if ((player.y < 30) && (inter_point_y > 29)) {
+			player.need_to_walk = false;
+		}
+	}
+
+	if (player_said_2(walk_to, lake) && (player.y < 30)) {
+		player_walk(LAKE_X, LAKE_Y, FACING_SOUTH);
+	}
+
+	if (player_said_1(walk_to) && (inter_point_x < 130) && (player.y < 30)) {
+		player.need_to_walk = false;
+	}
+
+	if (player_said_1(walk_to) && (inter_point_x > 203) && (player.y < 30)) {
+		player.need_to_walk = false;
+	}
+
+	if (player_said_2(walk_to, wall) && (player.y > 30)) {
+		if ((inter_point_x > 160) && (inter_point_x < 190)) {
+			player.need_to_walk = false;
+		}
+	}
 }
 
-void room_406_parser() {
+void room_407_parser() {
+	if (player_said_2(walk_to, wall) && (player.y > 30)) {
+		if ((inter_point_x > 160) && (inter_point_x < 190)) {
+			text_show(text_407_18);
+			goto handled;
+		}
+	}
+
+	if (player_said_1(walk_to) && (inter_point_x < 130) && (player.y < 30)) {
+		text_show(text_407_18);
+		goto handled;
+	}
+
+	if (player_said_1(walk_to) && (inter_point_x > 203) && (player.y < 30)) {
+		text_show(text_407_18);
+		goto handled;
+	}
+
+	if (player_said_2(walk_across, floor)) {
+		if ((player.y < 30) && (inter_point_y > 29)) {
+			text_show(text_407_18);
+			goto handled;
+
+		} else if ((player.y > 29) && (inter_point_y < 30)) {
+			text_show(text_407_18);
+			goto handled;
+			/* you can't cross the lake */
+		}
+	}
+
 	if (player_said_1(put) && player_said_1(floor)) {
 		if (player_said_1(red_frame) ||
 			player_said_1(blue_frame) ||
 			player_said_1(yellow_frame) ||
 			player_said_1(green_frame)) {
-			if (local->frame_is_here) {
+
+			if ((player.y < 30) && (inter_point_y < 30)) {
+				text_show(text_407_17);
+				goto handled;
+				/* you are on far side and want to put frame down on far side */
+
+			} else if ((player.y < 30) && (inter_point_y > 29)) {
+				text_show(text_407_18);
+				goto handled;
+				/* you are on far side and want to put frame down on near side */
+
+			} else if (local->frame_is_here) {
 				text_show(text_000_29);
+				/* a frame is already here */
 				goto handled;
 
 			} else {
@@ -242,109 +359,123 @@ void room_406_parser() {
 		}
 	}
 
-
 	if (player_said_1(take)) {
 		if (player_said_1(red_frame) || player_said_1(green_frame) ||
 			player_said_1(blue_frame) || player_said_1(yellow_frame)) {
 
 			if ((local->frame_here_for_taking || kernel.trigger)) {
-				switch (kernel.trigger) {
-				case (0):
-					player.commands_allowed = false;
-					player.walker_visible = false;
-					seq[fx_bend_down_9] = kernel_seq_pingpong(ss[fx_bend_down_9], true,
-						5, 0, 0, 2);
-					kernel_seq_range(seq[fx_bend_down_9], 1, 5);
-					kernel_seq_player(seq[fx_bend_down_9], true);
-					kernel_seq_trigger(seq[fx_bend_down_9],
-						KERNEL_TRIGGER_SPRITE, 5, 1);
-					kernel_seq_trigger(seq[fx_bend_down_9],
-						KERNEL_TRIGGER_EXPIRE, 0, 2);
-					break;
+				if (player.y < 30) {
+					text_show(text_407_18);
+					goto handled;
+				} else {
+					switch (kernel.trigger) {
+					case (0):
+						player.commands_allowed = false;
+						player.walker_visible = false;
+						seq[fx_bend_down_9] = kernel_seq_pingpong(ss[fx_bend_down_9], true,
+							5, 0, 0, 2);
+						kernel_seq_range(seq[fx_bend_down_9], 1, 5);
+						kernel_seq_player(seq[fx_bend_down_9], true);
+						kernel_seq_trigger(seq[fx_bend_down_9],
+							KERNEL_TRIGGER_SPRITE, 5, 1);
+						kernel_seq_trigger(seq[fx_bend_down_9],
+							KERNEL_TRIGGER_EXPIRE, 0, 2);
+						break;
 
-				case 1:
-					if (player_said_1(red_frame)) {
-						kernel_seq_delete(seq[fx_red_frame]);
-						kernel_delete_dynamic(local->dyn_red);
-						inter_give_to_player(red_frame);
+					case 1:
+						if (player_said_1(red_frame)) {
+							kernel_seq_delete(seq[fx_red_frame]);
+							kernel_delete_dynamic(local->dyn_red);
+							inter_give_to_player(red_frame);
+						}
+
+						if (player_said_1(green_frame)) {
+							kernel_seq_delete(seq[fx_green_frame]);
+							kernel_delete_dynamic(local->dyn_green);
+							inter_give_to_player(green_frame);
+						}
+
+						if (player_said_1(blue_frame)) {
+							kernel_seq_delete(seq[fx_blue_frame]);
+							kernel_delete_dynamic(local->dyn_blue);
+							inter_give_to_player(blue_frame);
+						}
+
+						if (player_said_1(yellow_frame)) {
+							kernel_seq_delete(seq[fx_yellow_frame]);
+							kernel_delete_dynamic(local->dyn_yellow);
+							inter_give_to_player(yellow_frame);
+						}
+
+						sound_play(N_TakeObjectSnd);
+						break;
+
+					case 2:
+						kernel_synch(KERNEL_PLAYER, 0, KERNEL_SERIES, seq[fx_bend_down_9]);
+						player.walker_visible = true;
+						player.commands_allowed = true;
+						break;
 					}
-
-					if (player_said_1(green_frame)) {
-						kernel_seq_delete(seq[fx_green_frame]);
-						kernel_delete_dynamic(local->dyn_green);
-						inter_give_to_player(green_frame);
-					}
-
-					if (player_said_1(blue_frame)) {
-						kernel_seq_delete(seq[fx_blue_frame]);
-						kernel_delete_dynamic(local->dyn_blue);
-						inter_give_to_player(blue_frame);
-					}
-
-					if (player_said_1(yellow_frame)) {
-						kernel_seq_delete(seq[fx_yellow_frame]);
-						kernel_delete_dynamic(local->dyn_yellow);
-						inter_give_to_player(yellow_frame);
-					}
-
-					sound_play(N_TakeObjectSnd);
-					break;
-
-				case 2:
-					kernel_synch(KERNEL_PLAYER, 0, KERNEL_SERIES, seq[fx_bend_down_9]);
-					player.walker_visible = true;
-					player.commands_allowed = true;
-					break;
+					goto handled;
 				}
-				goto handled;
 			}
 		}
 	}
 
 	if (player_said_2(walk_through, archway_to_west)) {
-		global_catacombs_move(WEST);
+		if (player.y < 30) {
+			global_catacombs_move(SOUTH);
+		} else {
+			text_show(text_407_18);
+		}
 		goto handled;
 	}
 
 	if (player_said_2(walk_through, archway_to_east)) {
-		global_catacombs_move(EAST);
+		if (player.y < 30) {
+			global_catacombs_move(NORTH);
+		} else {
+			text_show(text_407_18);
+		}
 		goto handled;
 	}
 
+	if (player_said_2(exit_to, more_catacombs)) {
+		if (player.y < 30) {
+			text_show(text_407_18);
+			goto handled;
+		}
+	}
+
 	if (player.look_around) {
-		text_show(text_406_10);
+		text_show(text_407_10);
 		goto handled;
 	}
 
 	if (player_said_1(look) || player_said_1(look_at)) {
 
 		if (player_said_1(wall)) {
-			text_show(text_406_11);
+			text_show(text_407_11);
 			goto handled;
 		}
 
 		if (player_said_1(floor)) {
-			text_show(text_406_12);
+			text_show(text_407_12);
 			goto handled;
 		}
 
 		if (player_said_1(archway)) {
-			text_show(text_406_13);
-			goto handled;
-		}
-
-		if (player_said_1(exposed_brick)) {
-			text_show(text_406_14);
+			text_show(text_407_13);
 			goto handled;
 		}
 
 		if (player_said_1(more_catacombs)) {
-			text_show(text_406_15);
+			text_show(text_407_14);
 			goto handled;
 		}
 
-		if (player_said_1(blocked_archway)) {
-			text_show(text_406_16);
+		if (player_said_1(column)) {
+			text_show(text_407_15);
 			goto handled;
 		}
 
@@ -357,7 +488,7 @@ void room_406_parser() {
 
 		if (player_said_1(green_frame)) {
 			if (!player_has(green_frame)) {
-				object_examine(green_frame, text_008_19, 0);
+				object_examine(green_frame, text_008_18, 0);
 				goto handled;
 			}
 		}
@@ -376,59 +507,10 @@ void room_406_parser() {
 			}
 		}
 
-		if (player_said_1(grate)) {
-			text_show(text_406_17);
+		if (player_said_1(lake)) {
+			text_show(text_407_16);
 			goto handled;
 		}
-	}
-
-	if ((player_said_2(open, grate)) ||
-		(player_said_2(push, grate)) ||
-		(player_said_2(pull, grate))) {
-		switch (kernel.trigger) {
-		case (0):
-			player.commands_allowed = false;
-			player.walker_visible = false;
-			seq[fx_bend_down_9] = kernel_seq_forward(ss[fx_bend_down_9], true,
-				5, 0, 0, 1);
-			kernel_seq_range(seq[fx_bend_down_9], KERNEL_FIRST, KERNEL_LAST);
-			kernel_seq_player(seq[fx_bend_down_9], true);
-			kernel_seq_trigger(seq[fx_bend_down_9],
-				KERNEL_TRIGGER_EXPIRE, 0, 2);
-			break;
-
-		case 2:
-			seq[fx_bend_down_9] = kernel_seq_stamp
-			(ss[fx_bend_down_9], true, KERNEL_LAST);
-			kernel_seq_player(seq[fx_bend_down_9], true);
-			/* kernel_seq_depth (seq[fx_bend_down_9], 1); */
-			kernel_timing_trigger(HALF_SECOND, 3);
-			break;
-
-		case 3:
-			/* temp = seq[fx_bend_down_9]; */
-			kernel_seq_delete(seq[fx_bend_down_9]);
-			seq[fx_bend_down_9] = kernel_seq_backward(ss[fx_bend_down_9], true,
-				5, 0, 0, 1);
-			/* kernel_synch (KERNEL_SERIES, seq[fx_bend_down_9], KERNEL_SERIES, temp); */
-			kernel_seq_range(seq[fx_bend_down_9], KERNEL_FIRST, KERNEL_LAST);
-			kernel_seq_player(seq[fx_bend_down_9], false);
-			kernel_seq_trigger(seq[fx_bend_down_9],
-				KERNEL_TRIGGER_EXPIRE, 0, 4);
-			break;
-
-		case 4:
-			player.walker_visible = true;
-			kernel_synch(KERNEL_PLAYER, 0, KERNEL_SERIES, seq[fx_bend_down_9]);
-			kernel_timing_trigger(TENTH_SECOND, 5);
-			break;
-
-		case 5:
-			player.commands_allowed = true;
-			text_show(text_406_18);
-			break;
-		}
-		goto handled;
 	}
 
 	goto done;
@@ -440,10 +522,10 @@ done:
 	;
 }
 
-void room_406_preload() {
-	room_init_code_pointer = room_406_init;
-	room_pre_parser_code_pointer = room_406_pre_parser;
-	room_parser_code_pointer = room_406_parser;
+void room_407_preload() {
+	room_init_code_pointer = room_407_init;
+	room_pre_parser_code_pointer = room_407_pre_parser;
+	room_parser_code_pointer = room_407_parser;
 	room_daemon_code_pointer = NULL;
 
 	section_4_walker();
