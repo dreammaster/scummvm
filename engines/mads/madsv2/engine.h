@@ -78,6 +78,7 @@ public:
 	virtual void global_daemon_code() = 0;
 	virtual void global_pre_parser_code() = 0;
 	virtual void global_parser_code() = 0;
+	virtual void global_error_code() = 0;
 };
 
 extern MADSV2Engine *g_engine;

@@ -52,7 +52,7 @@ void global_parser_code() {
 }
 
 void global_error_code() {
-	error("TODO: void global_error_code(void);");
+	g_engine->global_error_code();
 }
 
 void global_room_init() {

@@ -643,6 +643,153 @@ done:
 	;
 }
 
+void PhantomEngine::global_error_code() {
+	int show_me = 0;
+	int item;
+	int random;
+
+	random = imath_random(1, 1000);
+
+	if (player_said_3(put, chandelier, seats)) {
+		text_show(text_101_23);
+		goto done;
+	}
+
+	if (player_said_1(take)) {
+		item = object_named(player_main_noun);
+		if (player_has(item)) {
+			show_me = text_000_25;
+			/* player already has it */
+
+		} else {
+			if (random <= 333) {
+				show_me = text_000_01;
+			} else if (random <= 666) {
+				show_me = text_000_02;
+			} else {
+				show_me = text_000_03;
+			}
+		}
+		goto done;
+	}
+
+	if (player_said_1(push)) {
+		if (random < 750) {
+			show_me = text_000_04;
+		} else {
+			show_me = text_000_05;
+		}
+		goto done;
+	}
+
+	if (player_said_1(pull)) {
+		if (random < 750) {
+			show_me = text_000_06;
+		} else {
+			show_me = text_000_07;
+		}
+		goto done;
+	}
+
+	if (player_said_1(open)) {
+		if (random <= 500) {
+			show_me = text_000_08;
+		} else if (random <= 750) {
+			show_me = text_000_09;
+		} else {
+			show_me = text_000_10;
+		}
+		goto done;
+	}
+
+	if (player_said_1(close)) {
+		if (random <= 500) {
+			show_me = text_000_11;
+		} else if (random <= 750) {
+			show_me = text_000_12;
+		} else {
+			show_me = text_000_13;
+		}
+		goto done;
+	}
+
+	if (player_said_1(put)) {
+		item = object_named(player_main_noun);
+		if (player_has(item)) {
+			show_me = text_000_26;
+		} else if (random < 500) {
+			show_me = text_000_14;
+		} else {
+			show_me = text_000_15;
+		}
+		goto done;
+	}
+
+	if (player_said_1(talk_to)) {
+		if (random <= 500) {
+			show_me = text_000_16;
+		} else {
+			show_me = text_000_17;
+		}
+		goto done;
+	}
+
+	if (player_said_1(give)) {
+		item = object_named(player_main_noun);
+		if (player_has(item)) {
+			show_me = text_000_27;
+		} else {
+			show_me = text_000_18;
+		}
+		goto done;
+	}
+
+	if (player_said_1(throw)) {
+		item = object_named(player_main_noun);
+		if (player_has(item)) {
+			show_me = text_000_19;
+		} else {
+			show_me = text_000_28;
+		}
+		goto done;
+	}
+
+	if (player_said_1(look)) {
+		item = object_named(player_main_noun);
+		if (random <= 333) {
+			show_me = text_000_20;
+		} else if (random <= 666) {
+			show_me = text_000_21;
+		} else {
+			show_me = text_000_22;
+		}
+		goto done;
+	}
+
+	if (player_said_1(unlock) || player_said_1(lock)) {
+		if (player_said_1(door) || player_said_1(left_door) ||
+			player_said_1(middle_door) || player_said_1(right_door) ||
+			player_said_1(trap_door)) {
+			show_me = text_000_32;
+			goto done;
+		}
+	}
+
+	if (!player_said_1(walk_to) && !player_said_1(walk_across) &&
+		!player_said_1(walk_down) && !player_said_1(walk_up)) {
+		if (random < 500) {
+			show_me = text_000_23;
+		} else {
+			show_me = text_000_24;
+		}
+		goto done;
+	}
+
+
+done:
+	if (show_me) text_show(show_me);
+}
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS
