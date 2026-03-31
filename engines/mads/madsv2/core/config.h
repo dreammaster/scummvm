@@ -27,20 +27,26 @@
 namespace MADS {
 namespace MADSV2 {
 
-/* #define CONFIG_FILE_NAME        "CONFIG.REX" */
+enum {
+	INTERFACE_MACINTOSH			= 0,      /* Macintosh interface   */
+	INTERFACE_BRAINDEAD			= 1       /* The "other" interface */
+};
 
-#define INTERFACE_MACINTOSH     0       /* Macintosh interface   */
-#define INTERFACE_BRAINDEAD     1       /* The "other" interface */
+enum {
+	INVENTORY_SPINNING			= 0,      /* Inventory objects spin  */
+	INVENTORY_SQUAT				= 1       /* Inventory objects squat */
+};
 
-#define INVENTORY_SPINNING      0       /* Inventory objects spin  */
-#define INVENTORY_SQUAT         1       /* Inventory objects squat */
+enum {
+	INTERFACE_ANIMATED			= 0,      /* Interface animations on */
+	INTERFACE_STILL				= 1       /* Interface still         */
+};
 
-#define INTERFACE_ANIMATED      0       /* Interface animations on */
-#define INTERFACE_STILL         1       /* Interface still         */
-
-#define SCREEN_FADE_SMOOTH      0       /* Smooth fade (thru black)     */
-#define SCREEN_FADE_MEDIUM      1       /* Medium fade (Detmar-o-matic) */
-#define SCREEN_FADE_FAST        2       /* Fast fade (thru black)       */
+enum {
+	SCREEN_FADE_SMOOTH			= 0,       /* Smooth fade (thru black)     */
+	SCREEN_FADE_MEDIUM			= 1,       /* Medium fade (Detmar-o-matic) */
+	SCREEN_FADE_FAST			= 2       /* Fast fade (thru black)       */
+};
 
 #define MEMORY_ALL              0       /* Use all available memory */
 #define MEMORY_NO_EMS           1       /* Do not use EMS memory    */
@@ -66,6 +72,7 @@ struct ConfigFile {
 	int music_flag;               /* Music on/off              */
 	int sound_flag;               /* Sound on/off              */
 	int interface_hotspots;       /* Easy / Standard           */
+
 	int inventory_mode;           /* Spinning / Still          */
 	int animated_interface;       /* On / Off                  */
 
@@ -99,6 +106,11 @@ extern ConfigFile config_file;
 
 #define music_off               (!config_file.music_flag)
 #define sound_off               (!config_file.sound_flag)
+
+extern void read_config_file();
+extern void write_config_file();
+extern void global_load_config_parameters();
+extern void global_unload_config_parameters();
 
 } // namespace MADSV2
 } // namespace MADS

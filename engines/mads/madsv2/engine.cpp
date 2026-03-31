@@ -124,6 +124,5 @@ uint32 MADSV2Engine::getMillis() {
 	return g_system->getMillis();
 }
 
-
 } // namespace MADSV2
 } // namespace MADS

@@ -20,6 +20,7 @@
  */
 
 #include "common/textconsole.h"
+#include "mads/madsv2/core/config.h"
 #include "mads/madsv2/core/global.h"
 #include "mads/madsv2/engine.h"
 
@@ -88,19 +89,11 @@ void global_emergency_save() {
 }
 
 void global_read_config_file() {
-	error("TODO: void global_read_config_file(void);");
+	read_config_file();
 }
 
 void global_write_config_file() {
-	error("TODO: void global_write_config_file(void);");
-}
-
-void global_load_config_parameters() {
-	error("TODO: void global_load_config_parameters(void);");
-}
-
-void global_unload_config_parameters() {
-	error("TODO: void global_unload_config_parameters(void);");
+	write_config_file();
 }
 
 int global_copy_verify() {
