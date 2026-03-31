@@ -20,6 +20,7 @@
  */
 
 #include "engines/util.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/himem.h"
@@ -163,8 +164,222 @@ void PhantomEngine::global_object_sprite() {
 	Common::strcat_s(inter_object_buf, "I");
 }
 
+
+void PhantomEngine::stop_walker_basic() {
+	int random;
+	int count;
+	int how_many;
+
+	random = imath_random(1, 30000);
+
+	switch (player.facing) {
+	case FACING_SOUTH:
+		if (random < 500) {
+			how_many = imath_random(4, 10);
+			for (count = 0; count < how_many; count++) {
+				player_add_stop_walker((random < 250) ? 1 : 2, 0);
+			}
+		} else if (random < 750) {
+			for (count = 0; count < 4; count++) {
+				player_add_stop_walker(1, 0);
+			}
+
+			player_add_stop_walker(0, 0);
+
+			for (count = 0; count < 4; count++) {
+				player_add_stop_walker(2, 0);
+			}
+
+			player_add_stop_walker(0, 0);
+		}
+		break;
+
+	case FACING_SOUTHEAST:
+	case FACING_SOUTHWEST:
+	case FACING_NORTHEAST:
+	case FACING_NORTHWEST:
+		if (random < 150) {
+			player_add_stop_walker(-1, 0);
+			player_add_stop_walker(1, 0);
+			for (count = 0; count < 6; count++) {
+				player_add_stop_walker(0, 0);
+			}
+		}
+		break;
+
+	case FACING_EAST:
+	case FACING_WEST:
+		if (random < 250) {
+			player_add_stop_walker(-1, 0);
+			how_many = imath_random(2, 6);
+			for (count = 0; count < how_many; count++) {
+				player_add_stop_walker(2, 0);
+			}
+			player_add_stop_walker(1, 0);
+			player_add_stop_walker(0, 0);
+			player_add_stop_walker(0, 0);
+		} else if (random < 500) {
+			WRITE_LE_UINT32(&global[walker_timing], kernel.clock);
+		}
+		break;
+
+	case FACING_NORTH:
+		if (random < 250) {
+			player_add_stop_walker(-1, 0);
+			how_many = imath_random(3, 7);
+			for (count = 0; count < how_many; count++) {
+				player_add_stop_walker(2, 0);
+			}
+			player_add_stop_walker(1, 0);
+			player_add_stop_walker(0, 0);
+		}
+		break;
+
+	}
+}
+
+void PhantomEngine::stop_walker_tricks() {
+	int state;
+	int cmd;
+	int random;
+
+	state = global[walker_converse_state];
+	cmd = global[walker_converse];
+
+	global[walker_converse_now] = state;
+
+	if ((player.facing != FACING_NORTHEAST) &&
+		(player.facing != FACING_NORTHWEST)) {
+		state = CONVERSE_NONE;
+		cmd = CONVERSE_NONE;
+	}
+
+	switch (state) {
+	case CONVERSE_LEAN:
+		switch (cmd) {
+		case CONVERSE_LEAN:
+			player_add_stop_walker(3, 0);
+			break;
+
+		case CONVERSE_HAND_WAVE:
+		case CONVERSE_HAND_WAVE_2:
+			player_add_stop_walker(6, 0);
+			player_add_stop_walker(5, 0);
+			player_add_stop_walker(4, 0);
+			state = CONVERSE_HAND_WAVE;
+			break;
+
+		case CONVERSE_HAND_CHIN:
+			player_add_stop_walker(8, 0);
+			player_add_stop_walker(4, 0);
+			state = CONVERSE_HAND_CHIN;
+			break;
+
+		case CONVERSE_NONE:
+		default:
+			player_add_stop_walker(-2, 0);
+			state = CONVERSE_NONE;
+			break;
+		}
+		break;
+
+	case CONVERSE_HAND_WAVE:
+	case CONVERSE_HAND_WAVE_2:
+		switch (cmd) {
+		case CONVERSE_HAND_WAVE:
+		case CONVERSE_HAND_WAVE_2:
+			random = imath_random(1, 30000);
+
+			if (state == CONVERSE_HAND_WAVE) {
+				if (random < 2000) {
+					player_add_stop_walker(10, 0);
+					player_add_stop_walker(7, 0);
+					state = CONVERSE_HAND_WAVE_2;
+				} else {
+					player_add_stop_walker(6, 0);
+				}
+			} else {
+				if (random < 1000) {
+					player_add_stop_walker(6, 0);
+					player_add_stop_walker(7, 0);
+					state = CONVERSE_HAND_WAVE;
+				} else {
+					player_add_stop_walker(10, 0);
+				}
+			}
+			break;
+
+		case CONVERSE_LEAN:
+		case CONVERSE_HAND_CHIN:
+		case CONVERSE_NONE:
+		default:
+			player_add_stop_walker(-4, 0);
+			player_add_stop_walker(-5, 0);
+			if (state == CONVERSE_HAND_WAVE_2) {
+				player_add_stop_walker(6, 0);
+				player_add_stop_walker(7, 0);
+			}
+			state = CONVERSE_LEAN;
+			break;
+		}
+		break;
+
+	case CONVERSE_HAND_CHIN:
+		switch (cmd) {
+		case CONVERSE_HAND_CHIN:
+			player_add_stop_walker(9, 0);
+			break;
+
+		case CONVERSE_LEAN:
+		case CONVERSE_HAND_WAVE:
+		case CONVERSE_HAND_WAVE_2:
+		case CONVERSE_NONE:
+		default:
+			player_add_stop_walker(-4, 0);
+			player_add_stop_walker(-8, 0);
+			state = CONVERSE_LEAN;
+			break;
+		}
+		break;
+
+	case CONVERSE_NONE:
+	default:
+		switch (cmd) {
+		case CONVERSE_LEAN:
+		case CONVERSE_HAND_WAVE:
+		case CONVERSE_HAND_WAVE_2:
+		case CONVERSE_HAND_CHIN:
+			player_add_stop_walker(2, 0);
+			state = CONVERSE_LEAN;
+			break;
+
+		case CONVERSE_NONE:
+		default:
+			stop_walker_basic();
+			break;
+		}
+		break;
+	}
+
+	global[walker_converse] = cmd;
+	global[walker_converse_state] = state;
+}
+
 void PhantomEngine::global_section_constructor() {
 	Phantom::global_section_constructor();
+}
+
+void PhantomEngine::global_daemon_code() {
+	if (player.walker_visible && !global[stop_walker_disabled] && (player.commands_allowed || (conv_control.running >= 0)) && !player.walking &&
+		(player.facing == player.turn_to_facing)) {
+		if (kernel.clock >= READ_LE_INT32(&global[walker_timing])) {
+			if (!player.stop_walker_pointer) {
+				stop_walker_tricks();
+			}
+
+			WRITE_LE_INT32(&global[walker_timing], READ_LE_INT32(&global[walker_timing]) + 6);
+		}
+	}
 }
 
 } // namespace Phantom

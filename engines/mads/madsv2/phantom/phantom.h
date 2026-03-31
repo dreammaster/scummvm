@@ -33,6 +33,8 @@ private:
 	bool _soundFlag = true;
 
 	static void global_object_sprite();
+	static void stop_walker_basic();
+	static void stop_walker_tricks();
 
 public:
 	PhantomEngine(OSystem *syst, const MADSGameDescription *gameDesc) :
@@ -44,6 +46,7 @@ public:
 	void global_init_code() override;
 	void section_music(int section_num) override;
 	void global_section_constructor() override;
+	void global_daemon_code() override;
 };
 
 } // namespace Phantom

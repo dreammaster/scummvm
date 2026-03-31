@@ -56,11 +56,9 @@ static ConvData *conv_load_data(const char *fname) {
 	return nullptr;
 }
 
-
 void conv_system_init() {
+	Common::fill((byte *)&conv_control, (byte *)&conv_control + sizeof(ConvControl), 0);
 	conv_control.running = -1;
-	conv_control.slot = 0;
-	conv_control.status = CONV_NONE;
 
 	Common::fill(conv_slot_indexes, conv_slot_indexes + CONV_MAX_SLOTS, 0);
 	Common::fill(conv_slots, conv_slots + CONV_MAX_DATA, 0);

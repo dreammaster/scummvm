@@ -1785,7 +1785,7 @@ static void game_system_maintenance() {
 	}
 
 	if (unparsed_key || inter_auxiliary_click) {
-		/* pl conv_control.popup_clock = kernel.clock; */
+		conv_control.popup_clock = kernel.clock;
 		inter_auxiliary_click = false;
 	}
 }

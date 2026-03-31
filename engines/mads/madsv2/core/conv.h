@@ -60,6 +60,9 @@ struct ConvControl {
 	int running;
 	int slot;
 	ConvStatus status;
+	ConvStatus prior_status;
+
+	uint32 popup_clock;
 };
 
 extern int conv_restore_running;

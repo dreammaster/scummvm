@@ -74,8 +74,8 @@ public:
 
 	virtual void global_init_code() = 0;
 	virtual void section_music(int section_num) = 0;
-
 	virtual void global_section_constructor() = 0;
+	virtual void global_daemon_code() = 0;
 };
 
 extern MADSV2Engine *g_engine;
