@@ -27,6 +27,8 @@
 #include "mads/madsv2/core/imath.h"
 #include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/kernel.h"
+#include "mads/madsv2/core/object.h"
+#include "mads/madsv2/core/text.h"
 #include "mads/madsv2/phantom/phantom.h"
 #include "mads/madsv2/phantom/main.h"
 #include "mads/madsv2/phantom/sound_phantom.h"
@@ -380,6 +382,265 @@ void PhantomEngine::global_daemon_code() {
 			WRITE_LE_INT32(&global[walker_timing], READ_LE_INT32(&global[walker_timing]) + 6);
 		}
 	}
+}
+
+void PhantomEngine::global_pre_parser_code() {
+	if (player_said_1(look) || player_said_1(throw)) {
+		player.need_to_walk = false;
+	}
+}
+
+void PhantomEngine::global_parser_code() {
+	if (room_id >= 401 && room_id <= 456) {
+		if (player_said_1(red_frame) ||
+			player_said_1(yellow_frame) ||
+			player_said_1(green_frame) ||
+			player_said_1(blue_frame)) {
+
+			if (player_said_1(put)) {
+
+				if (player_said_1(unlucky_adventurer)) {
+					text_show(text_000_35);
+					goto handled;
+
+				} else if (player_said_1(hole)) {
+					text_show(text_000_36);
+					goto handled;
+
+				} else if (player_said_1(grate)) {
+					text_show(text_000_37);
+					goto handled;
+
+				} else if (player_said_1(wall)) {
+					text_show(text_000_38);
+					goto handled;
+				}
+			}
+		}
+	}
+
+	if (player.look_around) {
+		text_show(text_008_10);
+		goto handled;
+	}
+
+	if (player_said_2(put, red_frame) ||
+		player_said_2(put, blue_frame) ||
+		player_said_2(put, yellow_frame) ||
+		player_said_2(put, green_frame)) {
+		if (player_said_1(puddle)) {
+			text_show(text_401_24);
+		} else {
+			text_show(text_401_25);
+		}
+		goto handled;
+	}
+
+	if (player_said_2(wear, wedding_ring)) {
+		if (global[ring_is_on_finger]) {
+			text_show(text_008_49);
+		} else {
+			text_show(text_008_35);
+			global[ring_is_on_finger] = true;
+		}
+		goto handled;
+	}
+
+	if (player_said_2(remove, wedding_ring)) {
+		if (!global[ring_is_on_finger]) {
+			text_show(text_008_48);
+		} else {
+			text_show(text_008_36);
+			global[ring_is_on_finger] = false;
+		}
+		goto handled;
+	}
+
+	if (player_said_2(look, archway_to_west) || player_said_2(look, archway_to_east) ||
+		player_said_2(look, archway_to_north)) {
+		text_show(text_000_34);
+		goto handled;
+	}
+
+	if (player_said_2(attack, Christine)) {
+		text_show(text_000_33);
+		goto handled;
+	}
+
+	if (player_said_2(look, key)) {
+		object_examine(key, text_008_00, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, sandbag)) {
+		object_examine(sandbag, text_008_03, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, small_note) || player_said_2(read, small_note)) {
+		object_examine(small_note, text_008_06, 2);
+		goto handled;
+	}
+
+	if (player_said_2(look, rope)) {
+		object_examine(rope, text_008_07, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, sword)) {
+		object_examine(sword, text_008_08, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, envelope) || player_said_2(read, envelope)) {
+		object_examine(envelope, text_008_09, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, ticket) || player_said_2(read, ticket)) {
+		object_examine(ticket, text_008_10, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, piece_of_paper) || player_said_2(read, piece_of_paper)) {
+		object_examine(piece_of_paper, text_008_11, 1);
+		goto handled;
+	}
+
+	if (player_said_2(look, parchment) || player_said_2(read, parchment)) {
+		object_examine(parchment, text_008_12, 3);
+		goto handled;
+	}
+
+	if (player_said_2(look, letter) || player_said_2(read, letter)) {
+		object_examine(letter, text_008_13, 4);
+		goto handled;
+	}
+
+	if (player_said_2(look, notice) || player_said_2(read, notice)) {
+		object_examine(notice, text_008_14, 5);
+		goto handled;
+	}
+
+	if (player_said_2(look, book) || player_said_2(read, book)) {
+		object_examine(book, text_008_15, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, crumpled_note) || player_said_2(read, crumpled_note)) {
+		object_examine(crumpled_note, text_008_16, 6);
+		goto handled;
+	}
+
+	if (player_said_2(look, large_note) || player_said_2(read, large_note)) {
+		object_examine(large_note, text_008_18, 7);
+		goto handled;
+	}
+
+	if (player_said_2(look, music_score) || player_said_2(read, music_score)) {
+		object_examine(music_score, text_008_20, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, wedding_ring)) {
+		object_examine(wedding_ring, text_008_21, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, cable_hook)) {
+		object_examine(cable_hook, text_008_22, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, rope_with_hook)) {
+		object_examine(rope_with_hook, text_008_23, 0);
+		goto handled;
+	}
+
+	if (player_said_2(look, oar)) {
+		object_examine(oar, text_008_24, 0);
+		goto handled;
+	}
+
+
+	if (player_said_1(look) && player_has(object_named(player_main_noun))) {
+		object_examine(oar, text_008_24, 0);
+		goto handled;
+	}
+
+	if (player_said_2(turn_on, lantern)) {
+		if ((global[lantern_status] == LANTERN_IS_ON) && !kernel.trigger) {
+			text_show(text_008_28);
+			/* lantern is already on */
+		} else {
+			switch (kernel.trigger) {
+			case 0:
+				kernel_timing_trigger(4, 1);
+				global[lantern_status] = LANTERN_IS_ON;
+				inter_spin_object(lantern);
+				break;
+
+			case 1:
+				text_show(text_008_25);
+				break;
+			}
+		}
+		goto handled;
+	}
+
+	if (player_said_2(turn_off, lantern)) {
+		if ((global[lantern_status] == LANTERN_IS_OFF) && !kernel.trigger) {
+			text_show(text_008_29);
+			/* lantern is already off */
+		} else {
+			if (section_id == 4) {
+				text_show(text_008_26);
+				/* you are in catacombs, not a good idea */
+			} else {
+				switch (kernel.trigger) {
+				case 0:
+					kernel_timing_trigger(4, 1);
+					global[lantern_status] = LANTERN_IS_OFF;
+					inter_spin_object(lantern);
+					break;
+
+				case 1:
+					text_show(text_008_27);
+					break;
+				}
+			}
+		}
+		goto handled;
+	}
+
+	if (player_said_2(open, envelope)) {
+		inter_move_object(envelope, NOWHERE);
+		inter_give_to_player(ticket);
+		inter_give_to_player(piece_of_paper);
+		text_show(text_008_33);
+		goto handled;
+	}
+
+	if (player_said_3(attach, cable_hook, rope)) {
+		if (!player_has(rope)) {
+			text_show(text_114_38);
+		} else {
+			inter_move_object(cable_hook, NOWHERE);
+			inter_move_object(rope, NOWHERE);
+			inter_give_to_player(rope_with_hook);
+			object_examine(rope_with_hook, text_008_23, 0);
+			/* text_show (text_008_23); */
+		}
+		goto handled;
+	}
+
+	goto done;
+
+handled:
+	player.command_ready = false;
+
+done:
+	;
 }
 
 } // namespace Phantom

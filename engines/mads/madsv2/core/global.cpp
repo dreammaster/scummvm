@@ -40,15 +40,15 @@ void global_init_code() {
 }
 
 void global_daemon_code() {
-	error("TODO: void global_daemon_code(void);");
+	g_engine->global_daemon_code();
 }
 
 void global_pre_parser_code() {
-	error("TODO: void global_pre_parser_code(void);");
+	g_engine->global_pre_parser_code();
 }
 
 void global_parser_code() {
-	error("TODO: void global_parser_code(void);");
+	g_engine->global_parser_code();
 }
 
 void global_error_code() {

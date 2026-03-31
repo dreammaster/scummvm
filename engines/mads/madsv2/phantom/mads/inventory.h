@@ -40,6 +40,7 @@ enum {
 	sword = 8,
 	envelope = 9,
 	ticket = 10,
+	piece_of_paper = 11,
 	parchment = 12,
 	letter = 13,
 	notice = 14,

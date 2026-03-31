@@ -28,23 +28,46 @@ namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
 
-/* Formula: text_RRR_NN = RRR * 100 + NN */
-
 enum {
+	/* Globals */
 	text_000_29 = 29,
 	text_000_30 = 30,
 	text_000_31 = 31,
+	text_000_33 = 33,
+	text_000_34 = 34,
+	text_000_35 = 35,
+	text_000_36 = 36,
+	text_000_37 = 37,
+	text_000_38 = 38,
 
 	text_008_06 = 806,
 	text_008_07 = 807,
 	text_008_08 = 808,
+	text_008_09 = 809,
+	text_008_10 = 810,
+	text_008_11 = 811,
 	text_008_16 = 816,
 	text_008_17 = 817,
 	text_008_18 = 818,
 	text_008_19 = 819,
 	text_008_20 = 820,
+	text_008_23 = 823,
+	text_008_25 = 825,
+	text_008_26 = 826,
+	text_008_27 = 827,
+	text_008_28 = 828,
+	text_008_29 = 829,
+	text_008_33 = 833,
+	text_008_35 = 835,
+	text_008_36 = 836,
 	text_008_44 = 844,
 	text_008_45 = 845,
+	text_008_48 = 848,
+	text_008_49 = 849,
+
+	text_114_38 = 11438,
+	text_401_24 = 40124,
+	text_401_25 = 40125,
 
 	/* Room 101 */
 	text_101_10 = 10110,

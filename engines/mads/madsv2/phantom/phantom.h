@@ -47,6 +47,8 @@ public:
 	void section_music(int section_num) override;
 	void global_section_constructor() override;
 	void global_daemon_code() override;
+	void global_pre_parser_code() override;
+	void global_parser_code() override;
 };
 
 } // namespace Phantom
