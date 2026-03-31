@@ -120,9 +120,6 @@ static void main_menu_main() {
 	}
 
 	mcga_reset();
-
-	// Handle menu item selection
-	warning("Selected item = %d", selected_item);
 }
 
 static void main_cold_data_init() {
@@ -272,11 +269,26 @@ done:
 }
 
 void phantom_main() {
+	static const char *CMD_LINE[] = { nullptr, "-p" };
+
 	pack_enable_pfab_explode();
 	if (!env_verify())
 		env_search_mode = ENV_SEARCH_CONCAT_FILES;
 
-	main_menu_main();
+	while (!g_engine->shouldQuit()) {
+		main_menu_main();
+
+		if (!g_engine->shouldQuit()) {
+			switch (selected_item) {
+			case 0:
+				game_main(2, CMD_LINE);
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
 }
 
 } // namespace Phantom
