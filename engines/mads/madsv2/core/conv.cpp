@@ -21,11 +21,10 @@
 
 #include "common/algorithm.h"
 #include "common/str.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 
 namespace MADS {
 namespace MADSV2 {
-namespace Phantom {
 
 int conv_restore_running;
 ConvControl conv_control;
@@ -38,7 +37,6 @@ static int conv_slot_indexes[CONV_MAX_SLOTS];
 static int conv_slots[CONV_MAX_DATA];
 static int conv_data[CONV_MAX_DATA];
 static int conv_conditions[CONV_MAX_DATA];
-
 
 static const char *conv_get_filename(int convNum, int extType, char *name) {
 	*name = '\0';
@@ -60,6 +58,10 @@ static ConvData *conv_load_data(const char *fname) {
 
 
 void conv_system_init() {
+	conv_control.running = -1;
+	conv_control.slot = 0;
+	conv_control.status = CONV_NONE;
+
 	Common::fill(conv_slot_indexes, conv_slot_indexes + CONV_MAX_SLOTS, 0);
 	Common::fill(conv_slots, conv_slots + CONV_MAX_DATA, 0);
 	Common::fill(conv_data, conv_data + CONV_MAX_DATA, 0);
@@ -88,9 +90,15 @@ void conv_get(int convNum) {
 }
 
 void conv_run(int convNum) {}
+
+void conv_update(bool) {}
+
 void conv_export_pointer(int *ptr) {}
+
 void conv_abort() {}
+
 void conv_me_trigger(int trigger) {}
+
 void conv_you_trigger(int trigger) {}
 
 int *conv_get_variable(int varNum) {
@@ -110,6 +118,5 @@ void conv_release() {
 	// TODO
 }
 
-} // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS

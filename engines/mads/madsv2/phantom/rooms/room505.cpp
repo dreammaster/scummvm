@@ -28,7 +28,7 @@
 #include "mads/madsv2/core/object.h"
 #include "mads/madsv2/core/sound.h"
 #include "mads/madsv2/core/text.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/phantom/rooms/section5.h"
 #include "mads/madsv2/phantom/rooms/room505.h"
 

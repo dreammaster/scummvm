@@ -69,6 +69,7 @@ MODULE_OBJS += \
 	madsv2/core/camera.o \
 	madsv2/core/color.o \
 	madsv2/core/config.o \
+	madsv2/core/conv.o \
 	madsv2/core/copy.o \
 	madsv2/core/cursor.o \
 	madsv2/core/cycle.o \
@@ -178,7 +179,6 @@ MODULE_OBJS += \
 	madsv2/phantom/rooms/room506.o \
 	madsv2/phantom/phantom.o \
 	madsv2/phantom/catacombs.o \
-	madsv2/phantom/conv.o \
 	madsv2/phantom/global.o \
 	madsv2/phantom/main_menu.o \
 	madsv2/phantom/main.o \

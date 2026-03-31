@@ -19,15 +19,14 @@
  *
  */
 
-#ifndef MADS_PHANTOM_CONV_H
-#define MADS_PHANTOM_CONV_H
+#ifndef MADS_PHANTOM_MADS_CONV_H
+#define MADS_PHANTOM_MADS_CONV_H
 
 #include "common/scummsys.h"
 
 namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
-
 
 enum {
 	conv001_speech_talk = 0,
@@ -67,7 +66,7 @@ enum {
 	conv003_name_i_am = 3,
 	conv003_name_form = 4,
 	conv003_name_oops = 5,
-	conv003_adios_byebye= 6,
+	conv003_adios_byebye = 6,
 	conv003_nomore_byebye = 7,
 	conv003_questions_three = 10,
 	conv003_knowghost_see = 13,

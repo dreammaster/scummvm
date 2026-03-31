@@ -24,6 +24,7 @@
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/mads.h"
 #include "mads/madsv2/core/attr.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/core/lib.h"
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/keys.h"
@@ -1906,146 +1907,65 @@ static void game_handle_command() {
 
 	kernel_trigger_in = kernel.trigger;
 
-#ifdef debug_enable_logfiles
-#define LOGFILE_NONE                0
-#define LOGFILE_ROOM_PARSER         1
-#define LOGFILE_SECTION_PARSER      2
-#define LOGFILE_GLOBAL_PARSER       3
-#define LOGFILE_ROOM_ERROR          4
-#define LOGFILE_SECTION_ERROR       5
-#define LOGFILE_GLOBAL_ERROR        6
-	int logfile_handled_level = LOGFILE_NONE;
-	char temp1[20];
-	char temp2[80];
-#endif
-
-	/* pl  if (conv_control.running >= 0) {
+	if (conv_control.running >= 0) {
 		player.look_around = false;
 		if ((conv_control.status == CONV_STATUS_WAIT_AUTO) ||
 		   (conv_control.status == CONV_STATUS_WAIT_ENTRY)) {
 		  player.commands_allowed = false;
 		}
 	  }
-	  */
 
 	handled_this_one = false;
-	if (kernel.trigger) player.command_ready = true;
+	if (kernel.trigger)
+		player.command_ready = true;
 
 	kernel.trigger_setup_mode = KERNEL_TRIGGER_PARSER;
 
-	if (kernel.trigger && (kernel.trigger_mode == KERNEL_TRIGGER_PARSER) && player.command_error) {
+	if (kernel.trigger && (kernel.trigger_mode == KERNEL_TRIGGER_PARSER) &&
+			player.command_error) {
 		error_report(ERROR_ORPHANED_TRIGGER, WARNING, MODULE_KERNEL, kernel.trigger, 0);
 	}
 
-	if ((player.command_ready || kernel.trigger /*|| ((global[4] >= 0) && player.command_ready)*/) &&
-		(!player.command_error)) {
-
+	if (!player.command_error && 
+			(player.command_ready || kernel.trigger)) {
 		game_exec_function(room_parser_code_pointer);
 
 		handled_this_one = !player.command_ready;
-#ifdef debug_enable_logfiles
-		if (!player.command_ready) logfile_handled_level = LOGFILE_ROOM_PARSER;
-#endif
 	}
 
-	/* pl  if (conv_control.running >= 0) {
+	if (conv_control.running >= 0) {
 		player.command_ready = false;
 		goto done;
-	  }
-	  */
+	}
 
-	if (player.command_ready || kernel.trigger /*|| ((global[4] >= 0) && player.command_ready)*/) {
+	if (player.command_ready || kernel.trigger) {
 		game_exec_function(section_parser_code_pointer);
 		handled_this_one = !player.command_ready;
-#ifdef debug_enable_logfiles
-		if (!player.command_ready) logfile_handled_level = LOGFILE_SECTION_PARSER;
-#endif
 	}
 
-	if ((player.command_ready || kernel.trigger /*|| ((global[4] >= 0) && player.command_ready)*/) &&
+	if ((player.command_ready || kernel.trigger) &&
 		(!handled_this_one) && (!player.command_error)) {
 		global_parser_code();
-#ifdef debug_enable_logfiles
-		if (!player.command_ready) logfile_handled_level = LOGFILE_GLOBAL_PARSER;
-#endif
 	}
-
-
-	/* if (global[4] >= 0) */
-	  /* player.command_ready = false; */
 
 	if (player.look_around) goto done;
 
 	if (player.command_ready) {
 		player.command_error = true;
 		game_exec_function(room_error_code_pointer);
-#ifdef debug_enable_logfiles
-		if (!player.command_ready) logfile_handled_level = LOGFILE_ROOM_ERROR;
-#endif
 	}
 
 	if (player.command_ready) {
 		player.command_error = true;
 		game_exec_function(section_error_code_pointer);
-#ifdef debug_enable_logfiles
-		if (!player.command_ready) logfile_handled_level = LOGFILE_SECTION_ERROR;
-#endif
 	}
 
 	if (player.command_ready) {
 		global_error_code();
-#ifdef debug_enable_logfiles
-		logfile_handled_level = LOGFILE_GLOBAL_ERROR;
-#endif
 	}
-
 
 done:
 	player.command_ready = false;
-
-#ifdef debug_enable_logfiles
-	if ((!kernel.trigger) && (inter_input_mode == INTER_BUILDING_SENTENCES) && logfile_enabled) {
-		Common::strcpy_s(temp2, "ROOM");
-		temp1[0] = 0;
-		env_catint(temp1, room_id, 3);
-		Common::strcat_s(temp2, temp1);
-		Common::strcat_s(temp2, ".LOG");
-		logfile_handle = fopen(temp2, "at");
-		if (logfile_handle != NULL) {
-			if (player.command_error) {
-				Common::strcpy_s(temp1, "ERROR ");
-			} else {
-				Common::strcpy_s(temp1, "Valid ");
-			}
-			switch (logfile_handled_level) {
-			case LOGFILE_ROOM_PARSER:
-				Common::strcpy_s(temp2, "room parser)  ");
-				break;
-			case LOGFILE_SECTION_PARSER:
-				Common::strcpy_s(temp2, "sect. parser) ");
-				break;
-			case LOGFILE_GLOBAL_PARSER:
-				Common::strcpy_s(temp2, "global parser)");
-				break;
-			case LOGFILE_ROOM_ERROR:
-				Common::strcpy_s(temp2, "room error)   ");
-				break;
-			case LOGFILE_SECTION_ERROR:
-				Common::strcpy_s(temp2, "sect. error)  ");
-				break;
-			case LOGFILE_GLOBAL_ERROR:
-				Common::strcpy_s(temp2, "global error) ");
-				break;
-			case LOGFILE_NONE:
-			default:
-				Common::strcpy_s(temp2, "NOTHING)      ");
-				break;
-			}
-			fprintf(logfile_handle, "%s (by: %s \"%s\"\n", temp1, temp2, player.sentence);
-			fclose(logfile_handle);
-		}
-	}
-#endif
 
 	if (kernel.trigger_mode == KERNEL_TRIGGER_PARSER) {
 		if (kernel.trigger == kernel_trigger_in) {
@@ -2053,13 +1973,12 @@ done:
 		}
 	}
 
-	/* pl  if (conv_control.running >= 0) {
+	if (conv_control.running >= 0) {
 		if ((conv_control.status == CONV_STATUS_WAIT_AUTO) ||
-		   (conv_control.status == CONV_STATUS_WAIT_ENTRY)) {
-		  conv_update(true);
+			(conv_control.status == CONV_STATUS_WAIT_ENTRY)) {
+			conv_update(true);
 		}
-	  }
-	  */
+	}
 }
 
 

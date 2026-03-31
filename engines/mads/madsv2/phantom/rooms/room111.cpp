@@ -26,7 +26,7 @@
 #include "mads/madsv2/core/object.h"
 #include "mads/madsv2/core/sound.h"
 #include "mads/madsv2/phantom/global.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/phantom/mads/inventory.h"
 #include "mads/madsv2/phantom/mads/speeches.h"
 #include "mads/madsv2/phantom/mads/words.h"

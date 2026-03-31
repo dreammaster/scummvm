@@ -41,7 +41,7 @@
 #include "mads/madsv2/phantom/mads/sounds.h"
 #include "mads/madsv2/phantom/mads/speeches.h"
 #include "mads/madsv2/phantom/mads/text.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/phantom/rooms/section1.h"
 #include "mads/madsv2/phantom/rooms/room106.h"
 

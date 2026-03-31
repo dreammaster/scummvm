@@ -24,7 +24,7 @@
 #include "mads/madsv2/phantom/mads/words.h"
 #include "mads/madsv2/phantom/rooms/section1.h"
 #include "mads/madsv2/phantom/rooms/room101.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/core/imath.h"
 #include "mads/madsv2/core/camera.h"
 #include "mads/madsv2/core/matte.h"

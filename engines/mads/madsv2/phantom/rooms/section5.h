@@ -22,6 +22,7 @@
 #ifndef MADS_PHANTOM_SECTION5_H
 #define MADS_PHANTOM_SECTION5_H
 
+#include "mads/madsv2/phantom/mads/conv.h"
 #include "mads/madsv2/phantom/mads/inventory.h"
 #include "mads/madsv2/phantom/mads/quotes.h"
 #include "mads/madsv2/phantom/mads/sounds.h"

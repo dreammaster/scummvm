@@ -30,7 +30,7 @@
 #include "mads/madsv2/core/sound.h"
 #include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/core/text.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/phantom/mads/speeches.h"
 #include "mads/madsv2/phantom/rooms/section5.h"
 #include "mads/madsv2/phantom/rooms/room504.h"

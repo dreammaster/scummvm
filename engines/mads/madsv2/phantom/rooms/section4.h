@@ -22,6 +22,7 @@
 #ifndef MADS_PHANTOM_SECTION4_H
 #define MADS_PHANTOM_SECTION4_H
 
+#include "mads/madsv2/phantom/mads/conv.h"
 #include "mads/madsv2/phantom/global.h"
 #include "mads/madsv2/phantom/mads/text.h"
 #include "mads/madsv2/phantom/mads/words.h"

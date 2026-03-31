@@ -32,7 +32,7 @@
 #include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/buffer.h"
 #include "mads/madsv2/phantom/global.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/phantom/mads/inventory.h"
 #include "mads/madsv2/phantom/mads/quotes.h"
 #include "mads/madsv2/phantom/mads/sounds.h"

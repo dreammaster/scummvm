@@ -26,7 +26,7 @@
 #include "mads/madsv2/core/pal.h"
 #include "mads/madsv2/core/player.h"
 #include "mads/madsv2/core/sound.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/phantom/global.h"
 #include "mads/madsv2/phantom/mads/sounds.h"
 #include "mads/madsv2/phantom/rooms/section5.h"

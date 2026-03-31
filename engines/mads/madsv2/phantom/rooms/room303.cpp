@@ -37,7 +37,7 @@
 #include "mads/madsv2/phantom/mads/speeches.h"
 #include "mads/madsv2/phantom/rooms/section3.h"
 #include "mads/madsv2/phantom/rooms/room303.h"
-#include "mads/madsv2/phantom/conv.h"
+#include "mads/madsv2/core/conv.h"
 
 namespace MADS {
 namespace MADSV2 {
