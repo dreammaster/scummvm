@@ -50,6 +50,7 @@ public:
 	void global_pre_parser_code() override;
 	void global_parser_code() override;
 	void global_error_code() override;
+	void global_room_init() override;
 };
 
 } // namespace Phantom

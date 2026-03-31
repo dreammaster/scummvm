@@ -56,7 +56,7 @@ void global_error_code() {
 }
 
 void global_room_init() {
-	error("TODO: void global_room_init(void);");
+	g_engine->global_room_init();
 }
 
 void global_verb_filter() {

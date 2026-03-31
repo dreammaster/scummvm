@@ -1567,7 +1567,7 @@ void game_control() {
 			kernel_set_interface_mode(INTER_LIMITED_SENTENCES);
 
 			game_exec_function(room_init_code_pointer);
-
+#if 0
 			/* paul - oh no! magic numbers! */
 			stamp_sprite_to_interface(BP_X, BP_Y, 1, int_sprite[fx_int_backpack]);
 			if (global[5]) { /* candle_is_on */
@@ -1580,7 +1580,7 @@ void game_control() {
 			if (room_id != 199) {   /* Taranjeet, if this is not journal room */
 				stamp_sprite_to_interface(JOURNAL_X, JOURNAL_Y, 1, int_sprite[fx_int_journal]);
 			}
-
+#endif
 			scr_work.data = buffer_pointer(&scr_main, 0, viewing_at_y);
 			if (viewing_at_y) {
 				buffer_rect_fill(scr_main, 0, 0, video_x, viewing_at_y, 0);

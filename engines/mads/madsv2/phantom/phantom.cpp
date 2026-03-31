@@ -28,6 +28,7 @@
 #include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/object.h"
+#include "mads/madsv2/core/pal.h"
 #include "mads/madsv2/core/text.h"
 #include "mads/madsv2/phantom/phantom.h"
 #include "mads/madsv2/phantom/main.h"
@@ -788,6 +789,13 @@ void PhantomEngine::global_error_code() {
 
 done:
 	if (show_me) text_show(show_me);
+}
+
+void PhantomEngine::global_room_init() {
+	pal_change_color(16, 45, 45, 55);
+	pal_change_color(17, 30, 30, 45);
+	global[walker_converse] = 0;
+	global[walker_converse_state] = 0;
 }
 
 } // namespace Phantom
