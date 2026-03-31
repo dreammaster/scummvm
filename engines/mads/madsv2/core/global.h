@@ -126,7 +126,6 @@ void global_read_config_file(void);
 void global_write_config_file(void);
 void global_load_config_parameters(void);
 void global_unload_config_parameters(void);
-int global_copy_verify(void);
 
 } // namespace MADSV2
 } // namespace MADS

@@ -21,6 +21,7 @@
 
 #include "engines/util.h"
 #include "mads/madsv2/core/conv.h"
+#include "mads/madsv2/core/copy.h"
 #include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/himem.h"

@@ -39,19 +39,17 @@ namespace MADSV2 {
 
 
 struct CopyProt {
-	char manual;
-	int  page;
-	int  line;
-	int  word_number;
+	byte manual;
+	int16 page;
+	int16 line;
+	int16 word_number;
 	char say[20];
 
+	static constexpr int SIZE = 1 + 2 + 2 + 2 + 20;
 	void load(Common::SeekableReadStream *src);
 };
 
-extern void copy_mangle(CopyProt *copy_prot);
-extern int copy_load(CopyProt *copy_prot);
-extern int copy_pop_and_ask();
-extern int copy_verify();
+extern int global_copy_verify();
 
 } // namespace MADSV2
 } // namespace MADS

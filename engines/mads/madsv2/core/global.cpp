@@ -96,9 +96,5 @@ void global_write_config_file() {
 	write_config_file();
 }
 
-int global_copy_verify() {
-	error("TODO: int global_copy_verify(void);");
-}
-
 } // namespace MADSV2
 } // namespace MADS
