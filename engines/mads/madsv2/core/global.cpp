@@ -60,7 +60,7 @@ void global_room_init() {
 }
 
 void global_verb_filter() {
-	error("TODO: void global_verb_filter(void);");
+	g_engine->global_verb_filter();
 }
 
 void global_sound_driver() {

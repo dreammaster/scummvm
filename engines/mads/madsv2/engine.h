@@ -80,6 +80,7 @@ public:
 	virtual void global_parser_code() = 0;
 	virtual void global_error_code() = 0;
 	virtual void global_room_init() = 0;
+	virtual void global_verb_filter() {}
 };
 
 extern MADSV2Engine *g_engine;
