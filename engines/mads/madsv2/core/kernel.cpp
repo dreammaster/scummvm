@@ -355,7 +355,7 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 	if (ems_exists) {
 		pages = ems_pages_free;
 		for (count = 0; count < EMS_PAGING_CLASSES; count++) {
-			reserve[EMS_PAGING_CLASSES] = 0;
+			reserve[count] = 0;
 		}
 		if (pages >= 4) {
 			reserve[EMS_PAGING_SYSTEM] = 4;

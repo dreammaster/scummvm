@@ -61,8 +61,8 @@ typedef struct {
 } EmsPtr;
 
 
-constexpr bool ems_driver = false;	/* Flag if EMS driver is installed      */
-constexpr bool ems_exists = false;	/* Flag if we've got some EMS available */
+extern bool ems_driver;			/* Flag if EMS driver is installed      */
+extern bool ems_exists;			/* Flag if we've got some EMS available */
 extern word ems_page_frame;     /* Segment address of EMS page frame    */
 extern word ems_handle;         /* EMS handle of our allocated pages    */
 extern word ems_pages;          /* # of pages EMS allocated for us      */
@@ -93,15 +93,12 @@ extern int ems_page_stack[4];
  * Returns "false" if EMS did not exist, if no pages were available,
  * or if an error occurred.
  */
-inline bool ems_detect() {
-	return false;
-}
+extern bool ems_detect();
 
 /**
  * Frees up any EMS memory that might have been allocated by ems_detect().
  */
-inline void ems_shutdown() {
-}
+extern void ems_shutdown();
 
 /**
  * Maps a logical page (0 - (ems_pages-1)) to a physical page (0-3).

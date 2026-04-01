@@ -41,5 +41,40 @@ int ems_mapping_changed = 0;
 int ems_page_mapped[4] = {};
 int ems_page_stack[4] = {};
 
+static byte *ems_physical_pool = nullptr;
+
+bool ems_driver = false;
+bool ems_exists = false;
+
+bool ems_detect() {
+	if (ems_disabled)
+		return false;
+
+	ems_physical_pool = new byte[4 * EMS_PAGE_SIZE]();  // zero-initialised
+	if (!ems_physical_pool)
+		return false;
+
+	for (int i = 0; i < 4; i++) {
+		ems_page[i] = ems_physical_pool + i * EMS_PAGE_SIZE;
+		ems_page_mapped[i] = i;
+	}
+
+	ems_high_version = 4;
+	ems_low_version = 0;
+	ems_driver = true;
+	ems_exists = true;
+	return true;
+}
+
+void ems_shutdown() {
+	delete[] ems_physical_pool;
+	ems_physical_pool = nullptr;
+
+	for (int i = 0; i < 4; i++)
+		ems_page[i] = nullptr;
+
+	ems_exists = false;
+}
+
 } // namespace MADSV2
 } // namespace MADS
