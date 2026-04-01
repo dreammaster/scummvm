@@ -83,6 +83,7 @@ extern int *conv_get_variable(int varNum);
 extern void conv_export_value(int varNum);
 extern void conv_hold();
 extern void conv_release();
+extern void conv_flush();
 
 } // namespace MADSV2
 } // namespace MADS

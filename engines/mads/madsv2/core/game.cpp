@@ -31,6 +31,7 @@
 #include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/mouse.h"
+#include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/core/video.h"
 #include "mads/madsv2/core/buffer.h"
@@ -1271,16 +1272,12 @@ void game_copy_speech_files(int room_) {
 void game_control() {
 	int count, color;
 	int result;
+	bool aborted_conv = true;
 
 	/* Start up game level functions */
 
 	error_service_routine_2 = game_error_service;
 
-	/*
-	if (config_file.mouse_cursor_fix == MOUSE_NOT_MICROSOFT) {
-	  mouse_disable_scale();
-	}
-	*/
 	if (game_mouse_cursor_fix) {
 		mouse_disable_scale();
 	}
@@ -1441,7 +1438,7 @@ void game_control() {
 				if (player.walker_is_loaded) {
 					player_dump_walker();
 				}
-
+#if 0
 				if (int_sprite[fx_int_journal] != -1 && room_id != KERNEL_RESTORING_GAME) {
 					matte_deallocate_series(int_sprite[fx_int_candle_on], true);
 					matte_deallocate_series(int_sprite[fx_int_dooropen], true);
@@ -1453,11 +1450,11 @@ void game_control() {
 				}
 
 				g_engine->section_music(section_id);
-
+#endif
 				pal_init(KERNEL_RESERVED_LOW_COLORS, KERNEL_RESERVED_HIGH_COLORS);
 
 				matte_init(true);
-
+#if 0
 				if (!player.walker_is_loaded) {
 					int_sprite[fx_int_journal] = kernel_load_series("*journal", false);
 					int_sprite[fx_int_backpack] = kernel_load_series("*backpack", false);
@@ -1466,7 +1463,7 @@ void game_control() {
 					int_sprite[fx_int_dooropen] = kernel_load_series("*dooropen", false);
 					int_sprite[fx_int_candle_on] = kernel_load_series("*candleon", false);
 				}
-
+#endif
 			} else {
 				/* paul - call my special preserve palette routine in extra_1 */
 				/* player_preserve_palette(); */
@@ -1637,28 +1634,22 @@ void game_control() {
 
 			/* ********************************************************************************************** */
 
-			global[16] = false; /* dont_load_walker */
-
-			/* pl      if (speech_system_active && speech_on) {
+			if (speech_system_active && speech_on)
 				   speech_all_off();
-				  }
-				  */
 
 emergency:
 			game_wait_cursor();
 
 			kernel_mode = KERNEL_ROOM_PRELOAD;
 
-			/* pl if (!game.going) {
-			 aborted_conv = conv_control.running;
-			}
-
+			if (!game.going)
+				aborted_conv = conv_control.running;
 			conv_abort();
-			*/
 
 			/* Shutdown the current room structures */
 
-			if (kernel.quotes != NULL) mem_free(kernel.quotes);
+			if (kernel.quotes != NULL)
+				mem_free(kernel.quotes);
 
 			kernel_abort_all_animations();
 
@@ -1676,7 +1667,7 @@ emergency:
 
 			kernel_room_shutdown();
 
-			/* pl conv_flush(); */
+			conv_flush();
 
 			new_section = new_room / 100;
 
@@ -1684,15 +1675,14 @@ emergency:
 
 			himem_flush(ROOM);
 
-			if (!game.going && !win_status && section_id != 9 /*  && !global[copy_protect_failed] */) {
-				/* pl conv_control.running = aborted_conv; */
+			if (!game.going && !win_status) {
+				conv_control.running = aborted_conv;
 				game_save_name(0);
 				kernel_save_game(save_game_buf);
 				game_autosaved = true;
 			} else {
 				game_autosaved = false;
 			}
-
 		}
 
 		/* remove .RAC and .RAW files */

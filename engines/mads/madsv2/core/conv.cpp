@@ -116,5 +116,9 @@ void conv_release() {
 	// TODO
 }
 
+void conv_flush() {
+	// TODO
+}
+
 } // namespace MADSV2
 } // namespace MADS
