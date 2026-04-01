@@ -27,7 +27,7 @@
 namespace MADS {
 namespace MADSV2 {
 
-#define max_hot_spots   80     /* Size of hotspot list */
+#define max_hot_spots   120     /* Size of hotspot list */
 #define max_hot_lists   2       /* Maximum # of lists   */
 
 #define HS_ALL          -1      /* Pass in ERASE to wipe entire class */
