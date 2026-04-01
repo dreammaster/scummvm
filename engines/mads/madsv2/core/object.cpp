@@ -56,6 +56,15 @@ int object_ems_handle = BUFFER_PRESERVE;
 char object_speech_resource[20] = "*SPCHNOTE.DSR";
 
 
+void ObjectBuf::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(vocab_id, location, prep, num_verbs, num_qualities, syntax);
+	for (int i = 0; i < OBJECT_MAX_VERBS; ++i)
+		verb[i].load(src);
+	src->readMultipleLE(quality_id);
+	src->readMultipleLE(quality_value);
+}
+
+
 void object_unload(void) {
 	if (object != NULL) {
 		mem_free(object);
@@ -72,15 +81,14 @@ int object_load(void) {
 	handle = env_open("*OBJECTS.DAT", "rb");
 	if (handle == NULL) goto done;
 
-	if (!fileio_fread_f(&num_objects, sizeof(int), 1, handle)) goto done;
+	num_objects = handle->readUint16LE();
 
 	mem_to_get = sizeof(Object) * num_objects;
 	object = (ObjectPtr)mem_get_name(mem_to_get, "$objects");
 	if (object == NULL) goto done;
 
-	for (count = 0; (count < num_objects); count++) {
-		if (!fileio_fread_f(&object[count], sizeof(Object), 1, handle)) goto done;
-	}
+	for (count = 0; (count < num_objects); count++)
+		object[count].load(handle);
 
 	inven_num_objects = 0;
 	for (count = 0; count < num_objects; count++) {

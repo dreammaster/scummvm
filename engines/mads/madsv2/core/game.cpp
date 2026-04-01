@@ -1285,9 +1285,8 @@ void game_control() {
 		mouse_disable_scale();
 	}
 
-	game.going = (byte)!kernel_game_startup(mcga_mode, true,
-		global_release_version,
-		global_release_date);
+	game.going = (byte)!kernel_game_startup(mcga_mode, KERNEL_STARTUP_ALL_FLAGS,
+		global_release_version, global_release_date);
 
 	game_exec_function(game_menu_init);
 

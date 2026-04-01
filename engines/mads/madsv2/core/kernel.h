@@ -141,7 +141,7 @@ namespace MADSV2 {
 #define KERNEL_STARTUP_CURSOR_SHOW    0x0100
 #define KERNEL_STARTUP_VOCAB          0x0080
 #define KERNEL_STARTUP_INTERFACE      0x0040
-
+#define KERNEL_STARTUP_ALL_FLAGS      0xffc0
 
 typedef struct {
 	byte active_flag;                   /* Sequence is active */

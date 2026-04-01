@@ -160,6 +160,8 @@ struct VerbBuf {
 	word id;
 	byte verb_type;
 	byte prep_type;
+
+	void load(Common::SeekableReadStream *src);
 };
 typedef struct VerbBuf Verb;
 

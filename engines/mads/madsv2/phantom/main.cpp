@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/config-manager.h"
 #include "mads/madsv2/phantom/main.h"
 #include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/error.h"
@@ -274,8 +275,14 @@ void phantom_main() {
 	if (!env_verify())
 		env_search_mode = ENV_SEARCH_CONCAT_FILES;
 
+	bool firstTime = !ConfMan.getBool("start_game");
+	selected_item = 0;
+
 	while (!g_engine->shouldQuit()) {
-		main_menu_main();
+		if (firstTime) {
+			main_menu_main();
+			firstTime = false;
+		}
 
 		if (!g_engine->shouldQuit()) {
 			switch (selected_item) {

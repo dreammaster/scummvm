@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_OBJECT_H
 #define MADS_CORE_OBJECT_H
 
+#include "common/stream.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/vocab.h"
 #include "mads/madsv2/core/qual.h"
@@ -55,18 +56,18 @@ typedef struct {
 /* Format for storing objects on disk */
 
 struct FileObjectBuf {
-	int  number;                            /* Official object number */
+	int16  number;                            /* Official object number */
 	char vocab_name[VC_MAXWORDLEN + 1];
 	char variable_name[VC_MAXWORDLEN + 1];
 	char desc[80];
-	int  location;
+	int16  location;
 	byte prep;
 	byte num_verbs;
 	byte num_qualities;
 	byte syntax;
 	HagVerb verb[OBJECT_MAX_VERBS];
 	char quality_name[OBJECT_MAX_QUALITIES][QU_MAXWORDLEN + 1];
-	long quality_value[OBJECT_MAX_QUALITIES];
+	int32 quality_value[OBJECT_MAX_QUALITIES];
 	/* char short_name[OBJECT_SHORT_NAME_LEN + 1]; */
 };
 
@@ -75,14 +76,16 @@ typedef FileObject *FileObjectPtr;
 
 struct ObjectBuf {
 	word vocab_id;                                /* Vocab word for name     */
-	int  location;                                /* Current location        */
+	int16  location;                                /* Current location        */
 	byte prep;                                    /* "Put" preposition       */
 	byte num_verbs;                               /* Number of special verbs */
 	byte num_qualities;                           /* Number of qualities     */
 	byte syntax;                                  /* Syntax                  */
 	Verb verb[OBJECT_MAX_VERBS];                  /* Verb list for objects   */
 	byte quality_id[OBJECT_MAX_QUALITIES];        /* Quality list            */
-	long quality_value[OBJECT_MAX_QUALITIES];     /* Quality values          */
+	int32 quality_value[OBJECT_MAX_QUALITIES];     /* Quality values          */
+
+	void load(Common::SeekableReadStream *src);
 };
 
 typedef struct ObjectBuf Object;
