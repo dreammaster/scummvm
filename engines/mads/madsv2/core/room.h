@@ -100,10 +100,11 @@ struct HotSpot {
 	byte active;                        /* Flag if hotspot is active     */
 	byte cursor_number;                 /* Mouse cursor number           */
 	byte syntax;                        /* Syntax                        */
+	//-- padding byte--
 	int16 vocab;                          /* Vocabulary id of hotspot name */
 	int16 verb;                           /* Vocabulary id of default verb */
 
-	static constexpr int SIZE = 6 * 2 + (5 * 1) + 2 + 2;
+	static constexpr int SIZE = 6 * 2 + (5 * 1) + 1 + 2 + 2;
 	void load(Common::SeekableReadStream *src);
 };
 

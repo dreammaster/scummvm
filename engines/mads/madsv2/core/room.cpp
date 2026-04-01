@@ -384,7 +384,7 @@ HotPtr room_load_hotspots(int id, int *num_spots) {
 
 	{
 		byte buffer[2];
-		if (!loader_read(buffer, sizeof(int), 1, &load_handle))
+		if (!loader_read(buffer, 2, 1, &load_handle))
 			goto done;
 
 		*num_spots = READ_LE_UINT16(buffer);
@@ -401,7 +401,7 @@ HotPtr room_load_hotspots(int id, int *num_spots) {
 	{
 		size_t bytes_to_read = num_to_read * HotSpot::SIZE;
 		byte *buffer = (byte *)malloc(bytes_to_read);
-		if (!loader_read(spots, memory_needed, 1, &load_handle)) {
+		if (!loader_read(buffer, memory_needed, 1, &load_handle)) {
 			free(buffer);
 			goto done;
 		}
