@@ -159,9 +159,8 @@ static void game_main(int argc, const char **argv) {
 
 	mads_mode = env_verify();
 
-	new_section = 9;
-	new_room = 901;
-
+	new_section = 1;
+	new_room = 101;
 	player.x = 160;
 	player.y = 78;
 
