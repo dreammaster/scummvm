@@ -1330,7 +1330,7 @@ static void popup_item_init(PopupItem *item) {
 /*      Sets up popup dialog structure, allocating memory dynamically
 /*      if necessary.
 */
-Popup *popup_dialog_create(byte *memory, long heap_size, int max_items) {
+Popup *popup_dialog_create(void *memory, long heap_size, int max_items) {
 	int   count;
 	byte  *block = NULL;
 	word  status;
@@ -1514,7 +1514,7 @@ static int popup_font_size(const char *string) {
 
 
 static void popup_y_placement(PopupItem *item, int y) {
-	int bottom;
+	int16 bottom;
 
 	if (y == POPUP_FILL) {
 		item->y = popup->y_position;
@@ -1529,7 +1529,7 @@ static void popup_y_placement(PopupItem *item, int y) {
 
 
 static void popup_x_width_check(PopupItem *item) {
-	int new_width;
+	int16 new_width;
 
 	if (item->x & POPUP_CENTER) {
 		new_width = item->xs;
@@ -1545,7 +1545,7 @@ static void popup_x_width_check(PopupItem *item) {
 
 
 void popup_width_force(int width) {
-	popup->width = MAX(popup->width, width);
+	popup->width = MAX<int16>(popup->width, width);
 }
 
 
@@ -3030,7 +3030,7 @@ static void item_constructor(PopupItem *item, int type) {
 
 PopupItem *popup_button(const char *prompt, int x) {
 	int first_button;
-	int new_width;
+	int16 new_width;
 	PopupItem *item;
 
 	first_button = (popup->status & POPUP_STATUS_BUTTON) == 0;
@@ -3152,7 +3152,7 @@ PopupItem *popup_menu(const char *prompt,
 
 
 
-PopupItem *popup_message(char *prompt, int x, int y) {
+PopupItem *popup_message(const char *prompt, int x, int y) {
 	PopupItem *item;
 
 	item = item_allocate(false);
@@ -3171,7 +3171,7 @@ PopupItem *popup_message(char *prompt, int x, int y) {
 
 	popup_x_width_check(item);
 
-	return (item);
+	return item;
 }
 
 
@@ -3214,8 +3214,8 @@ PopupItem *popup_sprite(SeriesPtr series, int sprite, int x, int y) {
 
 
 
-PopupItem *popup_savelist(byte *data,
-	byte *empty_string,
+PopupItem *popup_savelist(const char *data,
+	const char *empty_string,
 	int elements,
 	int element_offset,
 	int element_max_length,

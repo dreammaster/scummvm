@@ -35,6 +35,7 @@
 #include "mads/madsv2/core/quote.h"
 #include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/phantom/main_menu.h"
+#include "mads/madsv2/phantom/menus.h"
 #include "mads/madsv2/engine.h"
 
 namespace MADS {
@@ -123,15 +124,13 @@ static void main_menu_main() {
 }
 
 static void main_cold_data_init() {
-#if 0
 	debugger_reset = game_debugger_reset;
 	debugger_update = game_debugger;
-
 	game_menu_routine = global_game_menu;
 	game_menu_init = global_menu_system_init;
 	game_menu_exit = global_menu_system_shutdown;
 	game_emergency_save = global_emergency_save;
-#endif
+
 	Common::strcpy_s(config_file_name, "config.pha");
 	Common::strcpy_s(save_game_key, "phan");
 	Common::strcpy_s(restart_game_key, "phantom");

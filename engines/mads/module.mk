@@ -181,6 +181,7 @@ MODULE_OBJS += \
 	madsv2/phantom/catacombs.o \
 	madsv2/phantom/global.o \
 	madsv2/phantom/main_menu.o \
+	madsv2/phantom/menus.o \
 	madsv2/phantom/main.o \
 	madsv2/phantom/sound_phantom.o
 endif

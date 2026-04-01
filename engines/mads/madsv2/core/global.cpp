@@ -72,22 +72,6 @@ void global_section_constructor() {
 	g_engine->global_section_constructor();
 }
 
-void global_game_menu() {
-	error("TODO: void global_game_menu(void);");
-}
-
-void global_menu_system_init() {
-	error("TODO: void global_menu_system_init(void);");
-}
-
-void global_menu_system_shutdown() {
-	error("TODO: void global_menu_system_shutdown(void);");
-}
-
-void global_emergency_save() {
-	error("TODO: void global_emergency_save(void);");
-}
-
 void global_read_config_file() {
 	read_config_file();
 }

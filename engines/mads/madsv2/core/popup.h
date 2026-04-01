@@ -354,22 +354,22 @@ typedef struct {
 
 	word status;                /* Popup status flags       */
 
-	int x, y;                   /* X location               */
-	int width;                  /* X minimum width          */
-	int y_position;             /* Y current usage          */
-	int y_spacing;              /* Y spacing                */
-	int xs, ys;                 /* Window size information  */
+	uint16 x, y;                  /* X location               */
+	int16 width;                  /* X minimum width          */
+	int16 y_position;             /* Y current usage          */
+	int16 y_spacing;              /* Y spacing                */
+	int16 xs, ys;                 /* Window size information  */
 
-	int button_y;               /* Button Y location        */
-	int button_spacing;         /* Button spacing           */
-	int button_left_fill;       /* Button row left fill     */
-	int button_right_fill;      /* Button row right fill    */
-	int button_bar_color;       /* Button bar color         */
+	int16 button_y;               /* Button Y location        */
+	int16 button_spacing;         /* Button spacing           */
+	int16 button_left_fill;       /* Button row left fill     */
+	int16 button_right_fill;      /* Button row right fill    */
+	int16 button_bar_color;       /* Button bar color         */
 
-	int key;                    /* Last keyboard input      */
-	int key_handled;            /* Flag if key handled      */
+	int16 key;                    /* Last keyboard input      */
+	int16 key_handled;            /* Flag if key handled      */
 
-	int mouse_status;           /* Mouse status word        */
+	int16 mouse_status;           /* Mouse status word        */
 	long mouse_clock;           /* Mouse action clock       */
 
 	PopupItem *enter_item;  /* ENTER key button         */
@@ -383,8 +383,8 @@ typedef struct {
 	PopupItem *list_item;   /* List item                */
 	PopupItem *clear_item;  /* Clear list item          */
 
-	int max_items;              /* Maximum # of items       */
-	int num_items;              /* Number of items in popup */
+	int16 max_items;              /* Maximum # of items       */
+	int16 num_items;              /* Number of items in popup */
 
 	PopupItem *item;        /* Item list                */
 } Popup;
@@ -449,9 +449,7 @@ int popup_alert(int width, const char *message_line, ...);
 int popup_box_load(void);
 
 /* popup_5.c */
-Popup *popup_dialog_create(void *memory,
-	long heap_size,
-	int max_items);
+Popup *popup_dialog_create(void *memory, long heap_size, int max_items);
 Popup *popup_dialog_destroy(void);
 
 /* popup_5.c */
@@ -461,8 +459,8 @@ PopupItem *popup_message(const char *prompt, int x, int y);
 PopupItem *popup_execute(void);
 
 /* popup_5.c */
-PopupItem *popup_savelist(byte *data,
-	byte *empty_string,
+PopupItem *popup_savelist(const char *data,
+	const char *empty_string,
 	int elements,
 	int element_offset,
 	int element_max_length,
@@ -479,7 +477,7 @@ void popup_width_force(int width);
 
 /* popup_5.c */
 void popup_menu_option(PopupItem *item, char *option);
-PopupItem *popup_menu(char *prompt,
+PopupItem *popup_menu(const char *prompt,
 	int x, int y, int pixel_width,
 	int off_center_x,
 	int elements, int element_max_length,
