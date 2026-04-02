@@ -2049,6 +2049,7 @@ static void game_main_loop() {
 	/* these 3 are for the background efx */
 	long dif;
 
+#if 0
 	if (global[10]) { /* please play the damn targets */
 
 		/* this is for the background sound efx */
@@ -2108,7 +2109,6 @@ static void game_main_loop() {
 			noise_timer = 0;
 		}
 	}
-
 
 	if (player.walker_visible && player.commands_allowed && section_id != 9 && lets_get_a_move_on_anim &&
 		!player.walking && !player.need_to_walk && move_your_butt_anim_handle == -1) {
@@ -2205,6 +2205,7 @@ static void game_main_loop() {
 
 
 	/* Clear any remaining player command message from screen */
+#endif
 
 	if (inter_sentence_ready || !player.commands_allowed) {
 		inter_init_sentence();
