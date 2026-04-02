@@ -99,7 +99,7 @@ void window_shadow(WindowPtr window) {
 	short x_count, y_count, max_x, max_y;
 	short my_color;
 
-	if (screen == mono_text_video) {
+	if (screen == nullptr /*mono_text_video*/) {
 		my_color = colorbyte(black, black);
 	} else {
 		my_color = window_shadow_color;

@@ -31,6 +31,7 @@
 #include "mads/madsv2/core/sort.h"
 #include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/core/video.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {

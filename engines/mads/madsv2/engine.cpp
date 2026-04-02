@@ -49,6 +49,9 @@ void MADSV2Engine::pollEvents() {
 	// Check for screen update time
 	uint32 time = g_system->getMillis();
 	if (time >= _nextFrameTime) {
+		// Because the screen is accessed directly via Buffer objects,
+		// we need to do a full screen update each frame
+		_screen->markAllDirty();
 		_screen->update();
 		_nextFrameTime = time + GAME_FRAME_TIME;
 	}

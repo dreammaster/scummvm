@@ -30,6 +30,7 @@
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/object.h"
 #include "mads/madsv2/core/pal.h"
+#include "mads/madsv2/core/screen.h"
 #include "mads/madsv2/core/text.h"
 #include "mads/madsv2/phantom/phantom.h"
 #include "mads/madsv2/phantom/main.h"
@@ -49,6 +50,8 @@ namespace Phantom {
 Common::Error PhantomEngine::run() {
 	initGraphics(320, 200);
 	_screen = new Graphics::Screen();
+	scr_live.data = (byte *)_screen->getPixels();
+
 	_soundManager = new PhantomSoundManager(_mixer, _soundFlag);
 	_soundManager->validate();
 

@@ -70,7 +70,7 @@ byte *mcga_open_window(word x, word y, word xsize, word ysize) {
 	*run++ = xsize;
 	*run++ = ysize;
 
-	live = (mcga_video + x + y * 320);
+	live = (byte *)g_engine->getScreen()->getBasePtr(x, y);
 
 	for (yy = 1; yy <= ysize; yy++) {
 		memcpy(work, live, xsize);
@@ -94,7 +94,7 @@ void mcga_close_window(byte *inp) {
 	xsize = *run++;
 	ysize = *run++;
 
-	live = (mcga_video + x + y * 320);
+	live = (byte *)g_engine->getScreen()->getBasePtr(x, y);
 
 	for (yy = 1; yy <= ysize; yy++) {
 		memcpy(live, work, xsize);

@@ -80,7 +80,7 @@ extern int room_state[40];
 #define MOVE_YOUR_BUTT_TIMEOUT 3600
 #define MAX_SPEECH_FILES_PER_ROOM 100
 
-Buffer scr_live = { video_y, video_x, mcga_video };
+Buffer scr_live = { video_y, video_x, nullptr };
 char config_file_name[20];
 int win_status = WIN_NOTHING;
 
@@ -2040,16 +2040,16 @@ static void game_main_loop() {
 	int temp_message_2 = 0;
 	int temp_message_3 = 0;
 	int temp_message_4 = 0;
-	int yy;
 	long one_clock, two_clock;
 	static char temp_buf[20];
 	static char temp_buf_2[20];
 	static char temp_buf_3[20];
 	static char temp_buf_4[20];
-	/* these 3 are for the background efx */
-	long dif;
 
 #if 0
+	/* these 3 are for the background efx */
+	int yy;
+	long dif;
 	if (global[10]) { /* please play the damn targets */
 
 		/* this is for the background sound efx */
@@ -2637,7 +2637,7 @@ done:
 
 
 void game_debugger_reset() {
-	screen = mono_text_video;
+	//screen = mono_text_video;
 
 	screen_normal_color = colorbyte(hi_white, black);
 	screen_hilite_color = screen_normal_color + 128;

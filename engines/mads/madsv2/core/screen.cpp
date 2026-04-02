@@ -38,7 +38,7 @@ int screen_center_y = 0;
 
 Window screen_active = { 0,0,79,24,NULL };  /* The currently active window */
 
-byte *screen = color_text_video;
+byte *screen = nullptr; // color_text_video;
 
 int *screen_bound_x = &screen_max_x;
 

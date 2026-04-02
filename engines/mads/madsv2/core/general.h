@@ -93,12 +93,7 @@ typedef struct {                        /* Video buffer structure         */
 
 #define display_y             156     /* Picture area max Y size */
 
-#define color_text_video      (byte *)0xb8000000 /* text mode address */
-#define mono_text_video       (byte *)0xb0000000 /* herc/mono address */
-#define mcga_video            (byte *)0xa0000000 /* 256 color address */
-#define tandy_video           (byte *)0xb8000000 /* Tandy clr address */
-#define ega_video             (byte *)0xa0000000 /* EGA color address */
-#define iaca                  (byte *)0x004000f0 /* The bad place     */
+#define mcga_video            (byte *)g_engine->getScreen()->getPixels()
 
 #define text_mode             0x03
 #define mono_text_mode        0x07

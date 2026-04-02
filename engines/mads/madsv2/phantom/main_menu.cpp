@@ -83,8 +83,6 @@ ConfigFile config_file;
 
 int mads_mode = false;
 
-Buffer scr_live = { video_y, video_x, mcga_video };
-
 FontPtr font = NULL;
 int font_auto_spacing = -1;
 

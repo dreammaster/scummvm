@@ -35,6 +35,7 @@
 #include "mads/madsv2/core/keys.h"
 #include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/core/sound.h"
+#include "mads/madsv2/engine.h"
 
 #define word_align_mattes
 #ifndef disable_error_check
