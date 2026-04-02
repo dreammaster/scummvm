@@ -31,6 +31,7 @@
 #include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/mouse.h"
+#include "mads/madsv2/core/sound.h"
 #include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/core/video.h"
@@ -1257,10 +1258,6 @@ void start_the_copy_process(char orig_path[80]) {
 	error("TODO: start_the_copy_process");
 }
 
-void game_copy_speech_files(int room_) {
-	error("TODO: game_copy_speech_files");
-}
-
 /*
 /*      game_control()
 /*
@@ -1496,13 +1493,11 @@ void game_control() {
 
 			game.going = (byte)!kernel_room_startup(new_room, kernel_initial_variant, kernel.interface, false);
 
-			game_copy_speech_files(new_room);
-
 			camera_init_default();
 
 			game_set_camera_speed();
 
-			/* pl sound_queue_hold(); */
+			sound_queue_hold();
 
 			/* Load current player walker set */
 

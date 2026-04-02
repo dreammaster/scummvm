@@ -34,6 +34,10 @@ int sound_queue(int soundNum) {
 	return g_engine->_soundManager->command(soundNum);
 }
 
+void sound_queue_hold() {
+	g_engine->_soundManager->pauseNewCommands();
+}
+
 void sound_queue_flush() {
 	g_engine->_soundManager->startQueuedCommands();
 }

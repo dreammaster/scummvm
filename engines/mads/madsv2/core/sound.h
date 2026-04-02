@@ -32,6 +32,7 @@ constexpr bool global_prefer_roland = false;
 
 extern int sound_play(int soundNum);
 extern int sound_queue(int soundNum);
+extern void sound_queue_hold();
 extern void sound_queue_flush();
 
 } // namespace MADSV2
