@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/algorithm.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/error.h"
@@ -29,6 +30,9 @@
 
 namespace MADS {
 namespace MADSV2 {
+
+constexpr int OFFSETS_OFFSET = 2 + FONT_SIZE;
+constexpr int HEADER_SIZE = 2 + FONT_SIZE + (FONT_SIZE * 2);
 
 FontPtr font_inter = NULL;
 FontPtr font_main = NULL;              /* Interface & main font handles */
@@ -43,10 +47,12 @@ FontPtr font_load(const char *name) {
 	char temp_buf_2[80];
 	char *mark;
 	char block_name[20];
-	long size;
+	long size, dataSize;
 	FontPtr new_font = NULL;
 	FontPtr result = NULL;
 	Load load_handle;
+	byte *buffer;
+	int i;
 
 	mem_last_alloc_loader = MODULE_FONT_LOADER;
 
@@ -66,11 +72,33 @@ FontPtr font_load(const char *name) {
 	if (loader_open(&load_handle, temp_buf_2, "rb", true)) goto done;
 
 	size = load_handle.pack.strategy[0].size;
+	dataSize = size - HEADER_SIZE;	// Size for just the pixel data section
 
-	new_font = (FontPtr)mem_get_name(size, block_name);
-	if (new_font == NULL) goto done;
+	new_font = (FontPtr)mem_get_name(sizeof(FontBuf) + dataSize, block_name);
+	if (new_font == NULL)
+		goto done;
 
-	if (!loader_read(new_font, size, 1, &load_handle)) goto done;
+	// Get the font resource into a temporary buffer
+	buffer = (byte *)malloc(size);
+	if (!buffer || !loader_read(buffer, size, 1, &load_handle)) {
+		free(buffer);
+		goto done;
+	}
+
+	// Copy data from the temporary buffer into the font
+	new_font->max_y_size = buffer[0];
+	new_font->max_x_size = buffer[1];
+	Common::copy(buffer + 2, buffer + OFFSETS_OFFSET, &new_font->width[0]);
+	Common::copy(buffer + HEADER_SIZE, buffer + size, (byte *)new_font + sizeof(FontBuf));
+
+	// Set up the individual pointers to the start of each character's data
+	for (i = 0; i < FONT_SIZE; ++i) {
+		int offset = READ_LE_UINT16(buffer + OFFSETS_OFFSET + i * 2);
+		new_font->data[i] = (byte *)new_font + sizeof(FontBuf) + (offset - HEADER_SIZE);
+	}
+
+	// Free the buffer
+	free(buffer);
 
 	result = new_font;
 

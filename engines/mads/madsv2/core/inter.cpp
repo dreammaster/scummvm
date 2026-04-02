@@ -466,7 +466,8 @@ write:
 		}
 	}
 
-	if (write_it) font_write(font_inter, &scr_inter, temp_buf, x, y, 0);
+	if (write_it)
+		font_write(font_inter, &scr_inter, temp_buf, x, y, 0);
 
 done:
 	;
