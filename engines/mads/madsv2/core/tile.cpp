@@ -603,6 +603,7 @@ int tile_buffer(Buffer *target,
 	int tile_page_number;
 	int last_page = -1;
 	Buffer tile_buffer;
+	int max_x;
 
 	default_value = (map->tile_type == TILE_PICTURE) ? 0 : 0xff;
 
@@ -615,12 +616,15 @@ int tile_buffer(Buffer *target,
 	tile_buffer.x = size_x;
 	tile_buffer.y = map->tile_y_size;
 
+	// WORKAROUND: For tile panning reading beyond end of buffer
+	max_x = MIN<int>(map->orig_x_tiles, map->num_x_tiles - tile_x);
+
 	for (y = 0; y < map->orig_y_tiles; y++) {
 
 		picture_y = y * map->tile_y_size;
 		map_y_offset = (y + tile_y) * map->num_x_tiles;
 
-		for (x = 0; x < map->orig_x_tiles; x++) {
+		for (x = 0; x < max_x; x++) {
 			picture_x = x * size_x;
 			map_value = *(map->map + map_y_offset + tile_x + x);
 
