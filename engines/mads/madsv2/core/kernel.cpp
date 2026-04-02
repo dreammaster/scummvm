@@ -686,7 +686,7 @@ int kernel_room_startup(int newRoom, int initial_variant, const char *interface,
 	/* Initialize rail-system parameters for this room */
 
 	rail_num_nodes = room->num_rails + 2;
-	rail_base = (byte *) & room->rail[0];
+	rail_base = &room->rail[0];
 
 	rail_connect_all_nodes();
 

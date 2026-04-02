@@ -35,7 +35,7 @@ extern byte rail_working_stack[RAIL_MAX_NODES];
 extern byte rail_solution_stack[RAIL_MAX_NODES];
 
 extern word rail_num_nodes;
-extern byte *rail_base;
+extern struct Rail *rail_base;
 
 extern void rail_add_node(int id, int x, int y);
 extern void rail_connect_node(int id);

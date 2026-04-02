@@ -61,24 +61,12 @@ namespace MADSV2 {
    *   then RAIL_MAX_NODES (12) weight words = 24 bytes,
    *   padding to reach 48 bytes total.
    * ---------------------------------------------------------------------- */
-typedef struct {
-	unsigned char header[RAIL_STRUCTURE_WEIGHT_OFFSET];    /* 4 bytes */
-	uint16 weight[RAIL_MAX_NODES];                 /* 24 bytes (12 words) */
-	unsigned char padding[48 - 4 - 24];                   /* 20 bytes padding */
-} RailNode;
+struct RailNode {
+	unsigned char header[RAIL_STRUCTURE_WEIGHT_OFFSET];	/* 4 bytes */
+	uint16 weight[RAIL_MAX_NODES];			/* 24 bytes (12 words) */
+	byte padding[48 - 4 - 24];				/* 20 bytes padding */
+};
 
-/* -------------------------------------------------------------------------
- * Global variables  (COMM in the original -- shared across modules)
- * ---------------------------------------------------------------------- */
-uint16  _rail_solution_stack_pointer;
-uint16  _rail_solution_stack_weight;
-
-unsigned char   _rail_visited[RAIL_MAX_NODES];
-unsigned char   _rail_working_stack[RAIL_MAX_NODES];
-unsigned char   _rail_solution_stack[RAIL_MAX_NODES];
-
-uint16  _rail_num_nodes;
-RailNode *_rail_base;         /* far ptr in original; flat ptr here */
 
 word rail_solution_stack_pointer;
 word rail_solution_stack_weight;
@@ -86,7 +74,7 @@ byte rail_visited[RAIL_MAX_NODES];
 byte rail_working_stack[RAIL_MAX_NODES];
 byte rail_solution_stack[RAIL_MAX_NODES];
 word rail_num_nodes;
-byte *rail_base;
+Rail *rail_base;
 byte rail_active[ROOM_MAX_RAILS + 2];
 
 
@@ -184,18 +172,18 @@ static void recursive_check_path(int node_id,
 	uint16 allow_mode,
 	int working_sp) {
 	/* visited[node_id] = true */
-	_rail_visited[node_id] = 1;
+	rail_visited[node_id] = 1;
 
 	/* push(node_id) onto working stack */
-	_rail_working_stack[working_sp] = (unsigned char)node_id;
+	rail_working_stack[working_sp] = (unsigned char)node_id;
 	working_sp++;
 
 	/* Point at rail[node_id] */
-	RailNode *node = &_rail_base[node_id];
+	Rail *node = &rail_base[node_id];
 
 	/* The source node is second-to-last: index = num_nodes - 2.
 	   We look up the weight from node_id to the source (from_node). */
-	int from_node = _rail_num_nodes - 2;
+	int from_node = rail_num_nodes - 2;
 	uint16 raw_weight = node->weight[from_node];
 
 	/* Check whether there is a direct legal path to the destination */
@@ -203,12 +191,12 @@ static void recursive_check_path(int node_id,
 		uint16 leg_weight = raw_weight & RAIL_WEIGHT_MASK;
 		uint16 total = weight + leg_weight;
 
-		if (total < _rail_solution_stack_weight) {
+		if (total < rail_solution_stack_weight) {
 			/* This is a better solution -- save it */
 			int stack_len = working_sp; /* number of bytes currently on stack */
-			memcpy(_rail_solution_stack, _rail_working_stack, stack_len);
-			_rail_solution_stack_pointer = (uint16)stack_len;
-			_rail_solution_stack_weight = total;
+			memcpy(rail_solution_stack, rail_working_stack, stack_len);
+			rail_solution_stack_pointer = (uint16)stack_len;
+			rail_solution_stack_weight = total;
 		}
 	} else {
 		/*
@@ -216,12 +204,12 @@ static void recursive_check_path(int node_id,
 		 * Intermediate nodes are indices 0 .. (num_nodes - 3); the last two
 		 * entries in the array are the destination and source nodes.
 		 */
-		int num_intermediate = _rail_num_nodes - 2;
+		int num_intermediate = rail_num_nodes - 2;
 
 		for (int i = 0; i < num_intermediate; i++) {
 			int test_node = i;          /* loop counter - 1 in the ASM    */
 
-			if (_rail_visited[test_node])
+			if (rail_visited[test_node])
 				continue;
 
 			/* Check edge weight from current node to test_node */
@@ -243,22 +231,22 @@ static void recursive_check_path(int node_id,
 	}
 
 	/* visited[node_id] = false  (unwind) */
-	_rail_visited[node_id] = 0;
+	rail_visited[node_id] = 0;
 
 	/* pop() -- working_sp is a local copy so this just falls off the frame */
 }
 
 void rail_check_path(int allow_one_illegal) {
 	/* Clear the visited array */
-	memset(_rail_visited, 0, _rail_num_nodes);
+	memset(rail_visited, 0, rail_num_nodes);
 
 	/* Initialise solution state to "no solution yet" */
-	_rail_solution_stack_weight = RAIL_WEIGHT_MASK;
-	_rail_solution_stack_pointer = 0;
+	rail_solution_stack_weight = RAIL_WEIGHT_MASK;
+	rail_solution_stack_pointer = 0;
 
 	/* The last node in the array (index num_nodes - 1) is the starting
 	   node for the search (the destination, in path terms) */
-	int start_node = _rail_num_nodes - 1;
+	int start_node = rail_num_nodes - 1;
 
 	uint16 allow_mode = allow_one_illegal ? RAIL_ALLOW_ILLEGAL
 		: RAIL_ALLOW_LEGAL_ONLY;
