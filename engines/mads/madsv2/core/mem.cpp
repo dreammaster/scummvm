@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/algorithm.h"
 #include "common/textconsole.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/error.h"
@@ -49,9 +50,11 @@ int mem_manager_active = false;
 
 
 void *mem_get_name(long size, const char *) {
-	void *memory_block = nullptr;
-	if (size > 0)
-		memory_block = malloc(size);
+	byte *memory_block = nullptr;
+	if (size > 0) {
+		memory_block = (byte *)malloc(size);
+		Common::fill(memory_block, memory_block + size, 0);
+	}
 
 	return memory_block;
 }

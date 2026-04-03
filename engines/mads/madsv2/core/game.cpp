@@ -1067,7 +1067,7 @@ int game_parse_keystroke(int mykey) {
 	case f1_key:
 		if (room_id != 199 && section_id != 9) {
 			if (kernel.activate_menu) {
-				kernel.activate_menu = 0;
+				kernel.activate_menu = GAME_NO_MENU;
 			} else {
 				kernel.activate_menu = GAME_MAIN_MENU;
 				kernel.paused = false;
@@ -1310,7 +1310,8 @@ void game_control() {
 		/* Get difficulty level if new game */
 		if (!kernel.teleported_in && (game.difficulty == -1)) {
 			/* Difficulty menu */
-			/* kernel.activate_menu = GAME_DIFFICULTY_MENU; */
+			if (g_engine->getGameID() == GType_Phantom)
+				kernel.activate_menu = GAME_DIFFICULTY_MENU;
 			game_exec_function(game_menu_routine);
 
 			game_wait_cursor();
@@ -2457,7 +2458,7 @@ static void game_control_loop() {
 
 				if (game_menu_routine == NULL) game.going = false;
 
-				kernel.activate_menu = 0;
+				kernel.activate_menu = GAME_NO_MENU;
 			}
 		}
 

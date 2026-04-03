@@ -240,7 +240,7 @@ static void global_menu_score() {
 
 	text_show(99);
 
-	kernel.activate_menu = 0;
+	kernel.activate_menu = GAME_NO_MENU;
 }
 
 static void global_menu_save_restore(int save) {
@@ -288,7 +288,7 @@ static void global_menu_save_restore(int save) {
 		case alt_q_key:
 		case ctrl_q_key:
 			game.going = false;
-			kernel.activate_menu = 0;
+			kernel.activate_menu = GAME_NO_MENU;
 			break;
 
 		case f1_key:
@@ -323,7 +323,7 @@ static void global_menu_save_restore(int save) {
 			break;
 		}
 	} else {
-		kernel.activate_menu = 0;
+		kernel.activate_menu = GAME_NO_MENU;
 	}
 
 	popup_dialog_destroy();
@@ -461,7 +461,7 @@ static void global_menu_options() {
 		case alt_q_key:
 		case ctrl_q_key:
 			game.going = false;
-			kernel.activate_menu = 0;
+			kernel.activate_menu = GAME_NO_MENU;
 			break;
 
 		case f1_key:
@@ -501,7 +501,7 @@ static void global_menu_options() {
 		global_write_config_file();
 		global_load_config_parameters();
 
-		kernel.activate_menu = 0;
+		kernel.activate_menu = GAME_NO_MENU;
 	}
 
 	if ((former_music != config_file.music_flag) ||
@@ -544,7 +544,7 @@ static void global_menu_difficulty() {
 
 	result = popup_execute();
 
-	kernel.activate_menu = 0;
+	kernel.activate_menu = GAME_NO_MENU;
 
 	if (result == easy_item) {
 		game.difficulty = EASY_MODE;
@@ -623,15 +623,15 @@ static void global_menu_main() {
 	result = popup_execute();
 
 	if (result == save_item) {
-		kernel.activate_menu = 2;
+		kernel.activate_menu = GAME_SAVE_MENU;
 	} else if (result == restore_item) {
-		kernel.activate_menu = 3;
+		kernel.activate_menu = GAME_RESTORE_MENU;
 	} else if (result == options_item) {
-		kernel.activate_menu = 4;
+		kernel.activate_menu = GAME_OPTIONS_MENU;
 	} else if (result == score_item) {
-		kernel.activate_menu = 7;
+		kernel.activate_menu = GAME_SCORE_MENU;
 	} else {
-		kernel.activate_menu = 0;
+		kernel.activate_menu = GAME_NO_MENU;
 	}
 
 	if (result == quit_item)
@@ -642,23 +642,23 @@ static void global_menu_main() {
 	case alt_x_key:
 	case ctrl_q_key:
 		game.going = false;
-		kernel.activate_menu = 0;
+		kernel.activate_menu = GAME_NO_MENU;
 		break;
 
 	case f5_key:
-		kernel.activate_menu = 2;
+		kernel.activate_menu = GAME_SAVE_MENU;
 		break;
 
 	case f7_key:
-		kernel.activate_menu = 3;
+		kernel.activate_menu = GAME_RESTORE_MENU;
 		break;
 
 	case f8_key:
-		kernel.activate_menu = 7;
+		kernel.activate_menu = GAME_SCORE_MENU;
 		break;
 
 	case f10_key:
-		kernel.activate_menu = 4;
+		kernel.activate_menu = GAME_OPTIONS_MENU;
 		break;
 
 	default:
@@ -676,33 +676,36 @@ void global_game_menu() {
 		loaded = true;
 	}
 
+	game_menu_setup();
 	g_engine->flushKeys();
 
 	do {
 		switch (kernel.activate_menu) {
-		case 1:
+		case GAME_MAIN_MENU:
 			global_menu_main();
 			break;
-		case 2:
+		case GAME_SAVE_MENU:
 			global_menu_save_restore(true);
 			break;
-		case 3:
+		case GAME_RESTORE_MENU:
 			global_menu_save_restore(false);
 			break;
-		case 4:
+		case GAME_OPTIONS_MENU:
 			global_menu_options();
 			break;
-		case 5:
+		case GAME_DIFFICULTY_MENU:
 			global_menu_difficulty();
 			break;
-		case 7:
+		case GAME_SCORE_MENU:
 			global_menu_score();
 			break;
 		default:
-			kernel.activate_menu = 0;
+			kernel.activate_menu = GAME_NO_MENU;
 			break;
 		}
-	} while (!g_engine->shouldQuit() && game.going && kernel.activate_menu != 0);
+	} while (!g_engine->shouldQuit() && game.going && kernel.activate_menu != GAME_NO_MENU);
+
+	game_menu_shutdown();
 
 	if (loaded) {
 		sprite_free(&box_param.menu, true);

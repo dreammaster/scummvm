@@ -32,17 +32,6 @@ namespace MADSV2 {
 
 int quote_emergency = false;
 
-static int word_get(char *target, Common::SeekableReadStream *handle) {
-	do {
-		*target = (char)handle->readByte();
-	} while (!handle->eos() && !*target++);
-
-	if (handle->err())
-		quote_emergency = true;
-
-	return false;
-}
-
 char *quote_load(int quote_id, ...) {
 	va_list marker;
 	int quote_error = 0;
@@ -80,7 +69,7 @@ char *quote_load(int quote_id, ...) {
 
 	sort_insertion_16(mark, (byte *)work, list);
 
-	total_mem_avail = mem_get_avail();
+	total_mem_avail = 65536;
 	buffer = pointer = (char *)mem_get_name(total_mem_avail - 64, "$quotes$");
 	if (buffer == NULL) {
 		quote_error = 2;
@@ -89,27 +78,26 @@ char *quote_load(int quote_id, ...) {
 
 	now_reading = 1;
 	while (now_finding < mark) {
-		if (word_get(work, handle)) {
-			quote_error = 3;
-			goto done;
-		}
+		Common::String quoteStr = handle->readString();
 
 		if (now_reading == list[now_finding]) {
-			mem_needed = strlen(work) + 3;
+			mem_needed = quoteStr.size() + 3;
 			total_mem_needed += mem_needed;
 			if (total_mem_needed > total_mem_avail) {
 				quote_error = 4;
 				goto done;
 			}
-			Common::strcpy_s(pointer, QUOTE_MAX_LIST_LENGTH, work);
+
+			Common::strcpy_s(pointer, QUOTE_MAX_LIST_LENGTH, quoteStr.c_str());
 			pointer += (mem_needed - 2);
-			WRITE_LE_UINT16(pointer, list[now_finding]);
+			*(uint16 *)(pointer) = list[now_finding];
 			pointer += 2;
-			pointer = (char *)mem_normalize(pointer);
 			now_finding++;
+
 		} else if (now_reading > list[now_finding]) {
 			error_report(ERROR_QUOTE_DUPLICATE_LOAD, WARNING, MODULE_QUOTE, quote_error, list[now_finding]);
 		}
+
 		now_reading++;
 	}
 
@@ -145,7 +133,7 @@ char *quote_string(char *quote_list, int quote_id) {
 	for (marker = quote_list; *marker && (result == NULL); marker = search + 2) {
 		for (search = marker; *search; search++);
 		search++;
-		id = *((int *)search);
+		id = *((uint16 *)search);
 		if (id == quote_id) result = marker;
 	}
 

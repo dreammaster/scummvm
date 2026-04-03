@@ -1641,10 +1641,12 @@ static void popup_redraw_item(PopupItem *item) {
 
 
 static void popup_update_item(PopupItem *item) {
-	if (item->vector[VECTOR_UPDATE] != NULL) {
-		popup_exec_function(item, VECTOR_UPDATE);
-	} else {
-		popup_redraw_item(item);
+	if (item) {
+		if (item->vector[VECTOR_UPDATE] != NULL) {
+			popup_exec_function(item, VECTOR_UPDATE);
+		} else {
+			popup_redraw_item(item);
+		}
 	}
 }
 

@@ -116,14 +116,20 @@ extern int selected_intro;
 extern Player journal_player;
 extern int journal_room;
 
-#define GAME_MAIN_MENU        1       /* Game menus */
-#define GAME_SAVE_MENU        2
-#define GAME_RESTORE_MENU     3
-#define GAME_OPTIONS_MENU     4
-#define GAME_DIFFICULTY_MENU  5
-#define GAME_ALERT_MENU       6
-#define GAME_SCORE_MENU       7
-#define GAME_CD_MENU          8
+/**
+ * Game menus
+ */
+enum {
+	GAME_NO_MENU          = 0,
+	GAME_MAIN_MENU        = 1,
+	GAME_SAVE_MENU        = 2,
+	GAME_RESTORE_MENU     = 3,
+	GAME_OPTIONS_MENU     = 4,
+	GAME_DIFFICULTY_MENU  = 5,
+	GAME_ALERT_MENU       = 6,
+	GAME_SCORE_MENU       = 7,
+	GAME_CD_MENU          = 8
+};
 
 #define GAME_MENU_MAX_ITEMS   20      /* Max number of menu items    */
 #define GAME_MAX_SAVE_SLOTS   99      /* Max number of save slots    */
