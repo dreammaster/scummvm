@@ -22,6 +22,7 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "mads/madsv2/engine.h"
+#include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/mouse.h"
 #include "mads/madsv2/phantom/main.h"
 #include "mads/core/sound.h"
@@ -58,7 +59,7 @@ void MADSV2Engine::pollEvents() {
 
 	// Poll for events
 	Common::Event e;
-	while (g_system->getEventManager()->pollEvent(e) && !shouldQuit()) {
+	while (g_system->getEventManager()->pollEvent(e) && game.going) {
 		bool isMouse = false;
 		switch (e.type) {
 		case Common::EVENT_LBUTTONDOWN:
@@ -84,6 +85,10 @@ void MADSV2Engine::pollEvents() {
 		case Common::EVENT_MBUTTONUP:
 			mouse_buttons &= ~4;
 			isMouse = true;
+			break;
+		case Common::EVENT_RETURN_TO_LAUNCHER:
+		case Common::EVENT_QUIT:
+			game.going = false;
 			break;
 		default:
 			break;
