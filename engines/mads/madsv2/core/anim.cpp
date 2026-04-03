@@ -109,8 +109,8 @@ int anim_load_background(AnimFile *anim_in, Buffer *this_orig,
 			depthMap,
 			pictureResource,
 			depthResource,
-			tile_picture_handle,
-			tile_attribute_handle,
+			-1,
+			-1,
 			load_flags);
 
 		if (my_room == NULL) {

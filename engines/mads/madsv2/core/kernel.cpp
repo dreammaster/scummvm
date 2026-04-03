@@ -326,8 +326,6 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 		}
 	}
 
-	if (tile_setup()) ems_error = true;
-
 	if (ems_error) {
 		if (ems_exists) {
 			error_report(ERROR_NO_MORE_EMS, SEVERE, MODULE_KERNEL, ems_pages, work_screen_ems_handle);
@@ -665,8 +663,8 @@ int kernel_room_startup(int newRoom, int initial_variant, const char *interface,
 		&depth_map,
 		&picture_resource,
 		&depth_resource,
-		tile_picture_handle,
-		tile_attribute_handle,
+		-1,
+		-1,
 		load_flags);
 	if (room == NULL) {
 #ifndef disable_error_check
@@ -2601,7 +2599,7 @@ void kernel_load_variant(int variant) {
 		&scr_special,
 		&depth_map,
 		&depth_resource,
-		tile_attribute_handle)) {
+		-1)) {
 		error_report(ERROR_VARIANT_LOAD_FAILURE, WARNING, MODULE_KERNEL, room_load_error, (room_id * 10) + room_variant);
 	}
 
@@ -3048,8 +3046,8 @@ int kernel_background_startup(int newRoom, int initial_variant) {
 		&depth_map,
 		&picture_resource,
 		&depth_resource,
-		tile_picture_handle,
-		tile_attribute_handle,
+		-1,
+		-1,
 		load_flags);
 	if (room == NULL) {
 		error_data = room_load_error;

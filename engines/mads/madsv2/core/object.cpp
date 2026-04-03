@@ -472,7 +472,7 @@ int object_examine(int number, long message, int speech) {
 
 	if (room_load_variant(room_id, room_variant, NULL, room,
 		&scr_depth, &scr_walk, &scr_special,
-		&depth_map, &depth_resource, tile_attribute_handle)) {
+		&depth_map, &depth_resource, -1)) {
 		error_report(ERROR_VARIANT_LOAD_FAILURE, WARNING, MODULE_OBJECT, room_load_error, (room_id * 10) + room_variant);
 	}
 	tile_pan(&depth_map, picture_view_x, picture_view_y);

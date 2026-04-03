@@ -22,7 +22,6 @@
 #include "common/memstream.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/anim.h"
-#include "mads/madsv2/core/ems.h"
 #include "mads/madsv2/core/buffer.h"
 #include "mads/madsv2/core/loader.h"
 #include "mads/madsv2/core/fileio.h"
@@ -44,10 +43,6 @@ namespace MADSV2 {
 
 int tile_load_error;
 ShadowList tile_shadow;
-
-int tile_ems_available = false;
-int tile_picture_handle = -1;
-int tile_attribute_handle = -1;
 
 
 void TileMapHeader::load(Common::SeekableReadStream *src) {
@@ -75,19 +70,13 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 	int error_flag = true;
 	int map_x_size;
 	int map_y_size;
-	int tile_page;
-	int tile_offset;
-	int count, count2;
+	int count;
 	int packing_flag;
 	int x, y;
 	int map_value;
 	int color_handle = -1;
-	int tile_page_number;
-	int last_page = -1;
 	int x_size;
 	int pan;
-	int ems_page_marker;
-	int ems_page_offset;
 	int memory_mode;
 	int already_unpacked = false;
 	char resource_name[80];
@@ -97,8 +86,6 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 	long top_of_file = 0;
 	long base_position;
 	long my_offset;
-	long my_ems_marker;
-	long my_ems_offset;
 	long compressed_size;
 	byte *decompress_buffer = NULL;
 	Tile *tile = NULL;
@@ -386,23 +373,16 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 		tile_resource->chunk_size = ((((long)tile_resource->tile_x - 1) >> 1) + 1) * (long)tile_resource->tile_y;
 	}
 
-	/* Load up EMS paging information */
+	/* Allocate flat tile store for panning maps */
 
-	tile_resource->ems_handle = emsHandle;
-	tile_resource->tiles_per_page = (int)(16384L / tile_resource->chunk_size);
-
-	if (tile_resource->tiles_per_page <= 0) {
-		if (!map->one_to_one) {
+	if (!map->one_to_one) {
+		delete[] tile_resource->tile_data;
+		tile_resource->tile_data = new byte[(long)tile_resource->num_tiles * tile_resource->chunk_size]();
+		if (!tile_resource->tile_data) {
 			tile_load_error = 16;
 			goto done;
 		}
-		tile_resource->tiles_per_page = 1;
 	}
-
-	tile_resource->num_pages = ((tile_resource->num_tiles - 1) / tile_resource->tiles_per_page) + 1;
-
-	tile_page = 0;
-	tile_offset = 0;
 
 	/* Get current (base) position in file */
 	if (memory_mode == LOADER_DISK) {
@@ -418,32 +398,6 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 
 	for (count = 0; count < tile_resource->num_tiles; count++) {
 		switch (memory_mode) {
-		case LOADER_EMS:
-			my_offset = base_position + (tile_resource->chunk_size * count);
-			my_ems_marker = my_offset / EMS_PAGE_SIZE;
-			my_ems_offset = my_offset - (my_ems_marker * EMS_PAGE_SIZE);
-
-			ems_page_marker = -1;
-			for (count2 = 0; count2 < (int)my_ems_marker; count2++) {
-				ems_page_marker = ems_next_handle_page(load_handle.ems_handle, ems_page_marker);
-			}
-			ems_page_offset = (int)my_ems_offset;
-			if (ems_page_offset >= EMS_PAGE_SIZE) {
-				ems_page_offset -= EMS_PAGE_SIZE;
-				ems_page_marker = ems_next_handle_page(load_handle.ems_handle, ems_page_marker);
-			}
-
-			if (!ems_copy_it_down(load_handle.ems_handle,
-				&ems_page_marker,
-				&ems_page_offset,
-				tile_buffer.data,
-				tile_resource->chunk_size)) {
-				tile_load_error = 17;
-				goto done;
-			}
-
-			break;
-
 		case LOADER_XMS:
 			my_offset = base_position + (tile_resource->chunk_size * count);
 			if (!xms_copy(tile_resource->chunk_size,
@@ -533,24 +487,8 @@ int tile_load(const char *base, int tile_type, TileResource *tile_resource,
 				}
 			}
 		} else {
-			tile_page = count / tile_resource->tiles_per_page;
-
-			if (tile_page != last_page) {
-				tile_page_number = ems_search_page(emsHandle, tile_page);
-				if (tile_page_number < 0) {
-					tile_load_error = 20;
-					goto done;
-				}
-				if (ems_map_page(tile_ems_page, tile_page_number)) {
-					tile_load_error = 21;
-					goto done;
-				}
-
-				last_page = tile_page;
-			}
-
-			tile_offset = (int)((count % tile_resource->tiles_per_page) * tile_resource->chunk_size);
-			memcpy(tile_ems_address + tile_offset, tile_buffer.data, (word)tile_resource->chunk_size);
+			memcpy(tile_resource->tile_data + (long)count * tile_resource->chunk_size,
+				tile_buffer.data, (word)tile_resource->chunk_size);
 		}
 	}
 
@@ -598,10 +536,6 @@ int tile_buffer(Buffer *target,
 	int picture_x, picture_y;
 	int map_y_offset;
 	int map_value;
-	int tile_page;
-	int tile_offset;
-	int tile_page_number;
-	int last_page = -1;
 	Buffer tile_buffer;
 	int max_x;
 
@@ -634,19 +568,8 @@ int tile_buffer(Buffer *target,
 					map->tile_y_size, (byte)default_value);
 			} else {
 
-				tile_page = map_value / tile_resource->tiles_per_page;
-				tile_offset = (word)((map_value % tile_resource->tiles_per_page) *
-					tile_resource->chunk_size);
-
-				if (tile_page != last_page) {
-					tile_page_number = ems_search_page(tile_resource->ems_handle, tile_page);
-					if (tile_page_number < 0) goto done;
-					if (ems_map_page(tile_ems_page, tile_page_number)) goto done;
-
-					last_page = tile_page;
-				}
-
-				tile_buffer.data = tile_ems_address + tile_offset;
+				tile_buffer.data = tile_resource->tile_data +
+					(long)map_value * tile_resource->chunk_size;
 				buffer_rect_copy_2(tile_buffer, *target,
 					0, 0,
 					picture_x, picture_y,
@@ -662,31 +585,13 @@ done:
 	return error_flag;
 }
 
-int tile_setup(void) {
-	int error_flag = true;
-
-	picture_map.map = NULL;
-	depth_map.map = NULL;
-
-	tile_picture_handle = ems_get_page_handle(TILE_MAX_PAGES);
-	if (tile_picture_handle < 0) goto done;
-
-	tile_attribute_handle = ems_get_page_handle(TILE_MAX_PAGES >> 1);
-	if (tile_attribute_handle < 0) goto done;
-
-	tile_ems_available = true;
-	error_flag = false;
-
-done:
-	if (error_flag) {
-		if (tile_picture_handle >= 0) ems_free_page_handle(tile_picture_handle);
-	}
-
-	return error_flag;
-}
 
 void tile_map_free(TileMapHeader *map) {
 	if (map != NULL) {
+		if (map->resource != NULL) {
+			delete[] map->resource->tile_data;
+			map->resource->tile_data = nullptr;
+		}
 		if (map->map != NULL) {
 			mem_free(map->map);
 			map->map = NULL;

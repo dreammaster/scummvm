@@ -32,8 +32,6 @@ namespace MADSV2 {
 #define DEFAULT_TILE_X          20
 #define DEFAULT_TILE_Y          12
 
-#define TILE_MAX_PAGES          14      /* Max EMS pages for a picture  */
-/* (14 is enough for 4 screens) */
 #define EMPTY_TILE              -1
 #define REPEAT_TILE             0x8000
 
@@ -42,19 +40,18 @@ namespace MADSV2 {
 
 #define TILE_MAP_SHADOW         0x0020  /* Load shadow for tile */
 
-#define tile_ems_page           0
-#define tile_ems_address        ems_page[tile_ems_page]
-
 struct TileResource {
 	uint16 num_tiles;                /* Number of tiles in resource      */
 	int16 tile_x;                   /* Tile X size                      */
 	int16 tile_y;                   /* Tile Y size                      */
 	int16 compression;              /* Compression in resource file     */
-	int16 ems_handle;               /* EMS handle of resource           */
+	int16 ems_handle;               /* EMS handle of resource (on-disk field; unused at runtime) */
 	uint16 num_pages;                /* Number of pages needed           */
 	uint16 tiles_per_page;           /* Tiles stored per page            */
 	uint32 chunk_size;              /* Tile size in bytes (x*y)         */
 	int16 color_handle;             /* Color handle for loaded resource */
+
+	byte *tile_data = nullptr;      /* Flat tile store allocated by tile_load (not serialised) */
 
 	static constexpr int SIZE = 2 + 2 + 2 + 2 + 2 + 2 + 2 + 4 + 2;
 	void load(Common::SeekableReadStream *src);
@@ -100,9 +97,6 @@ struct TileMapHeader {
 
 extern ShadowList tile_shadow;
 extern int tile_load_error;
-extern int tile_ems_available;
-extern int tile_picture_handle;
-extern int tile_attribute_handle;
 
 
 extern int tile_load(const char *base, int tile_type, TileResource *tile_resource,
@@ -110,7 +104,6 @@ extern int tile_load(const char *base, int tile_type, TileResource *tile_resourc
 	CycleListPtr cycle_list, int ems_handle, int load_flags);
 extern int tile_buffer(Buffer *target, TileResource *tile_resource,
 	TileMapHeader *map, int tile_x, int tile_y);
-extern int tile_setup(void);
 extern void tile_map_free(TileMapHeader *map);
 extern void tile_pan(TileMapHeader *tile_map, int x, int y);
 extern int tile_fake_map(int tile_type, TileMapHeader *tile_map,
