@@ -557,7 +557,6 @@ int tile_buffer(Buffer *target,
 
 		picture_y = y * map->tile_y_size;
 		map_y_offset = (y + tile_y) * map->num_x_tiles;
-
 		for (x = 0; x < max_x; x++) {
 			picture_x = x * size_x;
 			map_value = *(map->map + map_y_offset + tile_x + x);

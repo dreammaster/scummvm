@@ -62,7 +62,7 @@ typedef struct {
 } Tile;
 
 struct TileMapHeader {
-	uint16 tile_type;             /* Type of tile                     */
+	int16 tile_type;              /* Type of tile                     */
 	uint16 one_to_one;            /* One-to-one ratio with scr_orig   */
 	uint16 num_x_tiles;           /* Number of X tiles in map         */
 	uint16 num_y_tiles;           /* Number of Y tiles in map         */
