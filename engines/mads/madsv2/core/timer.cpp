@@ -27,6 +27,8 @@
 namespace MADS {
 namespace MADSV2 {
 
+long _timer_clock = 0;          /* Backing store for *timer_address writes */
+
 long *timer_address = dos_timer_address;
 word timer_rate = 20;
 int  timer_service_active = false;
@@ -54,8 +56,12 @@ void timer_remove() {
 }
 
 long timer_read() {
+	// kernel.clock is compared against timing constants where ONE_SECOND = 60,
+	// so this counter must run at 60 Hz.  The original DOS code achieved this
+	// by pointing timer_address at the interrupt handler's timer_60_low counter;
+	// here we derive the same rate directly from wall-clock milliseconds.
 	unsigned long ms = g_engine->getMillis();
-	return ms * 1193 / 65536;
+	return (long)(ms * 60 / 1000);
 }
 
 long timer_read_600() {

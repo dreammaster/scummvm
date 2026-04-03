@@ -66,8 +66,11 @@ typedef struct {                        /* Video buffer structure         */
 
 /* Timer and clock stuff */
 
-#define clock_address         0x0040006c            /* BIOS clock address */
-#define dos_timer_address     (long *)clock_address
+// ScummVM: replace the DOS hardware address with a safe writable dummy so
+// that game code which writes *timer_address doesn't touch unmapped memory.
+extern long _timer_clock;
+#define clock_address         (&_timer_clock)
+#define dos_timer_address     (&_timer_clock)
 
 #define interrupt_controller  0x20    /* Interrupt controller  */
 #define end_of_interrupt      0x20    /* End of interrupt ack  */
