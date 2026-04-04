@@ -47,6 +47,7 @@ void read_config_file() {
 	ConfMan.registerDefault("inventory_mode", INVENTORY_SQUAT);
 	ConfMan.registerDefault("animated_interface", true);
 	ConfMan.registerDefault("show_speech_boxes", true);
+	ConfMan.registerDefault("difficulty", -1);
 
 	config_file.music_flag = !ConfMan.getBool("music_mute");
 	config_file.sound_flag = !ConfMan.getBool("sfx_mute");
@@ -61,6 +62,7 @@ void read_config_file() {
 	config_file.panning_speed = ConfMan.getBool("panning_speed");
 
 	config_file.show_speech_boxes = ConfMan.getBool("show_speech_boxes");
+	game.difficulty = ConfMan.getInt("difficulty");
 }
 
 void write_config_file() {
