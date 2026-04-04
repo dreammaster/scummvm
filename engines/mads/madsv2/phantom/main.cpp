@@ -242,16 +242,6 @@ static void game_main(int argc, const char **argv) {
 
 	game_control();
 
-	if (!win_status) {
-		if (!chain_flag || !(win_status || force_chain) || !(key_abort_level < 2)) {
-			error_dump_file("*warn4.dat");
-		}
-
-		if (game_autosaved) {
-			error_dump_file("*warn5.dat");
-		}
-	}
-
 done:
 	global_unload_config_parameters();
 

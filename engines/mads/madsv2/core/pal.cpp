@@ -73,6 +73,8 @@ void pal_init(int reserve_bottom, int reserve_top) {
 		color_status[count] = 0;
 	}
 
+	pal_interface(master_palette);
+
 	if (!palette_ever_initialized) {
 		pal_interface(master_palette);
 		palette_ever_initialized = true;

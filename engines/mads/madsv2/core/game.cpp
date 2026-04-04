@@ -1313,6 +1313,8 @@ void game_control() {
 			if (g_engine->getGameID() == GType_Phantom)
 				kernel.activate_menu = GAME_DIFFICULTY_MENU;
 			game_exec_function(game_menu_routine);
+			if (!game.going)
+				return;
 
 			game_wait_cursor();
 

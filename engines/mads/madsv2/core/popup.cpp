@@ -3463,6 +3463,11 @@ PopupItem *popup_execute(void) {
 
 		mouse_end_cycle(false, (popup->status & POPUP_STATUS_EXIT) == 0);
 
+		if (!game.going) {
+			result_item = nullptr;
+			goto done;
+		}
+
 	} while (!(popup->status & POPUP_STATUS_EXIT));
 
 	result_item = popup->active_item;
@@ -3470,7 +3475,7 @@ PopupItem *popup_execute(void) {
 done:
 	popup_destroy();
 	box = keep_box;
-	return (result_item);
+	return result_item;
 }
 
 } // namespace MADSV2
