@@ -31,6 +31,57 @@ namespace MADSV2 {
 
 #define mcga_retrace_magic      14      /* Dave McKibbin's magic heuristic # */
 
+/* --------------------------------------------------------------------------
+ * Default VGA DAC palette for mode 13h (256 colours, 6-bit 0-63 range).
+ *
+ * In DOS, the BIOS loaded this table into the DAC when the video mode was
+ * set.  mcga_compute_retrace_parameters() read it back and stored a copy in
+ * master_palette.  ScummVM has no hardware DAC to read, so we supply the
+ * table explicitly.
+ *
+ * Source: captured via DOSBox debugger immediately after kernel_game_startup
+ * sets the video mode, before any game palette calls run.
+ *   Entries  0–15 : standard EGA/VGA 16-colour compatibility palette
+ *   Entries 16–31 : near-black utility + skin/cloth tones (room 922) + grey ramp
+ *   Entries 32–55 : full-saturation hue wheel (blue→magenta→red→yellow→green→cyan)
+ *   Entries 56–255: not yet captured; zeroed until confirmed
+ *
+ * NOTE: entries 0–3 were recorded after pal_white() ran (grayscale ramp).
+ * The true BIOS defaults for those four slots are the first four EGA colours
+ * ((0,0,0) (0,0,42) (0,42,0) (0,42,42)), but pal_interface() overwrites them
+ * immediately after this function returns, so the distinction is moot.
+ * -------------------------------------------------------------------------- */
+static const RGBcolor vga_default_pal[256] = {
+    /* 0-15: EGA compatibility (entries 0-3 show post-pal_white grayscale) */
+    {0x00,0x00,0x00}, {0x15,0x15,0x15}, {0x2A,0x2A,0x2A}, {0x3F,0x3F,0x3F}, /* 0-3  */
+    {0x2A,0x00,0x00}, {0x2A,0x00,0x2A}, {0x2A,0x15,0x00}, {0x2A,0x2A,0x2A}, /* 4-7  */
+    {0x15,0x15,0x15}, {0x15,0x15,0x3F}, {0x15,0x3F,0x15}, {0x15,0x3F,0x3F}, /* 8-11 */
+    {0x3F,0x15,0x15}, {0x3F,0x15,0x3F}, {0x3F,0x3F,0x15}, {0x3F,0x3F,0x3F}, /* 12-15*/
+
+    /* 16-31: near-black + game skin/cloth tones + grey ramp                 */
+    {0x00,0x00,0x00}, {0x05,0x05,0x05},                                       /* 16-17*/
+    {0x31,0x27,0x1A}, {0x25,0x18,0x12}, {0x11,0x10,0x21}, {0x05,0x0F,0x18},  /* 18-21*/
+    {0x18,0x1C,0x1E}, {0x0F,0x14,0x16}, {0x16,0x14,0x14}, {0x00,0x2A,0x2A},  /* 22-25*/
+    {0x24,0x24,0x24}, {0x28,0x28,0x28}, {0x2D,0x2D,0x2D}, {0x32,0x32,0x32},  /* 26-29*/
+    {0x38,0x38,0x38}, {0x3F,0x3F,0x3F},                                       /* 30-31*/
+
+    /* 32-55: full-saturation hue wheel (matches standard VGA BIOS defaults) */
+    /* blue → magenta */
+    {0x00,0x00,0x3F}, {0x10,0x00,0x3F}, {0x1F,0x00,0x3F}, {0x2F,0x00,0x3F}, /* 32-35*/
+    /* magenta → red */
+    {0x3F,0x00,0x3F}, {0x3F,0x00,0x2F}, {0x3F,0x00,0x1F}, {0x3F,0x00,0x10}, /* 36-39*/
+    /* red → yellow */
+    {0x3F,0x00,0x00}, {0x3F,0x10,0x00}, {0x3F,0x1F,0x00}, {0x3F,0x2F,0x00}, /* 40-43*/
+    /* yellow → green */
+    {0x3F,0x3F,0x00}, {0x2F,0x3F,0x00}, {0x1F,0x3F,0x00}, {0x10,0x3F,0x00}, /* 44-47*/
+    /* green → cyan */
+    {0x00,0x3F,0x00}, {0x00,0x3F,0x10}, {0x00,0x3F,0x1F}, {0x00,0x3F,0x2F}, /* 48-51*/
+    /* cyan → blue */
+    {0x00,0x3F,0x3F}, {0x00,0x2F,0x3F}, {0x00,0x1F,0x3F}, {0x00,0x10,0x3F}, /* 52-55*/
+
+    /* 56-255: not yet captured; zeroed */
+};
+
 word mcga_shakes = false;
 int  mcga_retrace_computed = false;
 word mcga_retrace_ticks = 0;
@@ -143,17 +194,18 @@ static word mcga_time_palette_swap(Palette *pal, int first_color, int num_colors
 }
 
 void mcga_compute_retrace_parameters(void) {
-	Palette temp_pal;
+	/* In DOS, the BIOS initialised the VGA DAC with a default 256-colour
+	   palette when the video mode was set; this function read that palette
+	   back and stored it in master_palette so the engine had a populated
+	   baseline before any room-specific colours were allocated.
+	   In ScummVM there is no hardware DAC to read, so we copy the known
+	   default table directly instead of calling mcga_getpal(). */
+	memcpy(&master_palette, &vga_default_pal, sizeof(Palette));
+	mcga_setpal(&master_palette);
 
-	mcga_getpal(&temp_pal);
-	memcpy(&master_palette, &temp_pal, sizeof(Palette));
-	mcga_setpal(&temp_pal);
-
-	/* On original hardware this function computed how many palette entries
-	   could be written within one vertical retrace interval, and stored the
-	   result in mcga_retrace_max_colors / mcga_retrace_max_bytes.  Under a
-	   modern graphics API there is no retrace constraint, so we set the
-	   maximums to the full 256-entry palette and mark the computation done. */
+	/* On original hardware this function also measured how many palette
+	   entries could be written inside one vertical retrace interval.
+	   Under a modern graphics API there is no such constraint. */
 	mcga_palette_fast = true;
 	mcga_retrace_max_colors = Graphics::PALETTE_COUNT;
 	mcga_retrace_max_bytes = Graphics::PALETTE_SIZE;
