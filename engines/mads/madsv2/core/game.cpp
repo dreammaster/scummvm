@@ -173,6 +173,7 @@ Popup *game_menu_popup;                     /* Popup structure for menu */
 int debugger_previous = DEBUGGER_NONE;
 int debugger_watch = 0;
 int debugger_watch_index[DEBUGGER_MAX_WATCH];
+static int previous_running = -1000;
 
 static void game_control_loop();
 
@@ -545,6 +546,7 @@ static void game_player_status() {
 int game_parse_keystroke(int mykey) {
 	int count;
 	int temp;
+	long big_temp;
 	int move_object;
 	int move_target;
 	int change_flag;
@@ -601,23 +603,22 @@ int game_parse_keystroke(int mykey) {
 			break;
 
 		case ctrl_l_key:
-			/* move_object = 0; */
-			/* if (!popup_get_number(&move_object, "Examine Object", "Object #:", 3)) { */
-			  /* big_temp = move_object + 800; */
-			  /* if (!popup_get_long(&big_temp, "Object Message", "Message #:", 5)) { */
-				/* object_examine (move_object, big_temp, 0); */
-			  /* } */
-			/* } */
+			move_object = 0;
+			if (!popup_get_number(&move_object, "Examine Object", "Object #:", 3)) {
+				big_temp = move_object + 800;
+				if (!popup_get_long(&big_temp, "Object Message", "Message #:", 5)) {
+					object_examine(move_object, big_temp, 0);
+				}
+			}
 			break;
 
 		case ctrl_n_key:
-			/* temp = 0; */
-			/* if (!popup_get_number(&temp, "Activate Conversation", "Conv #:", 3)) { */
-			  /* pl conv_flush();
-			  conv_get(temp);
-			  conv_run(temp);
-			  */
-			  /* } */
+			temp = 0;
+			if (!popup_get_number(&temp, "Activate Conversation", "Conv #:", 3)) {
+				conv_flush();
+				conv_get(temp);
+				conv_run(temp);
+			}
 			break;
 
 		case ctrl_o_key:
@@ -971,53 +972,53 @@ int game_parse_keystroke(int mykey) {
 		case 'I':
 		case 'i':
 			num = (mykey == 'i') ? 1 : 5;
-			/* pl y   = conv_control.y[conv_control.person_speaking]; */
+			y   = conv_control.y[conv_control.person_speaking];
 			if (y & POPUP_CENTER) y = 0;
 			y = MAX(y - num, 0);
-			/* pl conv_control.y[conv_control.person_speaking] = y; */
-			/* pl conv_regenerate_last_message(); */
+			conv_control.y[conv_control.person_speaking] = y;
+			conv_regenerate_last_message();
 			break;
 
 		case 'M':
 		case 'm':
 			num = (mykey == 'm') ? 1 : 5;
-			/* pl conv_control.y[conv_control.person_speaking] += num; */
-			/* pl conv_regenerate_last_message(); */
+			conv_control.y[conv_control.person_speaking] += num;
+			conv_regenerate_last_message();
 			break;
 
 		case 'J':
 		case 'j':
 			num = (mykey == 'j') ? 1 : 5;
-			/* pl x   = conv_control.x[conv_control.person_speaking]; */
+			x   = conv_control.x[conv_control.person_speaking];
 			if (x & POPUP_CENTER) x = 0;
 			x = MAX(x - num, 0);
-			/* pl conv_control.x[conv_control.person_speaking] = x; */
-			/* pl conv_regenerate_last_message(); */
+			conv_control.x[conv_control.person_speaking] = x;
+			conv_regenerate_last_message();
 			break;
 
 		case 'K':
 		case 'k':
 			num = (mykey == 'k') ? 1 : 5;
-			/* pl conv_control.x[conv_control.person_speaking] += num; */
-			/* pl conv_regenerate_last_message(); */
+			conv_control.x[conv_control.person_speaking] += num;
+			conv_regenerate_last_message();
 			break;
 
 		case ',':
 		case '<':
 			num = (mykey == ',') ? 1 : 5;
-			/* pl x = conv_control.width[conv_control.person_speaking]; */
+			x = conv_control.width[conv_control.person_speaking];
 			x = MAX(x - num, 10);
-			/* pl conv_control.width[conv_control.person_speaking] = x; */
-			/* pl conv_regenerate_last_message(); */
+			conv_control.width[conv_control.person_speaking] = x;
+			conv_regenerate_last_message();
 			break;
 
 		case '.':
 		case '>':
 			num = (mykey == '.') ? 1 : 5;
-			/* pl x = conv_control.width[conv_control.person_speaking]; */
+			x = conv_control.width[conv_control.person_speaking];
 			x = MIN(x + num, 35);
-			/* pl conv_control.width[conv_control.person_speaking] = x; */
-			/* pl conv_regenerate_last_message(); */
+			conv_control.width[conv_control.person_speaking] = x;
+			conv_regenerate_last_message();
 			break;
 
 		case 0:
@@ -1284,7 +1285,7 @@ void game_control() {
 
 	game_exec_function(game_menu_init);
 
-	/* pl conv_system_init(); */
+	conv_system_init();
 
 	result = main_copy_verify();
 	if (result == COPY_FAIL) {
@@ -1897,10 +1898,10 @@ static void game_handle_command() {
 	if (conv_control.running >= 0) {
 		player.look_around = false;
 		if ((conv_control.status == CONV_STATUS_WAIT_AUTO) ||
-		   (conv_control.status == CONV_STATUS_WAIT_ENTRY)) {
-		  player.commands_allowed = false;
+			(conv_control.status == CONV_STATUS_WAIT_ENTRY)) {
+			player.commands_allowed = false;
 		}
-	  }
+	}
 
 	handled_this_one = false;
 	if (kernel.trigger)
@@ -2265,7 +2266,7 @@ static void game_main_loop() {
 	}
 
 	if (new_room != room_id) {
-		/* pl conv_abort(); */
+		conv_abort();
 		kernel_doom_all_animations();
 		goto skip_frame;
 	}
@@ -2279,21 +2280,19 @@ static void game_main_loop() {
 	game_system_maintenance();
 
 	if (new_room != room_id) {
-		/* pl conv_abort(); */
+		conv_abort();
 		kernel_doom_all_animations();
 		goto skip_frame;
 	}
 
 	/* Update all active conversations */
-
-  /* pl  if (!kernel.trigger) {
-	  if (conv_control.running >= 0) {
-		if (!camera_x.panning && !camera_y.panning) {
-		 conv_update (false);
+	if (!kernel.trigger) {
+		if (conv_control.running >= 0) {
+			if (!camera_x.panning && !camera_y.panning) {
+				conv_update(false);
+			}
 		}
-	  }
 	}
-	*/
 
 	/* Update the player image, if it is time to do so */
 
@@ -2325,8 +2324,10 @@ static void game_main_loop() {
 			if (!cursor_id) cursor_id = 1;
 		}
 	}
-	if (!player.commands_allowed /*&& ((conv_control.running < 0) || conv_control.status == CONV_STATUS_HOLDING)*/) cursor_id = 2;
-	/* if ((conv_control.running >= 0) && (cursor_id > 2)) cursor_id = 1; */
+	if (!player.commands_allowed && ((conv_control.running < 0) || conv_control.status == CONV_STATUS_HOLDING))
+		cursor_id = 2;
+	if ((conv_control.running >= 0) && (cursor_id > 2))
+		cursor_id = 1;
 
 	if (section_id != 9 || room_id == 904) {
 		cursor_id = MIN(cursor_id, cursor->num_sprites);
@@ -2911,99 +2912,97 @@ static void game_help_update() {
 
 
 static void game_conversation() {
-	/* pl
-	  static int previous_running = -1000;
-	  int x, y;
-	  int count, count2;
-	  int temp;
-	  int my_status;
-	  char temp_buf[80];
-	  Conv *my_conv;
-	  ConvData *my_data;
+	int x, y;
+	int count, count2;
+	int temp;
+	int my_status;
+	char temp_buf[80];
+	Conv *my_conv;
+	ConvData *my_data;
 
-	  if (conv_control.running != previous_running) {
+	if (conv_control.running != previous_running) {
 		game_debugger_reset();
-	  }
+	}
 
-	  previous_running = conv_control.running;
+	previous_running = conv_control.running;
 
-	  debugger_name ("6", 23);
+	debugger_name("6", 23);
 
-	  if (conv_control.running < 0) {
-		screen_printf (0, 2, "(Conversation system inactive).");
+	if (conv_control.running < 0) {
+		screen_printf(0, 2, "(Conversation system inactive).");
 		goto done;
-	  } else {
-		screen_printf (0, 2, "Conversation: %d", conv_control.running);
-	  }
+	} else {
+		screen_printf(0, 2, "Conversation: %d", conv_control.running);
+	}
 
-	  my_conv = conv[conv_control.index];
-	  my_data = conv_data[conv_control.index];
+	my_conv = conv[conv_control.index];
+	my_data = conv_data[conv_control.index];
 
-	  temp_buf[0] = 0;
-	  if (conv_control.status == CONV_STATUS_HOLDING) {
+	temp_buf[0] = 0;
+	if (conv_control.status == CONV_STATUS_HOLDING) {
 		my_status = conv_control.hold_status;
-	  } else {
+	} else {
 		my_status = conv_control.status;
-	  }
+	}
 
-	  switch (my_status) {
-		case CONV_STATUS_NEXT_NODE:
-		  Common::strcpy_s (temp_buf, "Next");
-		  break;
+	switch (my_status) {
+	case CONV_STATUS_NEXT_NODE:
+		Common::strcpy_s(temp_buf, "Next");
+		break;
 
-		case CONV_STATUS_WAIT_AUTO:
-		  Common::strcpy_s (temp_buf, "W-auto");
-		  break;
+	case CONV_STATUS_WAIT_AUTO:
+		Common::strcpy_s(temp_buf, "W-auto");
+		break;
 
-		case CONV_STATUS_WAIT_ENTRY:
-		  Common::strcpy_s (temp_buf, "W-entry");
-		  break;
+	case CONV_STATUS_WAIT_ENTRY:
+		Common::strcpy_s(temp_buf, "W-entry");
+		break;
 
-		case CONV_STATUS_EXECUTE:
-		  Common::strcpy_s (temp_buf, "Execute");
-		  break;
+	case CONV_STATUS_EXECUTE:
+		Common::strcpy_s(temp_buf, "Execute");
+		break;
 
-		case CONV_STATUS_REPLY:
-		default:
-		  Common::strcpy_s (temp_buf, "Reply");
-		  break;
-	  }
+	case CONV_STATUS_REPLY:
+	default:
+		Common::strcpy_s(temp_buf, "Reply");
+		break;
+	}
 
-	  if (conv_control.status == CONV_STATUS_HOLDING) {
-		Common::strcat_s (temp_buf, " HOLD");
-	  }
+	if (conv_control.status == CONV_STATUS_HOLDING) {
+		Common::strcat_s(temp_buf, " HOLD");
+	}
 
-	  if (conv_control.popup_is_up) {
-		Common::strcat_s (temp_buf, " Popup");
-	  }
+	if (conv_control.popup_is_up) {
+		Common::strcat_s(temp_buf, " Popup");
+	}
 
-	  screen_printf (0, 4, "Status: %-70s", temp_buf);
+	screen_printf(0, 4, "Status: %-70s", temp_buf);
 
-	  screen_printf (0, 6, "Node: %-3d    Entry: %-3d", conv_control.node, conv_control.entry);
+	screen_printf(0, 6, "Node: %-3d    Entry: %-3d", conv_control.node, conv_control.entry);
 
-	  screen_printf (0, 8, "Speaker: %-3d                 (Me: %-3d  You: %-3d)", conv_control.person_speaking, conv_control.me_trigger, conv_control.you_trigger);
-	  temp = conv_control.person_speaking;
+	screen_printf(0, 8, "Speaker: %-3d                 (Me: %-3d  You: %-3d)",
+		conv_control.person_speaking, conv_control.me_trigger, conv_control.you_trigger);
+	temp = conv_control.person_speaking;
 
-	  screen_printf (0, 9,  "  X: %-6d   <=J  K=>", conv_control.x[temp]);
-	  screen_printf (0, 10, "  Y: %-6d   <=I  M=>", conv_control.y[temp]);
-	  screen_printf (0, 11, "  W: %-6d   <=,  .=>", conv_control.width[temp]);
+	screen_printf(0, 9, "  X: %-6d   <=J  K=>", conv_control.x[temp]);
+	screen_printf(0, 10, "  Y: %-6d   <=I  M=>", conv_control.y[temp]);
+	screen_printf(0, 11, "  W: %-6d   <=,  .=>", conv_control.width[temp]);
 
-	  for (count = 23; count < 143; count += 10) {
+	for (count = 23; count < 143; count += 10) {
 		y = ((count - 23) / 10) + 13;
 		x = 0;
 		if (count < my_conv->num_variables) {
-		  x = screen_printf (x, y, "%4d => ", count);
+			x = screen_printf(x, y, "%4d => ", count);
 		}
 		for (count2 = count; count2 < count + 10; count2++) {
-		  if (count2 < my_conv->num_variables) {
-		   x = screen_printf (x, y, "%04x  ", *conv_get_variable(count2));
-		  }
+			if (count2 < my_conv->num_variables) {
+				x = screen_printf(x, y, "%04x  ", *conv_get_variable(count2));
+			}
 		}
-	  }
+	}
 
-	done:
-	  ;
-	  */
+done:
+	;
 }
 
 
@@ -3200,7 +3199,7 @@ void game_debugger() {
 		break;
 
 	case DEBUGGER_CONVERSATION:
-		/* pl game_conversation(); */
+		game_conversation();
 		break;
 
 	case DEBUGGER_MATTE:

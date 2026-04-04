@@ -23,6 +23,7 @@
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/buffer.h"
+#include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/core/font.h"
 #include "mads/madsv2/core/video.h"
 #include "mads/madsv2/core/matte.h"
@@ -2656,12 +2657,13 @@ void kernel_dump_walker_only() {
 	player.walker_visible = false;
 }
 
-int kernel_save_game(char *filename) {
+int kernel_save_game(const char *filename) {
 	int error_flag = true;
 	Load load_handle;
 
 	load_handle.open = false;
 
+	// TODO: Proper endian/saving
 	if (loader_open(&load_handle, filename, "wb", PACK_NONE)) goto done;
 
 	if (!loader_write(&game, sizeof(KernelGame), 1, &load_handle)) goto done;
@@ -2675,15 +2677,16 @@ int kernel_save_game(char *filename) {
 	if (!loader_write(global, sizeof(int) * global_list_size, 1, &load_handle)) goto done;
 	if (!loader_write(object, sizeof(Object) * num_objects, 1, &load_handle)) goto done;
 	if (!loader_write(0, sizeof(int), 1, &load_handle)) goto done;
-	/* pl (see above line) if (!loader_write(&conv_control.running, sizeof(int), 1, &load_handle)) goto done; */
+	if (!loader_write(&conv_control.running, sizeof(int16), 1, &load_handle)) goto done;
 
 	if (!loader_write(&picture_view_x, sizeof(int), 1, &load_handle)) goto done;
 	if (!loader_write(&picture_view_y, sizeof(int), 1, &load_handle)) goto done;
+
 	if (!loader_write(room_state, sizeof(int) * OMR, 1, &load_handle)) goto done;
 	if (!loader_write(&previous_room, sizeof(int), 1, &load_handle)) goto done;
-
-	/* pl if (conv_append(load_handle.handle)) goto done; */
-
+#ifdef TODO
+	if (conv_append(load_handle.handle)) goto done;
+#endif
 	error_flag = false;
 
 done:
@@ -2691,7 +2694,7 @@ done:
 	return error_flag;
 }
 
-int kernel_load_game(char *filename) {
+int kernel_load_game(const char *filename) {
 	int error_flag = true;
 	Load load_handle;
 	int save;
@@ -2719,7 +2722,7 @@ int kernel_load_game(char *filename) {
 	if (!loader_read(global, sizeof(int) * global_list_size, 1, &load_handle)) goto done;
 	if (!loader_read(object, sizeof(Object) * num_objects, 1, &load_handle)) goto done;
 	if (!loader_read(0, sizeof(int), 1, &load_handle)) goto done;
-	/* pl (see above line) if (!loader_read(&conv_restore_running, sizeof(int), 1, &load_handle)) goto done; */
+	if (!loader_read(&conv_restore_running, sizeof(int), 1, &load_handle)) goto done;
 
 	/* Temporary support for old save file format */
 	if (load_handle.pack_list_marker >= (int)load_handle.pack.num_records) goto expand;
@@ -2730,7 +2733,7 @@ int kernel_load_game(char *filename) {
 	if (!loader_read(&previous_room, sizeof(int), 1, &load_handle)) goto done;
 
 expand:
-	/* pl if (conv_expand(load_handle.handle)) goto done; */
+	if (conv_expand(load_handle.handle)) goto done;
 
 	if (inven_num_objects > 0) {
 		active_inven = 0;

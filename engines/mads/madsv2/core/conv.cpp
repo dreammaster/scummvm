@@ -21,22 +21,22 @@
 
 #include "common/algorithm.h"
 #include "common/str.h"
+#include "common/textconsole.h"
 #include "mads/madsv2/core/conv.h"
 
 namespace MADS {
 namespace MADSV2 {
 
+Conv *conv[CONV_MAX_DATA];
+ConvData *conv_data[CONV_MAX_DATA];
+Conv *active_conv;
+ConvData *active_conv_data;
 int conv_restore_running;
 ConvControl conv_control;
 int *conv_my_next_start;
 
-constexpr int CONV_MAX_SLOTS = 40;
-constexpr int CONV_MAX_DATA = 5;
-
 static int conv_slot_indexes[CONV_MAX_SLOTS];
 static int conv_slots[CONV_MAX_DATA];
-static int conv_data[CONV_MAX_DATA];
-static int conv_conditions[CONV_MAX_DATA];
 
 static const char *conv_get_filename(int convNum, int extType, char *name) {
 	*name = '\0';
@@ -62,8 +62,8 @@ void conv_system_init() {
 
 	Common::fill(conv_slot_indexes, conv_slot_indexes + CONV_MAX_SLOTS, 0);
 	Common::fill(conv_slots, conv_slots + CONV_MAX_DATA, 0);
-	Common::fill(conv_data, conv_data + CONV_MAX_DATA, 0);
-	Common::fill(conv_conditions, conv_conditions + CONV_MAX_DATA, 0);
+	Common::fill(conv, conv + CONV_MAX_DATA, (Conv *)nullptr);
+	Common::fill(conv_data, conv_data + CONV_MAX_DATA, (ConvData *)nullptr);
 	conv_system_cleanup();
 }
 
@@ -87,9 +87,14 @@ void conv_get(int convNum) {
 	}
 }
 
-void conv_run(int convNum) {}
+void conv_run(int convNum) {
+}
 
-void conv_update(bool) {}
+void conv_update(bool) {
+}
+
+void conv_regenerate_last_message() {
+}
 
 void conv_export_pointer(int *ptr) {}
 
@@ -100,6 +105,8 @@ void conv_me_trigger(int trigger) {}
 void conv_you_trigger(int trigger) {}
 
 int *conv_get_variable(int varNum) {
+	assert(varNum >= 0 && varNum < active_conv_data->variablesCount);
+
 	// TODO
 	return nullptr;
 }
@@ -119,6 +126,17 @@ void conv_release() {
 void conv_flush() {
 	// TODO
 }
+
+int conv_append(Common::WriteStream *handle) {
+	error("TODO: conv_append");
+	return 0;
+}
+
+int conv_expand(Common::SeekableReadStream *handle) {
+	error("TODO: conv_expand");
+	return 0;
+}
+
 
 } // namespace MADSV2
 } // namespace MADS

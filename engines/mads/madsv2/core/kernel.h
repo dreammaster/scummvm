@@ -563,8 +563,8 @@ extern void kernel_new_palette();
 extern void kernel_dump_quotes();
 extern void kernel_dump_all();
 extern void kernel_dump_walker_only();
-extern int kernel_save_game(char *filename);
-extern int kernel_load_game(char *filename);
+extern int kernel_save_game(const char *filename);
+extern int kernel_load_game(const char *filename);
 
 /**
  * Initializes a random chatter sequence.  (Parameters end with

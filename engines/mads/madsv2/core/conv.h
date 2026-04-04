@@ -22,12 +22,24 @@
 #ifndef MADS_CORE_CONV_H
 #define MADS_CORE_CONV_H
 
-#include "common/scummsys.h"
+#include "common/stream.h"
 
 namespace MADS {
 namespace MADSV2 {
 
-struct ConvData {
+constexpr int CONV_MAX_SLOTS = 40;
+constexpr int CONV_MAX_DATA = 5;
+
+enum ConvStatus {
+	CONV_STATUS_HOLDING = -1,
+	CONV_STATUS_NEXT_NODE = 0,
+	CONV_STATUS_WAIT_AUTO = 1,
+	CONV_STATUS_WAIT_ENTRY = 2,
+	CONV_STATUS_EXECUTE = 3,
+	CONV_STATUS_REPLY = 4
+};
+
+struct Conv {
 	int16 node_count;
 	int16 dialog_count;
 	int16 message_count;
@@ -50,20 +62,56 @@ struct ConvData {
 	void *text_lines_ptr;
 };
 
-enum ConvStatus {
-	CONV_NONE,
-	CONV_STATUS_WAIT_AUTO,
-	CONV_STATUS_WAIT_ENTRY
+struct ConvData {
+	int16 currentNode;
+	int16 entryFlagsCount;
+	int16 variablesCount;
+	int16 importsCount;
+	int16 numImports;
+	int16 array1_size;
+	int16 messageList1_size;
+	int16 messageList2_size;
+	int16 messageList3_size;
+	int16 messageList4_size;
+	int16 array1[10];
+	int16 messageList1[10];
+	int16 messageList2[10];
+	int16 messageList3[10];
+	int16 messageList4[10];
+	int16 importsOffset;
+	int16 entryFlagsOffset;
+	int16 variablesOffset;
 };
 
 struct ConvControl {
-	int running;
-	int slot;
+	int16 running;
+	int16 index;
 	ConvStatus status;
-	ConvStatus prior_status;
-
+	ConvStatus hold_status;
+	int16 has_text;
+	int16 popup_is_up;
+	int16 mask;
 	uint32 popup_clock;
+	int16 speaker_active[CONV_MAX_DATA];
+	int16 speaker_series[CONV_MAX_DATA];
+	int16 speaker_frame[CONV_MAX_DATA];
+	int16 x[CONV_MAX_DATA];
+	int16 y[CONV_MAX_DATA];
+	int16 width[CONV_MAX_DATA];
+	int16 speaker_val;
+	int16 person_speaking;
+	int16 node;
+	int16 entry;
+	int16 me_trigger;
+	int16 me_trigger_mode;
+	int16 you_trigger;
+	int16 you_trigger_mode;
+	int16 commands_allowed;
+	int16 input_mode;
 };
+
+extern Conv *conv[CONV_MAX_DATA];
+extern ConvData *conv_data[CONV_MAX_DATA];
 
 extern int conv_restore_running;
 extern ConvControl conv_control;
@@ -75,6 +123,7 @@ extern void conv_system_cleanup();
 extern void conv_get(int convNum);
 extern void conv_run(int convNum);
 extern void conv_update(bool);
+extern void conv_regenerate_last_message();
 extern void conv_export_pointer(int *ptr);
 extern void conv_abort();
 extern void conv_me_trigger(int trigger);
@@ -84,6 +133,8 @@ extern void conv_export_value(int varNum);
 extern void conv_hold();
 extern void conv_release();
 extern void conv_flush();
+extern int conv_append(Common::WriteStream *handle);
+extern int conv_expand(Common::SeekableReadStream *handle);
 
 } // namespace MADSV2
 } // namespace MADS
