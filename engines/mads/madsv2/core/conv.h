@@ -125,6 +125,13 @@ struct ConvData {
 	int16 importsOffset;
 	int16 entryFlagsOffset;
 	int16 variablesOffset;
+
+	// On-disk size: 10 header words + 5 arrays of 10 words + 3 offset words
+	// = 20 + 100 + 6 = 126 = 0x7E.  The +21 padding in load_conv_data
+	// exploits the fact that 21 * 6 = 126, so the formula automatically
+	// includes the header in the total allocation.
+	static constexpr int SIZE = 2 * 10 + 2 * 10 * 5 + 2 * 3;
+	void load(Common::SeekableReadStream *src);
 };
 
 struct ConvControl {
@@ -156,6 +163,13 @@ struct ConvControl {
 
 extern Conv *conv[CONV_MAX_DATA];
 extern ConvData *conv_data[CONV_MAX_DATA];
+extern Conv *active_conv;
+extern ConvData *active_conv_data;
+
+extern int16 *conv_imports;
+extern int16 *conv_entry_flags;
+extern ConvVariable *conv_varsDataPtr;
+extern int16 *conv_vars0ValPtr;
 
 extern int conv_restore_running;
 extern ConvControl conv_control;
@@ -164,6 +178,7 @@ extern int *conv_my_next_start;
 extern void conv_system_init();
 extern void conv_system_cleanup();
 
+extern void conv_start(ConvData *convData, Conv *convIn);
 extern void conv_get(int convNum);
 extern void conv_run(int convNum);
 extern void conv_update(bool);

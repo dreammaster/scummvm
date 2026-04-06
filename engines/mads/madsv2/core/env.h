@@ -75,7 +75,7 @@ extern char env_null[7];
 
 
 extern int env_verify(void);
-extern Common::SeekableReadStream *env_open(const char *file_path, const char *options);
+extern Common::SeekableReadStream *env_open(const char *file_path, const char *options = "rb");
 extern int env_exist(const char *file_name);
 extern long env_get_file_size(Common::SeekableReadStream *handle);
 extern char *env_get_path(char *madspath, const char *infile);

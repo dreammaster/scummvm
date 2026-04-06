@@ -24,6 +24,7 @@
 #include "common/textconsole.h"
 #include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/core/general.h"
+#include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/fileio.h"
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/inter.h"
@@ -39,13 +40,17 @@ Conv *conv[CONV_MAX_DATA];
 ConvData *conv_data[CONV_MAX_DATA];
 Conv *active_conv;
 ConvData *active_conv_data;
+int16 *conv_imports;
+int16 *conv_entry_flags;
+ConvVariable *conv_varsDataPtr;
+int16 *conv_vars0ValPtr;
 int conv_restore_running;
 ConvControl conv_control;
 Box conv_box;
 int *conv_my_next_start;
 int conv_error_code;
 
-static int conv_slot_indexes[CONV_MAX_SLOTS];
+static int conv_indexes[CONV_MAX_SLOTS];
 static int conv_slots[CONV_MAX_DATA];
 
 
@@ -61,7 +66,7 @@ void Conv::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(text_length, commands_length);
 
 	// In the original these are far pointers patched after load; read as
-	// raw offsets and store temporarily - conv_load_data resolves them.
+	// raw offsets and store temporarily - load_conv resolves them.
 	uint32 text_off, scripts_off, nodes_off, dialogs_off, messages_off, text_lines_off;
 	src->readMultipleLE(text_off, scripts_off, nodes_off, dialogs_off, messages_off, text_lines_off);
 	text_ptr = (void *)(uintptr_t)text_off;
@@ -91,6 +96,19 @@ void ConvVariable::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(isPtr, val, unused);
 }
 
+void ConvData::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(currentNode, entryFlagsCount, variablesCount,
+		importsCount, numImports, array1_size,
+		messageList1_size, messageList2_size, messageList3_size, messageList4_size);
+	src->readMultipleLE(array1);
+	src->readMultipleLE(messageList1);
+	src->readMultipleLE(messageList2);
+	src->readMultipleLE(messageList3);
+	src->readMultipleLE(messageList4);
+	src->readMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
+}
+
+//====================================================================
 
 static const char *conv_get_filename(int convNum, int extType, char *name) {
 	*name = '\0';
@@ -105,7 +123,12 @@ static const char *conv_get_filename(int convNum, int extType, char *name) {
 	return name;
 }
 
-static Conv *conv_load_data(const char *fname) {
+static Common::SeekableReadStream *conv_open(int convNum) {
+	char name[40];
+	return env_open(conv_get_filename(convNum, 2, name));
+}
+
+static Conv *load_conv(const char *fname) {
 	Load file;
 	Conv convHeader;
 	Conv *dataPtr = nullptr;
@@ -219,19 +242,133 @@ done:
 	return result;
 }
 
-void conv_system_init() {
-	Common::fill((byte *)&conv_control, (byte *)&conv_control + sizeof(ConvControl), 0);
-	conv_control.running = -1;
+static ConvData *load_conv_data(const char *fname) {
+	Load file;
+	ConvData cndHeader;
+	ConvData *dataPtr = nullptr;
+	ConvData *result  = nullptr;
+	char filename[80];
+	char name_buf[9];
 
-	Common::fill(conv_slot_indexes, conv_slot_indexes + CONV_MAX_SLOTS, 0);
-	Common::fill(conv_slots, conv_slots + CONV_MAX_DATA, 0);
-	Common::fill(conv, conv + CONV_MAX_DATA, (Conv *)nullptr);
-	Common::fill(conv_data, conv_data + CONV_MAX_DATA, (ConvData *)nullptr);
-	conv_system_cleanup();
+	file.open = false;
+
+	Common::strcpy_s(filename, fname);
+	fileio_add_ext(filename, "cnv");
+
+	const char *fn = (filename[0] == '*') ? filename + 1 : filename;
+	Common::strlcpy(name_buf, fn, sizeof(name_buf));
+
+	if (loader_open(&file, filename, "rb", true))
+		goto done;
+
+	{
+		byte hdrBuf[ConvData::SIZE];
+		if (!loader_read(hdrBuf, ConvData::SIZE, 1, &file))
+			goto done;
+
+		Common::MemoryReadStream hdrStream(hdrBuf, ConvData::SIZE);
+		cndHeader.load(&hdrStream);
+	}
+
+	{
+		// Total allocation = ConvData header + imports array + entry flags array
+		// + variables array.  The +21 on variablesCount is paragraph-alignment
+		// padding; 21 * 3 * 2 = 126 = ConvData::SIZE, so the header cost is
+		// already baked into the formula without a separate +ConvData::SIZE term.
+		long total = ((long)(cndHeader.variablesCount + 21) * 3
+		            + cndHeader.importsCount + cndHeader.entryFlagsCount) * 2;
+
+		dataPtr = (ConvData *)mem_get_name(total, name_buf);
+		if (!dataPtr)
+			goto done;
+
+		*dataPtr = cndHeader;
+
+		// Sub-array byte offsets from the start of the block.
+		// 63 = ConvData::SIZE / 2; using it as a word-count base yields the
+		// correct byte offset arithmetic when multiplied by 2.
+		dataPtr->importsOffset    = ConvData::SIZE;
+		dataPtr->entryFlagsOffset = (int16)((cndHeader.importsCount    + 63) * 2);
+		dataPtr->variablesOffset  = (int16)((cndHeader.entryFlagsCount
+		                                   + cndHeader.importsCount + 63) * 2);
+
+		byte *block = (byte *)dataPtr;
+
+		// Imports: conditional — the original skips the loader_read when count <= 0
+		if (cndHeader.importsCount > 0) {
+			if (!loader_read(block + dataPtr->importsOffset,
+			                 (long)cndHeader.importsCount * 2, 1, &file))
+				goto done;
+		}
+
+		// Entry flags: always read (no count guard in the original)
+		if (!loader_read(block + dataPtr->entryFlagsOffset,
+		                 (long)cndHeader.entryFlagsCount * 2, 1, &file))
+			goto done;
+
+		// Variables
+		if (!loader_read(block + dataPtr->variablesOffset,
+		                 (long)cndHeader.variablesCount * ConvVariable::SIZE, 1, &file))
+			goto done;
+
+		// Zero the runtime isPtr flag for every variable; it is not meaningful
+		// as stored on disk
+		if (cndHeader.variablesCount > 0) {
+			ConvVariable *vars = (ConvVariable *)(block + dataPtr->variablesOffset);
+			for (int i = 0; i < cndHeader.variablesCount; ++i)
+				vars[i].isPtr = 0;
+		}
+
+		result = dataPtr;
+	}
+
+done:
+	if (file.open)
+		loader_close(&file);
+
+	if (dataPtr && dataPtr != result)
+		mem_free(dataPtr);
+
+	return result;
 }
 
-void conv_system_cleanup() {
-	// Removes any files with the format 'conv%d.dat'
+static ConvData *conv_read_data(Common::SeekableReadStream *src) {
+	byte buffer[ConvData::SIZE];
+	if (src->read(buffer, ConvData::SIZE) != ConvData::SIZE)
+		error("Reading ConvData header");
+
+	// TODO
+	error("TODO: conv_read_data");
+}
+
+static void conv_init(ConvData *convData, int val) {
+	conv_start(convData, nullptr);
+
+	for (int i = 0; i < convData->entryFlagsCount; ++i) {
+		uint16 *flag = (uint16 *)((byte *)convData + convData->entryFlagsOffset);
+		*flag &= 0x3fff;
+
+		if ((*flag & 1) || ((*flag & 4) && val))
+			*flag |= 0x8000;
+	}
+}
+
+static ConvData *conv_get_data(int convNum) {
+	ConvData *convData = nullptr;
+	char name[80];
+
+	if (conv_indexes[convNum]) {
+		Common::SeekableReadStream *handle = conv_open(convNum);
+		if (handle) {
+			convData = conv_read_data(handle);
+			delete handle;
+		}
+	} else {
+		convData = load_conv_data(conv_get_filename(convNum, 1, name));
+		conv_init(convData, 0);
+	}
+
+	return convData;
 }
 
 static void conv_purge_any_popup() {
@@ -250,6 +387,47 @@ static void conv_purge_any_popup() {
 	}
 }
 
+void conv_system_init() {
+	Common::fill((byte *)&conv_control, (byte *)&conv_control + sizeof(ConvControl), 0);
+	conv_control.running = -1;
+
+	Common::fill(conv_indexes, conv_indexes + CONV_MAX_SLOTS, 0);
+	Common::fill(conv_slots, conv_slots + CONV_MAX_DATA, 0);
+	Common::fill(conv, conv + CONV_MAX_DATA, (Conv *)nullptr);
+	Common::fill(conv_data, conv_data + CONV_MAX_DATA, (ConvData *)nullptr);
+	conv_system_cleanup();
+}
+
+void conv_system_cleanup() {
+	// Removes any files with the format 'conv%d.dat'
+}
+
+
+void conv_start(ConvData *convData, Conv *convIn) {
+	active_conv      = convIn;
+	active_conv_data = convData;
+
+	byte *block = (byte *)convData;
+
+	// Resolve the byte-offset sub-array pointers stored in the ConvData block
+	conv_imports     = (int16 *)(block + convData->importsOffset);
+	conv_entry_flags = (int16 *)(block + convData->entryFlagsOffset);
+	conv_varsDataPtr = (ConvVariable *)(block + convData->variablesOffset);
+
+	// conv_vars0ValPtr -> variables[0].val (skips the isPtr field)
+	conv_vars0ValPtr   = &conv_varsDataPtr[0].val;
+
+	// conv_my_next_start -> variables[1].val
+	// (offset = offsetof(ConvVariable, val) + sizeof(ConvVariable) from base)
+	conv_my_next_start = (int *)&conv_varsDataPtr[1].val;
+
+	convData->currentNode = -1;
+	convData->numImports  = 0;
+
+	// Initialise variables[0].val from variables[1].val
+	*conv_vars0ValPtr = (int16)*conv_my_next_start;
+}
+
 void conv_get(int convNum) {
 	int free_slot = -1;
 	char fname[40];
@@ -261,7 +439,7 @@ void conv_get(int convNum) {
 
 	if (free_slot >= 0) {
 		conv_slots[free_slot] = -1;
-		(void)conv_load_data(conv_get_filename(convNum, 0, fname));
+		(void)load_conv(conv_get_filename(convNum, 0, fname));
 		// TODO: More stuff
 	}
 }
