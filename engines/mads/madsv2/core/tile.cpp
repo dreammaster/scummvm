@@ -524,12 +524,8 @@ done:
 }
 
 
-int tile_buffer(Buffer *target,
-	TileResource *tile_resource,
-	TileMapHeader *map,
-	int           tile_x,
-	int           tile_y) {
-	int error_flag = true;
+int tile_buffer(Buffer *target, TileResource *tile_resource,
+		TileMapHeader *map, int tile_x, int tile_y) {
 	int default_value;
 	int x, y;
 	int size_x;
@@ -578,10 +574,7 @@ int tile_buffer(Buffer *target,
 		}
 	}
 
-	error_flag = false;
-
-done:
-	return error_flag;
+	return false;
 }
 
 

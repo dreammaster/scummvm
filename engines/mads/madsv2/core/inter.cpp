@@ -2315,5 +2315,6 @@ done:
 	if (load_handle.open) loader_close(&load_handle);
 	return error_flag;
 }
+
 } // namespace MADSV2
 } // namespace MADS

@@ -60,6 +60,50 @@ struct Conv {
 	void *dialogs_ptr;
 	void *messages_ptr;
 	void *text_lines_ptr;
+
+	static constexpr int SIZE = 2 * 7 + 16 * 5 + 2 * 5 + 14 + 4 + 4 + 4 * 6;
+	void load(Common::SeekableReadStream *src);
+};
+
+struct ConvNode {
+	int16 index;
+	int16 dialog_count;
+	int16 active;
+	int16 field_6;
+	int16 field_8;
+
+	static constexpr int SIZE = 2 * 5;
+	void load(Common::SeekableReadStream *src);
+};
+
+struct ConvDialog {
+	int16 text_line_index;
+	int16 speech_index;
+	int16 script_offset;
+	int16 script_size;
+
+	static constexpr int SIZE = 2 * 4;
+	void load(Common::SeekableReadStream *src);
+};
+
+struct ConvScriptParams {
+	int16 operation;
+	byte  param1IsVar;
+	byte  param2IsVar;
+	int16 param1;
+	int16 param2;
+
+	static constexpr int SIZE = 2 + 1 + 1 + 2 + 2;
+	void load(Common::SeekableReadStream *src);
+};
+
+struct ConvVariable {
+	int16 isPtr;
+	int16 val;
+	int16 unused;
+
+	static constexpr int SIZE = 2 * 3;
+	void load(Common::SeekableReadStream *src);
 };
 
 struct ConvData {
