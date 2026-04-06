@@ -1559,8 +1559,6 @@ void game_control() {
 
 			global_room_init();
 
-			kernel_set_interface_mode(INTER_LIMITED_SENTENCES);
-
 			game_exec_function(room_init_code_pointer);
 #if 0
 			/* paul - oh no! magic numbers! */

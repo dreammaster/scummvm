@@ -42,6 +42,7 @@ namespace MADSV2 {
 #define ANIM_LOAD_TRANSLATE   0x0001    /* Translate to 16 colors     */
 #define ANIM_LOAD_BACKGROUND  0x0100    /* Load background picture    */
 #define ANIM_LOAD_BACK_ONLY   0x0200    /* Load background only       */
+#define ANIM_INTERFACE        0x4000
 
 /* these are mapped to misc[] in the AnimFile structure below */
 

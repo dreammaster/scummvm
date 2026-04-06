@@ -140,7 +140,7 @@ namespace MADSV2 {
 #define KERNEL_STARTUP_CURSOR         0x0200
 #define KERNEL_STARTUP_CURSOR_SHOW    0x0100
 #define KERNEL_STARTUP_VOCAB          0x0080
-#define KERNEL_STARTUP_INTERFACE      0x0040
+//#define KERNEL_STARTUP_INTERFACE      0x0040
 #define KERNEL_STARTUP_ALL_FLAGS      0xffc0
 
 typedef struct {
@@ -596,7 +596,6 @@ extern void kernel_random_message_server();
 extern int kernel_generate_random_message(int chance_major, int chance_minor);
 
 extern void kernel_random_purge();
-extern void kernel_load_interface();
 
 /**
  * Switches interface modes (INTER_BUILDING_SENTENCES is the normal mode;

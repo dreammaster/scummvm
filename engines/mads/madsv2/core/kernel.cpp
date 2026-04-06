@@ -223,8 +223,6 @@ void kernel_game_shutdown() {
 	sprite_free(&box_param.logo, true);
 	sprite_free(&box_param.series, true);
 
-	buffer_free(&scr_inter_orig);
-
 	vocab_unload_active();
 
 	/* Drop cursor */
@@ -533,14 +531,6 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 		vocab_load_active();
 	}
 
-	if (load_flag & KERNEL_STARTUP_INTERFACE) {
-		buffer_init_name(&scr_inter_orig, video_x, inter_size_y, "$scrintr");
-		if (scr_inter_orig.data == NULL) {
-			error_code = ERROR_NO_MORE_MEMORY;
-			goto done;
-		}
-	}
-
 	if (load_flag & KERNEL_STARTUP_POPUP) {
 		if (popup_box_load()) {
 			error_code = ERROR_KERNEL_NO_POPUP;
@@ -584,6 +574,15 @@ int kernel_section_startup(int newSection) {
 void kernel_room_shutdown() {
 	inter_deallocate_objects();
 
+	if (inter_anim) {
+		anim_unload((AnimPtr)inter_anim);
+		buffer_free(&scr_inter_orig);
+		mem_free(inter_anim);
+		inter_anim = nullptr;
+	} else if (scr_inter_orig.data) {
+		buffer_free(&scr_inter_orig);
+	}
+
 	/* Dump the room hot spots */
 	if (room_spots != NULL) {
 		mem_free(room_spots);
@@ -621,6 +620,8 @@ int kernel_room_startup(int newRoom, int initial_variant, const char *interface,
 	previous_room = room_id;
 	room_id = newRoom;
 	room_variant = initial_variant;
+
+	scr_inter_orig.data = nullptr;
 
 	/* Start a brand new palette, reserving the proper # of colors */
 	if (new_palette)
@@ -689,8 +690,6 @@ int kernel_room_startup(int newRoom, int initial_variant, const char *interface,
 
 	rail_connect_all_nodes();
 
-	inter_anim = NULL;
-
 	/* Make preliminary scaling computations */
 
 	kernel_room_bound_dif = room->front_y - room->back_y;
@@ -713,26 +712,42 @@ int kernel_room_startup(int newRoom, int initial_variant, const char *interface,
 
 	if (barebones) {
 		room_spots = nullptr;
-
-	} else {
-		// Load up the room's hotspot table
-		room_spots = room_load_hotspots(room_id, &room_num_spots);
-		if (room_spots == NULL) {
-#ifndef disable_error_check
-			error_code = ERROR_KERNEL_NO_HOTSPOTS;
-#endif
-			goto done;
-		}
-
-		// Set up interface background screen
-		kernel_set_interface_mode(inter_input_mode);
-
-		// Mouse cursor on
-		mouse_show();
-
-		inter_allocate_objects();
+		goto finish;
 	}
 
+	// Load up the room's hotspot table
+	room_spots = room_load_hotspots(room_id, &room_num_spots);
+	if (room_spots == NULL) {
+#ifndef disable_error_check
+		error_code = ERROR_KERNEL_NO_HOTSPOTS;
+#endif
+		goto done;
+	}
+
+	kernel_load_vocab();
+
+	pal_activate_shadow(&kernel_shadow_inter);
+	load_flags = ANIM_LOAD_BACKGROUND | ANIM_INTERFACE;
+	if (kernel.translating)
+		load_flags |= ANIM_LOAD_TRANSLATE;
+	inter_anim = (AnimInterPtr)anim_load(interface, &scr_inter_orig, nullptr, nullptr,
+		nullptr, nullptr, nullptr, nullptr, nullptr, load_flags);
+	if (!inter_anim) goto done;
+
+	if (!inter_anim->font) {
+		mem_free(inter_anim);
+		inter_anim = nullptr;
+	}
+
+	// Set up interface background screen
+	kernel_set_interface_mode(inter_input_mode);
+
+	// Mouse cursor on
+	mouse_show();
+
+	inter_allocate_objects();
+
+finish:
 	error_flag = false;
 
 done:
@@ -2916,34 +2931,24 @@ done:
 	return generated_one;
 }
 
-void kernel_load_interface() {
-	char temp_buf[80];
-	char *mark;
-
-	Common::strcpy_s(temp_buf, kernel.interface);
-	mark = strchr(temp_buf, '.');
-	if (mark != NULL) {
-		*mark = 0;
-	}
-	if (inter_input_mode != INTER_BUILDING_SENTENCES) {
-		Common::strcat_s(temp_buf, "A");
-	}
-	Common::strcat_s(temp_buf, ".INT");
-
-	if (strcmp(kernel_interface_loaded, temp_buf)) {
-		buffer_free(&scr_inter_orig);
-		pal_activate_shadow(&kernel_shadow_inter);
-		if (inter_load_background(temp_buf, &scr_inter_orig)) {
-			error_report(ERROR_KERNEL_NO_INTERFACE, SEVERE, MODULE_KERNEL, inter_input_mode, 0);
-		}
-		Common::strcpy_s(kernel_interface_loaded, temp_buf);
-		pal_activate_shadow(&kernel_shadow_main);
-	}
-}
-
 void kernel_set_interface_mode(int mode) {
+	if (mode != inter_input_mode) {
+		char fname[80];
+		Common::strcpy_s(fname, kernel.interface + 1);
+		char *dot = strchr(fname, '.');
+
+		if (dot) {
+			*dot = '\0';
+			if (mode != INTER_BUILDING_SENTENCES)
+				Common::strcat_s(fname, "A");
+			Common::strcat_s(fname, ".INT");
+
+			buffer_free(&scr_inter_orig);
+			inter_load_background(fname, &scr_inter_orig);
+		}
+	}
+
 	inter_input_mode = mode;
-	kernel_load_interface();
 
 	image_inter_marker = 1;
 	image_inter_list[0].flags = IMAGE_REFRESH;
@@ -2970,7 +2975,8 @@ void kernel_set_interface_mode(int mode) {
 	inter_init_sentence();
 	inter_setup_hotspots();
 
-	if (!viewing_at_y) inter_prepare_background();
+	if (!viewing_at_y)
+		inter_prepare_background();
 
 	kernel_refresh_dynamic();
 }
