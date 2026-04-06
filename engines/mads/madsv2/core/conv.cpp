@@ -41,7 +41,7 @@ ConvData *conv_data[CONV_MAX_DATA];
 Conv *active_conv;
 ConvData *active_conv_data;
 int16 *conv_imports;
-int16 *conv_entry_flags;
+uint16 *conv_entry_flags;
 ConvVariable *conv_varsDataPtr;
 int16 *conv_vars0ValPtr;
 int conv_restore_running;
@@ -54,8 +54,7 @@ static int conv_indexes[CONV_MAX_SLOTS];
 static int conv_slots[CONV_MAX_DATA];
 
 
-
-void Conv::load(Common::SeekableReadStream *src) {
+void ConvHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(node_count, dialog_count, message_count, text_line_count,
 		num_variables, max_imports, speaker_count);
 	for (int i = 0; i < 5; ++i)
@@ -67,14 +66,8 @@ void Conv::load(Common::SeekableReadStream *src) {
 
 	// In the original these are far pointers patched after load; read as
 	// raw offsets and store temporarily - load_conv resolves them.
-	uint32 text_off, scripts_off, nodes_off, dialogs_off, messages_off, text_lines_off;
-	src->readMultipleLE(text_off, scripts_off, nodes_off, dialogs_off, messages_off, text_lines_off);
-	text_ptr = (void *)(uintptr_t)text_off;
-	scripts_ptr = (void *)(uintptr_t)scripts_off;
-	nodes_ptr = (void *)(uintptr_t)nodes_off;
-	dialogs_ptr = (void *)(uintptr_t)dialogs_off;
-	messages_ptr = (void *)(uintptr_t)messages_off;
-	text_lines_ptr = (void *)(uintptr_t)text_lines_off;
+	src->readMultipleLE(textOffset, scriptsOffset, nodesOffset,
+		dialogsOffset, messagesOffset, textLinesOffset);
 }
 
 void ConvNode::load(Common::SeekableReadStream *src) {
@@ -96,7 +89,7 @@ void ConvVariable::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(isPtr, val, unused);
 }
 
-void ConvData::load(Common::SeekableReadStream *src) {
+void ConvDataHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(currentNode, entryFlagsCount, variablesCount,
 		importsCount, numImports, array1_size,
 		messageList1_size, messageList2_size, messageList3_size, messageList4_size);
@@ -130,7 +123,7 @@ static Common::SeekableReadStream *conv_open(int convNum) {
 
 static Conv *load_conv(const char *fname) {
 	Load file;
-	Conv convHeader;
+	ConvHeader convHeader;
 	Conv *dataPtr = nullptr;
 	Conv *result = nullptr;
 	char filename[80];
@@ -153,83 +146,114 @@ static Conv *load_conv(const char *fname) {
 	{
 		// Read the fixed-size Conv header through a MemoryReadStream so that
 		// the load() function handles field sizes and endianness correctly.
-		byte hdrBuf[Conv::SIZE];
-		if (!loader_read(hdrBuf, Conv::SIZE, 1, &file)) {
+		byte hdrBuf[ConvHeader::SIZE];
+		if (!loader_read(hdrBuf, ConvHeader::SIZE, 1, &file)) {
 			conv_error_code = 2;
 			goto done;
 		}
-		Common::MemoryReadStream hdrStream(hdrBuf, Conv::SIZE);
+		Common::MemoryReadStream hdrStream(hdrBuf, ConvHeader::SIZE);
 		convHeader.load(&hdrStream);
 	}
 
+
+	dataPtr = new Conv();
+	if (!dataPtr) {
+		conv_error_code = 3;
+		goto done;
+	}
+
+	// Copy the loaded header to the front of the block
+	*dataPtr = convHeader;
+
+	// Read each section from the file.  Error codes deliberately match the
+	// originals (note: 6 is skipped, matching the disassembly).
+
+	// Nodes
 	{
-		// Calculate total allocation size.  The +15 on node_count matches the
-		// original: the DOS allocator rounded up to paragraph (16-byte) boundaries
-		// for the nodes sub-array so that far-pointer normalisation never overflows.
-		long nodeBytes = (long)(convHeader.node_count + 15) * ConvNode::SIZE;
-		long dialogBytes = (long)convHeader.dialog_count * ConvDialog::SIZE;
-		long messageBytes = (long)convHeader.message_count * 4;   // 2 x int16 per entry
-		long textLineBytes = (long)convHeader.text_line_count * 2;   // 1 x int16 per entry
-		long total = Conv::SIZE + nodeBytes + dialogBytes + messageBytes
-			+ textLineBytes + (long)convHeader.text_length
-			+ (long)convHeader.commands_length;
-
-		dataPtr = (Conv *)mem_get_name(total, name_buf);
-		if (!dataPtr) {
-			conv_error_code = 3;
-			goto done;
-		}
-
-		// Copy the loaded header to the front of the block, then fix up all
-		// sub-array pointers to point into the memory immediately following.
-		*dataPtr = convHeader;
-		byte *p = (byte *)dataPtr + Conv::SIZE;
-
-		dataPtr->nodes_ptr = p;  p += nodeBytes;
-		dataPtr->dialogs_ptr = p;  p += dialogBytes;
-		dataPtr->messages_ptr = p;  p += messageBytes;
-		dataPtr->text_lines_ptr = p;  p += textLineBytes;
-		dataPtr->text_ptr = p;  p += convHeader.text_length;
-		dataPtr->scripts_ptr = p;
-
-		// Read each section from the file.  Error codes deliberately match the
-		// originals (note: 6 is skipped, matching the disassembly).
-		if (!loader_read(dataPtr->nodes_ptr,
-			(long)convHeader.node_count * ConvNode::SIZE, 1, &file)) {
+		byte *buffer = (byte *)malloc(dataPtr->node_count * ConvNode::SIZE);
+		if (!loader_read(buffer, convHeader.node_count * ConvNode::SIZE, 1, &file)) {
 			conv_error_code = 4;
+			free(buffer);
 			goto done;
 		}
 
-		if (!loader_read(dataPtr->dialogs_ptr,
-			(long)convHeader.dialog_count * ConvDialog::SIZE, 1, &file)) {
+		Common::MemoryReadStream src(buffer, convHeader.node_count * ConvNode::SIZE);
+		dataPtr->nodes.resize(convHeader.node_count);
+		for (int i = 0; i < convHeader.node_count; ++i)
+			dataPtr->nodes[i].load(&src);
+
+		free(buffer);
+	}
+
+	// Dialogs
+	{
+		byte *buffer = (byte *)malloc(dataPtr->dialog_count * ConvDialog::SIZE);
+		if (!loader_read(buffer, convHeader.dialog_count * ConvDialog::SIZE, 1, &file)) {
 			conv_error_code = 5;
+			free(buffer);
 			goto done;
 		}
 
-		if (!loader_read(dataPtr->messages_ptr,
-			(long)convHeader.message_count * 4, 1, &file)) {
+		Common::MemoryReadStream src(buffer, convHeader.dialog_count * ConvNode::SIZE);
+		dataPtr->dialogs.resize(convHeader.dialog_count);
+		for (int i = 0; i < convHeader.dialog_count; ++i)
+			dataPtr->dialogs[i].load(&src);
+
+		free(buffer);
+	}
+
+	// Messages
+	{
+		byte *buffer = (byte *)malloc(dataPtr->message_count * 4);
+		if (!loader_read(buffer, convHeader.message_count * 4, 1, &file)) {
 			conv_error_code = 7;
+			free(buffer);
 			goto done;
 		}
 
-		if (!loader_read(dataPtr->text_lines_ptr,
-			(long)convHeader.text_line_count * 2, 1, &file)) {
+		Common::MemoryReadStream src(buffer, convHeader.message_count * 4);
+		dataPtr->dialogs.resize(convHeader.message_count);
+		for (int i = 0; i < convHeader.message_count; ++i)
+			dataPtr->messages[i] = src.readSint32LE();
+
+		free(buffer);
+	}
+
+	// Text lines
+	{
+		byte *buffer = (byte *)malloc(dataPtr->text_line_count * 2);
+		if (!loader_read(buffer, convHeader.text_line_count * 2, 1, &file)) {
 			conv_error_code = 8;
+			free(buffer);
 			goto done;
 		}
 
-		if (!loader_read(dataPtr->text_ptr, convHeader.text_length, 1, &file)) {
+		Common::MemoryReadStream src(buffer, convHeader.text_line_count * 2);
+		dataPtr->dialogs.resize(convHeader.text_line_count * 2);
+		for (int i = 0; i < convHeader.message_count; ++i)
+			dataPtr->messages[i] = src.readSint16LE();
+
+		free(buffer);
+	}
+
+	// Text block
+	{
+		dataPtr->text.resize(convHeader.text_length);
+		if (!loader_read(&dataPtr->text[0], convHeader.text_length, 1, &file)) {
 			conv_error_code = 9;
 			goto done;
 		}
+	}
 
-		if (!loader_read(dataPtr->scripts_ptr, convHeader.commands_length, 1, &file)) {
+	//  Scripts
+	{
+		if (!loader_read(&dataPtr->scripts[0], convHeader.commands_length, 1, &file)) {
 			conv_error_code = 10;
 			goto done;
 		}
-
-		result = dataPtr;
 	}
+
+	result = dataPtr;
 
 done:
 	if (file.open)
@@ -237,14 +261,14 @@ done:
 
 	// Free the block if we bailed out before completing the load
 	if (dataPtr && dataPtr != result)
-		mem_free(dataPtr);
+		delete dataPtr;
 
 	return result;
 }
 
 static ConvData *load_conv_data(const char *fname) {
 	Load file;
-	ConvData cndHeader;
+	ConvDataHeader header;
 	ConvData *dataPtr = nullptr;
 	ConvData *result  = nullptr;
 	char filename[80];
@@ -262,79 +286,83 @@ static ConvData *load_conv_data(const char *fname) {
 		goto done;
 
 	{
-		byte hdrBuf[ConvData::SIZE];
-		if (!loader_read(hdrBuf, ConvData::SIZE, 1, &file))
+		byte hdrBuf[ConvDataHeader::SIZE];
+		if (!loader_read(hdrBuf, ConvDataHeader::SIZE, 1, &file))
 			goto done;
 
-		Common::MemoryReadStream hdrStream(hdrBuf, ConvData::SIZE);
-		cndHeader.load(&hdrStream);
+		Common::MemoryReadStream hdrStream(hdrBuf, ConvDataHeader::SIZE);
+		header.load(&hdrStream);
 	}
 
+	dataPtr = new ConvData();
+	if (!dataPtr)
+		goto done;
+
+	*dataPtr = header;
+
+	// Imports: conditional — the original skips the loader_read when count <= 0
+	if (header.importsCount > 0) {
+		int16 *buffer = (int16 *)malloc(header.importsCount * 2);
+		if (!loader_read(buffer, (long)header.importsCount * 2, 1, &file)) {
+			free(buffer);
+			goto done;
+		}
+
+		dataPtr->imports.resize(header.importsCount);
+		for (int i = 0; i < header.importsCount; ++i)
+			dataPtr->imports[i] = FROM_LE_16(buffer[i]);
+		free(buffer);
+	}
+
+	// Entry flags: always read (no count guard in the original)
 	{
-		// Total allocation = ConvData header + imports array + entry flags array
-		// + variables array.  The +21 on variablesCount is paragraph-alignment
-		// padding; 21 * 3 * 2 = 126 = ConvData::SIZE, so the header cost is
-		// already baked into the formula without a separate +ConvData::SIZE term.
-		long total = ((long)(cndHeader.variablesCount + 21) * 3
-		            + cndHeader.importsCount + cndHeader.entryFlagsCount) * 2;
-
-		dataPtr = (ConvData *)mem_get_name(total, name_buf);
-		if (!dataPtr)
+		int16 *buffer = (int16 *)malloc(header.entryFlagsCount * 2);
+		if (!loader_read(buffer, (long)header.entryFlagsCount * 2, 1, &file)) {
+			free(buffer);
 			goto done;
-
-		*dataPtr = cndHeader;
-
-		// Sub-array byte offsets from the start of the block.
-		// 63 = ConvData::SIZE / 2; using it as a word-count base yields the
-		// correct byte offset arithmetic when multiplied by 2.
-		dataPtr->importsOffset    = ConvData::SIZE;
-		dataPtr->entryFlagsOffset = (int16)((cndHeader.importsCount    + 63) * 2);
-		dataPtr->variablesOffset  = (int16)((cndHeader.entryFlagsCount
-		                                   + cndHeader.importsCount + 63) * 2);
-
-		byte *block = (byte *)dataPtr;
-
-		// Imports: conditional — the original skips the loader_read when count <= 0
-		if (cndHeader.importsCount > 0) {
-			if (!loader_read(block + dataPtr->importsOffset,
-			                 (long)cndHeader.importsCount * 2, 1, &file))
-				goto done;
 		}
 
-		// Entry flags: always read (no count guard in the original)
-		if (!loader_read(block + dataPtr->entryFlagsOffset,
-		                 (long)cndHeader.entryFlagsCount * 2, 1, &file))
-			goto done;
-
-		// Variables
-		if (!loader_read(block + dataPtr->variablesOffset,
-		                 (long)cndHeader.variablesCount * ConvVariable::SIZE, 1, &file))
-			goto done;
-
-		// Zero the runtime isPtr flag for every variable; it is not meaningful
-		// as stored on disk
-		if (cndHeader.variablesCount > 0) {
-			ConvVariable *vars = (ConvVariable *)(block + dataPtr->variablesOffset);
-			for (int i = 0; i < cndHeader.variablesCount; ++i)
-				vars[i].isPtr = 0;
-		}
-
-		result = dataPtr;
+		dataPtr->entryFlags.resize(header.entryFlagsCount);
+		for (int i = 0; i < header.entryFlagsCount; ++i)
+			dataPtr->entryFlags[i] = FROM_LE_16(buffer[i]);
+		free(buffer);
 	}
+
+	// Variables
+	{
+		byte *buffer = (byte *)malloc(header.variablesCount * ConvVariable::SIZE);
+		if (!loader_read(buffer, (long)header.variablesCount * ConvVariable::SIZE, 1, &file)) {
+			free(buffer);
+			goto done;
+		}
+
+		Common::MemoryReadStream src(buffer, header.variablesCount * ConvVariable::SIZE);
+		dataPtr->variables.resize(header.entryFlagsCount);
+		for (int i = 0; i < header.entryFlagsCount; ++i) {
+			dataPtr->variables[i].load(&src);
+
+			// Zero the runtime isPtr flag for every variable; it is not meaningful
+			// as stored on disk
+			dataPtr->variables[i].isPtr = false;
+		}
+		free(buffer);
+	}
+
+	result = dataPtr;
 
 done:
 	if (file.open)
 		loader_close(&file);
 
 	if (dataPtr && dataPtr != result)
-		mem_free(dataPtr);
+		delete dataPtr;
 
 	return result;
 }
 
 static ConvData *conv_read_data(Common::SeekableReadStream *src) {
-	byte buffer[ConvData::SIZE];
-	if (src->read(buffer, ConvData::SIZE) != ConvData::SIZE)
+	byte buffer[ConvDataHeader::SIZE];
+	if (src->read(buffer, ConvDataHeader::SIZE) != ConvDataHeader::SIZE)
 		error("Reading ConvData header");
 
 	// TODO
@@ -344,12 +372,12 @@ static ConvData *conv_read_data(Common::SeekableReadStream *src) {
 static void conv_init(ConvData *convData, int val) {
 	conv_start(convData, nullptr);
 
-	for (int i = 0; i < convData->entryFlagsCount; ++i) {
-		uint16 *flag = (uint16 *)((byte *)convData + convData->entryFlagsOffset);
-		*flag &= 0x3fff;
+	for (uint i = 0; i < convData->entryFlags.size(); ++i) {
+		uint16 &flag = convData->entryFlags[i];
+		flag &= 0x3fff;
 
-		if ((*flag & 1) || ((*flag & 4) && val))
-			*flag |= 0x8000;
+		if ((flag & 1) || ((flag & 4) && val))
+			flag |= 0x8000;
 	}
 }
 
@@ -410,9 +438,9 @@ void conv_start(ConvData *convData, Conv *convIn) {
 	byte *block = (byte *)convData;
 
 	// Resolve the byte-offset sub-array pointers stored in the ConvData block
-	conv_imports     = (int16 *)(block + convData->importsOffset);
-	conv_entry_flags = (int16 *)(block + convData->entryFlagsOffset);
-	conv_varsDataPtr = (ConvVariable *)(block + convData->variablesOffset);
+	conv_imports = &convData->imports[0];
+	conv_entry_flags = &convData->entryFlags[0];
+	conv_varsDataPtr = &convData->variables[0];
 
 	// conv_vars0ValPtr -> variables[0].val (skips the isPtr field)
 	conv_vars0ValPtr   = &conv_varsDataPtr[0].val;

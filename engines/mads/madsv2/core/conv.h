@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_CONV_H
 #define MADS_CORE_CONV_H
 
+#include "common/array.h"
 #include "common/stream.h"
 
 namespace MADS {
@@ -39,31 +40,6 @@ enum ConvStatus {
 	CONV_STATUS_REPLY = 4
 };
 
-struct Conv {
-	int16 node_count;
-	int16 dialog_count;
-	int16 message_count;
-	int16 text_line_count;
-	int16 num_variables;
-
-	int16 max_imports;
-	int16 speaker_count;
-	char speaker_portraits[5][16];
-	int16 speaker_frame[5];
-	char speech_file[14];
-	uint32 text_length;
-
-	uint32 commands_length;
-	void *text_ptr;
-	void *scripts_ptr;
-	void *nodes_ptr;
-	void *dialogs_ptr;
-	void *messages_ptr;
-	void *text_lines_ptr;
-
-	static constexpr int SIZE = 2 * 7 + 16 * 5 + 2 * 5 + 14 + 4 + 4 + 4 * 6;
-	void load(Common::SeekableReadStream *src);
-};
 
 struct ConvNode {
 	int16 index;
@@ -106,7 +82,57 @@ struct ConvVariable {
 	void load(Common::SeekableReadStream *src);
 };
 
-struct ConvData {
+struct ConvBase {
+	int16 node_count;
+	int16 dialog_count;
+	int16 message_count;
+	int16 text_line_count;
+	int16 num_variables;
+
+	int16 max_imports;
+	int16 speaker_count;
+	char speaker_portraits[5][16];
+	int16 speaker_frame[5];
+	char speech_file[14];
+	uint32 text_length;
+
+	uint32 commands_length;
+
+	static constexpr int SIZE = 2 * 7 + 16 * 5 + 2 * 5 + 14 + 4 + 4 + 4 * 6;
+};
+
+struct ConvHeader : public ConvBase {
+	int textOffset;
+	int scriptsOffset;
+	int nodesOffset;
+	int dialogsOffset;
+	int messagesOffset;
+	int textLinesOffset;
+
+	void load(Common::SeekableReadStream *src);
+};
+
+struct Conv : public ConvBase {
+	Conv &operator=(const ConvBase &src) {
+		*((ConvBase *)this) = src;
+		text.clear();
+		scripts.clear();
+		nodes.clear();
+		dialogs.clear();
+		messages.clear();
+		textLines.clear();
+		return *this;
+	}
+
+	Common::Array<ConvNode> nodes;
+	Common::Array<ConvDialog> dialogs;
+	Common::Array<int32> messages;
+	Common::Array<uint16> text;
+	Common::Array<uint16> scripts;
+	Common::Array<uint16> textLines;
+};
+
+struct ConvDataBase {
 	int16 currentNode;
 	int16 entryFlagsCount;
 	int16 variablesCount;
@@ -122,6 +148,9 @@ struct ConvData {
 	int16 messageList2[10];
 	int16 messageList3[10];
 	int16 messageList4[10];
+};
+
+struct ConvDataHeader : public ConvDataBase {
 	int16 importsOffset;
 	int16 entryFlagsOffset;
 	int16 variablesOffset;
@@ -132,6 +161,20 @@ struct ConvData {
 	// includes the header in the total allocation.
 	static constexpr int SIZE = 2 * 10 + 2 * 10 * 5 + 2 * 3;
 	void load(Common::SeekableReadStream *src);
+};
+
+struct ConvData : public ConvDataBase {
+	ConvData &operator=(const ConvDataBase &src) {
+		*((ConvDataBase *)this) = src;
+		imports.clear();
+		entryFlags.clear();
+		variables.clear();
+		return *this;
+	}
+
+	Common::Array<int16> imports;
+	Common::Array<uint16> entryFlags;
+	Common::Array<ConvVariable> variables;
 };
 
 struct ConvControl {
@@ -167,7 +210,7 @@ extern Conv *active_conv;
 extern ConvData *active_conv_data;
 
 extern int16 *conv_imports;
-extern int16 *conv_entry_flags;
+extern uint16 *conv_entry_flags;
 extern ConvVariable *conv_varsDataPtr;
 extern int16 *conv_vars0ValPtr;
 
