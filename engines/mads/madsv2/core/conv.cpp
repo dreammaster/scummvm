@@ -33,6 +33,7 @@
 #include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/popup.h"
+#include "mads/madsv2/core/imath.h"
 #include "mads/madsv2/core/speech.h"
 
 namespace MADS {
@@ -51,10 +52,15 @@ ConvControl conv_control;
 Box conv_box;
 int16 *conv_my_next_start;
 int conv_error_code;
+int conv_dlg_script_ptr, conv_dlg_script_end;
 
 static int conv_indexes[CONV_MAX_SLOTS];
 static int conv_slots[CONV_MAX_DATA];
 
+
+// ====================================================================
+// Struct serialization methods
+// ====================================================================
 
 void ConvHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(node_count, dialog_count, message_count, text_line_count,
@@ -80,21 +86,24 @@ void ConvDialog::load(Common::SeekableReadStream *src) {
 }
 
 void ConvScriptParams::load(Common::SeekableReadStream *src) {
-	operation = src->readSint16LE();
+	operation = (ConvOp)src->readSint16LE();
 	param1IsVar = src->readByte();
 	param2IsVar = src->readByte();
 	src->readMultipleLE(param1, param2);
 }
 
 void ConvVariable::load(Common::SeekableReadStream *src) {
-	src->readMultipleLE(isPtr, val, unused);
+	(void)src->readUint16LE();	// isPtr
+	isPtr = false;
+	val = src->readSint16LE();
+	(void)src->readUint16LE();	// skip space for pointer segments
 }
 
 void ConvDataHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(currentNode, entryFlagsCount, variablesCount,
-		importsCount, numImports, array1_size,
+		importsCount, numImports, optionListSize,
 		messageList1_size, messageList2_size, speechListSize, messageList4_size);
-	src->readMultipleLE(array1);
+	src->readMultipleLE(optionList);
 	src->readMultipleLE(messageList1);
 	src->readMultipleLE(messageList2);
 	src->readMultipleLE(speechList);
@@ -102,7 +111,10 @@ void ConvDataHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
 }
 
-//====================================================================
+
+// ====================================================================
+// Static helpers (ordered so no forward declarations are needed)
+// ====================================================================
 
 static const char *conv_get_filename(int convNum, int extType, char *name) {
 	*name = '\0';
@@ -120,6 +132,48 @@ static const char *conv_get_filename(int convNum, int extType, char *name) {
 static Common::SeekableReadStream *conv_open(int convNum) {
 	char name[40];
 	return env_open(conv_get_filename(convNum, 2, name));
+}
+
+// ---------------------------------------------------------------------------
+// string_trim — strips trailing whitespace from a mutable C string in-place.
+// ---------------------------------------------------------------------------
+static void string_trim(char *str) {
+	if (!str) return;
+	size_t len = strlen(str);
+	while (len > 0 && (unsigned char)str[len - 1] <= ' ')
+		str[--len] = '\0';
+}
+
+// ---------------------------------------------------------------------------
+// conv_string — returns a pointer to the null-terminated dialog string
+// identified by textIdx.  textLines[textIdx] is a byte offset into the flat
+// text character pool stored in conv->text.
+// ---------------------------------------------------------------------------
+static const char *conv_string(int textIdx, Conv *convIn) {
+	uint16 byteOffset = convIn->textLines[textIdx];
+	return reinterpret_cast<const char *>(convIn->text.begin()) + byteOffset;
+}
+
+// Version to use if the isPtr parameter is true (-1)
+static void conv_set_variable(int idx, int16 *ptr) {
+	if (conv_control.running >= 0) {
+		ConvData &cd = *conv_data[conv_control.index];
+		ConvVariable &var = cd.variables[idx];
+
+		var.isPtr = true;
+		var.ptr = ptr;
+	}
+}
+
+// Version to use if the isPtr parameter is false (0)
+static void conv_set_variable(int idx, int16 val) {
+	if (conv_control.running >= 0) {
+		ConvData &cd = *conv_data[conv_control.index];
+		ConvVariable &var = cd.variables[idx];
+
+		var.isPtr = false;
+		var.val = val;
+	}
 }
 
 static Conv *load_conv(const char *fname) {
@@ -155,7 +209,6 @@ static Conv *load_conv(const char *fname) {
 		Common::MemoryReadStream hdrStream(hdrBuf, ConvHeader::SIZE);
 		convHeader.load(&hdrStream);
 	}
-
 
 	dataPtr = new Conv();
 	if (!dataPtr) {
@@ -246,7 +299,7 @@ static Conv *load_conv(const char *fname) {
 		}
 	}
 
-	//  Scripts
+	// Scripts
 	{
 		dataPtr->scripts.resize(convHeader.commands_length);
 		if (!loader_read(&dataPtr->scripts[0], convHeader.commands_length, 1, &file)) {
@@ -451,14 +504,575 @@ static void conv_purge_any_popup() {
 	}
 }
 
-static void conv_set_variable(int idx, int16 v1, int16 *valPtr) {
-	// TODO
+// ---------------------------------------------------------------------------
+// conv_generate_text
+//
+// Builds and displays a conversation-line popup for the current speaker, then
+// triggers the associated speech audio (if the speech system is active and at
+// least one speech index was supplied).
+//
+// Parameters
+//   speechList  — array of speech-audio indices; speechList[0] is played
+//   convData    — active ConvData (unused; callers already route through
+//                 conv_control)
+//   convIn      — active Conv (provides the text pool and speech filename)
+//   textIdx     — index into convIn->textLines that selects the dialog string
+//   speechCount — number of valid entries in speechList (0 = no speech)
+// ---------------------------------------------------------------------------
+static void conv_generate_text(int16 *speechList, ConvData * /*convData*/,
+                               Conv *convIn, int textIdx, int speechCount) {
+	int  person = conv_control.person_speaking;
+	char textBuf[512];
+	Box *savedBox;
+
+	// Redirect popup operations to the conversation-private box so that the
+	// bounds recorded by popup_draw can be used later by conv_purge_any_popup.
+	savedBox = box;
+	box = &conv_box;
+
+	// Size and position the popup from the current speaker's slot data.
+	int horiz_pieces = popup_estimate_pieces(conv_control.width[person]);
+	popup_create(horiz_pieces,
+	             conv_control.x[person],
+	             conv_control.y[person]);
+
+	// Attach the speaker portrait icon if a series was loaded for this slot.
+	// The icon_id is the 1-based frame stored in speaker_frame.
+	// center=0: left-aligned within the popup box.
+	if (conv_control.speaker_series[person] >= 0) {
+		popup_add_icon(series_list[conv_control.speaker_series[person]],
+		               conv_control.speaker_frame[person],
+		               0);
+	}
+
+	// Copy the dialog string to a local mutable buffer, strip trailing
+	// whitespace (the raw text pool can have padding bytes), then write it.
+	Common::strlcpy(textBuf, conv_string(textIdx, convIn), sizeof(textBuf));
+	string_trim(textBuf);
+	popup_write_string(textBuf);
+
+	// Render the popup, saving the underlying screen region.
+	popup_draw(true, false);
+
+	// Restore the caller's box and record that a conversation popup is live.
+	box = savedBox;
+	conv_control.popup_is_up  = -1;
+	conv_control.popup_clock  = kernel.clock;
+
+	// Play the associated speech audio when the speech system is on.
+	if (speech_system_active && speech_on && speechCount > 0) {
+		speech_ems_play(convIn->speech_file, speechList[0]);
+	}
 }
 
 static int conv_next_node() {
 	active_conv_data->currentNode = *conv_vars0ValPtr;
 	return active_conv->nodes[active_conv_data->currentNode].active;
 }
+
+// ---------------------------------------------------------------------------
+// conv_list_options
+//
+// Scans the dialogs belonging to the current conversation node and builds the
+// list of active (visible) options in active_conv_data->optionList[].
+//
+// A dialog entry is "active" when bit 15 of its entryFlags word is set.  Up
+// to 10 active entries are recorded; when hasMore is zero the list is capped
+// at 5 (normal single-page display), otherwise the full 10 are collected
+// (extended/scrolled display).  The final count of ALL active entries (not
+// just the ones stored) is written to active_conv_data->optionListSize.
+//
+// Parameters
+//   hasMore — non-zero when more than one page of options should be collected
+// ---------------------------------------------------------------------------
+static int16 conv_list_options(int16 hasMore) {
+	int16 nodeIndex  = *conv_vars0ValPtr;
+	int   count      = 0;
+	int   dialogIter = 0;
+
+	int dialogBase  = active_conv->nodes[nodeIndex].index;
+	int dialogCount = active_conv->nodes[nodeIndex].dialog_count;
+
+	while (dialogIter < dialogCount) {
+		int16 dialogIdx = (int16)(dialogBase + dialogIter);
+
+		if (active_conv_data->entryFlags[dialogIdx] & 0x8000) {
+			// Include in optionList only if within the allowed window size
+			if ((count < 5 || hasMore) && count < 10)
+				active_conv_data->optionList[count] = dialogIdx;
+			++count;
+		}
+		++dialogIter;
+	}
+
+	active_conv_data->optionListSize = (int16)count;
+	return (int16)count;
+}
+
+static void conv_flag_entry(int action, int index) {
+	uint16 &entry = active_conv_data->entryFlags[index];
+
+	switch (action) {
+	case 1:
+		entry |= 0x4000;
+		entry &= 0x7fff;
+		break;
+
+	case 2:
+		entry &= 0x7fff;
+		break;
+
+	case 3:
+		if (!(entry & 0x4000))
+			entry |= 0x8000;
+
+	default:
+		break;
+	}
+}
+
+static byte conv_get_script_byte() {
+	byte val = active_conv->scripts[conv_dlg_script_ptr];
+	if (conv_dlg_script_ptr <= conv_dlg_script_end)
+		++conv_dlg_script_ptr;
+
+	return val;
+}
+
+static void conv_get_script_bytes(byte *dest, int count) {
+	while (count-- > 0)
+		*dest++ = conv_get_script_byte();
+}
+
+static int16 conv_get_script_word() {
+	byte buffer[2];
+	conv_get_script_bytes(buffer, 2);
+	return READ_LE_INT16(buffer);
+}
+
+static void conv_param_load(ConvScriptParams *params) {
+	params->operation = (ConvOp)conv_get_script_word();
+
+	if (params->operation == CONV_OP_NONE) {
+		params->param1IsVar = false;
+		params->param1 = 0;
+	} else {
+		params->param1IsVar = conv_get_script_byte();
+		params->param1 = conv_get_script_word();
+	}
+
+	if (params->operation == CONV_OP_VALUE || params->operation == CONV_OP_NONE) {
+		params->param2IsVar = false;
+		params->param2 = 0;
+	} else {
+		params->param2IsVar = conv_get_script_byte();
+		params->param2 = conv_get_script_word();
+	}
+}
+
+// ---------------------------------------------------------------------------
+// conv_scr_get_param
+//
+// Resolves one operand of a script expression.  If the corresponding IsVar
+// flag is set the stored value is treated as a variable index and the live
+// value is fetched from conv_varsDataPtr; otherwise the value is used
+// directly.
+//
+// paramNum: 0 = param1, 1 = param2
+// ---------------------------------------------------------------------------
+static int16 conv_scr_get_param(ConvScriptParams *params, int paramNum) {
+	if (paramNum) {
+		return params->param2IsVar == 1 ? *conv_get_variable(params->param2) : params->param2;
+	} else {
+		return params->param1IsVar == 1 ? *conv_get_variable(params->param1) : params->param1;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// conv_param_evaluate
+//
+// Evaluates a script expression encoded in *params and returns the result as
+// an int16.
+//
+// Special operation codes:
+//   CONV_OP_NONE  (255) — no expression; returns -1 without reading params.
+//   CONV_OP_VALUE (  0) — identity; returns param1 (resolved variable or
+//                         literal) without a second operand.
+//
+// Operations 1–13 take two resolved operands (param1, param2) and compute
+// arithmetic or logical results.  An out-of-range operation code is a
+// non-fatal error (WARNING); the initialised result of -1 is returned.
+// ---------------------------------------------------------------------------
+static int16 conv_param_evaluate(ConvScriptParams *params) {
+	int16 result = -1;
+
+	if (params->operation == CONV_OP_NONE)
+		return result;
+
+	int16 param1 = conv_scr_get_param(params, 0);
+
+	if (params->operation == CONV_OP_VALUE)
+		return param1;
+
+	int16 param2 = conv_scr_get_param(params, 1);
+
+	switch (params->operation) {
+	case CONV_OP_ADD:
+		result = param1 + param2;
+		break;
+	case CONV_OP_SUB:
+		result = param1 - param2;
+		break;
+	case CONV_OP_MUL:
+		result = param1 * param2;
+		break;
+	case CONV_OP_DIV:
+		result = param1 / param2;
+		break;
+	case CONV_OP_MOD:
+		result = param1 % param2;
+		break;
+	case CONV_OP_GE:
+		result = (param1 >= param2) ? 1 : 0;
+		break;
+	case CONV_OP_LE:
+		result = (param1 <= param2) ? 1 : 0;
+		break;
+	case CONV_OP_GT:
+		result = (param1 > param2) ? 1 : 0;
+		break;
+	case CONV_OP_LT:
+		result = (param1 < param2) ? 1 : 0;
+		break;
+	case CONV_OP_NE:
+		result = (param1 != param2) ? 1 : 0;
+		break;
+	case CONV_OP_EQ:
+		result = (param1 == param2) ? 1 : 0;
+		break;
+	case CONV_OP_AND:
+		result = (param1 != 0 && param2 != 0) ? 1 : 0;
+		break;
+	case CONV_OP_OR:
+		result = (param1 != 0 || param2 != 0) ? 1 : 0;
+		break;
+	default:
+		// Unknown operator — non-fatal; report and return the initialised -1.
+		error_report(ERROR_CONV_BAD_OPERATOR, WARNING, MODULE_CONV,
+		             conv_dlg_script_ptr, (int)params->operation);
+		break;
+	}
+
+	return result;
+}
+
+// ---------------------------------------------------------------------------
+// conv_generate_menu
+//
+// Prepares the player-choice menu for the current conversation node.
+//
+// Calls conv_list_options(0) to populate convData->optionList[] with the global
+// dialog indices of all active entries for the current node and to obtain the
+// total active count.
+//
+// If the node's field_8 value is >= count it acts as a redirect: variables
+// are updated to the target node stored in field_6 and the function returns 0
+// so the caller (conv_update) can loop and re-evaluate.
+//
+// Otherwise the function initialises the dialog interface, registers each
+// active entry's display text with inter_add_dialog(), enables command input,
+// and returns 2.
+//
+// Parameters
+//   convData — ConvData for the active conversation (provides optionList)
+//   convIn   — Conv for the active conversation (provides nodes and dialogs)
+//
+// Returns
+//   0 — node redirected to another node (caller should re-run)
+//   2 — menu built and ready for player input
+// ---------------------------------------------------------------------------
+static int conv_generate_menu(ConvData *convData, Conv *convIn) {
+	int16 count     = conv_list_options(0);
+	int16 nodeIndex = *conv_vars0ValPtr;
+	ConvNode *node  = &convIn->nodes[nodeIndex];
+
+	// If field_8 >= count the node is a redirect: jump to the node index
+	// stored in field_6 and tell the caller to re-evaluate.
+	if (node->field_8 >= count) {
+		*conv_vars0ValPtr   = node->field_6;
+		*conv_my_next_start = *conv_vars0ValPtr;
+		return 0;
+	}
+
+	// Sanity-check: there should be at least one active dialog entry.
+	if (count < 1)
+		error_report(ERROR_CONV_MENU, ERROR, MODULE_CONV, nodeIndex, count);
+
+	conv_control.popup_clock = kernel.clock;
+	kernel_init_dialog();
+
+	for (int i = 0; i < count; ++i) {
+		int16 dialogIdx   = convData->optionList[i];
+		int16 textLineIdx = convIn->dialogs[dialogIdx].text_line_index;
+
+		if (textLineIdx < 0) {
+			// Dialog entry has no associated text — report and skip.
+			error_report(ERROR_CONV_NO_TEXT_LINE, ERROR, MODULE_CONV, dialogIdx, textLineIdx);
+			continue;
+		}
+
+		inter_add_dialog(const_cast<char *>(conv_string(textLineIdx, convIn)), dialogIdx);
+	}
+
+	kernel_set_interface_mode(INTER_CONVERSATION);
+	player.commands_allowed = -1;
+	return 2;
+}
+
+static void conv_handle_cmd123(int cmd) {
+	ConvScriptParams params;
+	conv_param_load(&params);
+	int value = conv_param_evaluate(&params);
+	int numFlags = conv_get_script_byte();
+
+	for (int i = 0; i < numFlags; ++i) {
+		int entryIndex = conv_get_script_word();
+		if (value)
+			conv_flag_entry(cmd, entryIndex);
+	}
+}
+
+static void conv_message(int cmd) {
+	ConvScriptParams params;
+	conv_param_load(&params);
+	int value = conv_param_evaluate(&params);
+	int count1 = conv_get_script_byte();
+	int count2 = conv_get_script_byte();
+	int total = 0;
+	int val1 = 0;
+	int array1[10], array2[10], array3[10];
+
+	for (int i = 0; i < count1; ++i) {
+		val1 = conv_get_script_byte();
+		if (i < 10) {
+			array1[i] = val1;
+			total += val1;
+		}
+	}
+
+	for (int i = 0; i < count1; ++i) {
+		val1 = conv_get_script_word();
+		if (i < 10)
+			array2[i] = val1;
+	}
+
+	for (int i = 0; i < count2; ++i) {
+		val1 = conv_get_script_word();
+		if (i < 10)
+			array3[i] = val1;
+	}
+
+	if (!value)
+		return;
+
+	// Weighted random selection: pick one of the count1 choices using the
+	// byte weights in array1.  randomIndex starts at -1 and is incremented
+	// before each subtraction so that the first iteration checks array1[0].
+	// The loop exits (jg / jump-if-greater) when randomVal drops to <= 0,
+	// leaving randomIndex pointing at the selected entry.
+	int randomVal   = imath_random(1, total);
+	int randomIndex = -1;
+	do {
+		++randomIndex;
+		randomVal -= array1[randomIndex];
+	} while (randomVal > 0);
+
+	int entryVal = array2[randomIndex];
+
+	if (cmd == 4) {
+		// Player/"you" line
+		if (active_conv_data->messageList2_size < 10)
+			active_conv_data->messageList2[active_conv_data->messageList2_size++] = (int16)entryVal;
+
+		if (count1 > 1) {
+			// Multiple weighted choices: append only the matching data entry
+			if (randomIndex < count2 && active_conv_data->messageList4_size < 10)
+				active_conv_data->messageList4[active_conv_data->messageList4_size++] = (int16)array3[randomIndex];
+		} else {
+			// Single choice: append every data entry from array3
+			for (int i = 0; i < count2; ++i) {
+				if (active_conv_data->messageList4_size < 10)
+					active_conv_data->messageList4[active_conv_data->messageList4_size++] = (int16)array3[i];
+			}
+		}
+	} else {
+		// NPC/"me" line
+		if (active_conv_data->messageList1_size < 10)
+			active_conv_data->messageList1[active_conv_data->messageList1_size++] = (int16)entryVal;
+
+		if (count1 > 1) {
+			// Multiple weighted choices: append only the matching speech entry
+			if (randomIndex < count2 && active_conv_data->speechListSize < 10)
+				active_conv_data->speechList[active_conv_data->speechListSize++] = (int16)array3[randomIndex];
+		} else {
+			// Single choice: append every speech entry from array3
+			for (int i = 0; i < count2; ++i) {
+				if (active_conv_data->speechListSize < 10)
+					active_conv_data->speechList[active_conv_data->speechListSize++] = (int16)array3[i];
+			}
+		}
+	}
+}
+
+static int conv_cmd_node() {
+	ConvScriptParams params1, params2, params3;
+	int result = 0;
+	conv_param_load(&params1);
+	conv_param_load(&params2);
+	conv_param_load(&params3);
+
+	if (conv_param_evaluate(&params1)) {
+		int val2 = conv_param_evaluate(&params2);
+		int val3 = conv_param_evaluate(&params3);
+
+		*conv_vars0ValPtr = val2;
+		if (val2 >= 0)
+			*conv_my_next_start = val2;
+		else if (val3 >= 0)
+			*conv_my_next_start = val3;
+
+		result = -1;
+	}
+
+	return result;
+}
+
+static void conv_cmd_assign() {
+	ConvScriptParams params1, params2;
+	conv_param_load(&params1);
+	conv_param_load(&params2);
+	int varIndex = conv_get_script_word();
+
+	if (conv_param_evaluate(&params1)) {
+		int val = conv_param_evaluate(&params2);
+		int16 *varPtr = conv_get_variable(varIndex);
+		*varPtr = val;
+	}
+}
+
+static void conv_cmd_goto() {
+	ConvScriptParams params1;
+	conv_param_load(&params1);
+	int newOffset = conv_get_script_word();
+
+	if (conv_param_evaluate(&params1))
+		conv_dlg_script_ptr = newOffset;
+}
+
+// ---------------------------------------------------------------------------
+// conv_execute_entry
+//
+// Executes the byte-code script attached to dialog entry 'index' within the
+// active conversation.  The script is consumed as a stream of command bytes,
+// each optionally followed by parameters read via the conv_get_script_*
+// helpers.  Command byte values:
+//
+//   0         — no-op (continue to next command)
+//   1, 2, 3  — flag/show/hide entry           → conv_handle_cmd123(cmd)
+//   4, 5     — NPC/player message             → conv_message(cmd)
+//   6        — invalid command (error)
+//   7        — conditional node jump          → conv_cmd_node()
+//   8        — conditional script goto        → conv_cmd_goto()
+//   9        — conditional variable assign    → conv_cmd_assign()
+//   >9       — invalid (same error path as 6)
+//
+// Execution continues until the script pointer advances past the end of the
+// script block, or until conv_cmd_node() signals "done" by returning
+// non-zero (which sets flag → 0 → loop exit).
+//
+// Returns *conv_vars0ValPtr: set to -1 when the script ran to natural
+// completion; left at whatever conv_cmd_node() wrote there when a node
+// jump caused an early exit.
+// ---------------------------------------------------------------------------
+static int16 conv_execute_entry(int index) {
+	// Point the script stream at this dialog entry's byte-code block.
+	ConvDialog &dlg     = active_conv->dialogs[index];
+	conv_dlg_script_ptr = dlg.script_offset;
+	conv_dlg_script_end = dlg.script_offset + dlg.script_size;
+
+	// Reset per-execution message lists.
+	active_conv_data->messageList1_size = 0;
+	active_conv_data->messageList2_size = 0;
+	active_conv_data->speechListSize    = 0;
+	active_conv_data->messageList4_size = 0;
+
+	// Restore the current node pointer from the saved "next start" slot.
+	*conv_vars0ValPtr = *conv_my_next_start;
+
+	// flag: -1 = keep looping; 0 = early exit requested by cmd7.
+	int16 flag = -1;
+
+	for (;;) {
+		// Exit when the script pointer has advanced past the end of the block
+		// (matches: cmp conv_dlg_script_end, ax; jnb; else jmp exit).
+		if (conv_dlg_script_ptr > conv_dlg_script_end)
+			break;
+
+		int commandId = (uint8)conv_get_script_byte();
+
+		if (commandId > 9) {
+			// Unknown command — non-fatal error; loop will naturally exhaust
+			// the script or hit a real end.
+			error_report(-50, ERROR, MODULE_CONV, conv_dlg_script_ptr, commandId);
+		} else {
+			switch (commandId) {
+			case 0:
+				// No-op: read next command.
+				break;
+			case 1:
+			case 2:
+			case 3:
+				conv_handle_cmd123(commandId);
+				break;
+			case 4:
+			case 5:
+				conv_message(commandId);
+				break;
+			case 6:
+				error_report(-50, ERROR, MODULE_CONV, conv_dlg_script_ptr, commandId);
+				break;
+			case 7:
+				// conv_cmd_node returns non-zero when a node jump was taken
+				// (signal done → flag=0 → exit loop); 0 means no jump taken
+				// (flag=1 → continue).
+				// Matches: cmp ax,1; sbb ax,ax; neg ax
+				flag = conv_cmd_node() ? 0 : 1;
+				break;
+			case 8:
+				conv_cmd_goto();
+				break;
+			case 9:
+				conv_cmd_assign();
+				break;
+			}
+		}
+
+		// Exit early if a command set flag to 0.
+		if (flag == 0)
+			break;
+	}
+
+	// Natural completion (flag still non-zero): mark node as finished.
+	// Early exit (flag == 0): conv_cmd_node already wrote the new target node.
+	if (flag != 0)
+		*conv_vars0ValPtr = -1;
+
+	return *conv_vars0ValPtr;
+}
+
+// ====================================================================
+// Public API
+// ====================================================================
 
 void conv_system_init() {
 	Common::fill((byte *)&conv_control, (byte *)&conv_control + sizeof(ConvControl), 0);
@@ -586,10 +1200,10 @@ void conv_run(int convId) {
 	// Variable 2 maps to speaker_val (not contiguous with the arrays below).
 	// Variables 3–22 map to speaker_frame[5], x[5], y[5], width[5] — 20
 	// consecutive int16s — so a single pointer walk replaces 20 separate calls.
-	conv_set_variable(2, -1, &conv_control.speaker_val);
+	conv_set_variable(2, &conv_control.speaker_val);
 	int16 *p = conv_control.speaker_frame;
 	for (int i = 3; i <= 22; ++i, ++p)
-		conv_set_variable(i, -1, p);
+		conv_set_variable(i, p);
 
 	// Load speaker portrait series for each declared speaker
 	for (idx = 0; idx < conv[slot]->speaker_count; ++idx) {
@@ -609,93 +1223,222 @@ void conv_run(int convId) {
 }
 
 // ---------------------------------------------------------------------------
-// conv_string
+// conv_generate_message
 //
-// Returns a pointer to the null-terminated text string whose index within the
-// flat text buffer is stored in conv->textLines[textIdx].  The text blob is
-// held in conv->text (stored as uint16 units but treated as a byte stream);
-// textLines values are byte offsets into that blob.
+// Generates and displays a conversation message popup for either the NPC
+// ("me") or player ("you") side, drawing from message and voice/data index
+// lists that conv_execute_entry populated.
+//
+// Parameters (DOS push order — rightmost pushed first):
+//   voiceList     — array of speech/data indices (speechList or messageList4)
+//   msgList       — array of dialog text indices  (messageList1 or messageList2)
+//   convData      — active ConvData
+//   convIn        — active Conv
+//   msgListSize   — number of valid entries in msgList  (in ax)
+//   voiceListSize — number of valid entries in voiceList (in dx)
 // ---------------------------------------------------------------------------
-static const char *conv_string(int textIdx, Conv *convIn) {
-	uint16 byteOffset = convIn->textLines[textIdx];
-	return reinterpret_cast<const char *>(convIn->text.begin()) + byteOffset;
+static void conv_generate_message(int16 *voiceList, int16 *msgList,
+                                  ConvData *convData, Conv *convIn,
+                                  int msgListSize, int voiceListSize) {
+	// TODO
 }
 
 // ---------------------------------------------------------------------------
-// string_trim
+// conv_update
 //
-// Strips trailing whitespace (any byte value <= ' ') from a mutable C string
-// in-place.  Mirrors the original DOS helper of the same name.
-// ---------------------------------------------------------------------------
-static void string_trim(char *str) {
-	if (!str) return;
-	size_t len = strlen(str);
-	while (len > 0 && (unsigned char)str[len - 1] <= ' ')
-		str[--len] = '\0';
-}
-
-// ---------------------------------------------------------------------------
-// conv_generate_text
+// Main per-tick conversation state machine.  Called once per game tick while
+// a conversation is running.  The 'flag' parameter indicates whether the
+// engine has a pending player command ready (mirrors player.command_ready in
+// the callers for modes 1 and 2).
 //
-// Builds and displays a conversation-line popup for the current speaker, then
-// triggers the associated speech audio (if the speech system is active and at
-// least one speech index was supplied).
-//
-// Parameters
-//   speechList  — array of speech-audio indices; speechList[0] is played
-//   convData    — active ConvData (unused here; callers already route through
-//                 conv_control)
-//   convIn      — active Conv (provides the text pool and speech filename)
-//   textIdx     — index into convIn->textLines that selects the dialog string
-//   speechCount — number of valid entries in speechList (0 = no speech)
+// Status dispatch table (off_2D438):
+//   0  (NEXT_NODE)   — advance to next node or build player menu
+//   1  (WAIT_AUTO)   — wait for auto-trigger then advance to EXECUTE
+//   2  (WAIT_ENTRY)  — player chose an option; execute it + show NPC portrait
+//   3  (EXECUTE)     — (clock-gated) execute entry script + show NPC message
+//   4  (REPLY)       — (clock-gated) show player reply message
+//   5–9              — no-op (exit)
+//   10 (DONE)        — call conv_abort
+//   >10              — no-op (exit)
 // ---------------------------------------------------------------------------
-static void conv_generate_text(int16 *speechList, ConvData * /*convData*/,
-                               Conv *convIn, int textIdx, int speechCount) {
-	int  person = conv_control.person_speaking;
-	char textBuf[512];
-	Box *savedBox;
+void conv_update(bool flag) {
+	if (conv_control.running < 0)
+		return;
 
-	// Redirect popup operations to the conversation-private box so that the
-	// bounds recorded by popup_draw can be used later by conv_purge_any_popup.
-	savedBox = box;
-	box = &conv_box;
+	int slot = conv_control.index;
+	Conv     *my_conv      = conv[slot];
+	ConvData *my_conv_data = conv_data[slot];
 
-	// Size and position the popup from the current speaker's slot data.
-	int horiz_pieces = popup_estimate_pieces(conv_control.width[person]);
-	popup_create(horiz_pieces,
-	             conv_control.x[person],
-	             conv_control.y[person]);
+	switch (conv_control.status) {
 
-	// Attach the speaker portrait icon if a series was loaded for this slot.
-	// The icon_id is the 1-based frame stored in speaker_frame.
-	// center=0: left-aligned within the popup box.
-	if (conv_control.speaker_series[person] >= 0) {
-		popup_add_icon(series_list[conv_control.speaker_series[person]],
-		               conv_control.speaker_frame[person],
-		               0);
+	// ------------------------------------------------------------------
+	// Mode 0 — NEXT_NODE
+	// ------------------------------------------------------------------
+	case CONV_STATUS_NEXT_NODE: {
+		if (*conv_vars0ValPtr < 0) {
+			// Node is exhausted — wait for the popup clock then clean up.
+			if (kernel.clock < conv_control.popup_clock)
+				return;
+
+			conv_purge_any_popup();
+
+			if (conv_control.me_trigger) {
+				player_verb            = conv_control.entry;
+				kernel.trigger         = conv_control.me_trigger;
+				kernel.trigger_mode    = conv_control.me_trigger_mode;
+				conv_control.me_trigger = 0;
+				return;
+			}
+
+			conv_control.status = CONV_STATUS_DONE;
+			return;
+		}
+
+		// Advance to the next node in the script.
+		int var_4 = conv_next_node();
+		conv_control.node = *conv_vars0ValPtr;
+
+		if (!var_4) {
+			// Node is a player-choice menu node.
+			conv_control.status = (ConvStatus)conv_generate_menu(my_conv_data, my_conv);
+			return;
+		}
+
+		// Node is an auto-play NPC node: pick the first dialog entry and
+		// fire a synthetic player command so mode 1 can advance to EXECUTE.
+		int16 nodeIndex       = *conv_vars0ValPtr;
+		conv_control.entry    = my_conv->nodes[nodeIndex].index;
+		conv_control.status   = CONV_STATUS_WAIT_AUTO;
+		player_verb           = conv_control.entry;
+		player.command_ready  = -1;
+		player.command_error  = 0;
+		return;
 	}
 
-	// Copy the dialog string to a local mutable buffer, strip trailing
-	// whitespace (the raw text pool can have padding bytes), then write it.
-	Common::strlcpy(textBuf, conv_string(textIdx, convIn), sizeof(textBuf));
-	string_trim(textBuf);
-	popup_write_string(textBuf);
+	// ------------------------------------------------------------------
+	// Mode 10 — DONE: conversation finished, tear everything down.
+	// ------------------------------------------------------------------
+	case CONV_STATUS_DONE:
+		conv_abort();
+		return;
 
-	// Render the popup, saving the underlying screen region.
-	popup_draw(true, false);
+	// ------------------------------------------------------------------
+	// Mode 1 — WAIT_AUTO: waiting for the synthetic command to fire.
+	// ------------------------------------------------------------------
+	case CONV_STATUS_WAIT_AUTO:
+		if (!flag)
+			return;
+		conv_control.status = CONV_STATUS_EXECUTE;
+		return;
 
-	// Restore the caller's box and record that a conversation popup is live.
-	box = savedBox;
-	conv_control.popup_is_up  = -1;
-	conv_control.popup_clock  = kernel.clock;
+	// ------------------------------------------------------------------
+	// Mode 2 — WAIT_ENTRY: player has chosen a dialog option.
+	// ------------------------------------------------------------------
+	case CONV_STATUS_WAIT_ENTRY: {
+		if (!flag)
+			return;
 
-	// Play the associated speech audio when the speech system is on.
-	if (speech_system_active && speech_on && speechCount > 0) {
-		speech_ems_play(convIn->speech_file, speechList[0]);
+		player.commands_allowed = 0;
+		conv_control.entry      = player_verb;
+
+		// Auto-hide the entry unless it is flagged as always-visible (bit 1).
+		if (!(active_conv_data->entryFlags[conv_control.entry] & 2))
+			conv_flag_entry(2, conv_control.entry);
+
+		conv_purge_any_popup();
+		kernel_init_dialog();
+		kernel_set_interface_mode(INTER_CONVERSATION);
+		conv_control.person_speaking = 0;
+
+		conv_execute_entry(conv_control.entry);
+
+		// If the dialog has a dedicated speech index, override the speech list
+		// with that single index (takes priority over anything conv_execute_entry
+		// populated via conv_message).
+		int16 speech_idx = my_conv->dialogs[conv_control.entry].speech_index;
+		if (speech_idx) {
+			my_conv_data->speechList[0] = speech_idx;
+			my_conv_data->speechListSize = 1;
+		}
+
+		conv_generate_text(my_conv_data->speechList, my_conv_data, my_conv,
+		                   my_conv->dialogs[conv_control.entry].text_line_index,
+		                   my_conv_data->speechListSize);
+
+		conv_control.status = CONV_STATUS_REPLY;
+
+		if (conv_control.me_trigger) {
+			player_verb            = conv_control.entry;
+			kernel.trigger         = conv_control.me_trigger;
+			kernel.trigger_mode    = conv_control.me_trigger_mode;
+			conv_control.me_trigger = 0;
+			return;
+		}
+		return;
 	}
-}
 
-void conv_update(bool) {
+	// ------------------------------------------------------------------
+	// Mode 3 — EXECUTE: execute the NPC entry's script and show message.
+	// ------------------------------------------------------------------
+	case CONV_STATUS_EXECUTE: {
+		if (kernel.clock < conv_control.popup_clock)
+			return;
+
+		conv_purge_any_popup();
+		conv_control.person_speaking = 0;
+
+		conv_execute_entry(conv_control.entry);
+
+		conv_generate_message(my_conv_data->speechList,
+		                      my_conv_data->messageList1,
+		                      my_conv_data, my_conv,
+		                      my_conv_data->messageList1_size,
+		                      my_conv_data->speechListSize);
+
+		// Fire me_trigger if one is pending and a popup is visible.
+		if (conv_control.me_trigger && conv_control.popup_is_up) {
+			player_verb            = conv_control.entry;
+			kernel.trigger         = conv_control.me_trigger;
+			kernel.trigger_mode    = conv_control.me_trigger_mode;
+			conv_control.me_trigger = 0;
+		}
+
+		conv_control.status = CONV_STATUS_REPLY;
+		return;
+	}
+
+	// ------------------------------------------------------------------
+	// Mode 4 — REPLY: show the player's reply message.
+	// ------------------------------------------------------------------
+	case CONV_STATUS_REPLY: {
+		if (kernel.clock < conv_control.popup_clock)
+			return;
+
+		conv_purge_any_popup();
+		conv_control.person_speaking = conv_control.speaker_val;
+
+		conv_generate_message(my_conv_data->messageList4,
+		                      my_conv_data->messageList2,
+		                      my_conv_data, my_conv,
+		                      my_conv_data->messageList2_size,
+		                      my_conv_data->messageList4_size);
+
+		conv_control.status = CONV_STATUS_NEXT_NODE;
+
+		if (conv_control.you_trigger && conv_control.popup_is_up) {
+			player_verb             = conv_control.entry;
+			kernel.trigger          = conv_control.you_trigger;
+			kernel.trigger_mode     = conv_control.you_trigger_mode;
+			conv_control.you_trigger = 0;
+			return;
+		}
+		return;
+	}
+
+	default:
+		// Statuses 5–9 and anything above 10: no-op.
+		return;
+	}
 }
 
 void conv_regenerate_last_message() {
@@ -727,15 +1470,23 @@ void conv_me_trigger(int trigger) {}
 
 void conv_you_trigger(int trigger) {}
 
-int *conv_get_variable(int varNum) {
+int16 *conv_get_variable(int varNum) {
 	assert(varNum >= 0 && varNum < active_conv_data->variablesCount);
+	ConvVariable &var = active_conv_data->variables[varNum];
 
-	// TODO
-	return nullptr;
+	return var.isPtr ? var.ptr : &var.val;
 }
 
-void conv_export_value(int varNum) {
-	// TODO
+void conv_export_value(int16 value) {
+	if (conv_control.running >= 0) {
+		Conv &c = *conv[conv_control.index];
+		ConvData &cd = *conv_data[conv_control.index];
+
+		if (cd.numImports < c.max_imports) {
+			int idx = conv_imports[cd.numImports++];
+			conv_set_variable(idx, value);
+		}
+	}
 }
 
 void conv_hold() {

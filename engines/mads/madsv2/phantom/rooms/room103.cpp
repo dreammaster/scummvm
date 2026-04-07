@@ -841,7 +841,7 @@ void room_103_daemon(void) {
 
 static void process_conv_jacques(void) {
 	int quit_converse = false;
-	int *value_1;
+	int16 *value_1;
 
 	switch (player_verb) {
 	case conv012_hello_four:

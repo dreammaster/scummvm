@@ -32,14 +32,34 @@ constexpr int CONV_MAX_SLOTS = 40;
 constexpr int CONV_MAX_DATA = 5;
 
 enum ConvStatus {
-	CONV_STATUS_HOLDING = -1,
+	CONV_STATUS_HOLDING   = -1,
 	CONV_STATUS_NEXT_NODE = 0,
 	CONV_STATUS_WAIT_AUTO = 1,
 	CONV_STATUS_WAIT_ENTRY = 2,
-	CONV_STATUS_EXECUTE = 3,
-	CONV_STATUS_REPLY = 4
+	CONV_STATUS_EXECUTE   = 3,
+	CONV_STATUS_REPLY     = 4,
+	CONV_STATUS_DONE      = 10  // conversation finished; next update calls conv_abort
 };
 
+// Operator codes used inside conversation script expressions.
+// Stored as int16 on disk; 0 = identity (return param1), 255 = no expression.
+enum ConvOp : int16 {
+	CONV_OP_VALUE = 0,   // No operator — return param1 directly
+	CONV_OP_ADD   = 1,   // param1 + param2
+	CONV_OP_SUB   = 2,   // param1 - param2
+	CONV_OP_MUL   = 3,   // param1 * param2
+	CONV_OP_DIV   = 4,   // param1 / param2  (signed integer)
+	CONV_OP_MOD   = 5,   // param1 % param2  (signed remainder)
+	CONV_OP_GE    = 6,   // param1 >= param2
+	CONV_OP_LE    = 7,   // param1 <= param2
+	CONV_OP_GT    = 8,   // param1 >  param2
+	CONV_OP_LT    = 9,   // param1 <  param2
+	CONV_OP_NE    = 10,  // param1 != param2
+	CONV_OP_EQ    = 11,  // param1 == param2
+	CONV_OP_AND   = 12,  // param1 && param2 (logical)
+	CONV_OP_OR    = 13,  // param1 || param2 (logical)
+	CONV_OP_NONE  = 255  // No expression — evaluates to -1
+};
 
 struct ConvNode {
 	int16 index;
@@ -63,8 +83,8 @@ struct ConvDialog {
 };
 
 struct ConvScriptParams {
-	int16 operation;
-	byte  param1IsVar;
+	ConvOp operation;
+	byte   param1IsVar;
 	byte  param2IsVar;
 	int16 param1;
 	int16 param2;
@@ -74,9 +94,11 @@ struct ConvScriptParams {
 };
 
 struct ConvVariable {
-	int16 isPtr;
-	int16 val;
-	int16 unused;
+	bool isPtr = false;
+	union {
+		int16 val;
+		int16 *ptr;
+	};
 
 	static constexpr int SIZE = 2 * 3;
 	void load(Common::SeekableReadStream *src);
@@ -138,12 +160,12 @@ struct ConvDataBase {
 	int16 variablesCount;
 	int16 importsCount;
 	int16 numImports;
-	int16 array1_size;
+	int16 optionListSize;
 	int16 messageList1_size;
 	int16 messageList2_size;
 	int16 speechListSize;
 	int16 messageList4_size;
-	int16 array1[10];
+	int16 optionList[10];
 	int16 messageList1[10];
 	int16 messageList2[10];
 	int16 speechList[10];
@@ -185,7 +207,7 @@ struct ConvControl {
 	int16 has_text;
 	int16 popup_is_up;
 	int16 mask;
-	uint32 popup_clock;
+	long popup_clock;
 	int16 speaker_active[CONV_MAX_DATA];
 	int16 speaker_series[CONV_MAX_DATA];
 	int16 speaker_frame[CONV_MAX_DATA];
@@ -216,7 +238,7 @@ extern int16 *conv_vars0ValPtr;
 
 extern int conv_restore_running;
 extern ConvControl conv_control;
-extern int *conv_my_next_start;
+extern int16 *conv_my_next_start;
 
 extern void conv_system_init();
 extern void conv_system_cleanup();
@@ -231,8 +253,8 @@ extern void conv_export_pointer(int *ptr);
 extern void conv_abort();
 extern void conv_me_trigger(int trigger);
 extern void conv_you_trigger(int trigger);
-extern int *conv_get_variable(int varNum);
-extern void conv_export_value(int varNum);
+extern int16 *conv_get_variable(int varNum);
+extern void conv_export_value(int16 value);
 extern void conv_hold();
 extern void conv_release();
 extern void conv_flush();

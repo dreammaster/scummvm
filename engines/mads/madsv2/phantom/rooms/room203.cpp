@@ -1172,8 +1172,8 @@ static void process_conversation_brie() {
 static void process_conversation_rich() {
 	int you_trig_flag = false;
 	int me_trig_flag  = false;
-	int *value_1;
-	int *value_2;
+	int16 *value_1;
+	int16 *value_2;
 
 	switch (player_verb) {
 	case conv008_tellabout_have:
