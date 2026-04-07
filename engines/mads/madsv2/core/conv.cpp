@@ -25,6 +25,7 @@
 #include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/env.h"
+#include "mads/madsv2/core/error.h"
 #include "mads/madsv2/core/fileio.h"
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/inter.h"
@@ -32,6 +33,7 @@
 #include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/popup.h"
+#include "mads/madsv2/core/speech.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -47,7 +49,7 @@ int16 *conv_vars0ValPtr;
 int conv_restore_running;
 ConvControl conv_control;
 Box conv_box;
-int *conv_my_next_start;
+int16 *conv_my_next_start;
 int conv_error_code;
 
 static int conv_indexes[CONV_MAX_SLOTS];
@@ -64,8 +66,7 @@ void ConvHeader::load(Common::SeekableReadStream *src) {
 	src->read(speech_file, 14);
 	src->readMultipleLE(text_length, commands_length);
 
-	// In the original these are far pointers patched after load; read as
-	// raw offsets and store temporarily - load_conv resolves them.
+	// Read in the offsets
 	src->readMultipleLE(textOffset, scriptsOffset, nodesOffset,
 		dialogsOffset, messagesOffset, textLinesOffset);
 }
@@ -92,11 +93,11 @@ void ConvVariable::load(Common::SeekableReadStream *src) {
 void ConvDataHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(currentNode, entryFlagsCount, variablesCount,
 		importsCount, numImports, array1_size,
-		messageList1_size, messageList2_size, messageList3_size, messageList4_size);
+		messageList1_size, messageList2_size, speechListSize, messageList4_size);
 	src->readMultipleLE(array1);
 	src->readMultipleLE(messageList1);
 	src->readMultipleLE(messageList2);
-	src->readMultipleLE(messageList3);
+	src->readMultipleLE(speechList);
 	src->readMultipleLE(messageList4);
 	src->readMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
 }
@@ -194,7 +195,7 @@ static Conv *load_conv(const char *fname) {
 			goto done;
 		}
 
-		Common::MemoryReadStream src(buffer, convHeader.dialog_count * ConvNode::SIZE);
+		Common::MemoryReadStream src(buffer, convHeader.dialog_count * ConvDialog::SIZE);
 		dataPtr->dialogs.resize(convHeader.dialog_count);
 		for (int i = 0; i < convHeader.dialog_count; ++i)
 			dataPtr->dialogs[i].load(&src);
@@ -212,7 +213,7 @@ static Conv *load_conv(const char *fname) {
 		}
 
 		Common::MemoryReadStream src(buffer, convHeader.message_count * 4);
-		dataPtr->dialogs.resize(convHeader.message_count);
+		dataPtr->messages.resize(convHeader.message_count);
 		for (int i = 0; i < convHeader.message_count; ++i)
 			dataPtr->messages[i] = src.readSint32LE();
 
@@ -229,9 +230,9 @@ static Conv *load_conv(const char *fname) {
 		}
 
 		Common::MemoryReadStream src(buffer, convHeader.text_line_count * 2);
-		dataPtr->dialogs.resize(convHeader.text_line_count * 2);
-		for (int i = 0; i < convHeader.message_count; ++i)
-			dataPtr->messages[i] = src.readSint16LE();
+		dataPtr->textLines.resize(convHeader.text_line_count);
+		for (int i = 0; i < convHeader.text_line_count; ++i)
+			dataPtr->textLines[i] = src.readUint16LE();
 
 		free(buffer);
 	}
@@ -247,6 +248,7 @@ static Conv *load_conv(const char *fname) {
 
 	//  Scripts
 	{
+		dataPtr->scripts.resize(convHeader.commands_length);
 		if (!loader_read(&dataPtr->scripts[0], convHeader.commands_length, 1, &file)) {
 			conv_error_code = 10;
 			goto done;
@@ -360,13 +362,47 @@ done:
 	return result;
 }
 
-static ConvData *conv_read_data(Common::SeekableReadStream *src) {
-	byte buffer[ConvDataHeader::SIZE];
-	if (src->read(buffer, ConvDataHeader::SIZE) != ConvDataHeader::SIZE)
-		error("Reading ConvData header");
+static ConvData *read_conv_data(Common::SeekableReadStream *src) {
+	ConvDataHeader header;
+	ConvData *dataPtr = nullptr;
+	ConvData *result = nullptr;
 
-	// TODO
-	error("TODO: conv_read_data");
+	// Load the header
+	header.load(src);
+
+	dataPtr = new ConvData();
+	if (!dataPtr)
+		goto done;
+
+	*dataPtr = header;
+
+	// Imports: conditional — the original skips the loader_read when count <= 0
+	if (header.importsCount > 0) {
+		dataPtr->imports.resize(header.importsCount);
+		for (int i = 0; i < header.importsCount; ++i)
+			dataPtr->imports[i] = src->readSint16LE();
+	}
+
+	if (header.entryFlagsCount > 0) {
+		dataPtr->entryFlags.resize(header.entryFlagsCount);
+		for (int i = 0; i < header.entryFlagsCount; ++i)
+			dataPtr->entryFlags[i] = src->readUint16LE();
+	}
+
+	if (header.variablesCount > 0) {
+		dataPtr->variables.resize(header.entryFlagsCount);
+		for (int i = 0; i < header.entryFlagsCount; ++i) {
+			dataPtr->variables[i].load(src);
+		}
+	}
+
+	result = dataPtr;
+
+done:
+	if (dataPtr && dataPtr != result)
+		delete dataPtr;
+
+	return result;
 }
 
 static void conv_init(ConvData *convData, int val) {
@@ -388,7 +424,7 @@ static ConvData *conv_get_data(int convNum) {
 	if (conv_indexes[convNum]) {
 		Common::SeekableReadStream *handle = conv_open(convNum);
 		if (handle) {
-			convData = conv_read_data(handle);
+			convData = read_conv_data(handle);
 			delete handle;
 		}
 	} else {
@@ -415,6 +451,15 @@ static void conv_purge_any_popup() {
 	}
 }
 
+static void conv_set_variable(int idx, int16 v1, int16 *valPtr) {
+	// TODO
+}
+
+static int conv_next_node() {
+	active_conv_data->currentNode = *conv_vars0ValPtr;
+	return active_conv->nodes[active_conv_data->currentNode].active;
+}
+
 void conv_system_init() {
 	Common::fill((byte *)&conv_control, (byte *)&conv_control + sizeof(ConvControl), 0);
 	conv_control.running = -1;
@@ -435,8 +480,6 @@ void conv_start(ConvData *convData, Conv *convIn) {
 	active_conv      = convIn;
 	active_conv_data = convData;
 
-	byte *block = (byte *)convData;
-
 	// Resolve the byte-offset sub-array pointers stored in the ConvData block
 	conv_imports = &convData->imports[0];
 	conv_entry_flags = &convData->entryFlags[0];
@@ -447,7 +490,7 @@ void conv_start(ConvData *convData, Conv *convIn) {
 
 	// conv_my_next_start -> variables[1].val
 	// (offset = offsetof(ConvVariable, val) + sizeof(ConvVariable) from base)
-	conv_my_next_start = (int *)&conv_varsDataPtr[1].val;
+	conv_my_next_start = (int16 *)&conv_varsDataPtr[1].val;
 
 	convData->currentNode = -1;
 	convData->numImports  = 0;
@@ -457,22 +500,199 @@ void conv_start(ConvData *convData, Conv *convIn) {
 }
 
 void conv_get(int convNum) {
-	int free_slot = -1;
 	char fname[40];
+	int free_slot = -1;
+	int error_occurred = -1;   // matches original si: -1 = error, 0 = success
+	int stage_error   = 0;     // which stage failed (1/2/3); used as data2 in error_report
 
-	for (int i = 0; i < CONV_MAX_DATA && free_slot == -1; ++i) {
-		if (!conv_slots[i])
+	// Find first free slot (stops as soon as one is found, matching original loop)
+	for (int i = 0; i < CONV_MAX_DATA; ++i) {
+		if (!conv_slots[i]) {
 			free_slot = i;
+			break;
+		}
 	}
 
-	if (free_slot >= 0) {
-		conv_slots[free_slot] = -1;
-		(void)load_conv(conv_get_filename(convNum, 0, fname));
-		// TODO: More stuff
+	if (free_slot < 0) {
+		stage_error = 1;
+		goto report;
 	}
+
+	conv_slots[free_slot] = 0xFF;
+
+	conv[free_slot] = load_conv(conv_get_filename(convNum, 0, fname));
+	if (!conv[free_slot]) {
+		stage_error = 2;
+		goto report;
+	}
+
+	conv_data[free_slot] = conv_get_data(convNum);
+	if (!conv_data[free_slot]) {
+		stage_error = 3;
+		goto report;
+	}
+
+	// Encode slot as (free_slot + 2) so that 0 means "not loaded"
+	conv_indexes[convNum] = free_slot + 2;
+	error_occurred = 0;
+
+report:
+	if (error_occurred)
+		error_report(ERROR_CONV_GET, ERROR, MODULE_CONV, convNum, stage_error);
 }
 
-void conv_run(int convNum) {
+void conv_run(int convId) {
+	char name[80];
+	int idx;
+
+	// Validate convId is loaded (non-fatal: report error but continue, matching original)
+	if (conv_indexes[convId] < 2)
+		error_report(ERROR_CONV_RUN, ERROR, MODULE_CONV, convId, 0);
+
+	// Stop any conversation already in progress
+	if (conv_control.running >= 0)
+		conv_abort();
+
+	conv_control.running          = convId;
+	conv_control.index            = conv_indexes[convId] - 2;
+	conv_control.status           = CONV_STATUS_NEXT_NODE;
+	conv_control.mask             = 0x7FFF;
+	conv_control.popup_clock      = kernel.clock;
+	conv_control.entry            = -1;
+	conv_control.commands_allowed = player.commands_allowed;
+	conv_control.input_mode       = inter_input_mode;
+	conv_control.popup_is_up      = 0;
+	conv_control.me_trigger       = 0;
+	conv_control.you_trigger      = 0;
+
+	// Initialise per-speaker slots.
+	// speaker_val and person_speaking are written inside the loop in the original
+	// (compiler artefact from an unrolled version); preserved here for fidelity.
+	for (idx = 0; idx < CONV_MAX_DATA; ++idx) {
+		conv_control.speaker_active[idx] = 0;
+		conv_control.speaker_series[idx] = -1;
+		conv_control.speaker_frame[idx]  = 1;
+		conv_control.x[idx]              = (int16)0x8000;
+		conv_control.y[idx]              = (int16)0x8000;
+		conv_control.width[idx]          = 30;
+		conv_control.speaker_val         = 1;
+		conv_control.person_speaking     = 1;
+	}
+
+	int slot = conv_control.index;
+	conv_start(conv_data[slot], conv[slot]);
+
+	// Bind conv variables 2–22 to live ConvControl fields.
+	// Variable 2 maps to speaker_val (not contiguous with the arrays below).
+	// Variables 3–22 map to speaker_frame[5], x[5], y[5], width[5] — 20
+	// consecutive int16s — so a single pointer walk replaces 20 separate calls.
+	conv_set_variable(2, -1, &conv_control.speaker_val);
+	int16 *p = conv_control.speaker_frame;
+	for (int i = 3; i <= 22; ++i, ++p)
+		conv_set_variable(i, -1, p);
+
+	// Load speaker portrait series for each declared speaker
+	for (idx = 0; idx < conv[slot]->speaker_count; ++idx) {
+		Common::strcpy_s(name, conv[slot]->speaker_portraits[idx]);
+		int series = kernel_load_series(name, 0x4000);
+		conv_control.speaker_series[idx] = series;
+		if (series > 0) {
+			conv_control.speaker_active[idx] = -1;
+			conv_control.speaker_frame[idx]  = conv[slot]->speaker_frame[idx];
+		}
+	}
+
+	if (kernel_mode == KERNEL_ACTIVE_CODE)
+		kernel_new_palette();
+
+	player.commands_allowed = 0;
+}
+
+// ---------------------------------------------------------------------------
+// conv_string
+//
+// Returns a pointer to the null-terminated text string whose index within the
+// flat text buffer is stored in conv->textLines[textIdx].  The text blob is
+// held in conv->text (stored as uint16 units but treated as a byte stream);
+// textLines values are byte offsets into that blob.
+// ---------------------------------------------------------------------------
+static const char *conv_string(int textIdx, Conv *convIn) {
+	uint16 byteOffset = convIn->textLines[textIdx];
+	return reinterpret_cast<const char *>(convIn->text.begin()) + byteOffset;
+}
+
+// ---------------------------------------------------------------------------
+// string_trim
+//
+// Strips trailing whitespace (any byte value <= ' ') from a mutable C string
+// in-place.  Mirrors the original DOS helper of the same name.
+// ---------------------------------------------------------------------------
+static void string_trim(char *str) {
+	if (!str) return;
+	size_t len = strlen(str);
+	while (len > 0 && (unsigned char)str[len - 1] <= ' ')
+		str[--len] = '\0';
+}
+
+// ---------------------------------------------------------------------------
+// conv_generate_text
+//
+// Builds and displays a conversation-line popup for the current speaker, then
+// triggers the associated speech audio (if the speech system is active and at
+// least one speech index was supplied).
+//
+// Parameters
+//   speechList  — array of speech-audio indices; speechList[0] is played
+//   convData    — active ConvData (unused here; callers already route through
+//                 conv_control)
+//   convIn      — active Conv (provides the text pool and speech filename)
+//   textIdx     — index into convIn->textLines that selects the dialog string
+//   speechCount — number of valid entries in speechList (0 = no speech)
+// ---------------------------------------------------------------------------
+static void conv_generate_text(int16 *speechList, ConvData * /*convData*/,
+                               Conv *convIn, int textIdx, int speechCount) {
+	int  person = conv_control.person_speaking;
+	char textBuf[512];
+	Box *savedBox;
+
+	// Redirect popup operations to the conversation-private box so that the
+	// bounds recorded by popup_draw can be used later by conv_purge_any_popup.
+	savedBox = box;
+	box = &conv_box;
+
+	// Size and position the popup from the current speaker's slot data.
+	int horiz_pieces = popup_estimate_pieces(conv_control.width[person]);
+	popup_create(horiz_pieces,
+	             conv_control.x[person],
+	             conv_control.y[person]);
+
+	// Attach the speaker portrait icon if a series was loaded for this slot.
+	// The icon_id is the 1-based frame stored in speaker_frame.
+	// center=0: left-aligned within the popup box.
+	if (conv_control.speaker_series[person] >= 0) {
+		popup_add_icon(series_list[conv_control.speaker_series[person]],
+		               conv_control.speaker_frame[person],
+		               0);
+	}
+
+	// Copy the dialog string to a local mutable buffer, strip trailing
+	// whitespace (the raw text pool can have padding bytes), then write it.
+	Common::strlcpy(textBuf, conv_string(textIdx, convIn), sizeof(textBuf));
+	string_trim(textBuf);
+	popup_write_string(textBuf);
+
+	// Render the popup, saving the underlying screen region.
+	popup_draw(true, false);
+
+	// Restore the caller's box and record that a conversation popup is live.
+	box = savedBox;
+	conv_control.popup_is_up  = -1;
+	conv_control.popup_clock  = kernel.clock;
+
+	// Play the associated speech audio when the speech system is on.
+	if (speech_system_active && speech_on && speechCount > 0) {
+		speech_ems_play(convIn->speech_file, speechList[0]);
+	}
 }
 
 void conv_update(bool) {

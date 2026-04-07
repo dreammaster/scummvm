@@ -141,12 +141,12 @@ struct ConvDataBase {
 	int16 array1_size;
 	int16 messageList1_size;
 	int16 messageList2_size;
-	int16 messageList3_size;
+	int16 speechListSize;
 	int16 messageList4_size;
 	int16 array1[10];
 	int16 messageList1[10];
 	int16 messageList2[10];
-	int16 messageList3[10];
+	int16 speechList[10];
 	int16 messageList4[10];
 };
 
@@ -222,6 +222,7 @@ extern void conv_system_init();
 extern void conv_system_cleanup();
 
 extern void conv_start(ConvData *convData, Conv *convIn);
+extern void conv_stop();
 extern void conv_get(int convNum);
 extern void conv_run(int convNum);
 extern void conv_update(bool);
