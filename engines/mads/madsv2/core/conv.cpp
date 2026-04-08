@@ -20,6 +20,8 @@
  */
 
 #include "common/algorithm.h"
+#include "common/hashmap.h"
+#include "common/hash-str.h"
 #include "common/memstream.h"
 #include "common/textconsole.h"
 #include "mads/madsv2/core/conv.h"
@@ -28,12 +30,12 @@
 #include "mads/madsv2/core/error.h"
 #include "mads/madsv2/core/fileio.h"
 #include "mads/madsv2/core/game.h"
+#include "mads/madsv2/core/imath.h"
 #include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/popup.h"
-#include "mads/madsv2/core/imath.h"
 #include "mads/madsv2/core/speech.h"
 
 namespace MADS {
@@ -53,6 +55,13 @@ Box conv_box;
 int16 *conv_my_next_start;
 int conv_error_code;
 int conv_dlg_script_ptr, conv_dlg_script_end;
+
+struct MemoryWriteStreamDynamic : public Common::MemoryWriteStreamDynamic {
+public:
+	MemoryWriteStreamDynamic() : Common::MemoryWriteStreamDynamic(DisposeAfterUse::YES) {}
+};
+Common::HashMap<Common::String, MemoryWriteStreamDynamic,
+	Common::IgnoreCase_Hash, Common::IgnoreCase_EqualTo> *savedConv;
 
 static int conv_indexes[CONV_MAX_SLOTS];
 static int conv_slots[CONV_MAX_DATA];
@@ -129,10 +138,31 @@ static const char *conv_get_filename(int convNum, int extType, char *name) {
 	return name;
 }
 
+// conv_open version for when mode is "rb"
 static Common::SeekableReadStream *conv_open(int convNum) {
 	char name[40];
-	return env_open(conv_get_filename(convNum, 2, name));
+	conv_get_filename(convNum, 2, name);
+	Common::String fname = name;
+
+	// If there's a pretend temporary file for it, use that instead
+	if (savedConv->contains(fname))
+		return new Common::MemoryReadStream((*savedConv)[fname].getData(),
+			(*savedConv)[fname].size());
+
+	// Fall back on normal resource open
+	return env_open(name);
 }
+
+// conv_open version for when mode is "wb"
+static Common::WriteStream *conv_open_write(int convNum) {
+	char name[40];
+	conv_get_filename(convNum, 2, name);
+	Common::String fname = name;
+
+	(*savedConv)[fname] = MemoryWriteStreamDynamic();
+	return &(*savedConv)[fname];
+}
+
 
 // ---------------------------------------------------------------------------
 // string_trim — strips trailing whitespace from a mutable C string in-place.
@@ -149,9 +179,9 @@ static void string_trim(char *str) {
 // identified by textIdx.  textLines[textIdx] is a byte offset into the flat
 // text character pool stored in conv->text.
 // ---------------------------------------------------------------------------
-static const char *conv_string(int textIdx, Conv *convIn) {
-	uint16 byteOffset = convIn->textLines[textIdx];
-	return reinterpret_cast<const char *>(convIn->text.begin()) + byteOffset;
+static const char *conv_string(Conv *convIn, int textIdx) {
+	uint16 strOffset = convIn->textLines[textIdx];
+	return &convIn->text[0] + strOffset;
 }
 
 // Version to use if the isPtr parameter is true (-1)
@@ -267,8 +297,10 @@ static Conv *load_conv(const char *fname) {
 
 		Common::MemoryReadStream src(buffer, convHeader.message_count * 4);
 		dataPtr->messages.resize(convHeader.message_count);
-		for (int i = 0; i < convHeader.message_count; ++i)
-			dataPtr->messages[i] = src.readSint32LE();
+		for (int i = 0; i < convHeader.message_count; ++i) {
+			dataPtr->messages[i].lineStart = src.readSint16LE();
+			dataPtr->messages[i].lineCount = src.readSint16LE();
+		}
 
 		free(buffer);
 	}
@@ -547,7 +579,7 @@ static void conv_generate_text(int16 *speechList, ConvData * /*convData*/,
 
 	// Copy the dialog string to a local mutable buffer, strip trailing
 	// whitespace (the raw text pool can have padding bytes), then write it.
-	Common::strlcpy(textBuf, conv_string(textIdx, convIn), sizeof(textBuf));
+	Common::strlcpy(textBuf, conv_string(convIn, textIdx), sizeof(textBuf));
 	string_trim(textBuf);
 	popup_write_string(textBuf);
 
@@ -821,7 +853,7 @@ static int conv_generate_menu(ConvData *convData, Conv *convIn) {
 			continue;
 		}
 
-		inter_add_dialog(const_cast<char *>(conv_string(textLineIdx, convIn)), dialogIdx);
+		inter_add_dialog(const_cast<char *>(conv_string(convIn, textLineIdx)), dialogIdx);
 	}
 
 	kernel_set_interface_mode(INTER_CONVERSATION);
@@ -1082,11 +1114,13 @@ void conv_system_init() {
 	Common::fill(conv_slots, conv_slots + CONV_MAX_DATA, 0);
 	Common::fill(conv, conv + CONV_MAX_DATA, (Conv *)nullptr);
 	Common::fill(conv_data, conv_data + CONV_MAX_DATA, (ConvData *)nullptr);
-	conv_system_cleanup();
+
+	savedConv = new Common::HashMap<Common::String, MemoryWriteStreamDynamic,
+		Common::IgnoreCase_Hash, Common::IgnoreCase_EqualTo>();
 }
 
 void conv_system_cleanup() {
-	// Removes any files with the format 'conv%d.dat'
+	delete savedConv;
 }
 
 
@@ -1240,7 +1274,50 @@ void conv_run(int convId) {
 static void conv_generate_message(int16 *voiceList, int16 *msgList,
                                   ConvData *convData, Conv *convIn,
                                   int msgListSize, int voiceListSize) {
-	// TODO
+	Box *priorBox = box;
+	box = &conv_box;
+	conv_control.has_text = 0;
+	int personSpeaking;
+	int messageId;
+	int lineStart, lineCount;
+	char tempString[256];
+
+	if (msgListSize != 0) {
+		personSpeaking = conv_control.person_speaking;
+		if (!popup_create(popup_estimate_pieces(conv_control.width[personSpeaking]),
+				conv_control.x[personSpeaking], conv_control.y[personSpeaking])) {
+			if (conv_control.speaker_series[personSpeaking] >= 0) {
+				popup_add_icon(series_list[conv_control.speaker_series[personSpeaking]],
+					conv_control.speaker_frame[personSpeaking], 0);
+			}
+
+			for (int msgIndex = 0; msgIndex < msgListSize; ++msgIndex) {
+				messageId = msgList[msgIndex];
+				lineStart = convIn->messages[messageId].lineStart;
+				lineCount = convIn->messages[messageId].lineCount;
+
+				for (int lineCtr = 0; lineCtr < lineCount; ++lineCtr) {
+					Common::strcpy_s(tempString, conv_string(convIn, lineStart + lineCtr));
+					string_trim(tempString);
+					popup_write_string(tempString);
+				}
+			}
+
+			popup_next_line();
+			if (!popup_draw(-1, -1)) {
+				conv_control.popup_is_up = -1;
+				conv_control.popup_clock = kernel.clock + conv_control.mask;
+
+				if (speech_system_active && speech_on) {
+					if (voiceListSize != 0) {
+						speech_ems_play(convIn->speech_file, *voiceList);
+					}
+				}
+			}
+		}
+	}
+
+	box = priorBox;
 }
 
 // ---------------------------------------------------------------------------
@@ -1490,15 +1567,30 @@ void conv_export_value(int16 value) {
 }
 
 void conv_hold() {
-	// TODO
+	if (conv_control.status != CONV_STATUS_HOLDING) {
+		conv_control.hold_status = conv_control.status;
+		conv_control.status = CONV_STATUS_HOLDING;
+	}
 }
 
 void conv_release() {
-	// TODO
+	if (conv_control.status == CONV_STATUS_HOLDING) {
+		conv_control.status = conv_control.hold_status;
+
+		if (conv_control.status == CONV_STATUS_WAIT_AUTO ||
+			conv_control.status == CONV_STATUS_WAIT_ENTRY)
+			conv_update(true);
+	}
 }
 
 void conv_flush() {
-	// TODO
+/*
+	bool errorFlag = true;
+	int errCode = 0;
+
+	for (int i = 0; i < CONV_MAX_SLOTS; ++i) {
+		// TODO
+	}*/
 }
 
 int conv_append(Common::WriteStream *handle) {

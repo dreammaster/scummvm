@@ -146,10 +146,15 @@ struct Conv : public ConvBase {
 		return *this;
 	}
 
+	struct LineSet {
+		int lineStart = 0;
+		int lineCount = 0;
+	};
+
 	Common::Array<ConvNode> nodes;
 	Common::Array<ConvDialog> dialogs;
-	Common::Array<int32> messages;
-	Common::Array<uint16> text;
+	Common::Array<LineSet> messages;
+	Common::Array<char> text;
 	Common::Array<uint16> scripts;
 	Common::Array<uint16> textLines;
 };
