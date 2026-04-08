@@ -108,6 +108,13 @@ void ConvVariable::load(Common::SeekableReadStream *src) {
 	(void)src->readUint16LE();	// skip space for pointer segments
 }
 
+void ConvVariable::save(Common::WriteStream *dest) const {
+	assert(!isPtr);
+	dest->writeSint16LE(0);
+	dest->writeSint16LE(val);
+	dest->writeSint16LE(0);
+}
+
 void ConvDataHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(currentNode, entryFlagsCount, variablesCount,
 		importsCount, numImports, optionListSize,
@@ -118,6 +125,72 @@ void ConvDataHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(speechList1);
 	src->readMultipleLE(speechList2);
 	src->readMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
+}
+
+void ConvDataHeader::save(Common::WriteStream *dest) const {
+	dest->writeMultipleLE(currentNode, entryFlagsCount, variablesCount,
+		importsCount, numImports, optionListSize,
+		messageList1Size, messageList2Size, speechList1Size, speechList2Size);
+	dest->writeMultipleLE(optionList);
+	dest->writeMultipleLE(messageList1);
+	dest->writeMultipleLE(messageList2);
+	dest->writeMultipleLE(speechList1);
+	dest->writeMultipleLE(speechList2);
+	dest->writeMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
+}
+
+void ConvData::load(Common::SeekableReadStream *src) {
+	size_t startPos = src->pos();
+
+	// Load the header
+	ConvDataHeader header;
+	header.load(src);
+
+	// Copy header fields in
+	*this = header;
+
+	// Imports: conditional — the original skips the loader_read when count <= 0
+	if (header.importsCount > 0) {
+		assert((src->pos() - startPos) == header.importsOffset);
+		imports.resize(header.importsCount);
+		for (int i = 0; i < header.importsCount; ++i)
+			imports[i] = src->readSint16LE();
+	}
+
+	if (header.entryFlagsCount > 0) {
+		assert((src->pos() - startPos) == header.entryFlagsOffset);
+		entryFlags.resize(header.entryFlagsCount);
+		for (int i = 0; i < header.entryFlagsCount; ++i)
+			entryFlags[i] = src->readUint16LE();
+	}
+
+	if (header.variablesCount > 0) {
+		assert((src->pos() - startPos) == header.entryFlagsOffset);
+		variables.resize(header.entryFlagsCount);
+		for (int i = 0; i < header.entryFlagsCount; ++i) {
+			variables[i].load(src);
+		}
+	}
+}
+
+void ConvData::save(Common::WriteStream *dest) const {
+	// Save the header
+	ConvDataHeader header;
+	header = *this;
+	header.importsOffset = ConvDataHeader::SIZE;
+	header.entryFlagsOffset = header.importsOffset + (importsCount * 2);
+	header.variablesOffset = header.entryFlagsOffset + (entryFlagsCount * 2);
+
+	header.save(dest);
+
+	for (int i = 0; i < header.importsCount; ++i)
+		dest->writeSint16LE(imports[i]);
+
+	for (int i = 0; i < header.entryFlagsCount; ++i)
+		dest->writeSint16LE(entryFlags[i]);
+
+	for (int i = 0; i < header.entryFlagsCount; ++i)
+		variables[i].save(dest);
 }
 
 
@@ -447,47 +520,15 @@ done:
 	return result;
 }
 
-static ConvData *read_conv_data(Common::SeekableReadStream *src) {
-	ConvDataHeader header;
-	ConvData *dataPtr = nullptr;
-	ConvData *result = nullptr;
+static ConvData *conv_read(Common::SeekableReadStream *src) {
+	ConvData *cd = new ConvData();
+	cd->load(src);
+	return cd;
+}
 
-	// Load the header
-	header.load(src);
-
-	dataPtr = new ConvData();
-	if (!dataPtr)
-		goto done;
-
-	*dataPtr = header;
-
-	// Imports: conditional — the original skips the loader_read when count <= 0
-	if (header.importsCount > 0) {
-		dataPtr->imports.resize(header.importsCount);
-		for (int i = 0; i < header.importsCount; ++i)
-			dataPtr->imports[i] = src->readSint16LE();
-	}
-
-	if (header.entryFlagsCount > 0) {
-		dataPtr->entryFlags.resize(header.entryFlagsCount);
-		for (int i = 0; i < header.entryFlagsCount; ++i)
-			dataPtr->entryFlags[i] = src->readUint16LE();
-	}
-
-	if (header.variablesCount > 0) {
-		dataPtr->variables.resize(header.entryFlagsCount);
-		for (int i = 0; i < header.entryFlagsCount; ++i) {
-			dataPtr->variables[i].load(src);
-		}
-	}
-
-	result = dataPtr;
-
-done:
-	if (dataPtr && dataPtr != result)
-		delete dataPtr;
-
-	return result;
+static int conv_write(Common::WriteStream *dest, const ConvData *convData) {
+	convData->save(dest);
+	return 0;
 }
 
 static void conv_init(ConvData *convData, int val) {
@@ -509,7 +550,7 @@ static ConvData *conv_get_data(int convNum) {
 	if (conv_indexes[convNum]) {
 		Common::SeekableReadStream *handle = conv_open(convNum);
 		if (handle) {
-			convData = read_conv_data(handle);
+			convData = conv_read(handle);
 			delete handle;
 		}
 	} else {
@@ -1611,22 +1652,117 @@ void conv_release() {
 }
 
 void conv_flush() {
-/*
 	bool errorFlag = true;
 	int errCode = 0;
+	Common::WriteStream *dest;
+	int i;
 
-	for (int i = 0; i < CONV_MAX_SLOTS; ++i) {
-		// TODO
-	}*/
+	for (i = 0; i < CONV_MAX_SLOTS; ++i) {
+		if (conv_indexes[i] >= 2) {
+			dest = conv_open_write(i);
+			if (!dest)
+				goto done;
+
+			ConvData *convData = conv_data[conv_indexes[i] - 2];
+			errCode = conv_write(dest, convData);
+			if (errCode) {
+				delete dest;
+				goto done;
+			}
+		}
+	}
+
+	for (i = CONV_MAX_DATA - 1; i >= 0; --i) {
+		if (conv_slots[i]) {
+			delete conv_data[i];
+			delete conv[i];
+			conv_data[i] = nullptr;
+			conv[i] = nullptr;
+			conv_slots[i] = 0;
+		}
+	}
+
+	errorFlag = false;
+done:
+	if (errorFlag)
+		error("Error flushing conversation data");
 }
 
 int conv_append(Common::WriteStream *handle) {
-	error("TODO: conv_append");
+	int count = 0;
+	int16 list[CONV_MAX_SLOTS];
+	ConvData *convData;
+	int convNum, convIndex;
+	int i, errCode;
+
+	// Generate a list of conv_indexes that are present
+	for (i = 0; i < CONV_MAX_SLOTS; ++i) {
+		if (conv_indexes[i])
+			list[count++] = i;
+	}
+
+	// Write out count and list
+	handle->writeUint16LE(count);
+	for (i = 0; i < count; ++i)
+		handle->writeSint16LE(list[i]);
+
+	for (i = 0; i < count; ++i) {
+		convNum = list[i];
+		convIndex = conv_indexes[convNum];
+
+		if (convIndex == 1) {
+			convData = conv_get_data(convNum);
+			if (!convData)
+				break;
+
+			errCode = conv_write(handle, convData);
+			delete convData;
+		} else {
+			convData = conv_data[convIndex - 2];
+			errCode = conv_write(handle, convData);
+		}
+
+		if (errCode)
+			break;
+	}
+
 	return 0;
 }
 
 int conv_expand(Common::SeekableReadStream *handle) {
-	error("TODO: conv_expand");
+	int count;
+	int16 list[CONV_MAX_SLOTS];
+	ConvData *convData;
+
+	Common::fill(conv_indexes, conv_indexes + CONV_MAX_SLOTS, 0);
+
+	// Read count and list
+	count = handle->readUint16LE();
+	handle->readMultipleLE(list);
+
+	for (int i = 0; i < count; ++i) {
+		int index = list[i];
+		conv_indexes[index] = 1;
+
+		// Open a temporary file for the conversation
+		Common::WriteStream *dest = conv_open_write(index);
+		if (!dest)
+			break;
+
+		// Read it's data from the savegame
+		convData = conv_read(handle);
+
+		// Write it out to the temporary file
+		bool success = false;
+		if (convData)
+			success = !conv_write(dest, convData);
+
+		if (!success) {
+			delete convData;
+			break;
+		}
+	}
+
 	return 0;
 }
 
