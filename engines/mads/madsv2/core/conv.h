@@ -166,15 +166,15 @@ struct ConvDataBase {
 	int16 importsCount;
 	int16 numImports;
 	int16 optionListSize;
-	int16 messageList1_size;
-	int16 messageList2_size;
-	int16 speechListSize;
-	int16 messageList4_size;
+	int16 messageList1Size;
+	int16 messageList2Size;
+	int16 speechList1Size;
+	int16 speechList2Size;
 	int16 optionList[10];
 	int16 messageList1[10];
 	int16 messageList2[10];
-	int16 speechList[10];
-	int16 messageList4[10];
+	int16 speechList1[10];
+	int16 speechList2[10];
 };
 
 struct ConvDataHeader : public ConvDataBase {
@@ -254,7 +254,7 @@ extern void conv_get(int convNum);
 extern void conv_run(int convNum);
 extern void conv_update(bool);
 extern void conv_regenerate_last_message();
-extern void conv_export_pointer(int *ptr);
+extern void conv_export_pointer(int16 *ptr);
 extern void conv_abort();
 extern void conv_me_trigger(int trigger);
 extern void conv_you_trigger(int trigger);

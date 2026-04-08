@@ -91,7 +91,7 @@ char text_command_subject[8] = TEXT_COMMAND_SUBJECT;
 char text_command_custom[7] = TEXT_COMMAND_CUSTOM;
 char text_command_demonstrative[14] = TEXT_COMMAND_DEMONSTRATIVE;
 
-extern int global[GLOBAL_LIST_SIZE];
+extern int16 global[GLOBAL_LIST_SIZE];
 
 
 TextPtr text_load(long id, int mode) {

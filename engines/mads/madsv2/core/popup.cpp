@@ -1098,7 +1098,7 @@ int popup_get_long(long *value, const char *top, const char *left, int maxlen) {
 }
 
 
-int popup_get_number(int *value, const char *top, const char *left, int maxlen) {
+int popup_get_number(int16 *value, const char *top, const char *left, int maxlen) {
 	int result;
 	long temp;
 

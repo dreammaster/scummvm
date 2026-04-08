@@ -106,7 +106,7 @@ extern char global_release_version[];
 extern char global_release_date[];
 extern char global_release_copyright[];
 
-extern int global[];
+extern int16 global[];
 extern int global_list_size;
 
 void global_init_code(void);

@@ -440,7 +440,7 @@ int  popup_ask_number(long *value, int maxlen, int save_screen);
 int popup_estimate_pieces(int maxlen);
 int popup_get_string(char *target, const char *top, const char *left, int maxlen);
 int popup_get_long(long *value, const char *top, const char *left, int maxlen);
-int popup_get_number(int *value, const char *top, const char *left, int maxlen);
+int popup_get_number(int16 *value, const char *top, const char *left, int maxlen);
 
 /* popup_3.c */
 int popup_alert(int width, const char *message_line, ...);

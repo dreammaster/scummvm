@@ -78,11 +78,11 @@ int room_id      = KERNEL_STARTING_GAME;
 int section_id   = KERNEL_STARTING_GAME;
 int room_variant = 0;
 
-int new_room     = 101;
-int new_section  = 1;
+int16 new_room   = 101;
+int16 new_section  = 1;
 
-int previous_room    = 0;
-int previous_section = 0;
+int16 previous_room    = 0;
+int16 previous_section = 0;
 
 int kernel_initial_variant = 0;
 

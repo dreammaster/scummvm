@@ -27,7 +27,7 @@
 namespace MADS {
 namespace MADSV2 {
 
-int global[GLOBAL_LIST_SIZE];
+int16 global[GLOBAL_LIST_SIZE];
 int global_list_size = GLOBAL_LIST_SIZE;
 
 char global_release_name[] = { "ScummVM" };

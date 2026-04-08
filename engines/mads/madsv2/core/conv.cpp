@@ -111,12 +111,12 @@ void ConvVariable::load(Common::SeekableReadStream *src) {
 void ConvDataHeader::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(currentNode, entryFlagsCount, variablesCount,
 		importsCount, numImports, optionListSize,
-		messageList1_size, messageList2_size, speechListSize, messageList4_size);
+		messageList1Size, messageList2Size, speechList1Size, speechList2Size);
 	src->readMultipleLE(optionList);
 	src->readMultipleLE(messageList1);
 	src->readMultipleLE(messageList2);
-	src->readMultipleLE(speechList);
-	src->readMultipleLE(messageList4);
+	src->readMultipleLE(speechList1);
+	src->readMultipleLE(speechList2);
 	src->readMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
 }
 
@@ -544,15 +544,15 @@ static void conv_purge_any_popup() {
 // least one speech index was supplied).
 //
 // Parameters
-//   speechList  — array of speech-audio indices; speechList[0] is played
+//   convIn      — active Conv (provides the text pool and speech filename)
 //   convData    — active ConvData (unused; callers already route through
 //                 conv_control)
-//   convIn      — active Conv (provides the text pool and speech filename)
 //   textIdx     — index into convIn->textLines that selects the dialog string
+//   speechList  — array of speech-audio indices; speechList[0] is played
 //   speechCount — number of valid entries in speechList (0 = no speech)
 // ---------------------------------------------------------------------------
-static void conv_generate_text(int16 *speechList, ConvData * /*convData*/,
-                               Conv *convIn, int textIdx, int speechCount) {
+static void conv_generate_text(Conv *convIn, ConvData * /*convData*/,
+		int textIdx, int16 *speechList, int speechCount) {
 	int  person = conv_control.person_speaking;
 	char textBuf[512];
 	Box *savedBox;
@@ -923,34 +923,34 @@ static void conv_message(int cmd) {
 
 	if (cmd == 4) {
 		// Player/"you" line
-		if (active_conv_data->messageList2_size < 10)
-			active_conv_data->messageList2[active_conv_data->messageList2_size++] = (int16)entryVal;
+		if (active_conv_data->messageList2Size < 10)
+			active_conv_data->messageList2[active_conv_data->messageList2Size++] = (int16)entryVal;
 
 		if (count1 > 1) {
 			// Multiple weighted choices: append only the matching data entry
-			if (randomIndex < count2 && active_conv_data->messageList4_size < 10)
-				active_conv_data->messageList4[active_conv_data->messageList4_size++] = (int16)array3[randomIndex];
+			if (randomIndex < count2 && active_conv_data->speechList2Size < 10)
+				active_conv_data->speechList2[active_conv_data->speechList2Size++] = (int16)array3[randomIndex];
 		} else {
 			// Single choice: append every data entry from array3
 			for (int i = 0; i < count2; ++i) {
-				if (active_conv_data->messageList4_size < 10)
-					active_conv_data->messageList4[active_conv_data->messageList4_size++] = (int16)array3[i];
+				if (active_conv_data->speechList2Size < 10)
+					active_conv_data->speechList2[active_conv_data->speechList2Size++] = (int16)array3[i];
 			}
 		}
 	} else {
 		// NPC/"me" line
-		if (active_conv_data->messageList1_size < 10)
-			active_conv_data->messageList1[active_conv_data->messageList1_size++] = (int16)entryVal;
+		if (active_conv_data->messageList1Size < 10)
+			active_conv_data->messageList1[active_conv_data->messageList1Size++] = (int16)entryVal;
 
 		if (count1 > 1) {
 			// Multiple weighted choices: append only the matching speech entry
-			if (randomIndex < count2 && active_conv_data->speechListSize < 10)
-				active_conv_data->speechList[active_conv_data->speechListSize++] = (int16)array3[randomIndex];
+			if (randomIndex < count2 && active_conv_data->speechList1Size < 10)
+				active_conv_data->speechList1[active_conv_data->speechList1Size++] = (int16)array3[randomIndex];
 		} else {
 			// Single choice: append every speech entry from array3
 			for (int i = 0; i < count2; ++i) {
-				if (active_conv_data->speechListSize < 10)
-					active_conv_data->speechList[active_conv_data->speechListSize++] = (int16)array3[i];
+				if (active_conv_data->speechList1Size < 10)
+					active_conv_data->speechList1[active_conv_data->speechList1Size++] = (int16)array3[i];
 			}
 		}
 	}
@@ -1033,10 +1033,10 @@ static int16 conv_execute_entry(int index) {
 	conv_dlg_script_end = dlg.script_offset + dlg.script_size;
 
 	// Reset per-execution message lists.
-	active_conv_data->messageList1_size = 0;
-	active_conv_data->messageList2_size = 0;
-	active_conv_data->speechListSize    = 0;
-	active_conv_data->messageList4_size = 0;
+	active_conv_data->messageList1Size = 0;
+	active_conv_data->messageList2Size = 0;
+	active_conv_data->speechList1Size    = 0;
+	active_conv_data->speechList2Size = 0;
 
 	// Restore the current node pointer from the saved "next start" slot.
 	*conv_vars0ValPtr = *conv_my_next_start;
@@ -1264,16 +1264,15 @@ void conv_run(int convId) {
 // lists that conv_execute_entry populated.
 //
 // Parameters (DOS push order — rightmost pushed first):
-//   voiceList     — array of speech/data indices (speechList or messageList4)
-//   msgList       — array of dialog text indices  (messageList1 or messageList2)
-//   convData      — active ConvData
 //   convIn        — active Conv
+//   convData      — active ConvData
+//   msgList       — array of dialog text indices  (messageList1 or messageList2)
 //   msgListSize   — number of valid entries in msgList  (in ax)
+//   voiceList     — array of speech/data indices (speechList1 or speechList2)
 //   voiceListSize — number of valid entries in voiceList (in dx)
 // ---------------------------------------------------------------------------
-static void conv_generate_message(int16 *voiceList, int16 *msgList,
-                                  ConvData *convData, Conv *convIn,
-                                  int msgListSize, int voiceListSize) {
+static void conv_generate_message(Conv *convIn, ConvData *convData,
+		int16 *msgList, int msgListSize, int16 *voiceList, int voiceListSize) {
 	Box *priorBox = box;
 	box = &conv_box;
 	conv_control.has_text = 0;
@@ -1434,13 +1433,13 @@ void conv_update(bool flag) {
 		// populated via conv_message).
 		int16 speech_idx = my_conv->dialogs[conv_control.entry].speech_index;
 		if (speech_idx) {
-			my_conv_data->speechList[0] = speech_idx;
-			my_conv_data->speechListSize = 1;
+			my_conv_data->speechList1[0] = speech_idx;
+			my_conv_data->speechList1Size = 1;
 		}
 
-		conv_generate_text(my_conv_data->speechList, my_conv_data, my_conv,
-		                   my_conv->dialogs[conv_control.entry].text_line_index,
-		                   my_conv_data->speechListSize);
+		conv_generate_text(my_conv, my_conv_data,
+			my_conv->dialogs[conv_control.entry].text_line_index,
+			my_conv_data->speechList1, my_conv_data->speechList1Size);
 
 		conv_control.status = CONV_STATUS_REPLY;
 
@@ -1466,11 +1465,9 @@ void conv_update(bool flag) {
 
 		conv_execute_entry(conv_control.entry);
 
-		conv_generate_message(my_conv_data->speechList,
-		                      my_conv_data->messageList1,
-		                      my_conv_data, my_conv,
-		                      my_conv_data->messageList1_size,
-		                      my_conv_data->speechListSize);
+		conv_generate_message(my_conv, my_conv_data,
+			my_conv_data->messageList1, my_conv_data->messageList1Size,
+			my_conv_data->speechList1, my_conv_data->speechList1Size);
 
 		// Fire me_trigger if one is pending and a popup is visible.
 		if (conv_control.me_trigger && conv_control.popup_is_up) {
@@ -1494,11 +1491,9 @@ void conv_update(bool flag) {
 		conv_purge_any_popup();
 		conv_control.person_speaking = conv_control.speaker_val;
 
-		conv_generate_message(my_conv_data->messageList4,
-		                      my_conv_data->messageList2,
-		                      my_conv_data, my_conv,
-		                      my_conv_data->messageList2_size,
-		                      my_conv_data->messageList4_size);
+		conv_generate_message(my_conv, my_conv_data,
+			my_conv_data->messageList2, my_conv_data->messageList2Size,
+			my_conv_data->speechList2, my_conv_data->speechList2Size);
 
 		conv_control.status = CONV_STATUS_NEXT_NODE;
 
@@ -1519,9 +1514,35 @@ void conv_update(bool flag) {
 }
 
 void conv_regenerate_last_message() {
+	if (conv_control.running && conv_control.popup_is_up) {
+		Conv &c = *conv[conv_control.index];
+		ConvData &cd = *conv_data[conv_control.index];
+
+		conv_purge_any_popup();
+
+		if (conv_control.has_text) {
+			conv_generate_text(&c, &cd, c.dialogs[conv_control.entry].text_line_index,
+				cd.speechList1, cd.speechList1Size);
+		} else if (conv_control.person_speaking) {
+			conv_generate_message(&c, &cd, cd.messageList2, cd.messageList2Size,
+				cd.speechList2, cd.speechList2Size);
+		} else {
+
+		}
+	}
 }
 
-void conv_export_pointer(int *ptr) {}
+void conv_export_pointer(int16 *ptr) {
+	if (conv_control.running) {
+		Conv &c = *conv[conv_control.index];
+		ConvData &cd = *conv_data[conv_control.index];
+
+		if (cd.numImports < c.max_imports) {
+			int idx = conv_imports[cd.numImports++];
+			conv_set_variable(idx, ptr);
+		}
+	}
+}
 
 void conv_abort() {
 	if (conv_control.running >= 0) {
@@ -1543,9 +1564,15 @@ void conv_abort() {
 	}
 }
 
-void conv_me_trigger(int trigger) {}
+void conv_me_trigger(int trigger) {
+	conv_control.me_trigger = trigger;
+	conv_control.me_trigger_mode = kernel.trigger_setup_mode;
+}
 
-void conv_you_trigger(int trigger) {}
+void conv_you_trigger(int trigger) {
+	conv_control.you_trigger = trigger;
+	conv_control.you_trigger_mode = kernel.trigger_setup_mode;
+}
 
 int16 *conv_get_variable(int varNum) {
 	assert(varNum >= 0 && varNum < active_conv_data->variablesCount);
@@ -1602,7 +1629,6 @@ int conv_expand(Common::SeekableReadStream *handle) {
 	error("TODO: conv_expand");
 	return 0;
 }
-
 
 } // namespace MADSV2
 } // namespace MADS

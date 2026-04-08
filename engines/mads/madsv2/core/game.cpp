@@ -545,11 +545,11 @@ static void game_player_status() {
 
 int game_parse_keystroke(int mykey) {
 	int count;
-	int temp;
+	int16 temp;
 	long big_temp;
-	int move_object;
-	int move_target;
-	int change_flag;
+	int16 move_object;
+	int16 move_target;
+	int16 change_flag;
 	int current_mode;
 	int num;
 	int unpause = 0;

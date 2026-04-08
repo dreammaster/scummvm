@@ -339,11 +339,11 @@ extern int room_id;             /* Current room #                 */
 extern int section_id;          /* Current section #              */
 extern int room_variant;        /* Current room attribute variant */
 
-extern int new_room;            /* New room # to enter            */
-extern int new_section;         /* New section # to enter         */
+extern int16 new_room;          /* New room # to enter            */
+extern int16 new_section;       /* New section # to enter         */
 
-extern int previous_room;       /* Last room #                    */
-extern int previous_section;    /* Last section #                 */
+extern int16 previous_room;     /* Last room #                    */
+extern int16 previous_section;  /* Last section #                 */
 
 extern int kernel_initial_variant; /* Initial variant to load     */
 
