@@ -71,7 +71,7 @@ static bool conv_slots[CONV_MAX_DATA];
 // Struct serialization methods
 // ====================================================================
 
-void ConvHeader::load(Common::SeekableReadStream *src) {
+void Conv::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(node_count, dialog_count, message_count, text_line_count,
 		num_variables, max_imports, speaker_count);
 	for (int i = 0; i < 5; ++i)
@@ -81,11 +81,15 @@ void ConvHeader::load(Common::SeekableReadStream *src) {
 	src->read(speech_file, 14);
 	src->readMultipleLE(text_length, commands_length);
 
-	// Read in the offsets
-	src->readMultipleLE(textOffset, scriptsOffset, nodesOffset,
-		dialogsOffset, messagesOffset, textLinesOffset);
-	warning("pos = %d", src->pos());
-	assert(src->pos() == SIZE);
+	// Skip over original padding for pointer fields
+	src->skip(6 * sizeof(uint32));
+
+	nodes.clear();
+	dialogs.clear();
+	messages.clear();
+	text.clear();
+	scripts.clear();
+	textLines.clear();
 }
 
 void ConvNode::load(Common::SeekableReadStream *src) {
@@ -283,7 +287,6 @@ static void conv_set_variable(int idx, int16 val) {
 
 static Conv *load_conv(const char *fname) {
 	Load file;
-	ConvHeader convHeader;
 	Conv *dataPtr = nullptr;
 	Conv *result = nullptr;
 	char filename[80];
@@ -298,26 +301,19 @@ static Conv *load_conv(const char *fname) {
 		goto done;
 	}
 
+	dataPtr = new Conv();
+
 	{
 		// Read the fixed-size Conv header through a MemoryReadStream so that
 		// the load() function handles field sizes and endianness correctly.
-		byte hdrBuf[ConvHeader::SIZE];
-		if (!loader_read(hdrBuf, ConvHeader::SIZE, 1, &file)) {
+		byte hdrBuf[Conv::SIZE];
+		if (!loader_read(hdrBuf, Conv::SIZE, 1, &file)) {
 			conv_error_code = 2;
 			goto done;
 		}
-		Common::MemoryReadStream hdrStream(hdrBuf, ConvHeader::SIZE);
-		convHeader.load(&hdrStream);
+		Common::MemoryReadStream hdrStream(hdrBuf, Conv::SIZE);
+		dataPtr->load(&hdrStream);
 	}
-
-	dataPtr = new Conv();
-	if (!dataPtr) {
-		conv_error_code = 3;
-		goto done;
-	}
-
-	// Copy the loaded header to the front of the block
-	*dataPtr = convHeader;
 
 	// Read each section from the file.  Error codes deliberately match the
 	// originals (note: 6 is skipped, matching the disassembly).
@@ -325,15 +321,15 @@ static Conv *load_conv(const char *fname) {
 	// Nodes
 	{
 		byte *buffer = (byte *)malloc(dataPtr->node_count * ConvNode::SIZE);
-		if (!loader_read(buffer, convHeader.node_count * ConvNode::SIZE, 1, &file)) {
+		if (!loader_read(buffer, dataPtr->node_count * ConvNode::SIZE, 1, &file)) {
 			conv_error_code = 4;
 			free(buffer);
 			goto done;
 		}
 
-		Common::MemoryReadStream src(buffer, convHeader.node_count * ConvNode::SIZE);
-		dataPtr->nodes.resize(convHeader.node_count);
-		for (int i = 0; i < convHeader.node_count; ++i)
+		Common::MemoryReadStream src(buffer, dataPtr->node_count * ConvNode::SIZE);
+		dataPtr->nodes.resize(dataPtr->node_count);
+		for (int i = 0; i < dataPtr->node_count; ++i)
 			dataPtr->nodes[i].load(&src);
 
 		free(buffer);
@@ -342,15 +338,15 @@ static Conv *load_conv(const char *fname) {
 	// Dialogs
 	{
 		byte *buffer = (byte *)malloc(dataPtr->dialog_count * ConvDialog::SIZE);
-		if (!loader_read(buffer, convHeader.dialog_count * ConvDialog::SIZE, 1, &file)) {
+		if (!loader_read(buffer, dataPtr->dialog_count * ConvDialog::SIZE, 1, &file)) {
 			conv_error_code = 5;
 			free(buffer);
 			goto done;
 		}
 
-		Common::MemoryReadStream src(buffer, convHeader.dialog_count * ConvDialog::SIZE);
-		dataPtr->dialogs.resize(convHeader.dialog_count);
-		for (int i = 0; i < convHeader.dialog_count; ++i)
+		Common::MemoryReadStream src(buffer, dataPtr->dialog_count * ConvDialog::SIZE);
+		dataPtr->dialogs.resize(dataPtr->dialog_count);
+		for (int i = 0; i < dataPtr->dialog_count; ++i)
 			dataPtr->dialogs[i].load(&src);
 
 		free(buffer);
@@ -359,15 +355,15 @@ static Conv *load_conv(const char *fname) {
 	// Messages
 	{
 		byte *buffer = (byte *)malloc(dataPtr->message_count * 4);
-		if (!loader_read(buffer, convHeader.message_count * 4, 1, &file)) {
+		if (!loader_read(buffer, dataPtr->message_count * 4, 1, &file)) {
 			conv_error_code = 7;
 			free(buffer);
 			goto done;
 		}
 
-		Common::MemoryReadStream src(buffer, convHeader.message_count * 4);
-		dataPtr->messages.resize(convHeader.message_count);
-		for (int i = 0; i < convHeader.message_count; ++i) {
+		Common::MemoryReadStream src(buffer, dataPtr->message_count * 4);
+		dataPtr->messages.resize(dataPtr->message_count);
+		for (int i = 0; i < dataPtr->message_count; ++i) {
 			dataPtr->messages[i].lineStart = src.readSint16LE();
 			dataPtr->messages[i].lineCount = src.readSint16LE();
 		}
@@ -378,15 +374,15 @@ static Conv *load_conv(const char *fname) {
 	// Text lines
 	{
 		byte *buffer = (byte *)malloc(dataPtr->text_line_count * 2);
-		if (!loader_read(buffer, convHeader.text_line_count * 2, 1, &file)) {
+		if (!loader_read(buffer, dataPtr->text_line_count * 2, 1, &file)) {
 			conv_error_code = 8;
 			free(buffer);
 			goto done;
 		}
 
-		Common::MemoryReadStream src(buffer, convHeader.text_line_count * 2);
-		dataPtr->textLines.resize(convHeader.text_line_count);
-		for (int i = 0; i < convHeader.text_line_count; ++i)
+		Common::MemoryReadStream src(buffer, dataPtr->text_line_count * 2);
+		dataPtr->textLines.resize(dataPtr->text_line_count);
+		for (int i = 0; i < dataPtr->text_line_count; ++i)
 			dataPtr->textLines[i] = src.readUint16LE();
 
 		free(buffer);
@@ -394,8 +390,8 @@ static Conv *load_conv(const char *fname) {
 
 	// Text block
 	{
-		dataPtr->text.resize(convHeader.text_length);
-		if (!loader_read(&dataPtr->text[0], convHeader.text_length, 1, &file)) {
+		dataPtr->text.resize(dataPtr->text_length);
+		if (!loader_read(&dataPtr->text[0], dataPtr->text_length, 1, &file)) {
 			conv_error_code = 9;
 			goto done;
 		}
@@ -403,8 +399,8 @@ static Conv *load_conv(const char *fname) {
 
 	// Scripts
 	{
-		dataPtr->scripts.resize(convHeader.commands_length);
-		if (!loader_read(&dataPtr->scripts[0], convHeader.commands_length, 1, &file)) {
+		dataPtr->scripts.resize(dataPtr->commands_length);
+		if (!loader_read(&dataPtr->scripts[0], dataPtr->commands_length, 1, &file)) {
 			conv_error_code = 10;
 			goto done;
 		}

@@ -105,7 +105,7 @@ struct ConvVariable {
 	void save(Common::WriteStream *dest) const;
 };
 
-struct ConvBase {
+struct Conv {
 	int16 node_count;
 	int16 dialog_count;
 	int16 message_count;
@@ -119,31 +119,6 @@ struct ConvBase {
 	char speech_file[14];
 	uint32 text_length;
 	uint32 commands_length;
-};
-
-struct ConvHeader : public ConvBase {
-	uint32 textOffset;
-	uint32 scriptsOffset;
-	uint32 nodesOffset;
-	uint32 dialogsOffset;
-	uint32 messagesOffset;
-	uint32 textLinesOffset;
-
-	static constexpr int SIZE = (2 * 7 + 16 * 5 + 2 * 5 + 14 + 4 + 4) + 4 * 6;
-	void load(Common::SeekableReadStream *src);
-};
-
-struct Conv : public ConvBase {
-	Conv &operator=(const ConvBase &src) {
-		*((ConvBase *)this) = src;
-		text.clear();
-		scripts.clear();
-		nodes.clear();
-		dialogs.clear();
-		messages.clear();
-		textLines.clear();
-		return *this;
-	}
 
 	struct LineSet {
 		int lineStart = 0;
@@ -156,6 +131,11 @@ struct Conv : public ConvBase {
 	Common::Array<char> text;
 	Common::Array<uint16> scripts;
 	Common::Array<uint16> textLines;
+
+	static constexpr int SIZE = (2 * 7 + 16 * 5 + 2 * 5 + 14 + 4 + 4) +
+		// Padding for pointers in original structure
+		4 * 6;
+	void load(Common::SeekableReadStream *src);
 };
 
 struct ConvDataBase {
