@@ -129,7 +129,7 @@ struct Conv {
 	Common::Array<ConvDialog> dialogs;
 	Common::Array<LineSet> messages;
 	Common::Array<char> text;
-	Common::Array<uint16> scripts;
+	Common::Array<byte> scripts;
 	Common::Array<uint16> textLines;
 
 	static constexpr int SIZE = (2 * 7 + 16 * 5 + 2 * 5 + 14 + 4 + 4) +
