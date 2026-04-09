@@ -118,20 +118,18 @@ struct ConvBase {
 	int16 speaker_frame[5];
 	char speech_file[14];
 	uint32 text_length;
-
 	uint32 commands_length;
-
-	static constexpr int SIZE = 2 * 7 + 16 * 5 + 2 * 5 + 14 + 4 + 4 + 4 * 6;
 };
 
 struct ConvHeader : public ConvBase {
-	int textOffset;
-	int scriptsOffset;
-	int nodesOffset;
-	int dialogsOffset;
-	int messagesOffset;
-	int textLinesOffset;
+	uint32 textOffset;
+	uint32 scriptsOffset;
+	uint32 nodesOffset;
+	uint32 dialogsOffset;
+	uint32 messagesOffset;
+	uint32 textLinesOffset;
 
+	static constexpr int SIZE = (2 * 7 + 16 * 5 + 2 * 5 + 14 + 4 + 4) + 4 * 6;
 	void load(Common::SeekableReadStream *src);
 };
 

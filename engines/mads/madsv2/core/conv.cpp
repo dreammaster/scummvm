@@ -64,7 +64,7 @@ Common::HashMap<Common::String, MemoryWriteStreamDynamic,
 	Common::IgnoreCase_Hash, Common::IgnoreCase_EqualTo> *savedConv;
 
 static int conv_indexes[CONV_MAX_SLOTS];
-static int conv_slots[CONV_MAX_DATA];
+static bool conv_slots[CONV_MAX_DATA];
 
 
 // ====================================================================
@@ -84,6 +84,8 @@ void ConvHeader::load(Common::SeekableReadStream *src) {
 	// Read in the offsets
 	src->readMultipleLE(textOffset, scriptsOffset, nodesOffset,
 		dialogsOffset, messagesOffset, textLinesOffset);
+	warning("pos = %d", src->pos());
+	assert(src->pos() == SIZE);
 }
 
 void ConvNode::load(Common::SeekableReadStream *src) {
@@ -204,7 +206,7 @@ static const char *conv_get_filename(int convNum, int extType, char *name) {
 	if (extType != 2)
 		Common::strcat_s(name, 40, "*");
 	Common::strcat_s(name, 40, "conv");
-	Common::strcat_s(name, 40, Common::String::format("%d", convNum).c_str());
+	Common::strcat_s(name, 40, Common::String::format("%.3d", convNum).c_str());
 	if (extType == 2)
 		Common::strcat_s(name, 40, ".dat");
 
@@ -285,16 +287,11 @@ static Conv *load_conv(const char *fname) {
 	Conv *dataPtr = nullptr;
 	Conv *result = nullptr;
 	char filename[80];
-	char name_buf[9];
 
 	file.open = false;
 
 	Common::strcpy_s(filename, fname);
 	fileio_add_ext(filename, "cnv");
-
-	// Strip leading '*' (wildcard prefix used for himem search) to get bare name
-	const char *fn = (filename[0] == '*') ? filename + 1 : filename;
-	Common::strlcpy(name_buf, fn, sizeof(name_buf));
 
 	if (loader_open(&file, filename, "rb", true)) {
 		conv_error_code = 1;
@@ -1152,7 +1149,7 @@ void conv_system_init() {
 	conv_control.running = -1;
 
 	Common::fill(conv_indexes, conv_indexes + CONV_MAX_SLOTS, 0);
-	Common::fill(conv_slots, conv_slots + CONV_MAX_DATA, 0);
+	Common::fill(conv_slots, conv_slots + CONV_MAX_DATA, false);
 	Common::fill(conv, conv + CONV_MAX_DATA, (Conv *)nullptr);
 	Common::fill(conv_data, conv_data + CONV_MAX_DATA, (ConvData *)nullptr);
 
@@ -1207,7 +1204,7 @@ void conv_get(int convNum) {
 		goto report;
 	}
 
-	conv_slots[free_slot] = 0xFF;
+	conv_slots[free_slot] = true;
 
 	conv[free_slot] = load_conv(conv_get_filename(convNum, 0, fname));
 	if (!conv[free_slot]) {
@@ -1678,7 +1675,7 @@ void conv_flush() {
 			delete conv[i];
 			conv_data[i] = nullptr;
 			conv[i] = nullptr;
-			conv_slots[i] = 0;
+			conv_slots[i] = false;
 		}
 	}
 
