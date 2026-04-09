@@ -121,19 +121,65 @@ void ConvVariable::save(Common::WriteStream *dest) const {
 	dest->writeSint16LE(0);
 }
 
-void ConvDataHeader::load(Common::SeekableReadStream *src) {
-	src->readMultipleLE(currentNode, entryFlagsCount, variablesCount,
-		importsCount, numImports, optionListSize,
-		messageList1Size, messageList2Size, speechList1Size, speechList2Size);
-	src->readMultipleLE(optionList);
-	src->readMultipleLE(messageList1);
-	src->readMultipleLE(messageList2);
-	src->readMultipleLE(speechList1);
-	src->readMultipleLE(speechList2);
-	src->readMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
+void ConvData::load(Common::SeekableReadStream *src) {
+	{
+		byte buffer[SIZE];
+		if (!src->read(buffer, SIZE))
+			return;
+
+		Common::MemoryReadStream mrs(buffer, SIZE);
+		mrs.readMultipleLE(currentNode, entryFlagsCount, variablesCount,
+			importsCount, numImports, optionListSize,
+			messageList1Size, messageList2Size, speechList1Size, speechList2Size);
+		mrs.readMultipleLE(optionList);
+		mrs.readMultipleLE(messageList1);
+		mrs.readMultipleLE(messageList2);
+		mrs.readMultipleLE(speechList1);
+		mrs.readMultipleLE(speechList2);
+		mrs.readMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
+	}
+
+	// Imports: conditional — the original skips the loader_read when count <= 0
+	imports.clear();
+	if (importsCount > 0) {
+		int16 *buffer = (int16 *)malloc(importsCount * 2);
+		src->read(buffer, importsCount * 2);
+
+		imports.resize(importsCount);
+		for (int i = 0; i < importsCount; ++i)
+			imports[i] = FROM_LE_16(buffer[i]);
+		free(buffer);
+	}
+
+	// Entry flags: always read (no count guard in the original)
+	{
+		int16 *buffer = (int16 *)malloc(entryFlagsCount * 2);
+		src->read(buffer, entryFlagsCount * 2);
+
+		entryFlags.resize(entryFlagsCount);
+		for (int i = 0; i < entryFlagsCount; ++i)
+			entryFlags[i] = FROM_LE_16(buffer[i]);
+		free(buffer);
+	}
+
+	// Variables
+	{
+		byte *buffer = (byte *)malloc(variablesCount * ConvVariable::SIZE);
+		src->read(buffer, (long)variablesCount * ConvVariable::SIZE);
+
+		Common::MemoryReadStream mrs(buffer, variablesCount * ConvVariable::SIZE);
+		variables.resize(variablesCount);
+		for (int i = 0; i < variablesCount; ++i) {
+			variables[i].load(&mrs);
+
+			// Zero the runtime isPtr flag for every variable; it is not meaningful as stored on disk
+			variables[i].isPtr = false;
+		}
+		free(buffer);
+	}
 }
 
-void ConvDataHeader::save(Common::WriteStream *dest) const {
+void ConvData::save(Common::WriteStream *dest) const {
 	dest->writeMultipleLE(currentNode, entryFlagsCount, variablesCount,
 		importsCount, numImports, optionListSize,
 		messageList1Size, messageList2Size, speechList1Size, speechList2Size);
@@ -142,60 +188,20 @@ void ConvDataHeader::save(Common::WriteStream *dest) const {
 	dest->writeMultipleLE(messageList2);
 	dest->writeMultipleLE(speechList1);
 	dest->writeMultipleLE(speechList2);
-	dest->writeMultipleLE(importsOffset, entryFlagsOffset, variablesOffset);
-}
 
-void ConvData::load(Common::SeekableReadStream *src) {
-	size_t startPos = src->pos();
+	// Figure out offset fields
+	uint16 importsOffset1 = SIZE;
+	uint16 entryFlagsOffset1 = importsOffset1 + (importsCount * 2);
+	uint16 variablesOffset1 = entryFlagsOffset1 + (entryFlagsCount * 2);
+	dest->writeMultipleLE(importsOffset1, entryFlagsOffset1, variablesOffset1);
 
-	// Load the header
-	ConvDataHeader header;
-	header.load(src);
-
-	// Copy header fields in
-	*this = header;
-
-	// Imports: conditional — the original skips the loader_read when count <= 0
-	if (header.importsCount > 0) {
-		assert((src->pos() - startPos) == header.importsOffset);
-		imports.resize(header.importsCount);
-		for (int i = 0; i < header.importsCount; ++i)
-			imports[i] = src->readSint16LE();
-	}
-
-	if (header.entryFlagsCount > 0) {
-		assert((src->pos() - startPos) == header.entryFlagsOffset);
-		entryFlags.resize(header.entryFlagsCount);
-		for (int i = 0; i < header.entryFlagsCount; ++i)
-			entryFlags[i] = src->readUint16LE();
-	}
-
-	if (header.variablesCount > 0) {
-		assert((src->pos() - startPos) == header.entryFlagsOffset);
-		variables.resize(header.entryFlagsCount);
-		for (int i = 0; i < header.entryFlagsCount; ++i) {
-			variables[i].load(src);
-		}
-	}
-}
-
-void ConvData::save(Common::WriteStream *dest) const {
-	// Save the header
-	ConvDataHeader header;
-	header = *this;
-	header.importsOffset = ConvDataHeader::SIZE;
-	header.entryFlagsOffset = header.importsOffset + (importsCount * 2);
-	header.variablesOffset = header.entryFlagsOffset + (entryFlagsCount * 2);
-
-	header.save(dest);
-
-	for (int i = 0; i < header.importsCount; ++i)
+	for (int i = 0; i < importsCount; ++i)
 		dest->writeSint16LE(imports[i]);
 
-	for (int i = 0; i < header.entryFlagsCount; ++i)
+	for (int i = 0; i < entryFlagsCount; ++i)
 		dest->writeSint16LE(entryFlags[i]);
 
-	for (int i = 0; i < header.entryFlagsCount; ++i)
+	for (int i = 0; i < entryFlagsCount; ++i)
 		variables[i].save(dest);
 }
 
@@ -306,12 +312,12 @@ static Conv *load_conv(const char *fname) {
 	{
 		// Read the fixed-size Conv header through a MemoryReadStream so that
 		// the load() function handles field sizes and endianness correctly.
-		byte hdrBuf[Conv::SIZE];
-		if (!loader_read(hdrBuf, Conv::SIZE, 1, &file)) {
+		byte buffer[Conv::SIZE];
+		if (!loader_read(buffer, Conv::SIZE, 1, &file)) {
 			conv_error_code = 2;
 			goto done;
 		}
-		Common::MemoryReadStream hdrStream(hdrBuf, Conv::SIZE);
+		Common::MemoryReadStream hdrStream(buffer, Conv::SIZE);
 		dataPtr->load(&hdrStream);
 	}
 
@@ -421,96 +427,23 @@ done:
 
 static ConvData *load_conv_data(const char *fname) {
 	Load file;
-	ConvDataHeader header;
-	ConvData *dataPtr = nullptr;
-	ConvData *result  = nullptr;
+	ConvData *convData = nullptr;
 	char filename[80];
-	char name_buf[9];
 
 	file.open = false;
 
 	Common::strcpy_s(filename, fname);
-	fileio_add_ext(filename, "cnv");
-
-	const char *fn = (filename[0] == '*') ? filename + 1 : filename;
-	Common::strlcpy(name_buf, fn, sizeof(name_buf));
+	fileio_add_ext(filename, "cnd");
 
 	if (loader_open(&file, filename, "rb", true))
-		goto done;
+		return nullptr;
 
-	{
-		byte hdrBuf[ConvDataHeader::SIZE];
-		if (!loader_read(hdrBuf, ConvDataHeader::SIZE, 1, &file))
-			goto done;
+	convData = new ConvData();
+	LoaderReadStream src(&file);
+	convData->load(&src);
 
-		Common::MemoryReadStream hdrStream(hdrBuf, ConvDataHeader::SIZE);
-		header.load(&hdrStream);
-	}
-
-	dataPtr = new ConvData();
-	if (!dataPtr)
-		goto done;
-
-	*dataPtr = header;
-
-	// Imports: conditional — the original skips the loader_read when count <= 0
-	if (header.importsCount > 0) {
-		int16 *buffer = (int16 *)malloc(header.importsCount * 2);
-		if (!loader_read(buffer, (long)header.importsCount * 2, 1, &file)) {
-			free(buffer);
-			goto done;
-		}
-
-		dataPtr->imports.resize(header.importsCount);
-		for (int i = 0; i < header.importsCount; ++i)
-			dataPtr->imports[i] = FROM_LE_16(buffer[i]);
-		free(buffer);
-	}
-
-	// Entry flags: always read (no count guard in the original)
-	{
-		int16 *buffer = (int16 *)malloc(header.entryFlagsCount * 2);
-		if (!loader_read(buffer, (long)header.entryFlagsCount * 2, 1, &file)) {
-			free(buffer);
-			goto done;
-		}
-
-		dataPtr->entryFlags.resize(header.entryFlagsCount);
-		for (int i = 0; i < header.entryFlagsCount; ++i)
-			dataPtr->entryFlags[i] = FROM_LE_16(buffer[i]);
-		free(buffer);
-	}
-
-	// Variables
-	{
-		byte *buffer = (byte *)malloc(header.variablesCount * ConvVariable::SIZE);
-		if (!loader_read(buffer, (long)header.variablesCount * ConvVariable::SIZE, 1, &file)) {
-			free(buffer);
-			goto done;
-		}
-
-		Common::MemoryReadStream src(buffer, header.variablesCount * ConvVariable::SIZE);
-		dataPtr->variables.resize(header.entryFlagsCount);
-		for (int i = 0; i < header.entryFlagsCount; ++i) {
-			dataPtr->variables[i].load(&src);
-
-			// Zero the runtime isPtr flag for every variable; it is not meaningful
-			// as stored on disk
-			dataPtr->variables[i].isPtr = false;
-		}
-		free(buffer);
-	}
-
-	result = dataPtr;
-
-done:
-	if (file.open)
-		loader_close(&file);
-
-	if (dataPtr && dataPtr != result)
-		delete dataPtr;
-
-	return result;
+	loader_close(&file);
+	return convData;
 }
 
 static ConvData *conv_read(Common::SeekableReadStream *src) {
@@ -1163,16 +1096,16 @@ void conv_start(ConvData *convData, Conv *convIn) {
 	active_conv_data = convData;
 
 	// Resolve the byte-offset sub-array pointers stored in the ConvData block
-	conv_imports = &convData->imports[0];
-	conv_entry_flags = &convData->entryFlags[0];
-	conv_varsDataPtr = &convData->variables[0];
+	conv_imports = convData->imports.empty() ? nullptr : &convData->imports[0];
+	conv_entry_flags = convData->entryFlags.empty() ? nullptr : & convData->entryFlags[0];
+	conv_varsDataPtr = convData->variables.empty() ? nullptr : & convData->variables[0];
 
 	// conv_vars0ValPtr -> variables[0].val (skips the isPtr field)
 	conv_vars0ValPtr   = &conv_varsDataPtr[0].val;
 
 	// conv_my_next_start -> variables[1].val
 	// (offset = offsetof(ConvVariable, val) + sizeof(ConvVariable) from base)
-	conv_my_next_start = (int16 *)&conv_varsDataPtr[1].val;
+	conv_my_next_start = &conv_varsDataPtr[1].val;
 
 	convData->currentNode = -1;
 	convData->numImports  = 0;

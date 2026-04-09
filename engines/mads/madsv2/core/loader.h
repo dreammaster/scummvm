@@ -51,6 +51,25 @@ typedef struct {
 
 typedef Load *LoadHandle;
 
+/**
+ * Simple encapsulation for using loaders in Conv::load
+ */
+class LoaderReadStream : public Common::SeekableReadStream {
+private:
+	LoadHandle _load;
+public:
+	LoaderReadStream(LoadHandle load) : _load(load) {}
+	~LoaderReadStream() override {
+	}
+
+	int64 pos() const override { return 0; }
+	int64 size() const { return 0; }
+	bool seek(int64 offset, int whence = SEEK_SET) override { return false; }
+	bool eos() const override { return false; }
+	uint32 read(void *dataPtr, uint32 dataSize) override;
+};
+
+
 /* Debug tracking variables */
 #ifndef disable_statistics
 extern long loader_found_in_ems;

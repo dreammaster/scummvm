@@ -138,7 +138,7 @@ struct Conv {
 	void load(Common::SeekableReadStream *src);
 };
 
-struct ConvDataBase {
+struct ConvData {
 	int16 currentNode;
 	int16 entryFlagsCount;
 	int16 variablesCount;
@@ -154,41 +154,15 @@ struct ConvDataBase {
 	int16 messageList2[10];
 	int16 speechList1[10];
 	int16 speechList2[10];
-};
 
-struct ConvDataHeader : public ConvDataBase {
-	int16 importsOffset;
-	int16 entryFlagsOffset;
-	int16 variablesOffset;
-
-	ConvDataHeader &operator=(const ConvDataBase &src) {
-		*((ConvDataBase *)this) = src;
-		importsOffset = entryFlagsOffset = variablesOffset = 0;
-		return *this;
-	}
-
-	// On-disk size: 10 header words + 5 arrays of 10 words + 3 offset words
-	// = 20 + 100 + 6 = 126 = 0x7E.  The +21 padding in load_conv_data
-	// exploits the fact that 21 * 6 = 126, so the formula automatically
-	// includes the header in the total allocation.
-	static constexpr int SIZE = 2 * 10 + 2 * 10 * 5 + 2 * 3;
-	void load(Common::SeekableReadStream *src);
-	void save(Common::WriteStream *dest) const;
-};
-
-struct ConvData : public ConvDataBase {
-	ConvData &operator=(const ConvDataBase &src) {
-		*((ConvDataBase *)this) = src;
-		imports.clear();
-		entryFlags.clear();
-		variables.clear();
-		return *this;
-	}
-
+	uint16 importsOffset;
+	uint16 entryFlagsOffset;
+	uint16 variablesOffset;
 	Common::Array<int16> imports;
 	Common::Array<uint16> entryFlags;
 	Common::Array<ConvVariable> variables;
 
+	static constexpr int SIZE = 2 * 10 + 2 * 10 * 5 + 2 * 3;
 	void load(Common::SeekableReadStream *src);
 	void save(Common::WriteStream *dest) const;
 };

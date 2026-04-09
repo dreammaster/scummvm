@@ -55,6 +55,12 @@ int loader_ems_search_disabled = false;
 char loader_last[14] = "";
 
 
+uint32 LoaderReadStream::read(void *dataPtr, uint32 dataSize) {
+	loader_read(dataPtr, dataSize, 1, _load);
+	return dataSize;
+}
+
+
 int loader_open(LoadHandle handle, const char *filename, const char *options, int flags) {
 	int error_flag = true;
 	int found_himem = -1;
