@@ -410,7 +410,6 @@ extern BoxParam box_param;
 
 /* popup_1.c */
 int  popup_create(int horiz_pieces, int x, int y);
-int  popup_create(FontPtr font, int horiz_pieces, int x, int y);
 void popup_add_icon(SeriesPtr series, int id, int center);
 int  popup_draw(int save_screen, int depth_code);
 void popup_destroy(void);

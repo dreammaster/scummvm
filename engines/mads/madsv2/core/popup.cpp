@@ -144,10 +144,6 @@ done:
 	return error_flag;
 }
 
-int popup_create(FontPtr font, int horiz_pieces, int x, int y) {
-	error("TODO: popup_create");
-}
-
 void popup_add_icon(SeriesPtr series, int id, int center) {
 	box->icon = series;
 	box->icon_id = id;
