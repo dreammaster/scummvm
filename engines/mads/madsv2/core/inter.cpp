@@ -2258,7 +2258,7 @@ void inter_main_loop(int allow_input) {
 			}
 			x = (video_x >> 1) - (width >> 1);
 			y = (viewing_at_y + scr_work.y - 1) - 12;
-			/* inter_sentence_handle = matte_add_message (use_font, inter_sentence, x, y, INTER_MESSAGE_COLOR, use_spacing); */
+			inter_sentence_handle = matte_add_message (use_font, inter_sentence, x, y, INTER_MESSAGE_COLOR, use_spacing);
 		}
 		inter_sentence_changed = false;
 	}
