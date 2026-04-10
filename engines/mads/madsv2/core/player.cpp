@@ -180,6 +180,7 @@ static void player_keep_turning() {
 		temp_facing = player_clockwise[temp_facing]) {
 		clockwise_count++;
 		clockwise_sum += temp_facing;
+		assert(clockwise_count < 100);
 	}
 
 	for (temp_facing = player.facing;

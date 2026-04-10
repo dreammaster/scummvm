@@ -74,7 +74,9 @@ void RoomFile::load(Common::SeekableReadStream *src) {
 
 void HotSpot::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(ul_x, ul_y, lr_x, lr_y, feet_x, feet_y,
-		facing, prep, active, cursor_number, syntax, vocab, verb);
+		facing, prep, active, cursor_number, syntax);
+	src->skip(1);
+	src->readMultipleLE(vocab, verb);
 }
 
 //====================================================================
@@ -391,7 +393,7 @@ HotPtr room_load_hotspots(int id, int *num_spots) {
 	}
 
 	num_to_read = MAX(*num_spots, 1);
-	memory_needed = (num_to_read * sizeof(HotSpot));
+	memory_needed = num_to_read * sizeof(HotSpot);
 
 	spots = (HotPtr)mem_get_name(memory_needed, "$hotspot");
 	if (spots == NULL)
