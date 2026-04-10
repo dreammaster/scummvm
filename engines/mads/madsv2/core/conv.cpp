@@ -1330,7 +1330,6 @@ void conv_update(bool flag) {
 				kernel.trigger         = conv_control.me_trigger;
 				kernel.trigger_mode    = conv_control.me_trigger_mode;
 				conv_control.me_trigger = 0;
-				return;
 			}
 
 			conv_control.status = CONV_STATUS_DONE;
