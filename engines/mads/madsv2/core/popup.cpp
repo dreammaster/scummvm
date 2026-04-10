@@ -115,6 +115,9 @@ int popup_create(int horiz_pieces, int x, int y) {
 
 	box->text_width = (box->text_xs / box_param.font->max_x_size) << 1;
 
+	box->screen_buffer.data = NULL;
+	box->depth_buffer.data  = NULL;
+
 	box->screen_saved = false;
 	box->depth_saved = false;
 
@@ -503,23 +506,20 @@ int popup_draw(int save_screen, int depth_code) {
 		matte_map_work_screen();
 
 		if (depth_code) {
-			box->preserve_handle = buffer_preserve(&scr_orig, popup_preserve_initiator[2],
-				-1,
-				box->x + picture_map.pan_offset_x,
-				box->y + picture_map.pan_offset_y,
-				box->xs, box->ys);
+			buffer_init(&box->screen_buffer, box->xs, box->ys);
+			if (box->screen_buffer.data != NULL)
+				buffer_rect_copy_2(scr_orig, box->screen_buffer,
+					box->x + picture_map.pan_offset_x,
+					box->y + picture_map.pan_offset_y,
+					0, 0, box->xs, box->ys);
 		} else {
-			box->preserve_handle = buffer_preserve(&scr_main, popup_preserve_initiator[0],
-				work_screen_ems_handle,
-				box->x, box->y,
-				box->xs, box->ys);
+			buffer_init(&box->screen_buffer, box->xs, box->ys);
+			if (box->screen_buffer.data != NULL)
+				buffer_rect_copy_2(scr_main, box->screen_buffer,
+					box->x, box->y, 0, 0, box->xs, box->ys);
 		}
 
-		box->screen_saved = true;
-
-		if (box->preserve_handle == BUFFER_NOT_PRESERVED) {
-			error_report(ERROR_POPUP_PRESERVE_FAILURE, WARNING, MODULE_POPUP, box->preserve_handle, 0);
-		}
+		box->screen_saved = (box->screen_buffer.data != NULL);
 
 		if (depth_code) {
 			box->depth_x = box->x + picture_map.pan_offset_x;
@@ -535,18 +535,14 @@ int popup_draw(int save_screen, int depth_code) {
 			box->depth_x = box->depth_x >> 1;
 			box->depth_xs = box->depth_xs >> 1;
 
-			box->depth_preserve_handle = buffer_preserve(&scr_depth,
-				popup_preserve_initiator[1],
-				-1,
-				box->depth_x,
-				box->y + picture_map.pan_offset_y,
-				box->depth_xs, box->ys);
+			buffer_init(&box->depth_buffer, box->depth_xs, box->ys);
+			if (box->depth_buffer.data != NULL)
+				buffer_rect_copy_2(scr_depth, box->depth_buffer,
+					box->depth_x,
+					box->y + picture_map.pan_offset_y,
+					0, 0, box->depth_xs, box->ys);
 
-			if (box->depth_preserve_handle == BUFFER_NOT_PRESERVED) {
-				error_report(ERROR_POPUP_PRESERVE_FAILURE, WARNING, MODULE_POPUP, box->depth_preserve_handle, 1);
-			}
-
-			box->depth_saved = true;
+			box->depth_saved = (box->depth_buffer.data != NULL);
 		}
 	}
 
@@ -749,13 +745,21 @@ void popup_destroy(void) {
 
 	if (box->active && box->screen_saved) {
 		if (box->depth_saved) {
-			buffer_restore(&scr_orig, box->preserve_handle, -1,
-				box->x + picture_map.pan_offset_x,
-				box->y + picture_map.pan_offset_y,
-				box->xs, box->ys);
-			buffer_restore(&scr_depth, box->depth_preserve_handle, -1,
-				box->depth_x, box->y + picture_map.pan_offset_y,
-				box->depth_xs, box->ys);
+			if (box->screen_buffer.data != NULL) {
+				buffer_rect_copy_2(box->screen_buffer, scr_orig,
+					0, 0,
+					box->x + picture_map.pan_offset_x,
+					box->y + picture_map.pan_offset_y,
+					box->xs, box->ys);
+				buffer_free(&box->screen_buffer);
+			}
+			if (box->depth_buffer.data != NULL) {
+				buffer_rect_copy_2(box->depth_buffer, scr_depth,
+					0, 0,
+					box->depth_x, box->y + picture_map.pan_offset_y,
+					box->depth_xs, box->ys);
+				buffer_free(&box->depth_buffer);
+			}
 
 			matte_guard_depth_0 = false;
 
@@ -780,8 +784,11 @@ void popup_destroy(void) {
 
 		} else {
 			matte_map_work_screen();
-			buffer_restore(&scr_main, box->preserve_handle, work_screen_ems_handle,
-				box->x, box->y, box->xs, box->ys);
+			if (box->screen_buffer.data != NULL) {
+				buffer_rect_copy_2(box->screen_buffer, scr_main,
+					0, 0, box->x, box->y, box->xs, box->ys);
+				buffer_free(&box->screen_buffer);
+			}
 
 			matte_map_work_screen();
 

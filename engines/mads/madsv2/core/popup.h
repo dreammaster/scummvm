@@ -177,6 +177,9 @@ typedef struct {
 	int preserve_handle;
 	int depth_preserve_handle;
 
+	Buffer screen_buffer;     /* Direct copy of screen area under popup */
+	Buffer depth_buffer;      /* Direct copy of depth area under popup  */
+
 	int screen_saved;
 	int depth_saved;
 
