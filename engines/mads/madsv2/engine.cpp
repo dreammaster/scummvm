@@ -23,7 +23,6 @@
 #include "engines/util.h"
 #include "mads/madsv2/engine.h"
 #include "mads/madsv2/core/kernel.h"
-#include "mads/madsv2/core/mouse.h"
 #include "mads/madsv2/phantom/main.h"
 #include "mads/core/sound.h"
 
@@ -63,27 +62,30 @@ void MADSV2Engine::pollEvents() {
 		bool isMouse = false;
 		switch (e.type) {
 		case Common::EVENT_LBUTTONDOWN:
-			mouse_buttons |= 1;
+			_mouseButtons |= 1;
 			isMouse = true;
 			break;
 		case Common::EVENT_LBUTTONUP:
-			mouse_buttons &= ~1;
+			_mouseButtons &= ~1;
 			isMouse = true;
 			break;
 		case Common::EVENT_RBUTTONDOWN:
-			mouse_buttons |= 2;
+			_mouseButtons |= 2;
 			isMouse = true;
 			break;
 		case Common::EVENT_RBUTTONUP:
-			mouse_buttons &= ~2;
+			_mouseButtons &= ~2;
 			isMouse = true;
 			break;
 		case Common::EVENT_MBUTTONDOWN:
-			mouse_buttons |= 4;
+			_mouseButtons |= 4;
 			isMouse = true;
 			break;
 		case Common::EVENT_MBUTTONUP:
-			mouse_buttons &= ~4;
+			_mouseButtons &= ~4;
+			isMouse = true;
+			break;
+		case Common::EVENT_MOUSEMOVE:
 			isMouse = true;
 			break;
 		case Common::EVENT_RETURN_TO_LAUNCHER:
@@ -94,10 +96,8 @@ void MADSV2Engine::pollEvents() {
 			break;
 		}
 
-		if (isMouse) {
-			mouse_x = e.mouse.x;
-			mouse_y = e.mouse.y;
-		}
+		if (isMouse)
+			_mousePos = e.mouse;
 
 		if (e.type == Common::EVENT_KEYDOWN)
 			_keyEvents.push(e);
@@ -125,6 +125,14 @@ void MADSV2Engine::flushKeys() {
 	pollEvents();
 
 	_keyEvents.clear();
+}
+
+int MADSV2Engine::getMouseState(int &x, int &y) {
+	pollEvents();
+
+	x = _mousePos.x;
+	y = _mousePos.y;
+	return _mouseButtons;
 }
 
 uint32 MADSV2Engine::getMillis() {

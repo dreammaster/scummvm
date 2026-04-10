@@ -27,6 +27,7 @@
 #include "mads/madsv2/core/mouse.h"
 #include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/core/video.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -34,7 +35,6 @@ namespace MADSV2 {
 int mouse_button = -1;
 int mouse_status = 0;
 int mouse_x = 0, mouse_y = 0;
-int mouse_buttons = 0;
 bool mouse_start_stroke = false;
 bool mouse_stroke_going = false;
 bool mouse_changed = false;
@@ -196,10 +196,7 @@ void mouse_double_freedom(int freedom_flag) {
 }
 
 int mouse_get_status(int *x, int *y) {
-	*x = mouse_x;
-	*y = mouse_y;
-
-	return mouse_buttons;
+	return g_engine->getMouseState(*x, *y);
 }
 
 void mouse_timing() {

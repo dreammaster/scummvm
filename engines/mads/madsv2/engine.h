@@ -38,6 +38,8 @@ protected:
 	Graphics::Screen *_screen = nullptr;
 	Common::Stack<Common::Event> _keyEvents;
 	uint32 _nextFrameTime = 0;
+	Common::Point _mousePos;
+	int _mouseButtons = 0;
 
 	void pollEvents();
 
@@ -55,6 +57,8 @@ public:
 	bool hasPendingKey();
 	int getKey();
 	void flushKeys();
+
+	int getMouseState(int &x, int &y);
 
 	/**
 	 * Get the elapsed time in milliseconds
