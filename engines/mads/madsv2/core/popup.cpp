@@ -40,6 +40,7 @@
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/pal.h"
 #include "mads/madsv2/core/mcga.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -820,8 +821,8 @@ void popup_destroy(void) {
 
 
 int popup_and_wait(int save_screen) {
-	int error_flag = true;
-	int waiting;
+	bool error_flag = true;
+	bool waiting;
 
 	if (cursor != NULL) {
 		cursor_last = 1;
@@ -836,7 +837,6 @@ int popup_and_wait(int save_screen) {
 	mouse_init_cycle();
 
 	while (waiting) {
-
 		mouse_begin_cycle(false);
 
 		if (keys_any()) {
@@ -847,6 +847,9 @@ int popup_and_wait(int save_screen) {
 		if (mouse_stop_stroke) waiting = false;
 
 		mouse_end_cycle(false, waiting);
+
+		if (g_engine->shouldQuit())
+			waiting = false;
 	}
 
 	popup_destroy();
