@@ -76,22 +76,22 @@ namespace MADSV2 {
 #define TEXT_UPPER_AND_LOWER    2
 #define TEXT_AS_IS              3
 
-#define TEXT_LOAD_BY_ID         0       /* Load by id #          */
-#define TEXT_LOAD_BY_ORDER      1       /* Load by order in file */
-#define TEXT_LOAD_NEXT          2       /* Load next in file     */
-#define TEXT_LOAD_PREVIOUS      3       /* Load previous in file */
-
 typedef struct {
 	word length;
 	char text[1];
 } Text;
 
 
-typedef struct {
-	long id;
-	long file_offset;
+struct TextDirectory {
+	int32 id;
+	uint32 file_offset;
 	word length;
-} TextDirectory;
+
+	static constexpr int SIZE = 4 + 4 + 2;
+	void load(Common::SeekableReadStream *src) {
+		src->readMultipleLE(id, file_offset, length);
+	}
+};
 
 typedef Text *TextPtr;
 
@@ -116,12 +116,10 @@ extern int  text_last_number;                /* Last text number used     */
 extern int  text_last_num_entries;           /* Number of entries         */
 
 
-extern TextPtr text_load(long id, int mode);
+extern TextPtr text_load(long id);
 
 extern int text_build(int build_header);
-
 extern void text_copy_vocab(char **mark, int vocab_id);
-extern int text_show_full(long id, int mode, int key_wait, int report_errors);
 extern int text_show(long id);
 
 } // namespace MADSV2

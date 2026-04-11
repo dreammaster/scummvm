@@ -20,6 +20,7 @@
  */
 
 #include "common/debug.h"
+#include "common/memstream.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/popup.h"
@@ -94,23 +95,16 @@ char text_command_demonstrative[14] = TEXT_COMMAND_DEMONSTRATIVE;
 extern int16 global[GLOBAL_LIST_SIZE];
 
 
-TextPtr text_load(long id, int mode) {
+TextPtr text_load(long id) {
 	TextPtr result = NULL;
-	TextDirectory dir;
-	TextDirectory *table = NULL;
 	char temp_buf[80];
 	word num_entries;
 	long file_offset;
-	long index_offset;
 	long target_offset;
-	long full_mem_size;
-	long mem_avail;
-	/* long high, low; */
-	int  count;
-	int  short_id;
-	int  number = 0;
-	int  found = false;
+	int count;
+	bool found = false;
 	Common::SeekableReadStream *handle = NULL;
+	TextDirectory dir;
 
 	dir.id = dir.file_offset = dir.length = 0;
 	mem_last_alloc_loader = MODULE_TEXT_LOADER;
@@ -119,97 +113,17 @@ TextPtr text_load(long id, int mode) {
 	Common::strcat_s(temp_buf, TEXT_COMPILED);
 
 	handle = env_open(temp_buf, "rb");
-
-
 	if (handle == NULL) goto done;
 
 	file_offset = handle->pos();
 
-	if (!fileio_fread_f(&num_entries, sizeof(word), 1, handle))
-		goto done;
+	num_entries = handle->readUint16LE();
 
-	switch (mode) {
-	case TEXT_LOAD_BY_ORDER:
-		number = short_id = (int)id;
-		if (short_id >= (int)num_entries) goto done;
-
-		index_offset = file_offset + sizeof(word) + (sizeof(TextDirectory) * short_id);
-		fileio_setpos(handle, index_offset);
-
-		if (!fileio_fread_f(&dir, sizeof(TextDirectory), 1, handle)) goto done;
-
-		found = true;
-		break;
-
-	case TEXT_LOAD_BY_ID:
-	case TEXT_LOAD_NEXT:
-	case TEXT_LOAD_PREVIOUS:
-	default:
-		full_mem_size = sizeof(TextDirectory) * num_entries;
-		mem_avail = mem_get_avail();
-
-		if (mem_avail - 128 >= full_mem_size) {
-			table = (TextDirectory *)mem_get_name(full_mem_size, "$table$");
-		}
-
-		if (table != NULL) {
-			if (!fileio_fread_f(table, full_mem_size, 1, handle)) goto done;
-			for (count = 0; (!found) && (count < (int)num_entries); count++) {
-				found = (table[count].id == id);
-				if (found) {
-					number = count;
-					memcpy(&dir, &table[count], sizeof(TextDirectory));
-				}
-			}
-			mem_free(table);
-			table = NULL;
-		} else {
-			for (count = 0; (!found) && (count < (int)num_entries); count++) {
-				if (!fileio_fread_f(&dir, sizeof(TextDirectory), 1, handle)) goto done;
-				found = (dir.id == id);
-				number = count;
-			}
-		}
-
-		if ((mode == TEXT_LOAD_NEXT) || (mode == TEXT_LOAD_PREVIOUS)) {
-			if (!found) goto done;
-			if (mode == TEXT_LOAD_NEXT) {
-				number++;
-			} else {
-				number--;
-			}
-			if (number >= (int)num_entries) goto done;
-			if (number < 0) goto done;
-
-			index_offset = file_offset + sizeof(word) + (sizeof(TextDirectory) * number);
-			fileio_setpos(handle, index_offset);
-
-			if (!fileio_fread_f(&dir, sizeof(TextDirectory), 1, handle)) goto done;
-		}
-		break;
+	for (count = 0; count < num_entries && !found; ++count) {
+		// Iterate over reading table elements
+		dir.load(handle);
+		found = dir.id == id;
 	}
-
-	/*
-	for (count = 0; (!found) && (count < (int)num_entries); count++) {
-	  if (!fileio_fread_f(&dir, sizeof(TextDirectory), 1, handle)) goto done;
-	  found = (dir.id == id);
-	}
-	*/
-
-	if (!found) {
-		/*
-		#ifndef disable_error_check
-		  high = id / 100;
-		  low  = id - high;
-		  error_report (ERROR_NO_SUCH_MESSAGE, WARNING, MODULE_TEXT, (word)high, (word)low);
-		#endif
-		*/
-		goto done;
-	}
-
-	text_last_id = dir.id;
-	text_last_number = number;
-	text_last_num_entries = num_entries;
 
 	target_offset = file_offset + dir.file_offset;
 
@@ -229,9 +143,7 @@ TextPtr text_load(long id, int mode) {
 	}
 
 done:
-	if (table != NULL) mem_free(table);
-	if (handle != NULL)
-		delete handle;
+	delete handle;
 	return result;
 }
 
@@ -505,7 +417,7 @@ done:
 	;
 }
 
-int text_show_full(long id, int mode, int key_wait, int report_errors) {
+int text_show(long id) {
 	int error_flag = true;
 	int center = false;
 	int cr;
@@ -529,8 +441,6 @@ int text_show_full(long id, int mode, int key_wait, int report_errors) {
 	int icon_id = 0;
 	int icon_center = false;
 
-	if (!key_wait) popup_destroy();
-
 	x = text_default_x;
 	y = text_default_y;
 
@@ -538,15 +448,8 @@ int text_show_full(long id, int mode, int key_wait, int report_errors) {
 
 	text_width = (text_force_width > 0) ? text_force_width : text_default_width;
 
-	text = text_load(id, mode);
-	if (text == NULL) {
-		if (report_errors) {
-#ifndef disable_error_check
-			error_report(ERROR_NO_SUCH_MESSAGE, WARNING, MODULE_TEXT, id, mode);
-#endif
-		}
-		goto done;
-	}
+	text = text_load(id);
+	if (text == NULL) goto done;
 
 	scan = text->text;
 
@@ -686,11 +589,7 @@ int text_show_full(long id, int mode, int key_wait, int report_errors) {
 
 	if (!center) popup_next_line();
 
-	if (key_wait) {
-		if (popup_and_wait(text_saves_screen)) goto done;
-	} else {
-		if (popup_and_dont_wait(text_saves_screen)) goto done;
-	}
+	if (popup_and_wait(text_saves_screen)) goto done;
 
 	error_flag = false;
 
@@ -702,11 +601,6 @@ done:
 	if (text != NULL)  mem_free(text);
 
 	return error_flag;
-}
-
-
-int text_show(long id) {
-	return text_show_full(id, TEXT_LOAD_BY_ID, true, true);
 }
 
 } // namespace MADSV2
