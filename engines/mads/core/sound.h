@@ -161,6 +161,13 @@ public:
 
 	// TODO: Only used by asound.003. Figure out usage
 	byte _field20;
+
+	// Phantom-specific fields
+	int _field26;        // pitch delta (set in case -14, zeroed in case -3)
+	int _field28;        // zeroed in case -3
+	int _field2A;        // set in case -18
+	int _field2B;        // volume-cap flag (suppresses upward volume changes)
+	int _field2C;        // frequency counter (used with _field7 in cases -9/-10)
 public:
 	static bool _channelsEnabled;
 public:
@@ -284,7 +291,7 @@ protected:
 	int _chanCommandCount;
 	int _commandParam;
 
-	virtual void channelCommand(int cmdNum, byte *&pSrc, bool &updateFlag) = 0;
+	virtual void channelCommand(byte *&pSrc, bool &updateFlag) = 0;
 
 	/**
 	 * Loads up the specified sample
@@ -355,6 +362,12 @@ protected:
 	 * Returns a 16-bit random number
 	 */
 	int getRandomNumber();
+
+	/**
+	 * Converts a 16-bit near pointer (data-segment offset) to a C++ byte pointer
+	 * by searching the data cache for the matching block.
+	 */
+	byte *getDataPtr(int nearPtr);
 
 	virtual int command0();
 	int command1();

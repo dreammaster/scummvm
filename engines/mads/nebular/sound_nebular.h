@@ -42,7 +42,7 @@ public:
 
 class RexASound : public ASound {
 protected:
-	void channelCommand(int cmdNum, byte *&pSrc, bool &updateFlag) override;
+	void channelCommand(byte *&pSrc, bool &updateFlag) override;
 
 public:
 	RexASound(Audio::Mixer *mixer, OPL::OPL *opl,

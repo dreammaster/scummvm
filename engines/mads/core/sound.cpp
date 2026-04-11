@@ -157,6 +157,11 @@ AdlibChannel::AdlibChannel() {
 	_field1F = 0;
 
 	_field20 = 0;
+	_field26 = 0;
+	_field28 = 0;
+	_field2A = 0;
+	_field2B = 0;
+	_field2C = 0;
 }
 
 void AdlibChannel::reset() {
@@ -351,6 +356,16 @@ void ASound::noise() {
 	if (_v2) {
 		setFrequency(_channelNum2, (randomVal & _freqMask2) + _freqBase2);
 	}
+}
+
+byte *ASound::getDataPtr(int nearPtr) {
+	for (auto i = _dataCache.begin(); i != _dataCache.end(); ++i) {
+		CachedDataEntry &e = *i;
+		int entrySize = (int)(e._dataEnd - e._data) + 1;
+		if (nearPtr >= e._offset && nearPtr < e._offset + entrySize)
+			return e._data + (nearPtr - e._offset);
+	}
+	return nullptr;
 }
 
 CachedDataEntry &ASound::getCachedData(byte *pData) {
@@ -555,7 +570,7 @@ void ASound::pollActiveChannel() {
 					break;
 				} else {
 					updateFlag = false;
-					channelCommand(255 - *pSrc, pSrc, updateFlag);
+					channelCommand(pSrc, updateFlag);
 				}
 			}
 		}

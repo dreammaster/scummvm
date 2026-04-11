@@ -43,7 +43,15 @@ public:
 
 class PhantomASound : public ASound {
 protected:
-	void channelCommand(int cmdNum, byte *&pSrc, bool &updateFlag) override;
+	// Per-driver scripting register file (256 byte-sized registers)
+	byte _scratchArr[256];
+
+	// Music synchronisation state variables (mirrors word_11F32 etc.)
+	int _w11F32 = 0, _w11F42 = 0, _w11F44 = 0;
+	int _w11F46 = 0, _w11F48 = 0, _w11F4A = 0;
+	int _w11F4C = 0, _w11F4E = 0, _w11F50 = 0;
+
+	void channelCommand(byte *&pSrc, bool &updateFlag) override;
 
 public:
 	/**

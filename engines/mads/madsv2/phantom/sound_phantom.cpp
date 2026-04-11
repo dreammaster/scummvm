@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/endian.h"
 #include "common/md5.h"
 #include "common/textconsole.h"
 #include "mads/madsv2/phantom/sound_phantom.h"
@@ -86,10 +87,546 @@ void PhantomSoundManager::loadDriver(int sectionNumber) {
 PhantomASound::PhantomASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset) :
 		ASound(mixer, opl, filename, dataOffset) {
 	_chanCommandCount = 66;
+	memset(_scratchArr, 0, sizeof(_scratchArr));
 }
 
-void PhantomASound::channelCommand(int cmdNum, byte *&pSrc, bool &updateFlag) {
-	// TODO
+void PhantomASound::channelCommand(byte *&pSrc, bool &updateFlag) {
+	AdlibChannel *chan = _activeChannelPtr;
+	int cmdNum = (int8)*pSrc;   // -1 .. -66
+
+	switch (cmdNum) {
+
+	case -1:
+		// Single-level repeat loop (uses _field17 / _ptr3)
+		if (!chan->_field17) {
+			if (pSrc[1] == 0) {
+				chan->_pSrc += 2;
+				chan->_ptr3 = chan->_pSrc;
+				chan->_field17 = 0;
+			} else {
+				chan->_field17 = (int8)pSrc[1];
+				chan->_pSrc = chan->_ptr3;
+			}
+		} else {
+			--chan->_field17;
+			if (!chan->_field17) {
+				chan->_pSrc += 2;
+				chan->_ptr3 = chan->_pSrc;
+			} else {
+				chan->_pSrc = chan->_ptr3;
+			}
+		}
+		break;
+
+	case -2:
+		// Double-level repeat loop (uses _field19/_ptr4 outer, _field17/_ptr3 inner)
+		if (!chan->_field19) {
+			if (pSrc[1] == 0) {
+				chan->_pSrc += 2;
+				chan->_ptr4 = chan->_pSrc;
+				chan->_ptr3 = chan->_pSrc;
+				chan->_field17 = 0;
+				chan->_field19 = 0;
+			} else {
+				chan->_field19 = (int8)pSrc[1];
+				chan->_pSrc = chan->_ptr4;
+				chan->_ptr3 = chan->_ptr4;
+			}
+		} else {
+			--chan->_field19;
+			if (!chan->_field19) {
+				chan->_pSrc += 2;
+				chan->_ptr4 = chan->_pSrc;
+				chan->_ptr3 = chan->_pSrc;
+			} else {
+				chan->_pSrc = chan->_ptr4;
+				chan->_ptr3 = chan->_ptr4;
+			}
+		}
+		break;
+
+	case -3:
+		// Reset channel to soundData start
+		chan->_fieldE = 0;      // original stored soundData near ptr here
+		chan->_pSrc     = chan->_soundData;
+		chan->_ptr3     = chan->_soundData;
+		chan->_ptr4     = chan->_soundData;
+		chan->_field1   = 0;
+		chan->_field2   = 0;
+		chan->_field3   = 0;
+		chan->_field26  = 0;
+		chan->_volumeOffset = 0;
+		chan->_field28  = 0;
+		chan->_volume   = 0;
+		chan->_field9   = 0;
+		chan->_fieldB   = 0;
+		chan->_field17  = 0;
+		chan->_field19  = 0;
+		chan->_field7   = 0;
+		break;
+
+	case -4: {
+		// Jump: set all four data pointers from a near-pointer word argument
+		++pSrc;
+		int nearPtr = (int16)READ_LE_UINT16(pSrc);
+		byte *p = getDataPtr(nearPtr);
+		chan->_fieldE    = nearPtr;
+		chan->_pSrc      = p;
+		chan->_ptr3      = p;
+		chan->_ptr4      = p;
+		chan->_soundData = p;
+		break;
+	}
+
+	case -5: {
+		// Unconditional jump to near-pointer target (no return address saved)
+		++pSrc;
+		int nearPtr = (int16)READ_LE_UINT16(pSrc);
+		chan->_pSrc = getDataPtr(nearPtr);
+		break;
+	}
+
+	case -6: {
+		// Unconditional call to near-pointer target (saves return address in _ptrEnd)
+		++pSrc;
+		int nearPtr = (int16)READ_LE_UINT16(pSrc);
+		chan->_ptrEnd = chan->_pSrc + 3;
+		chan->_pSrc   = getDataPtr(nearPtr);
+		break;
+	}
+
+	case -7:
+		// Return from call (restores _pSrc from _ptrEnd)
+		if (chan->_ptrEnd) {
+			chan->_pSrc   = chan->_ptrEnd;
+			chan->_ptrEnd = nullptr;
+		} else {
+			chan->_pSrc += 1;
+		}
+		break;
+
+	case -8:
+		// Load sample: byte argument is sample index
+		chan->_sampleIndex = pSrc[1];
+		chan->_pSrc += 2;
+		loadSample(chan->_sampleIndex);
+		break;
+
+	case -9:
+		// Set _field7 (pitch source), clear _field2C (frequency counter)
+		chan->_field7  = pSrc[1];
+		chan->_field2C = 0;
+		chan->_pSrc += 2;
+		break;
+
+	case -10:
+		// Set _field2C (frequency counter), clear _field7
+		chan->_field2C = pSrc[1];
+		chan->_field7  = 0;
+		chan->_pSrc += 2;
+		break;
+
+	case -11:
+		// Set _field1 (envelope / modulation)
+		chan->_field1 = pSrc[1];
+		chan->_pSrc += 2;
+		break;
+
+	case -12:
+		// Set volume, capped downward if _field2B (mute flag) is active
+		{
+			int val = (int8)pSrc[1];
+			if (chan->_field2B) {
+				if (chan->_volume > val)
+					chan->_volume = val;
+			} else {
+				chan->_volume = val;
+			}
+			updateFlag = true;
+			chan->_pSrc += 2;
+		}
+		break;
+
+	case -13:
+		// Set _fieldA and _field2 (vibrato params), or skip if muted
+		if (chan->_field2B) {
+			chan->_pSrc += 3;
+		} else {
+			chan->_fieldA = pSrc[1];
+			chan->_field2 = pSrc[2];
+			chan->_field9 = 1;
+			chan->_pSrc += 3;
+		}
+		break;
+
+	case -14:
+		// Set _field26 (pitch delta)
+		chan->_field26 = pSrc[1];
+		chan->_pSrc += 2;
+		break;
+
+	case -15:
+		// Set _volumeOffset, capped downward if _field2B (mute flag) is active
+		{
+			int val = (int8)pSrc[1];
+			if (chan->_field2B) {
+				if ((int8)chan->_volumeOffset > val)
+					chan->_volumeOffset = val;
+			} else {
+				chan->_volumeOffset = val;
+			}
+			updateFlag = true;
+			chan->_pSrc += 2;
+		}
+		break;
+
+	case -16:
+		// Set _fieldD (volume increment step)
+		chan->_fieldD = pSrc[1];
+		updateFlag = true;
+		chan->_pSrc += 2;
+		break;
+
+	case -17:
+		// Set _fieldC (period) and _field3 (volume slide), enable slide (_fieldB=1)
+		chan->_fieldC = pSrc[1];
+		chan->_field3 = pSrc[2];
+		chan->_fieldB = 1;
+		chan->_pSrc += 3;
+		break;
+
+	case -18:
+		// Set _field2A
+		chan->_field2A = pSrc[1];
+		chan->_pSrc += 2;
+		break;
+
+	case -19:
+		// Relative skip: advance by (signed byte arg) + 3
+		chan->_pSrc += (int8)pSrc[1] + 3;
+		break;
+
+	case -20: {
+		// Pick random element from array[0..N-1], write chosen value to a
+		// self-modifying offset within the sound data
+		int n    = (byte)pSrc[1];
+		byte *base = pSrc + 2;
+		int rnd  = getRandomNumber() & 0x7FFF;
+		int idx  = rnd % n;
+		byte chosen = base[idx];
+		int destIdx = (int8)base[n];
+		base[destIdx + n + 1] = chosen;
+		chan->_pSrc += n + 3;
+		break;
+	}
+
+	case -21: {
+		// Pick random value in [lower..upper], write to a self-modifying offset
+		int lower = (int8)pSrc[1];
+		int upper = (int8)pSrc[2];
+		int range = upper - lower + 1;
+		int rnd   = getRandomNumber() & 0x7FFF;
+		byte *base = pSrc + 3;
+		int destIdx = (int8)base[0];
+		base[destIdx + 1] = (byte)(rnd % range + lower);
+		chan->_pSrc += 4;
+		break;
+	}
+
+	case -22: {
+		// Like -20 but array index is read from _scratchArr[regIdx]
+		int regIdx = (byte)pSrc[1];
+		int n      = (byte)pSrc[2];
+		byte *base = pSrc + 3;
+		int arrVal = _scratchArr[regIdx];
+		byte chosen = base[arrVal];
+		int destOffset = (int8)base[n];
+		base[destOffset + n + 1] = chosen;
+		chan->_pSrc += n + 4;
+		break;
+	}
+
+	case -23:
+		// arr[dest] = literal
+		_scratchArr[(byte)pSrc[1]] = (byte)pSrc[2];
+		chan->_pSrc += 3;
+		break;
+
+	case -24:
+		// arr[dest] = arr[src]
+		_scratchArr[(byte)pSrc[1]] = _scratchArr[(byte)pSrc[2]];
+		chan->_pSrc += 3;
+		break;
+
+	case -25:
+		// Write arr[regIdx] into sound data at pSrc[offset+3]
+		pSrc[(int8)pSrc[2] + 3] = _scratchArr[(byte)pSrc[1]];
+		chan->_pSrc += 3;
+		break;
+
+	case -26:
+		// arr[idx]++
+		++_scratchArr[(byte)pSrc[1]];
+		chan->_pSrc += 2;
+		break;
+
+	case -27:
+		// arr[idx]--
+		--_scratchArr[(byte)pSrc[1]];
+		chan->_pSrc += 2;
+		break;
+
+	case -28:
+		// arr[dest] += literal
+		_scratchArr[(byte)pSrc[1]] += (byte)pSrc[2];
+		chan->_pSrc += 3;
+		break;
+
+	case -29:
+		// arr[dest] += arr[src]
+		_scratchArr[(byte)pSrc[1]] += _scratchArr[(byte)pSrc[2]];
+		chan->_pSrc += 3;
+		break;
+
+	case -30:
+		// arr[dest] -= literal
+		_scratchArr[(byte)pSrc[1]] -= (byte)pSrc[2];
+		chan->_pSrc += 3;
+		break;
+
+	case -31:
+		// arr[dest] -= arr[src]
+		_scratchArr[(byte)pSrc[1]] -= _scratchArr[(byte)pSrc[2]];
+		chan->_pSrc += 3;
+		break;
+
+	case -32:
+		// arr[dest] = literal * arr[dest]  (byte multiply, low byte)
+		_scratchArr[(byte)pSrc[1]] = (byte)((byte)pSrc[2] * _scratchArr[(byte)pSrc[1]]);
+		chan->_pSrc += 3;
+		break;
+
+	case -33:
+		// arr[dest] = arr[src] * arr[dest]  (byte multiply, low byte)
+		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[2]] * _scratchArr[(byte)pSrc[1]]);
+		chan->_pSrc += 3;
+		break;
+
+	case -34:
+		// arr[dest] /= literal  (quotient)
+		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[1]] / (int8)pSrc[2]);
+		chan->_pSrc += 3;
+		break;
+
+	case -35:
+		// arr[dest] /= arr[src]  (quotient, unsigned)
+		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[1]] / _scratchArr[(byte)pSrc[2]]);
+		chan->_pSrc += 3;
+		break;
+
+	case -36:
+		// arr[dest] %= literal  (remainder)
+		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[1]] % (int8)pSrc[2]);
+		chan->_pSrc += 3;
+		break;
+
+	case -37:
+		// arr[dest] %= arr[src]  (remainder, unsigned)
+		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[1]] % _scratchArr[(byte)pSrc[2]]);
+		chan->_pSrc += 3;
+		break;
+
+	case -38:
+		// arr[dest] &= literal
+		_scratchArr[(byte)pSrc[1]] &= (byte)pSrc[2];
+		chan->_pSrc += 3;
+		break;
+
+	case -39:
+		// arr[dest] &= arr[src]
+		_scratchArr[(byte)pSrc[1]] &= _scratchArr[(byte)pSrc[2]];
+		chan->_pSrc += 3;
+		break;
+
+	case -40:
+		// arr[dest] |= literal
+		_scratchArr[(byte)pSrc[1]] |= (byte)pSrc[2];
+		chan->_pSrc += 3;
+		break;
+
+	case -41:
+		// arr[dest] |= arr[src]
+		_scratchArr[(byte)pSrc[1]] |= _scratchArr[(byte)pSrc[2]];
+		chan->_pSrc += 3;
+		break;
+
+	case -42:
+		// arr[dest] ^= literal
+		_scratchArr[(byte)pSrc[1]] ^= (byte)pSrc[2];
+		chan->_pSrc += 3;
+		break;
+
+	case -43:
+		// arr[dest] ^= arr[src]
+		_scratchArr[(byte)pSrc[1]] ^= _scratchArr[(byte)pSrc[2]];
+		chan->_pSrc += 3;
+		break;
+
+	// Cases -44 to -51: conditional jumps (5-byte: cmd, idx, literal/idx2, ptr_lo, ptr_hi)
+	// Branch taken  → jump to near-pointer target (bytes 3-4)
+	// Branch not taken → skip 5 bytes
+
+#define PHANTOM_COND_JUMP(cond) \
+	do { \
+		if (cond) { \
+			int nearPtr = (int16)READ_LE_UINT16(pSrc + 3); \
+			chan->_pSrc = getDataPtr(nearPtr); \
+		} else { \
+			chan->_pSrc += 5; \
+		} \
+	} while (0)
+
+	case -44:
+		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[1]] == (byte)pSrc[2]);
+		break;
+
+	case -45:
+		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[1]] != (byte)pSrc[2]);
+		break;
+
+	case -46:
+		// arr[idx] < literal  (jmp if below the cap)
+		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[1]] < (byte)pSrc[2]);
+		break;
+
+	case -47:
+		// arr[idx] > literal
+		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[1]] > (byte)pSrc[2]);
+		break;
+
+	case -48:
+		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[2]] == _scratchArr[(byte)pSrc[1]]);
+		break;
+
+	case -49:
+		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[2]] != _scratchArr[(byte)pSrc[1]]);
+		break;
+
+	case -50:
+		// arr[idx2] > arr[idx1]  (unsigned)
+		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[2]] > _scratchArr[(byte)pSrc[1]]);
+		break;
+
+	case -51:
+		// arr[idx2] < arr[idx1]  (unsigned)
+		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[2]] < _scratchArr[(byte)pSrc[1]]);
+		break;
+
+#undef PHANTOM_COND_JUMP
+
+	// Cases -52 to -59: conditional calls — same as -44..-51 but save return address
+	// Branch taken  → save (chan->_pSrc + 5) in _ptrEnd, then jump to target
+	// Branch not taken → skip 5 bytes
+
+#define PHANTOM_COND_CALL(cond) \
+	do { \
+		if (cond) { \
+			int nearPtr = (int16)READ_LE_UINT16(pSrc + 3); \
+			chan->_ptrEnd = chan->_pSrc + 5; \
+			chan->_pSrc   = getDataPtr(nearPtr); \
+		} else { \
+			chan->_pSrc += 5; \
+		} \
+	} while (0)
+
+	case -52:
+		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[1]] == (byte)pSrc[2]);
+		break;
+
+	case -53:
+		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[1]] != (byte)pSrc[2]);
+		break;
+
+	case -54:
+		// arr[idx] < literal
+		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[1]] < (byte)pSrc[2]);
+		break;
+
+	case -55:
+		// arr[idx] > literal
+		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[1]] > (byte)pSrc[2]);
+		break;
+
+	case -56:
+		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[2]] == _scratchArr[(byte)pSrc[1]]);
+		break;
+
+	case -57:
+		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[2]] != _scratchArr[(byte)pSrc[1]]);
+		break;
+
+	case -58:
+		// arr[idx2] > arr[idx1]  (unsigned)
+		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[2]] > _scratchArr[(byte)pSrc[1]]);
+		break;
+
+	case -59:
+		// arr[idx2] < arr[idx1]  (unsigned)
+		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[2]] < _scratchArr[(byte)pSrc[1]]);
+		break;
+
+#undef PHANTOM_COND_CALL
+
+	case -60:
+		// Call near function pointer — not translatable to C++; skip 3-byte command
+		chan->_pSrc += 3;
+		break;
+
+	case -61:
+		// No-op with 2-byte command (original called a null stub)
+		chan->_pSrc += 2;
+		break;
+
+	case -62:
+		// Skip 4 bytes (advance past this 4-byte command)
+		chan->_pSrc += 4;
+		break;
+
+	case -63:
+		// Store signed byte into _w11F50 music state variable
+		_w11F50 = (int8)pSrc[1];
+		chan->_pSrc += 2;
+		break;
+
+	case -64:
+		// Store signed byte into _w11F46; if _w11F44 == 0, also copy to _w11F4E
+		_w11F46 = (int8)pSrc[1];
+		chan->_pSrc += 2;
+		if (!_w11F44)
+			_w11F4E = _w11F46;
+		break;
+
+	case -65: {
+		// Store 16-bit word into _w11F48; signal music sync (_w11F32/_w11F42 = 1)
+		++pSrc;
+		_w11F48 = (int16)READ_LE_UINT16(pSrc);
+		chan->_pSrc = pSrc + 2;     // advance 3 bytes total from command
+		if (!_w11F44)
+			_w11F4C = _w11F48;
+		_w11F32 = 1;
+		_w11F42 = 1;
+		break;
+	}
+
+	case -66:
+		// Store signed byte into _w11F4A music state variable
+		_w11F4A = (int8)pSrc[1];
+		chan->_pSrc += 2;
+		break;
+
+	default:
+		break;
+	}
 }
 
 /*-----------------------------------------------------------------------*/

@@ -101,8 +101,9 @@ RexASound::RexASound(Audio::Mixer *mixer, OPL::OPL *opl,
 	_chanCommandCount = 15;
 }
 
-void RexASound::channelCommand(int cmdNum, byte *&pSrc, bool &updateFlag) {
+void RexASound::channelCommand(byte *&pSrc, bool &updateFlag) {
 	AdlibChannel *chan = _activeChannelPtr;
+	int cmdNum = 255 - *pSrc;
 
 	switch (cmdNum) {
 	case 0:
