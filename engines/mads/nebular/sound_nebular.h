@@ -40,7 +40,16 @@ public:
 	void validate() override;
 };
 
-class ASound1 : public ASound {
+class RexASound : public ASound {
+protected:
+	void channelCommand(int cmdNum, byte *&pSrc, bool &updateFlag) override;
+
+public:
+	RexASound(Audio::Mixer *mixer, OPL::OPL *opl,
+		const Common::Path &filename, int dataOffset);
+};
+
+class ASound1 : public RexASound {
 private:
 	typedef int (ASound1::*CommandPtr)();
 	static const CommandPtr _commandList[42];
@@ -88,7 +97,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound2 : public ASound {
+class ASound2 : public RexASound {
 private:
 	byte _command12Param;
 private:
@@ -140,7 +149,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound3 : public ASound {
+class ASound3 : public RexASound {
 private:
 	bool _command39Flag;
 
@@ -200,7 +209,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound4 : public ASound {
+class ASound4 : public RexASound {
 private:
 	typedef int (ASound4::*CommandPtr)();
 	static const CommandPtr _commandList[61];
@@ -238,7 +247,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound5 : public ASound {
+class ASound5 : public RexASound {
 private:
 	typedef int (ASound5::*CommandPtr)();
 	static const CommandPtr _commandList[42];
@@ -284,7 +293,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound6 : public ASound {
+class ASound6 : public RexASound {
 private:
 	typedef int (ASound6::*CommandPtr)();
 	static const CommandPtr _commandList[30];
@@ -313,7 +322,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound7 : public ASound {
+class ASound7 : public RexASound {
 private:
 	typedef int (ASound7::*CommandPtr)();
 	static const CommandPtr _commandList[38];
@@ -345,7 +354,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound8 : public ASound {
+class ASound8 : public RexASound {
 private:
 	typedef int (ASound8::*CommandPtr)();
 	static const CommandPtr _commandList[38];
@@ -388,7 +397,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound9 : public ASound {
+class ASound9 : public RexASound {
 private:
 	int _v1, _v2;
 	byte *_soundPtr;

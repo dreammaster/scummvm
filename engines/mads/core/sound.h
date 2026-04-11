@@ -269,11 +269,6 @@ private:
 	void updateActiveChannel();
 
 	/**
-	 * Loads up the specified sample
-	 */
-	void loadSample(int sampleIndex);
-
-	/**
 	 * Writes out the data of the selected sample to the Adlib
 	 */
 	void processSample();
@@ -284,8 +279,17 @@ private:
 	 * Timer function for OPL
 	 */
 	void onTimer();
+
 protected:
+	int _chanCommandCount;
 	int _commandParam;
+
+	virtual void channelCommand(int cmdNum, byte *&pSrc, bool &updateFlag) = 0;
+
+	/**
+	 * Loads up the specified sample
+	 */
+	void loadSample(int sampleIndex);
 
 	/**
 	 * Queue a byte for an Adlib register
