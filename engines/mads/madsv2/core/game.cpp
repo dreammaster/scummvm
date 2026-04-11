@@ -59,7 +59,6 @@
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/core/config.h"
 #include "mads/madsv2/core/fileio.h"
-#include "mads/madsv2/core/digi.h"
 #include "mads/madsv2/core/midi.h"
 #include "mads/madsv2/core/copy.h"
 #include "mads/madsv2/core/camera.h"
@@ -896,7 +895,7 @@ int game_parse_keystroke(int mykey) {
 		case ctrl_c_key:
 			kernel.mouse_cursor_point = (byte)(!kernel.mouse_cursor_point);
 			break;
-
+#if 0
 		case ctrl_s_key:
 			Common::strcpy_s(temp_buf, "d322u001");
 
@@ -926,7 +925,7 @@ int game_parse_keystroke(int mykey) {
 				}
 			}
 			break;
-
+#endif
 		case alt_f1_key:
 			if (room->front_y > room->back_y) room->front_y--;
 			kernel_room_bound_dif = room->front_y - room->back_y;
@@ -1817,6 +1816,7 @@ void do_interface_for_ouaf() {
 /*      Calls, in proper order, all daemon code for this framing round.
 */
 static void game_daemon_code() {
+#if 0
 	global[4] = -1; /* turn off global[player_selected_object] */
 
 	digi_read_another_chunk();
@@ -1826,7 +1826,7 @@ static void game_daemon_code() {
 	if (section_id != 9) {
 		do_interface_for_ouaf();
 	}
-
+#endif
 	kernel.trigger_setup_mode = KERNEL_TRIGGER_DAEMON;
 
 	game_exec_function(room_daemon_code_pointer);
@@ -2443,10 +2443,6 @@ skip_frame:
 static void game_control_loop() {
 	game_any_keystroke = false;
 
-	digi_trigger_dialog = true;
-	digi_trigger_ambiance = true;
-	digi_trigger_effect = true;
-
 	if (debugger) game_exec_function(debugger_reset);
 
 	while ((new_room == room_id) && game.going && !kernel.force_restart) {
@@ -2468,13 +2464,12 @@ static void game_control_loop() {
 				error_report(ERROR_TIME_LIMIT_EXPIRED, SEVERE, MODULE_GAME, abort_value, 0);
 			}
 		}
-
 	}
-
+#if 0
 	digi_stop(1);
 	digi_stop(2);
 	digi_stop(3);
-
+#endif
 	if (debugger) game_exec_function(debugger_reset);
 }
 

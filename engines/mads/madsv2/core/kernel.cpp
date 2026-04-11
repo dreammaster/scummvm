@@ -52,7 +52,6 @@
 #include "mads/madsv2/core/fileio.h"
 #include "mads/madsv2/core/vocab.h"
 #include "mads/madsv2/core/midi.h"
-#include "mads/madsv2/core/digi.h"
 #include "mads/madsv2/core/rail.h"
 #include "mads/madsv2/core/hspot.h"
 #include "mads/madsv2/core/attr.h"
@@ -274,9 +273,6 @@ void kernel_game_shutdown() {
 
 	/* Remove timer interrupt stuff */
 
-	midi_uninstall();
-	digi_uninstall();
-
 	timer_activate_low_priority(NULL);
 
 	timer_remove();
@@ -441,17 +437,6 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 	// Install timer handler & low priority cycling interrupt
 	if (load_flag & KERNEL_STARTUP_INTERRUPT) {
 		timer_install();
-
-		midi_install();
-		digi_install();
-
-		/*
-		if (!lock_verification()) {
-		  error_report (ERROR_COPY_PROTECTION, SEVERE, MODULE_LOCK, 0, 0);
-		}
-		timer_remove();
-		timer_install();
-		*/
 
 		cycling_active = false;
 		timer_activate_low_priority(cycle_colors);
@@ -1497,12 +1482,13 @@ int kernel_run_animation(const char *name, int trigger_code) {
 	int id;
 	long largest_block;
 
-
+#if 0
 	if (stop_speech_on_run_anim) {
 		digi_stop(1);
 		digi_stop(2);
 		digi_stop(3);
 	}
+#endif
 
 	anim_error = -2;
 

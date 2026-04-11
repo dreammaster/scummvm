@@ -74,7 +74,6 @@ MODULE_OBJS += \
 	madsv2/core/cursor.o \
 	madsv2/core/cycle.o \
 	madsv2/core/dialog.o \
-	madsv2/core/digi.o \
 	madsv2/core/ems.o \
 	madsv2/core/env.o \
 	madsv2/core/error.o \

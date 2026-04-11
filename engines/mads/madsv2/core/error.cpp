@@ -35,7 +35,6 @@
 #include "mads/madsv2/core/keys.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/midi.h"
-#include "mads/madsv2/core/digi.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -180,8 +179,6 @@ done:
 
 static void error_explode(const char *error_buf, const char *module_buf,
 		const char *data1_buf, const char *data2_buf, long avail, int error) {
-	midi_uninstall();
-	digi_uninstall();
 
 	timer_remove();
 	keys_remove();

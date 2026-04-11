@@ -34,7 +34,6 @@
 #include "mads/madsv2/core/keys.h"
 #include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/core/sprite.h"
-#include "mads/madsv2/core/digi.h"
 #include "mads/madsv2/core/midi.h"
 #include "mads/madsv2/core/screen.h"
 #include "mads/madsv2/core/game.h"
@@ -3385,7 +3384,6 @@ PopupItem *popup_execute(void) {
 	mouse_init_cycle();
 
 	do {
-		digi_read_another_chunk();
 		midi_loop();
 
 		mouse_begin_cycle(false);
