@@ -88,6 +88,12 @@ PhantomASound::PhantomASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::P
 		ASound(mixer, opl, filename, dataOffset) {
 	_chanCommandCount = 66;
 	memset(_scratchArr, 0, sizeof(_scratchArr));
+
+	// Load sound samples - all the asound drivers have an identical set of 120
+	// samples starting at offset 1d4h in their data segment
+	_soundFile.seek(_dataOffset + 0x1d4);
+	for (int i = 0; i < 120; ++i)
+		_samples.push_back(AdlibSample(_soundFile));
 }
 
 void PhantomASound::channelCommand(byte *&pSrc, bool &updateFlag) {
