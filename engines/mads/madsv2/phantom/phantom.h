@@ -51,6 +51,7 @@ public:
 	void global_parser_code() override;
 	void global_error_code() override;
 	void global_room_init() override;
+	void global_sound_driver() override;
 };
 
 } // namespace Phantom

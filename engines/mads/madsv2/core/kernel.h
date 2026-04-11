@@ -290,7 +290,7 @@ typedef struct {
 	byte teleported_in;         /* Flag if player teleported to room    */
 
 	char interface[20];         /* Name of current interface animation  */
-	/*    char sound_driver[20];  */    /* Name of current sound driver         */
+	char sound_driver[20];      /* Name of current sound driver         */
 
 	char *quotes;           /* Quote list                           */
 

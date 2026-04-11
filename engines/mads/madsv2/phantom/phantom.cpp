@@ -802,6 +802,11 @@ void PhantomEngine::global_room_init() {
 	global[walker_converse_state] = 0;
 }
 
+void PhantomEngine::global_sound_driver() {
+	Common::strcpy_s(kernel.sound_driver, "*#SOUND.PH");
+	env_catint(kernel.sound_driver, new_section, 1);
+}
+
 } // namespace Phantom
 } // namespace MADSV2
 } // namespace MADS

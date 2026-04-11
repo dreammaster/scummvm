@@ -65,7 +65,7 @@ void global_verb_filter() {
 }
 
 void global_sound_driver() {
-	error("TODO: void global_sound_driver(void);");
+	g_engine->global_sound_driver();
 }
 
 void global_section_constructor() {

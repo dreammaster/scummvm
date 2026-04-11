@@ -172,6 +172,11 @@ Popup *game_menu_popup;                     /* Popup structure for menu */
 int debugger_previous = DEBUGGER_NONE;
 int debugger_watch = 0;
 int debugger_watch_index[DEBUGGER_MAX_WATCH];
+
+int  sound_board_address = 0;
+int  sound_board_type = 0;
+int  sound_board_irq = 0;
+
 static int previous_running = -1000;
 
 static void game_control_loop();
@@ -1358,7 +1363,7 @@ void game_control() {
 
 		kernel_mode = KERNEL_SECTION_PRELOAD;
 
-		/* pl global_sound_driver (); */
+		global_sound_driver();
 
 		ems_paging_mode(EMS_PAGING_SECTION);
 
@@ -1368,8 +1373,7 @@ void game_control() {
 		game.going = (byte)!kernel_section_startup(new_section);
 
 		/* Load sound driver */
-
-		/* pl kernel_load_sound_driver (kernel.sound_driver, kernel.sound_card, sound_board_address, sound_board_type, sound_board_irq); */
+		kernel_load_sound_driver(kernel.sound_driver, kernel.sound_card, sound_board_address, sound_board_type, sound_board_irq);
 
 		kernel_mode = KERNEL_SECTION_INIT;
 

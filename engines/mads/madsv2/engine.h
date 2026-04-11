@@ -84,6 +84,7 @@ public:
 	virtual void global_parser_code() = 0;
 	virtual void global_error_code() = 0;
 	virtual void global_room_init() = 0;
+	virtual void global_sound_driver() = 0;
 	virtual void global_verb_filter() {}
 };
 
