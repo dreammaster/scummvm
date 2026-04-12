@@ -80,6 +80,11 @@ public:
 		return 0;
 	}
 
+	bool canLoadGameStateCurrently(Common::U32String *msg) override;
+	bool canSaveGameStateCurrently(Common::U32String *msg) override {
+		return canLoadGameStateCurrently(msg);
+	}
+
 	virtual void global_init_code() = 0;
 	virtual void section_music(int section_num) = 0;
 	virtual void global_section_constructor() = 0;

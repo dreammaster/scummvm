@@ -23,6 +23,9 @@
 #include "engines/util.h"
 #include "mads/madsv2/engine.h"
 #include "mads/madsv2/core/config.h"
+#include "mads/madsv2/core/conv.h"
+#include "mads/madsv2/core/game.h"
+#include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/phantom/main.h"
 #include "mads/core/sound.h"
@@ -51,6 +54,12 @@ void MADSV2Engine::readConfigFile() {
 	_musicFlag = config_file.music_flag;
 	_soundFlag = config_file.sound_flag;
 	_speechFlag = config_file.speech_flag;
+}
+
+bool MADSV2Engine::canLoadGameStateCurrently(Common::U32String *msg) {
+	return game.going && !win_status && !kernel.activate_menu &&
+		inter_input_mode == INTER_BUILDING_SENTENCES &&
+		conv_control.running == -1;
 }
 
 void MADSV2Engine::pollEvents() {
