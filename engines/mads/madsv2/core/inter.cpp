@@ -2280,7 +2280,7 @@ void inter_main_loop(int allow_input) {
 }
 
 
-int inter_load_background(char *name, Buffer *target) {
+int inter_load_background(const char *name, Buffer *target) {
 	Color color[16];
 	int count;
 	int error_flag = true;

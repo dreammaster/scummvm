@@ -2919,7 +2919,7 @@ done:
 void kernel_set_interface_mode(int mode) {
 	if (mode != inter_input_mode) {
 		char fname[80];
-		Common::strcpy_s(fname, kernel.interface + 1);
+		Common::strcpy_s(fname, kernel.interface);
 		char *dot = strchr(fname, '.');
 
 		if (dot) {

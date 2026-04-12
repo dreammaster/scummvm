@@ -290,7 +290,7 @@ extern void inter_reset_dialog(void);
 extern int inter_add_dialog(char *string, int result);
 
 /* inter_2.c */
-extern int inter_load_background(char *name, Buffer *target);
+extern int inter_load_background(const char *name, Buffer *target);
 
 } // namespace MADSV2
 } // namespace MADS
