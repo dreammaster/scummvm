@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_OBJECT_H
 #define MADS_CORE_OBJECT_H
 
+#include "common/serializer.h"
 #include "common/stream.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/vocab.h"
@@ -86,6 +87,7 @@ struct ObjectBuf {
 	int32 quality_value[OBJECT_MAX_QUALITIES];     /* Quality values          */
 
 	void load(Common::SeekableReadStream *src);
+	void synchronize(Common::Serializer &s);
 };
 
 typedef struct ObjectBuf Object;

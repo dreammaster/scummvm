@@ -72,7 +72,7 @@ namespace MADSV2 {
 
 extern long mem_used;
 extern long mem_avail_at_start;
-extern int room_state[40];
+extern int16 room_state[40];
 
 
 #define MOVE_YOUR_BUTT_TIMEOUT 3600
@@ -1347,8 +1347,10 @@ void game_control() {
 				force_chain = true;
 			}
 		} else {
+#if 0
 			game.going = (byte)!kernel_load_game(save_game_buf);
 			if (!game.going) force_chain = true;
+#endif
 		}
 	}
 
@@ -1676,8 +1678,12 @@ emergency:
 
 			if (!game.going && !win_status) {
 				conv_control.running = aborted_conv;
+#if 0
 				game_save_name(0);
 				kernel_save_game(save_game_buf);
+#else
+				warning("TODO: Original save dialog saves");
+#endif
 				game_autosaved = true;
 			} else {
 				game_autosaved = false;

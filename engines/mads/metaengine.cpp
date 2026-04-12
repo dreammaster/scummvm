@@ -186,12 +186,13 @@ public:
 
 bool MADSMetaEngine::hasFeature(MetaEngineFeature f) const {
 	return
-	    (f == kSupportsListSaves) ||
+		(f == kSupportsListSaves) ||
 		(f == kSupportsLoadingDuringStartup) ||
 		(f == kSupportsDeleteSave) ||
 		(f == kSavesSupportMetaInfo) ||
 		(f == kSavesSupportThumbnail) ||
-		(f == kSimpleSavesNames);
+		(f == kSimpleSavesNames) ||
+		checkExtendedSaves(f);
 }
 
 bool MADS::MADSEngine::hasFeature(EngineFeature f) const {

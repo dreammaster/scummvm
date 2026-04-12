@@ -23,6 +23,7 @@
 #define MADSV2_ENGINE_H
 
 #include "common/events.h"
+#include "common/serializer.h"
 #include "common/stack.h"
 #include "common/random.h"
 #include "graphics/screen.h"
@@ -34,6 +35,9 @@ namespace MADS {
 namespace MADSV2 {
 
 class MADSV2Engine : public MADSEngine {
+private:
+	void syncGame(Common::Serializer &s);
+
 protected:
 	Graphics::Screen *_screen = nullptr;
 	Common::Stack<Common::Event> _keyEvents;
@@ -84,6 +88,8 @@ public:
 	bool canSaveGameStateCurrently(Common::U32String *msg) override {
 		return canLoadGameStateCurrently(msg);
 	}
+	Common::Error saveGameStream(Common::WriteStream *stream, bool isAutosave) override;
+	Common::Error loadGameStream(Common::SeekableReadStream *stream) override;
 
 	virtual void global_init_code() = 0;
 	virtual void section_music(int section_num) = 0;

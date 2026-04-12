@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_INTER_H
 #define MADS_CORE_INTER_H
 
+#include "common/serializer.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/anim.h"
 
@@ -161,7 +162,7 @@ struct VerbBuf {
 	byte verb_type;
 	byte prep_type;
 
-	void load(Common::SeekableReadStream *src);
+	void synchronize(Common::Serializer &s);
 };
 typedef struct VerbBuf Verb;
 
@@ -195,6 +196,7 @@ extern int inven[INVEN_MAX_OBJECTS];    /* Inventory index                */
 extern int inven_num_objects;           /* Inventory size                 */
 
 extern int active_inven;                /* The selected inventory item    */
+extern int first_inven;
 
 extern int right_command;              /* Right mouse main verb      */
 extern int left_command;               /* Left mouse main verb       */

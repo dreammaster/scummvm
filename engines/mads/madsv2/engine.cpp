@@ -22,11 +22,14 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "mads/madsv2/engine.h"
+#include "mads/madsv2/core/camera.h"
 #include "mads/madsv2/core/config.h"
 #include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/kernel.h"
+#include "mads/madsv2/core/object.h"
+#include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/phantom/main.h"
 #include "mads/core/sound.h"
 
@@ -60,6 +63,74 @@ bool MADSV2Engine::canLoadGameStateCurrently(Common::U32String *msg) {
 	return game.going && !win_status && !kernel.activate_menu &&
 		inter_input_mode == INTER_BUILDING_SENTENCES &&
 		conv_control.running == -1;
+}
+
+Common::Error MADSV2Engine::saveGameStream(Common::WriteStream *stream, bool isAutosave) {
+	// Sync main game data
+	Common::Serializer s(nullptr, stream);
+	syncGame(s);
+
+	// Save conversation data
+	conv_append(stream);
+
+	return Common::kNoError;
+}
+
+Common::Error MADSV2Engine::loadGameStream(Common::SeekableReadStream *stream) {
+int save = player.walker_is_loaded;
+
+	// Sync main game data
+	Common::Serializer s(stream, nullptr);
+	syncGame(s);
+
+	// Load conversation data
+	if (conv_expand(stream))
+		goto done;
+
+	if (inven_num_objects > 0) {
+		active_inven = 0;
+	} else {
+		active_inven = -1;
+	}
+
+	first_inven = 0;
+
+	section_id = KERNEL_RESTORING_GAME;
+	room_id = KERNEL_RESTORING_GAME;
+
+	new_section = new_room / 100;
+
+	kernel.clock = timer_read();
+	game.going = true;
+
+done:
+	player.walker_is_loaded = save;
+	return Common::kNoError;
+}
+	
+void MADSV2Engine::syncGame(Common::Serializer &s) {
+	game.synchronize(s);
+	s.syncAsSint16LE(new_room);
+	player2.synchronize(s);
+
+	s.syncAsSint16LE(inven_num_objects);
+	for (int i = 0; i < inven_num_objects; ++i)
+		s.syncAsSint16LE(inven[i]);
+
+	player.synchronize(s);
+	for (int i = 0; i < global_list_size; ++i)
+		s.syncAsSint16LE(global[i]);
+
+	for (int i = 0; i < num_objects; ++i)
+		object[i].synchronize(s);
+
+	s.syncAsSint16LE(conv_restore_running);
+	s.syncAsSint16LE(camera_old_x_target);
+	s.syncAsSint16LE(camera_old_y_target);
+
+	for (int i = 0; i < OMR; ++i)
+		s.syncAsSint16LE(room_state[i]);
+	s.syncAsSint16LE(previous_room);
 }
 
 void MADSV2Engine::pollEvents() {

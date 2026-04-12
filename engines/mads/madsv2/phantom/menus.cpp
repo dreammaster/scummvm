@@ -70,11 +70,10 @@ static int global_save(int id) {
 
 	game_save_name(id + 1);
 
-	if (!kernel_save_game(save_game_buf)) {
+	if (g_engine->saveGameState(id, save_game_buf).getCode() == Common::kNoError)
 		status = SAVE_SUCCESSFUL;
-	} else {
+	else
 		status = SAVE_FAILED;
-	}
 
 	return status;
 }
@@ -82,14 +81,10 @@ static int global_save(int id) {
 static int global_restore(int id) {
 	int status;
 
-	game_save_name(id + 1);
-
-	if (!kernel_load_game(save_game_buf)) {
+	if (g_engine->loadGameState(id).getCode() == Common::kNoError)
 		status = RESTORE_SUCCESSFUL;
-	} else {
+	else
 		status = RESTORE_FAILED;
-		save_game_buf[0] = 0;
-	}
 
 	WRITE_LE_UINT32(&global[walker_timing], 0);
 
@@ -163,14 +158,7 @@ void global_emergency_save() {
 
 	if (scr_orig.data != NULL) mem_free(scr_orig.data);
 
-	if (!kernel_save_game(save_game_buf)) {
-		echo(menu_quote(quote_emergency_save_success), true);
-		echo(menu_quote(quote_emergency_save_attempt), false);
-		echo(restart_game_key, true);
-		echo(menu_quote(quote_emergency_save_resume), true);
-	} else {
-		echo(menu_quote(quote_emergency_save_failure), true);
-	}
+	g_engine->saveAutosaveIfEnabled();
 }
 
 static void global_alert(int status) {

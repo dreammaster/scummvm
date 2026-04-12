@@ -44,6 +44,105 @@ byte player_facing_to_series[10] = { 0, 7, 4, 3, 6, 0, 2, 5, 0, 1 };
 byte player_clockwise[10] = { 9, 4, 1, 2, 7, 9, 3, 8, 9, 6 };
 byte player_counter_clockwise[10] = { 7, 2, 3, 6, 1, 7, 9, 4, 7, 8 };
 
+void Player::synchronize(Common::Serializer &s) {
+	s.syncAsSint16LE(walking);
+	s.syncAsSint16LE(x);
+	s.syncAsSint16LE(y);
+	s.syncAsSint16LE(target_x);
+	s.syncAsSint16LE(target_y);
+	s.syncAsSint16LE(sign_x);
+	s.syncAsSint16LE(sign_y);
+	s.syncAsSint16LE(x_count);
+	s.syncAsSint16LE(y_count);
+	s.syncAsSint16LE(x_counter);
+	s.syncAsSint16LE(y_counter);
+	s.syncAsSint16LE(target_facing);
+	s.syncAsSint16LE(special_code);
+	s.syncAsSint16LE(sprite_changed);
+	s.syncAsSint16LE(frame_delay);
+	s.syncAsSint16LE(center_of_gravity);
+	s.syncAsSint16LE(walk_freedom);
+	s.syncAsSint16LE(walk_anywhere);
+	s.syncAsSint16LE(walk_off_edge_to_room);
+	s.syncAsSint16LE(walk_off_edge);
+	s.syncAsSint16LE(need_to_walk);
+	s.syncAsSint16LE(ready_to_walk);
+	s.syncAsSint16LE(prepare_walk_facing);
+	s.syncAsSint16LE(prepare_walk_x);
+	s.syncAsSint16LE(prepare_walk_y);
+	s.syncAsSint16LE(commands_allowed);
+	s.syncAsSint16LE(walker_visible);
+	s.syncAsSint16LE(walker_previously_visible);
+	s.syncAsSint16LE(series_base);
+	s.syncAsSint16LE(available[8]);
+	s.syncAsSint16LE(facing);
+	s.syncAsSint16LE(turn_to_facing);
+	s.syncAsSint16LE(series);
+	s.syncAsSint16LE(mirror);
+	s.syncAsSint16LE(sprite);
+	s.syncAsByte(depth);
+	s.syncAsByte(scale);
+	s.syncAsSint16LE(stop_walker_sequence);
+	for (int i = 0; i < PLAYER_MAX_STOP; ++i)
+		s.syncAsSint16LE(stop_walker_stack[i]);
+	for (int i = 0; i < PLAYER_MAX_STOP; ++i)
+		s.syncAsSint16LE(stop_walker_trigger[i]);
+	s.syncAsSint16LE(stop_walker_pointer);
+	s.syncAsSint16LE(upcoming_trigger);
+	s.syncAsSint16LE(trigger);
+	s.syncAsSint16LE(next_special_code);
+	s.syncAsSint16LE(scaling_velocity);
+	s.syncAsSint16LE(pixel_accum);
+	s.syncAsSint16LE(dist_accum);
+	s.syncAsUint16LE(delta_distance);
+	s.syncAsUint16LE(total_distance);
+	s.syncAsSint16LE(velocity);
+	s.syncAsSint16LE(high_sprite);
+	s.syncAsSint16LE(command_ready);
+	s.syncAsSint16LE(command_error);
+	s.syncAsSint16LE(command_source);
+	s.syncAsSint16LE(command);
+	s.syncAsSint16LE(main_object);
+	s.syncAsSint16LE(second_object);
+	s.syncAsSint16LE(main_object_source);
+	s.syncAsSint16LE(second_object_source);
+	s.syncAsSint16LE(prep);
+	s.syncAsSint16LE(look_around);
+	s.syncAsSint16LE(main_syntax);
+	s.syncAsSint16LE(second_syntax);
+	s.syncBytes((byte *)series_name, 20);
+	s.syncBytes((byte *)sentence, 64);
+	s.syncAsSint32LE(clock);
+	s.syncAsByte(been_here_before);
+	s.skip(1);
+
+	s.syncAsSint16LE( num_rooms_been_in);
+	for (int i = 0; i < PLAYER_MAX_ROOMS; ++i)
+		s.syncAsSint16LE(rooms_been_in[i]);
+
+	s.syncAsSint16LE(num_series);
+	s.syncAsByte(walker_loads_first);
+	s.syncAsByte(walker_loaded_first);
+	s.syncAsByte(walker_is_loaded);
+	s.syncAsByte(walker_must_reload);
+	s.syncAsSint16LE(walker_been_visible);
+	s.syncAsByte(force_series);
+	s.skip(1);
+	s.syncAsSint16LE(walk_trigger);
+	s.syncAsByte(walk_trigger_dest);
+	s.skip(1);
+
+	for (int i = 0; i < 3; ++i)
+		s.syncAsSint16LE(walk_trigger_words[i]);
+
+	s.syncAsSint16LE(enable_at_target);
+}
+
+void Player2::synchronize(Common::Serializer &s) {
+	for (int i = 0; i < 3; ++i)
+		s.syncAsSint16LE(words[i]);
+}
+
 /**
  * Returns the scaling factor for the player walker, based on the
  * player's current position

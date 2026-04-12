@@ -57,11 +57,23 @@ char object_speech_resource[20] = "*SPCHNOTE.DSR";
 
 
 void ObjectBuf::load(Common::SeekableReadStream *src) {
-	src->readMultipleLE(vocab_id, location, prep, num_verbs, num_qualities, syntax);
+	Common::Serializer s(src, nullptr);
+	synchronize(s);
+}
+
+void ObjectBuf::synchronize(Common::Serializer &s) {
+	s.syncAsUint16LE(vocab_id);
+	s.syncAsSint16LE(location);
+	s.syncAsByte(prep);
+	s.syncAsByte(num_verbs);
+	s.syncAsByte(num_qualities);
+	s.syncAsByte(syntax);
+
 	for (int i = 0; i < OBJECT_MAX_VERBS; ++i)
-		verb[i].load(src);
-	src->readMultipleLE(quality_id);
-	src->readMultipleLE(quality_value);
+		verb[i].synchronize(s);
+	s.syncBytes(quality_id, OBJECT_MAX_QUALITIES);
+	for (int i = 0; i < OBJECT_MAX_QUALITIES; ++i)
+		s.syncAsSint32LE(quality_value[i]);
 }
 
 

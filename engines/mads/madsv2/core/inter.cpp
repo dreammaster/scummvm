@@ -213,8 +213,10 @@ void inter_spin_object(int object_id);
 void inter_turn_off_object(void);
 
 
-void VerbBuf::load(Common::SeekableReadStream *src) {
-	src->readMultipleLE(id, verb_type, prep_type);
+void VerbBuf::synchronize(Common::Serializer &s) {
+	s.syncAsUint16LE(id);
+	s.syncAsByte(verb_type);
+	s.syncAsByte(prep_type);
 }
 
 

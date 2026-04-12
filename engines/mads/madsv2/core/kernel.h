@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_KERNEL_H
 #define MADS_CORE_KERNEL_H
 
+#include "common/serializer.h"
 #include "mads/madsv2/core/general.h"
 #include "mads/madsv2/core/anim.h"
 #include "mads/madsv2/core/color.h"
@@ -304,12 +305,14 @@ typedef struct {
 } Kernel;
 
 
-typedef struct {
-	byte going;                         /* Game is running OK          */
-	int  scratch[KERNEL_SCRATCH_SIZE];  /* Scratch variables for room  */
-	char difficulty;                    /* Difficulty level            */
-	int  last_save;                     /* Most recent save slot #     */
-} KernelGame;
+struct KernelGame {
+	byte going;							/* Game is running OK          */
+	int16 scratch[KERNEL_SCRATCH_SIZE];	/* Scratch variables for room  */
+	int8 difficulty;					/* Difficulty level            */
+	int16  last_save;					/* Most recent save slot #     */
+
+	void synchronize(Common::Serializer &s);
+};
 
 
 #ifdef old_animation
@@ -408,6 +411,9 @@ extern KernelGame game;                 /* Kernel level game data */
 extern KernelMessage kernel_message[KERNEL_MAX_MESSAGES];
 extern FontPtr kernel_message_font;
 extern int kernel_message_spacing;
+
+#define OMR 40  /* OUAF_MAX_ROOMS in global.mac */
+extern int16 room_state[OMR];
 
 
 extern int kernel_load_vocab();
@@ -563,8 +569,6 @@ extern void kernel_new_palette();
 extern void kernel_dump_quotes();
 extern void kernel_dump_all();
 extern void kernel_dump_walker_only();
-extern int kernel_save_game(const char *filename);
-extern int kernel_load_game(const char *filename);
 
 /**
  * Initializes a random chatter sequence.  (Parameters end with

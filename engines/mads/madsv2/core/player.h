@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_PLAYER_H
 #define MADS_CORE_PLAYER_H
 
+#include "common/serializer.h"
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
@@ -139,12 +140,16 @@ struct Player {
 	int walk_trigger_words[3];    /* Vocabulary words for reactivating parser*/
 
 	int enable_at_target;         /* Enable commands at walk target          */
+
+	void synchronize(Common::Serializer &s);
 };
 
 
-typedef struct {
+struct Player2 {
 	int words[3];                 /* Vocab word array of player's sentence   */
-} Player2;
+
+	void synchronize(Common::Serializer &s);
+};
 
 
 extern Player  player;
