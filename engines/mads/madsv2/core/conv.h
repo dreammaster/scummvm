@@ -94,11 +94,11 @@ struct ConvScriptParams {
 };
 
 struct ConvVariable {
+	enum PtrType { PTRTYPE_GLOBAL = 1, PTRTYPE_CONV_CONTROL = 2 };
+
 	bool isPtr = false;
-	union {
-		int16 val;
-		int16 *ptr;
-	};
+	int16 val = 0, type = 0;
+	int16 *ptr;
 
 	static constexpr int SIZE = 2 * 3;
 	void load(Common::SeekableReadStream *src);

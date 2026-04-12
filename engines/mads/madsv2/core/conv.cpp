@@ -111,20 +111,45 @@ void ConvScriptParams::load(Common::SeekableReadStream *src) {
 
 void ConvVariable::load(Common::SeekableReadStream *src) {
 	uint16 flag = src->readUint16LE();
-	isPtr = flag == 0xffff;
-	val = src->readSint16LE();
-	int16 seg = src->readUint16LE();
+	assert(flag != 0xffff);	// TODO: See if original game has pointers for any conv
+	isPtr = flag == MKTAG16('V', 'M');
 
-	if (isPtr && flag != 0xffff)
-		debugC(1, kDebugConversations, "Invalid conv pointer: %.4x:%.4x", seg, val);
-	assert(!isPtr);
+	val = src->readSint16LE();
+	uint16 type = src->readUint16LE();
+
+	if (isPtr) {
+		switch (type) {
+		case PTRTYPE_GLOBAL:
+			ptr = global + val;
+			break;
+		case PTRTYPE_CONV_CONTROL:
+			if (val >= 0 && val < 20) {
+				// Index into one of the sequential 5 element arrays:
+				// speaker_frame[5], x[5], y[5], width[5]
+				ptr = conv_control.speaker_frame + val;
+			} else if (val == 20) {
+				ptr = &conv_control.speaker_val;
+			} else {
+				error("Unknown ConvVariable conv_control pointer");
+			}
+			break;
+		default:
+			error("Unknown ConvVariable pointer type");
+			break;
+		}
+	}
 }
 
 void ConvVariable::save(Common::WriteStream *dest) const {
-	assert(!isPtr);
-	dest->writeSint16LE(0);
-	dest->writeSint16LE(val);
-	dest->writeSint16LE(0);
+	if (isPtr) {
+		dest->writeUint16LE(MKTAG16('V', 'M'));
+		dest->writeSint16LE(val);
+		dest->writeSint16LE(type);
+	} else {
+		dest->writeUint16LE(0);
+		dest->writeSint16LE(val);
+		dest->writeSint16LE(0);
+	}
 }
 
 void ConvData::load(Common::SeekableReadStream *src) {
@@ -283,6 +308,22 @@ static void conv_set_variable(int idx, int16 *ptr) {
 
 		var.isPtr = true;
 		var.ptr = ptr;
+
+		// We need to know what kind of pointer it is so it can be properly serialized
+		if (ptr >= global && ptr < (global + GLOBAL_LIST_SIZE)) {
+			var.type = ConvVariable::PTRTYPE_GLOBAL;
+			var.val = ptr - global;
+		} else if (ptr >= conv_control.speaker_frame && ptr < conv_control.speaker_frame + 20) {
+			// Index into one of the sequential 5 element arrays:
+			// speaker_frame[5], x[5], y[5], width[5]
+			var.type = ConvVariable::PTRTYPE_CONV_CONTROL;
+			var.val = ptr - conv_control.speaker_frame;
+		} else if (ptr == &conv_control.speaker_val) {
+			var.type = ConvVariable::PTRTYPE_CONV_CONTROL;
+			var.val = 20;
+		} else {
+			error("Unhandled ConvVariable pointer type");
+		}
 	}
 }
 
@@ -294,6 +335,7 @@ static void conv_set_variable(int idx, int16 val) {
 
 		var.isPtr = false;
 		var.val = val;
+		var.type = 0;
 	}
 }
 
