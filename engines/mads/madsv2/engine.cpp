@@ -66,7 +66,7 @@ void MADSV2Engine::pollEvents() {
 
 	// Poll for events
 	Common::Event e;
-	while (g_system->getEventManager()->pollEvent(e) && game.going) {
+	while (g_system->getEventManager()->pollEvent(e)) {
 		bool isMouse = false;
 		switch (e.type) {
 		case Common::EVENT_LBUTTONDOWN:
