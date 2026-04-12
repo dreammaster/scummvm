@@ -20,6 +20,7 @@
  */
 
 #include "common/algorithm.h"
+#include "common/debug.h"
 #include "common/hashmap.h"
 #include "common/hash-str.h"
 #include "common/memstream.h"
@@ -37,6 +38,7 @@
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/popup.h"
 #include "mads/madsv2/core/speech.h"
+#include "mads/mads.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -108,10 +110,14 @@ void ConvScriptParams::load(Common::SeekableReadStream *src) {
 }
 
 void ConvVariable::load(Common::SeekableReadStream *src) {
-	(void)src->readUint16LE();	// isPtr
-	isPtr = false;
+	uint16 flag = src->readUint16LE();
+	isPtr = flag == 0xffff;
 	val = src->readSint16LE();
-	(void)src->readUint16LE();	// skip space for pointer segments
+	int16 seg = src->readUint16LE();
+
+	if (isPtr && flag != 0xffff)
+		debugC(1, kDebugConversations, "Invalid conv pointer: %.4x:%.4x", seg, val);
+	assert(!isPtr);
 }
 
 void ConvVariable::save(Common::WriteStream *dest) const {

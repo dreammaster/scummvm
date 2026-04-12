@@ -40,6 +40,7 @@ enum MADSDebugChannels {
 	kDebugPath = 1,
 	kDebugScripts,
 	kDebugGraphics,
+	kDebugConversations
 };
 
 enum ScreenFade {
