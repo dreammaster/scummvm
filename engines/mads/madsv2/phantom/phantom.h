@@ -30,8 +30,6 @@ namespace Phantom {
 
 class PhantomEngine : public MADSV2Engine {
 private:
-	bool _soundFlag = true;
-
 	static void global_object_sprite();
 	static void stop_walker_basic();
 	static void stop_walker_tricks();

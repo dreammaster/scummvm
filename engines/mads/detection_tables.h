@@ -156,7 +156,7 @@ static const MADSGameDescription gameDescriptions[] = {
 			Common::EN_ANY,
 			Common::kPlatformDOS,
 			ADGF_UNSTABLE,
-			GUIO1(GAMEOPTION_EASY_MOUSE)
+			GUIO2(GUIO_NOMUSIC, GAMEOPTION_EASY_MOUSE)
 		},
 		GType_Phantom,
 		0

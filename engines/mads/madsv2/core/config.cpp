@@ -49,9 +49,9 @@ void read_config_file() {
 	ConfMan.registerDefault("show_speech_boxes", true);
 	ConfMan.registerDefault("difficulty", -1);
 
-	config_file.music_flag = !ConfMan.getBool("music_mute");
-	config_file.sound_flag = !ConfMan.getBool("sfx_mute");
-	config_file.speech_flag = !ConfMan.getBool("speech_mute");
+	config_file.music_flag = !ConfMan.getBool("music_mute") && !ConfMan.getBool("mute");
+	config_file.sound_flag = !ConfMan.getBool("sfx_mute") && !ConfMan.getBool("mute");
+	config_file.speech_flag = !ConfMan.getBool("speech_mute") && !ConfMan.getBool("mute");
 
 	config_file.interface_hotspots = ConfMan.getInt("interface_hotspots");
 	config_file.inventory_mode = ConfMan.getInt("inventory_spinning");

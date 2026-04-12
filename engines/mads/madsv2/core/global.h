@@ -118,7 +118,6 @@ void global_room_init(void);
 void global_verb_filter(void);
 void global_sound_driver(void);
 void global_section_constructor(void);
-void global_read_config_file(void);
 void global_write_config_file(void);
 void global_load_config_parameters(void);
 void global_unload_config_parameters(void);

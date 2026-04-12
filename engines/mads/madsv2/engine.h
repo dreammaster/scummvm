@@ -45,10 +45,14 @@ protected:
 
 public:
 	MADS::SoundManager *_soundManager = nullptr;
+	bool _musicFlag = true;
+	bool _soundFlag = true;
+	bool _speechFlag = true;
 
 public:
 	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);
 	~MADSV2Engine() override;
+	void readConfigFile();
 
 	Graphics::Screen *getScreen() const {
 		return _screen;

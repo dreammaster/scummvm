@@ -22,6 +22,7 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "mads/madsv2/engine.h"
+#include "mads/madsv2/core/config.h"
 #include "mads/madsv2/core/kernel.h"
 #include "mads/madsv2/phantom/main.h"
 #include "mads/core/sound.h"
@@ -35,7 +36,7 @@ constexpr int GAME_FRAME_TIME = 1000 / GAME_FRAME_RATE;
 MADSV2Engine *g_engine;
 
 MADSV2Engine::MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc) :
-		MADSEngine(syst, gameDesc) {
+	MADSEngine(syst, gameDesc) {
 	g_engine = this;
 }
 
@@ -43,6 +44,13 @@ MADSV2Engine::~MADSV2Engine() {
 	g_engine = nullptr;
 	delete _screen;
 	delete _soundManager;
+}
+
+void MADSV2Engine::readConfigFile() {
+	read_config_file();
+	_musicFlag = config_file.music_flag;
+	_soundFlag = config_file.sound_flag;
+	_speechFlag = config_file.speech_flag;
 }
 
 void MADSV2Engine::pollEvents() {

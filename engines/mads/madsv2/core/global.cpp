@@ -72,10 +72,6 @@ void global_section_constructor() {
 	g_engine->global_section_constructor();
 }
 
-void global_read_config_file() {
-	read_config_file();
-}
-
 void global_write_config_file() {
 	write_config_file();
 }
