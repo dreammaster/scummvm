@@ -51,7 +51,6 @@
 #include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/fileio.h"
 #include "mads/madsv2/core/vocab.h"
-#include "mads/madsv2/core/midi.h"
 #include "mads/madsv2/core/rail.h"
 #include "mads/madsv2/core/hspot.h"
 #include "mads/madsv2/core/attr.h"

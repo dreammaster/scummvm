@@ -34,7 +34,6 @@
 #include "mads/madsv2/core/keys.h"
 #include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/core/sprite.h"
-#include "mads/madsv2/core/midi.h"
 #include "mads/madsv2/core/screen.h"
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/pal.h"
@@ -3384,8 +3383,6 @@ PopupItem *popup_execute(void) {
 	mouse_init_cycle();
 
 	do {
-		midi_loop();
-
 		mouse_begin_cycle(false);
 
 		if (keys_any()) {

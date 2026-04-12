@@ -98,7 +98,6 @@ MODULE_OBJS += \
 	madsv2/core/matte.o \
 	madsv2/core/mcga.o \
 	madsv2/core/mem.o \
-	madsv2/core/midi.o \
 	madsv2/core/mouse.o \
 	madsv2/core/object.o \
 	madsv2/core/pack.o \

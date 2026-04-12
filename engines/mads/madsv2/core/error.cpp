@@ -34,7 +34,6 @@
 #include "mads/madsv2/core/popup.h"
 #include "mads/madsv2/core/keys.h"
 #include "mads/madsv2/core/mem.h"
-#include "mads/madsv2/core/midi.h"
 
 namespace MADS {
 namespace MADSV2 {
