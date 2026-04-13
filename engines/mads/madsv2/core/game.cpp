@@ -1671,12 +1671,8 @@ emergency:
 
 			if (!game.going && !win_status) {
 				conv_control.running = aborted_conv;
-#if 0
-				game_save_name(0);
-				kernel_save_game(save_game_buf);
-#else
-				warning("TODO: Original save dialog saves");
-#endif
+
+				g_engine->saveAutosaveIfEnabled();
 				game_autosaved = true;
 			} else {
 				game_autosaved = false;
