@@ -343,6 +343,20 @@ const ExtraGuiOptions AdvancedMetaEngineBase::getExtraGuiOptions(const Common::S
 	return options;
 }
 
+Common::String AdvancedMetaEngineBase::getGameId(const char *target) const {
+	// Store a copy of the active domain
+	Common::String currDomain = ConfMan.getActiveDomainName();
+
+	// Switch to the given target domain and get it's game Id
+	ConfMan.setActiveDomain(target);
+	Common::String gameId = ConfMan.get("gameid");
+
+	// Switch back to the original domain and return the game Id
+	ConfMan.setActiveDomain(currDomain);
+
+	return gameId;
+}
+
 Common::Error AdvancedMetaEngineDetectionBase::identifyGame(DetectedGame &game, const void **descriptor) {
 	Common::Language language = Common::UNK_LANG;
 	Common::Platform platform = Common::kPlatformUnknown;

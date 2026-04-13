@@ -655,6 +655,13 @@ public:
 	 */
 	const char *getName() const override = 0;
 
+	/**
+	 * Gets the game Id based on the provided target.
+	 * @param target		Game target string
+	 * @return Game Id string
+	*/
+	Common::String getGameId(const char *target) const;
+
 public:
 	/**
 	 * A hashmap of file paths and their file system nodes.
