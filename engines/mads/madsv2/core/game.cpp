@@ -1462,9 +1462,10 @@ void game_control() {
 				}
 #endif
 			} else {
-				/* paul - call my special preserve palette routine in extra_1 */
-				/* player_preserve_palette(); */
+				player_preserve_palette();
+#if 0
 				extra_inven_preserve_palette();
+#endif
 			}
 
 			pal_activate_shadow(&kernel_shadow_main);

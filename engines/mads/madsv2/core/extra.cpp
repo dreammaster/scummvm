@@ -58,10 +58,6 @@ void extra_spinning_object(void) {
 	error("TODO: extra_spinning_object");
 }
 
-void extra_inven_preserve_palette(void) {
-	error("TODO: extra_inven_preserve_palette");
-}
-
 void stamp_sprite_to_interface(int x, int y, int sprite, int series) {
 	error("TODO: stamp_sprite_to_interface");
 }
