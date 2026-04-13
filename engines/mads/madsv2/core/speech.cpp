@@ -19,11 +19,13 @@
  *
  */
 
+#include "audio/mixer.h"
 #include "common/textconsole.h"
 #include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/mem.h"
 #include "mads/madsv2/core/pack.h"
+#include "mads/madsv2/engine.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -40,6 +42,14 @@ void SpeechDir::load(Common::SeekableReadStream *src) {
 	src->readMultipleLE(field0, compression, field4, field6, field8, size, offset);
 }
 
+
+void speech_init() {
+	speech_system_active = true;
+}
+
+void speech_shutdown() {
+	speech_system_active = false;
+}
 
 SpeechDirPtr speech_load(const char *resName, int id, bool useMainMemory) {
 	SpeechDirPtr result = nullptr;

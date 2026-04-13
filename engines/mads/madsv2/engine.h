@@ -29,6 +29,7 @@
 #include "graphics/screen.h"
 #include "mads/mads.h"
 #include "mads/core/sound.h"
+#include "mads/madsv2/core/speech.h"
 
 namespace MADS {
 
@@ -51,7 +52,7 @@ public:
 	MADS::SoundManager *_soundManager = nullptr;
 	bool _musicFlag = true;
 	bool _soundFlag = true;
-	bool _speechFlag = true;
+	bool &_speechFlag = speech_on;
 
 public:
 	MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc);

@@ -45,6 +45,7 @@ MADSV2Engine *g_engine;
 MADSV2Engine::MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc) :
 	MADSEngine(syst, gameDesc) {
 	g_engine = this;
+	_speechFlag = true;
 }
 
 MADSV2Engine::~MADSV2Engine() {

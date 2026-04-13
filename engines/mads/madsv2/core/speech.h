@@ -51,6 +51,8 @@ extern int speech_ems_handle;
 extern SpeechBuffer speech_main_buffer;
 extern int global_speech_ready;
 
+extern void speech_init();
+extern void speech_shutdown();
 extern SpeechDirPtr speech_load(const char *resName, int id, bool useMainMemory = true);
 extern void speech_play(const char *resName, int id);
 extern void speech_all_off();

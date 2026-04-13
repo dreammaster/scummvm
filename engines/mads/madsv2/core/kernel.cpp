@@ -32,6 +32,7 @@
 #include "mads/madsv2/core/object.h"
 #include "mads/madsv2/core/error.h"
 #include "mads/madsv2/core/screen.h"
+#include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/core/ems.h"
 #include "mads/madsv2/core/himem.h"
 #include "mads/madsv2/core/echo.h"
@@ -262,11 +263,13 @@ void kernel_game_shutdown() {
 
 	/* Deallocate main screen buffer */
 
-	if (work_screen_ems_handle < 0) buffer_free(&scr_main);
+	if (work_screen_ems_handle < 0)
+		buffer_free(&scr_main);
 
 	/* Turn of speech system */
 
-	/* pl if (speech_system_active) speech_shutdown(); */
+	if (speech_system_active)
+		speech_shutdown();
 
 	/* Return video to text mode */
 
@@ -317,6 +320,8 @@ int kernel_game_startup(int game_video_mode, int load_flag,
 	/* Set up EMS/XMS paging system, if any */
 
 	himem_startup();
+
+	speech_init();
 
 	// ScummVM doesn't need EMS/XMS
 #if 0
