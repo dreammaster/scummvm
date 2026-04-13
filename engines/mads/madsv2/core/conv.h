@@ -174,7 +174,7 @@ struct ConvControl {
 	ConvStatus hold_status;
 	int16 has_text;
 	int16 popup_is_up;
-	int16 mask;
+	int16 popup_duration;
 	long popup_clock;
 	int16 speaker_active[CONV_MAX_DATA];
 	int16 speaker_series[CONV_MAX_DATA];

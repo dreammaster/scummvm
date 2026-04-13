@@ -604,7 +604,7 @@ static void conv_generate_text(Conv *convIn, ConvData * /*convData*/,
 	// Restore the caller's box and record that a conversation popup is live.
 	box = savedBox;
 	conv_control.popup_is_up  = -1;
-	conv_control.popup_clock  = kernel.clock;
+	conv_control.popup_clock  = kernel.clock + conv_control.popup_duration;
 
 	// Play the associated speech audio when the speech system is on.
 	if (speech_system_active && speech_on && speechCount > 0) {
@@ -1219,7 +1219,7 @@ void conv_run(int convId) {
 	conv_control.running          = convId;
 	conv_control.index            = conv_indexes[convId] - 2;
 	conv_control.status           = CONV_STATUS_NEXT_NODE;
-	conv_control.mask             = 0x7FFF;
+	conv_control.popup_duration   = 0x7FFF;			// Display for a long time
 	conv_control.popup_clock      = kernel.clock;
 	conv_control.entry            = -1;
 	conv_control.commands_allowed = player.commands_allowed;
@@ -1320,7 +1320,7 @@ static void conv_generate_message(Conv *convIn, ConvData *convData,
 			popup_next_line();
 			if (!popup_draw(-1, -1)) {
 				conv_control.popup_is_up = -1;
-				conv_control.popup_clock = kernel.clock + conv_control.mask;
+				conv_control.popup_clock = kernel.clock + conv_control.popup_duration;
 
 				if (speech_system_active && speech_on) {
 					if (voiceListSize != 0) {
