@@ -115,7 +115,7 @@ void ConvVariable::load(Common::SeekableReadStream *src) {
 	isPtr = flag == MKTAG16('V', 'M');
 
 	val = src->readSint16LE();
-	uint16 type = src->readUint16LE();
+	type = src->readUint16LE();
 
 	if (isPtr) {
 		switch (type) {
@@ -1638,10 +1638,9 @@ void conv_flush() {
 
 			ConvData *convData = conv_data[conv_indexes[i] - 2];
 			errCode = conv_write(dest, convData);
-			if (errCode) {
-				delete dest;
-				goto done;
-			}
+			if (errCode) goto done;
+
+			conv_indexes[i] = 1;
 		}
 	}
 
