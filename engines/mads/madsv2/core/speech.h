@@ -22,6 +22,7 @@
 #ifndef MADS_CORE_SPEECH_H
 #define MADS_CORE_SPEECH_H
 
+#include "common/stream.h"
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
@@ -32,7 +33,17 @@ struct SpeechBuffer {
 	int decompress_size;
 };
 
-typedef void *SpeechDirPtr;
+struct SpeechDir {
+	int16 field0 = 0;
+	int16 compression = 0;
+	int16 field4 = 0, field6 = 0, field8 = 0;
+	int32 size = 0;
+	int32 offset = 0;
+
+	static constexpr int SIZE = 2 + 2 + 2 + 2 + 2 + 4 + 4;
+	void load(Common::SeekableReadStream *src);
+};
+typedef SpeechDir *SpeechDirPtr;
 
 extern bool speech_system_active;
 extern bool speech_on;
@@ -40,8 +51,8 @@ extern int speech_ems_handle;
 extern SpeechBuffer speech_main_buffer;
 extern int global_speech_ready;
 
-extern SpeechDirPtr speech_load(const char *resName, int id, bool);
-extern void speech_ems_play(const char *resName, int id);
+extern SpeechDirPtr speech_load(const char *resName, int id, bool useMainMemory = true);
+extern void speech_play(const char *resName, int id);
 extern void speech_all_off();
 extern void speech_sample_rate(int rate);
 extern void speech_ems_go(int handle, int size);

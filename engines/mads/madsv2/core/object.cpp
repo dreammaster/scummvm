@@ -365,7 +365,7 @@ int object_examine(int number, long message, int speech) {
 
 		/* pl    if (speech) {
 			  if (speech_system_active && speech_on) {
-			   speech_ems_play (object_speech_resource, speech);
+			   speech_play (object_speech_resource, speech);
 			  }
 			}
 			*/

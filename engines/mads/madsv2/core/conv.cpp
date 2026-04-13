@@ -608,7 +608,7 @@ static void conv_generate_text(Conv *convIn, ConvData * /*convData*/,
 
 	// Play the associated speech audio when the speech system is on.
 	if (speech_system_active && speech_on && speechCount > 0) {
-		speech_ems_play(convIn->speech_file, speechList[0]);
+		speech_play(convIn->speech_file, speechList[0]);
 	}
 }
 
@@ -1324,7 +1324,7 @@ static void conv_generate_message(Conv *convIn, ConvData *convData,
 
 				if (speech_system_active && speech_on) {
 					if (voiceListSize != 0) {
-						speech_ems_play(convIn->speech_file, *voiceList);
+						speech_play(convIn->speech_file, *voiceList);
 					}
 				}
 			}

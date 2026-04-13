@@ -21,6 +21,9 @@
 
 #include "common/textconsole.h"
 #include "mads/madsv2/core/speech.h"
+#include "mads/madsv2/core/env.h"
+#include "mads/madsv2/core/mem.h"
+#include "mads/madsv2/core/pack.h"
 
 namespace MADS {
 namespace MADSV2 {
@@ -32,12 +35,76 @@ SpeechBuffer speech_main_buffer;
 char global_speech_resource[16] = "*PHAN009.DSR";
 int  global_speech_ready = -1;
 
-SpeechDirPtr speech_load(const char *resName, int id, bool) {
-	warning("TODO: speech_load");
-	return nullptr;
+
+void SpeechDir::load(Common::SeekableReadStream *src) {
+	src->readMultipleLE(field0, compression, field4, field6, field8, size, offset);
 }
 
-void speech_ems_play(const char *resName, int id) {
+
+SpeechDirPtr speech_load(const char *resName, int id, bool useMainMemory) {
+	SpeechDirPtr result = nullptr;
+	SpeechDirPtr speechPtr = nullptr;
+	uint filePos;
+	int count;
+	SpeechDir speechDir;
+	int headerSize, totalSize;
+	byte *load_buf;
+	int packing_flag;
+
+	// Always use main memory in ScummVM
+	useMainMemory = true;
+
+	// Open the sound resource for access
+	Common::SeekableReadStream *handle = env_open(resName);
+	if (!handle) goto done;
+	filePos = handle->pos();
+
+	// Get the number of voice samples in the file
+	count = handle->readUint16LE();
+
+	// Validate the speech Id specified is within range
+	--id;
+	if (id < 0 || id >= count) goto done;
+
+	// Seek to the correct offset and read the index entry
+	if (id > 0)
+		handle->seek(id * SpeechDir::SIZE, SEEK_CUR);
+	speechDir.load(handle);
+
+	// Seek to the start of the voice content
+	filePos += speechDir.offset;
+	handle->seek(filePos);
+
+	// Get the buffer space
+	headerSize = ((sizeof(SpeechDir) + 15) / 16) * 16;
+	totalSize = headerSize + speechDir.size;
+	speechPtr = (SpeechDirPtr)mem_get_name(totalSize, "$SPEECH");
+
+	// Copy the the index entry into memory block
+	*speechPtr = speechDir;
+	load_buf = (byte *)speechPtr + headerSize;
+
+	// Decompress the data
+	pack_strategy = speechDir.compression;
+	packing_flag = (speechDir.compression != PACK_NONE) ? PACK_EXPLODE : PACK_RAW_COPY;
+
+	if (pack_data(packing_flag, speechDir.size, FROM_DISK, handle, TO_MEMORY, load_buf) != speechDir.size) goto done;
+
+	// At this point we have valid data
+	result = speechPtr;
+
+done:
+	if (useMainMemory && !result && speechPtr)
+		mem_free(speechPtr);
+	delete handle;
+
+	return result;
+}
+
+void speech_play(const char *resName, int id) {
+	SpeechDirPtr speech = speech_load(resName, id);
+	assert(speech);
+
 	warning("TODO: global_speech_resource");
 }
 
@@ -55,7 +122,7 @@ void speech_ems_go(int handle, int size) {
 
 void global_speech(int id) {
 	if (speech_system_active && speech_on) {
-		speech_ems_play(global_speech_resource, id);
+		speech_play(global_speech_resource, id);
 	}
 }
 
