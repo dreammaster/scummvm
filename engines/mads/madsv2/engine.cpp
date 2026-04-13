@@ -28,6 +28,7 @@
 #include "mads/madsv2/core/game.h"
 #include "mads/madsv2/core/inter.h"
 #include "mads/madsv2/core/kernel.h"
+#include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/object.h"
 #include "mads/madsv2/core/timer.h"
 #include "mads/madsv2/phantom/main.h"
@@ -125,8 +126,14 @@ void MADSV2Engine::syncGame(Common::Serializer &s) {
 		object[i].synchronize(s);
 
 	s.syncAsSint16LE(conv_restore_running);
-	s.syncAsSint16LE(camera_old_x_target);
-	s.syncAsSint16LE(camera_old_y_target);
+
+	if (s.isSaving()) {
+		s.syncAsSint16LE(picture_view_x);
+		s.syncAsSint16LE(picture_view_y);
+	} else {
+		s.syncAsSint16LE(camera_old_x_target);
+		s.syncAsSint16LE(camera_old_y_target);
+	}
 
 	for (int i = 0; i < OMR; ++i)
 		s.syncAsSint16LE(room_state[i]);

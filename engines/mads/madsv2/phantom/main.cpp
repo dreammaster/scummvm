@@ -264,7 +264,7 @@ void phantom_main() {
 	if (!env_verify())
 		env_search_mode = ENV_SEARCH_CONCAT_FILES;
 
-	bool firstTime = !ConfMan.getBool("start_game");
+	bool firstTime = !ConfMan.getBool("start_game") && !ConfMan.hasKey("save_slot");
 	selected_item = 0;
 
 	while (!g_engine->shouldQuit()) {

@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/config-manager.h"
 #include "common/debug.h"
 #include "mads/madsv2/engine.h"
 #include "mads/madsv2/core/game.h"
@@ -1264,7 +1265,7 @@ void game_set_camera_speed() {
 
 void game_control() {
 	int count, color;
-	int result;
+	int result = COPY_SUCCEED;
 	bool aborted_conv = true;
 
 	/* Start up game level functions */
@@ -1282,18 +1283,24 @@ void game_control() {
 
 	conv_system_init();
 
-	result = main_copy_verify();
-	if (result == COPY_FAIL) {
-		game.going = false;
-		force_chain = true;
-		game_restore_flag = false;
-		/* new_room    = 804;                  */
-		/* global_init_code();                 */
-		/* global[copy_protect_failed] = true; */
-		error_report(ERROR_COPY_PROTECTION, SEVERE, MODULE_LOCK, 0, 0);
-	} else if (result == COPY_ESCAPE) {
-		game.going = false;
-		force_chain = true;
+	if (ConfMan.hasKey("save_slot")) {
+		// Flag to do a savegame load
+		game_restore_flag = 1;
+
+	} else {
+		result = main_copy_verify();
+		if (result == COPY_FAIL) {
+			game.going = false;
+			force_chain = true;
+			game_restore_flag = false;
+			/* new_room    = 804;                  */
+			/* global_init_code();                 */
+			/* global[copy_protect_failed] = true; */
+			error_report(ERROR_COPY_PROTECTION, SEVERE, MODULE_LOCK, 0, 0);
+		} else if (result == COPY_ESCAPE) {
+			game.going = false;
+			force_chain = true;
+		}
 	}
 
 	kernel.clock = timer_read();
@@ -1339,10 +1346,8 @@ void game_control() {
 				force_chain = true;
 			}
 		} else {
-#if 0
-			game.going = (byte)!kernel_load_game(save_game_buf);
-			if (!game.going) force_chain = true;
-#endif
+			// Savegame load from GMM
+			g_engine->loadGameState(ConfMan.getInt("save_slot"));
 		}
 	}
 
