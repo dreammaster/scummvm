@@ -77,7 +77,7 @@ Common::Error MADSV2Engine::saveGameStream(Common::WriteStream *stream, bool isA
 }
 
 Common::Error MADSV2Engine::loadGameStream(Common::SeekableReadStream *stream) {
-int save = player.walker_is_loaded;
+	int save = player.walker_is_loaded;
 
 	// Sync main game data
 	Common::Serializer s(stream, nullptr);

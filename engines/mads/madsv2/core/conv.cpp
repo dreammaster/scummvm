@@ -232,7 +232,7 @@ void ConvData::save(Common::WriteStream *dest) const {
 	for (int i = 0; i < entryFlagsCount; ++i)
 		dest->writeSint16LE(entryFlags[i]);
 
-	for (int i = 0; i < entryFlagsCount; ++i)
+	for (int i = 0; i < variablesCount; ++i)
 		variables[i].save(dest);
 }
 
@@ -1711,7 +1711,8 @@ int conv_expand(Common::SeekableReadStream *handle) {
 
 	// Read count and list
 	count = handle->readUint16LE();
-	handle->readMultipleLE(list);
+	for (int i = 0; i < count; ++i)
+		list[i] = handle->readSint16LE();
 
 	for (int i = 0; i < count; ++i) {
 		int index = list[i];

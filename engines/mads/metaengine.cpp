@@ -214,6 +214,9 @@ Common::Error MADSMetaEngine::createInstance(OSystem *syst, Engine **engine, con
 }
 
 SaveStateList MADSMetaEngine::listSaves(const char *target) const {
+	if (getGameId(target) != "nebular")
+		return AdvancedMetaEngine<MADS::MADSGameDescription>::listSaves(target);
+
 	Common::SaveFileManager *saveFileMan = g_system->getSavefileManager();
 	Common::StringArray filenames;
 	Common::String saveDesc;
@@ -248,11 +251,18 @@ int MADSMetaEngine::getMaximumSaveSlot() const {
 }
 
 bool MADSMetaEngine::removeSaveState(const char *target, int slot) const {
-	Common::String filename = Common::String::format("%s.%03d", target, slot);
-	return g_system->getSavefileManager()->removeSavefile(filename);
+	if (getGameId(target) == "nebular") {
+		Common::String filename = Common::String::format("%s.%03d", target, slot);
+		return g_system->getSavefileManager()->removeSavefile(filename);
+	} else {
+		return AdvancedMetaEngine<MADS::MADSGameDescription>::removeSaveState(target, slot);
+	}
 }
 
 SaveStateDescriptor MADSMetaEngine::querySaveMetaInfos(const char *target, int slot) const {
+	if (getGameId(target) != "nebular")
+		return AdvancedMetaEngine<MADS::MADSGameDescription>::querySaveMetaInfos(target, slot);
+
 	Common::String filename = Common::String::format("%s.%03d", target, slot);
 	Common::InSaveFile *f = g_system->getSavefileManager()->openForLoading(filename);
 

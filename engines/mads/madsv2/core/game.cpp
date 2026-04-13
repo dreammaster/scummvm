@@ -1254,14 +1254,6 @@ void game_set_camera_speed() {
 	}
 }
 
-void nuke_all_speech_files(void) {
-	error("TODO: nuke_all_speech_files");
-}
-
-void start_the_copy_process(char orig_path[80]) {
-	error("TODO: start_the_copy_process");
-}
-
 /*
 /*      game_control()
 /*
@@ -1689,9 +1681,6 @@ emergency:
 				game_autosaved = false;
 			}
 		}
-
-		/* remove .RAC and .RAW files */
-		nuke_all_speech_files();
 
 		player_dump_walker();
 
