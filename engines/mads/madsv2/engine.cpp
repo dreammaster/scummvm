@@ -236,5 +236,13 @@ uint32 MADSV2Engine::getMillis() {
 	return g_system->getMillis();
 }
 
+void MADSV2Engine::playSpeech(Audio::AudioStream *stream) {
+	_mixer->playStream(Audio::Mixer::kSpeechSoundType, &_speechHandle, stream);
+}
+
+void MADSV2Engine::stopSpeech() {
+	_mixer->stopHandle(_speechHandle);
+}
+
 } // namespace MADSV2
 } // namespace MADS

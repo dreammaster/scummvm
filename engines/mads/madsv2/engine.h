@@ -22,6 +22,7 @@
 #ifndef MADSV2_ENGINE_H
 #define MADSV2_ENGINE_H
 
+#include "audio/mixer.h"
 #include "common/events.h"
 #include "common/serializer.h"
 #include "common/stack.h"
@@ -45,6 +46,7 @@ protected:
 	uint32 _nextFrameTime = 0;
 	Common::Point _mousePos;
 	int _mouseButtons = 0;
+	Audio::SoundHandle _speechHandle;
 
 	void pollEvents();
 
@@ -102,6 +104,9 @@ public:
 	virtual void global_room_init() = 0;
 	virtual void global_sound_driver() = 0;
 	virtual void global_verb_filter() {}
+
+	void playSpeech(Audio::AudioStream *stream);
+	void stopSpeech();
 };
 
 extern MADSV2Engine *g_engine;

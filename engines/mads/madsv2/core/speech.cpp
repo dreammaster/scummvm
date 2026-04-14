@@ -20,7 +20,8 @@
  */
 
 #include "audio/mixer.h"
-#include "common/textconsole.h"
+#include "audio/decoders/raw.h"
+#include "common/memstream.h"
 #include "mads/madsv2/core/speech.h"
 #include "mads/madsv2/core/env.h"
 #include "mads/madsv2/core/mem.h"
@@ -32,10 +33,21 @@ namespace MADSV2 {
 
 bool speech_system_active = false;
 bool speech_on = false;
-int speech_ems_handle;
-SpeechBuffer speech_main_buffer;
 char global_speech_resource[16] = "*PHAN009.DSR";
 int  global_speech_ready = -1;
+Audio::AudioStream *speech_stream;
+
+
+struct SpeechDir {
+	int16 field0 = 0;
+	int16 compression = 0;
+	int16 field4 = 0, field6 = 0, field8 = 0;
+	int32 size = 0;
+	int32 offset = 0;
+
+	static constexpr int SIZE = 2 + 2 + 2 + 2 + 2 + 4 + 4;
+	void load(Common::SeekableReadStream *src);
+};
 
 
 void SpeechDir::load(Common::SeekableReadStream *src) {
@@ -48,17 +60,21 @@ void speech_init() {
 }
 
 void speech_shutdown() {
+	if (speech_stream) {
+		delete speech_stream;
+		speech_stream = nullptr;
+	}
+
 	speech_system_active = false;
 }
 
-SpeechDirPtr speech_load(const char *resName, int id, bool useMainMemory) {
-	SpeechDirPtr result = nullptr;
-	SpeechDirPtr speechPtr = nullptr;
+Audio::AudioStream *speech_load(const char *resName, int id, bool useMainMemory) {
+	Common::MemoryReadStream *memStream;
+	Audio::AudioStream *audioStream = nullptr;
 	uint filePos;
 	int count;
 	SpeechDir speechDir;
-	int headerSize, totalSize;
-	byte *load_buf;
+	byte *load_buf = nullptr;
 	int packing_flag;
 
 	// Always use main memory in ScummVM
@@ -86,13 +102,7 @@ SpeechDirPtr speech_load(const char *resName, int id, bool useMainMemory) {
 	handle->seek(filePos);
 
 	// Get the buffer space
-	headerSize = ((sizeof(SpeechDir) + 15) / 16) * 16;
-	totalSize = headerSize + speechDir.size;
-	speechPtr = (SpeechDirPtr)mem_get_name(totalSize, "$SPEECH");
-
-	// Copy the the index entry into memory block
-	*speechPtr = speechDir;
-	load_buf = (byte *)speechPtr + headerSize;
+	load_buf = (byte *)malloc(speechDir.size);
 
 	// Decompress the data
 	pack_strategy = speechDir.compression;
@@ -101,33 +111,40 @@ SpeechDirPtr speech_load(const char *resName, int id, bool useMainMemory) {
 	if (pack_data(packing_flag, speechDir.size, FROM_DISK, handle, TO_MEMORY, load_buf) != speechDir.size) goto done;
 
 	// At this point we have valid data
-	result = speechPtr;
+	memStream = new Common::MemoryReadStream(load_buf, speechDir.size, DisposeAfterUse::YES);
+	audioStream = Audio::makeRawStream(memStream, 11025, Audio::FLAG_UNSIGNED, DisposeAfterUse::YES);
 
 done:
-	if (useMainMemory && !result && speechPtr)
-		mem_free(speechPtr);
 	delete handle;
 
-	return result;
+	delete speech_stream;
+	speech_stream = audioStream;
+
+	return audioStream;
 }
 
 void speech_play(const char *resName, int id) {
-	SpeechDirPtr speech = speech_load(resName, id);
-	assert(speech);
+	Audio::AudioStream *speech = speech_load(resName, id);
 
-	warning("TODO: global_speech_resource");
+	if (speech)
+		g_engine->playSpeech(speech);
+
+	speech_stream = nullptr;
 }
 
 void speech_all_off() {
-	warning("TODO: speech_all_off");
+	g_engine->stopSpeech();
 }
 
 void speech_sample_rate(int rate) {
-	warning("TODO: speech_sample_rate");
+	// TODO: implement speech_sample_rate
 }
 
-void speech_ems_go(int handle, int size) {
-	warning("TODO: speech_ems_go");
+void speech_go() {
+	if (speech_stream) {
+		g_engine->playSpeech(speech_stream);
+		speech_stream = nullptr;
+	}
 }
 
 void global_speech(int id) {
@@ -137,7 +154,7 @@ void global_speech(int id) {
 }
 
 void global_speech_load(int id) {
-	SpeechDirPtr chunk;
+	Audio::AudioStream *chunk;
 
 	if (speech_system_active && speech_on) {
 		speech_all_off();
@@ -156,8 +173,8 @@ void global_speech_go(int id) {
 	if (speech_system_active && speech_on) {
 		if (global_speech_ready == id) {
 			speech_all_off();
-			speech_sample_rate(speech_main_buffer.sample_rate);
-			speech_ems_go(speech_ems_handle, speech_main_buffer.decompress_size);
+			//speech_sample_rate(speech_main_buffer.sample_rate);
+			speech_go();
 		} else {
 			global_speech(id);
 		}
