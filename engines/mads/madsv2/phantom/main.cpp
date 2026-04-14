@@ -279,6 +279,10 @@ void phantom_main() {
 				game_main(2, CMD_LINE);
 				break;
 
+			case 4:
+				// Exit
+				return;
+
 			default:
 				break;
 			}
