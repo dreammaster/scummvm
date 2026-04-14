@@ -82,14 +82,15 @@ int       inter_dialog_results[inter_columns];
 
 Verb command[INTER_COMMANDS] = {             /* Main Verb List */
 	{ words_look, VERB_THAT, PREP_NONE },
-	{ words_give, VERB_THIS, PREP_TO },
 	{ words_take, VERB_THAT, PREP_NONE },
-	{ words_talk_to, VERB_THAT, PREP_NONE },
 	{ words_push, VERB_THAT, PREP_NONE },
-	{ words_pull, VERB_THAT, PREP_NONE },
-	{ words_put,  VERB_THIS, PREP_RELATIONAL },
 	{ words_open, VERB_THAT, PREP_NONE },
-	{ words_close, VERB_THAT, PREP_NONE }
+	{ words_put,  VERB_THIS, PREP_RELATIONAL },
+	{ words_talk_to, VERB_THAT, PREP_NONE },
+	{ words_give, VERB_THIS, PREP_TO },
+	{ words_pull, VERB_THAT, PREP_NONE },
+	{ words_close, VERB_THAT, PREP_NONE },
+	{ words_throw, VERB_THIS, PREP_AT }
 };
 
 
@@ -353,7 +354,6 @@ static void inter_show_word(int class_, int id) {
 	int x, y, junk;
 	int word_id = 0;
 	char temp_buf[80];
-	int paul_id;
 	int write_it = true;
 
 	if (!inter_get_spot(class_, id, &x, &y, &junk, &junk)) {
@@ -425,14 +425,6 @@ static void inter_show_word(int class_, int id) {
 
 	case STROKE_ACTION:
 	default:
-
-		paul_id = object[inven[active_inven]].vocab_id;
-		paul_id = object_named(paul_id);
-
-		if (paul_id == 8 && !global[86]) {  /* pid doll / global [heal_verbs_visible] */
-			if (id > 0) write_it = false;  /* id == second verb, or == third verb */
-		}
-
 		word_id = object[inven[active_inven]].verb[id].id;
 		if (id == left_action) {
 			inter_set_colors(LEFT_SELECT);
@@ -449,25 +441,6 @@ static void inter_show_word(int class_, int id) {
 	temp_buf[0] = (char)toupper((int)temp_buf[0]);
 
 write:
-
-	/* if (class_ == STROKE_INVEN) */
-
-	if (class_ == STROKE_COMMAND) {
-		switch (word_id) {
-		case 3:  x += 10; break;  /* look    */
-		case 9:  x += 12; break;  /* give    */
-		case 4:  x += 10; break;  /* take    */
-
-		case 8:  x += 4;  break;  /* talk to */
-		case 5:  x += 10; break;  /* push    */
-		case 10: x += 13; break;  /* pull    */
-
-		case 7:  x += 12; break;  /* put     */
-		case 6:  x += 10; break;  /* open    */
-		case 11: x += 9;  break;  /* close   */
-		}
-	}
-
 	if (write_it)
 		font_write(font_inter, &scr_inter, temp_buf, x, y, 0);
 
