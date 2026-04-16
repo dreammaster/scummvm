@@ -301,7 +301,6 @@ int pal_allocate(ColorListPtr new_list, ShadowListPtr shadow_list, int pal_flags
 	int shadowing_enabled;
 	int shadowing_special;
 	int defining_background;
-	int primary_load;
 	int conduct_search, conduct_insert;
 	int free_colors;
 	int hash, best_hash;
@@ -343,7 +342,6 @@ int pal_allocate(ColorListPtr new_list, ShadowListPtr shadow_list, int pal_flags
 	/* Check if we are defining a new background picture */
 
 	defining_background = pal_flags & PAL_MAP_BACKGROUND;
-	primary_load = pal_flags & (PAL_MAP_BACKGROUND | PAL_MAP_DEFINE_RESERVED);
 
 	/* If a shadowing description was passed, enable shadow checking */
 
@@ -377,12 +375,6 @@ int pal_allocate(ColorListPtr new_list, ShadowListPtr shadow_list, int pal_flags
 	/* mappings are placed at the bottom of the list.  That way, colors which */
 	/* require an exact RGB mapping are given the first chance to allocate    */
 	/* free color space.                                                      */
-
-	/*
-	reordering_index = mem_get_name(256, "$palidx");
-	reordering_hash  = mem_get_name(256, "$palhash");
-	if ((reordering_index == NULL) || (reordering_hash == NULL)) goto done;
-	*/
 
 	for (count = 0; count < new_list->num_colors; count++) {
 		reordering_index[count] = (byte)count;
@@ -458,10 +450,9 @@ int pal_allocate(ColorListPtr new_list, ShadowListPtr shadow_list, int pal_flags
 		/* found a (shadowing) match; and  B) if we are defining an initial   */
 		/* background and therefore should not have any matches.              */
 
-		conduct_search = (!found) && (!defining_background);
+		conduct_search = !found && !defining_background && cycle_mask != 0;
 
 		if (conduct_search) {
-
 			/* Now, decide whether we need an exact match or are willing to just */
 			/* take the closest.                                                 */
 
@@ -550,14 +541,10 @@ int pal_allocate(ColorListPtr new_list, ShadowListPtr shadow_list, int pal_flags
 	pal_exec(pal_manager_update, 2);
 
 done:
-	/*
-	if (reordering_hash  != NULL) mem_free(reordering_hash);
-	if (reordering_index != NULL) mem_free(reordering_index);
-	*/
 #ifdef palette_dumps
 	pal_dump();
 #endif
-	return (return_code);
+	return return_code;
 }
 
 int pal_get_flags()
