@@ -24,7 +24,6 @@
 namespace MADS {
 namespace MADSV2 {
 
-
 void sort_insertion(int elements, int *id, long *value) {
 	int going, count, count2, my_id;
 	int insertion, deletion;
@@ -36,21 +35,29 @@ void sort_insertion(int elements, int *id, long *value) {
 		going = false;
 		for (count = 0; (count < (elements - 1)) && !going; count++) {
 			if (value[count] > value[count + 1]) {
-				deletion = (elements - (count + 1)) << 1;
+				deletion = elements - (count + 1);
 				my_value = value[count];
 				my_id = id[count];
 				if (deletion > 0) {
-					memmove(&value[count], &value[count + 1], (deletion << 1));
-					memmove(&id[count], &id[count + 1], deletion);
+					memmove(&value[count], &value[count + 1], deletion * sizeof(long));
+					memmove(&id[count], &id[count + 1], deletion * sizeof(int));
 				}
 				for (count2 = 0; (count2 < elements - 1) && !going; count2++) {
 					going = (my_value < value[count2]);
 				}
+				/* After the loop, count2 has been post-incremented one step past
+				 * the found insertion position.  If going was set to true inside
+				 * the loop (i.e. we found a value[count2-1] > my_value), the for
+				 * loop's count2++ still fired, so the real target index is
+				 * count2-1.  Decrement to correct for this. */
+				if (going) {
+					count2--;
+				}
 				going = true;
-				insertion = ((elements - 1) - count2) << 1;
+				insertion = (elements - 1) - count2;
 				if (insertion > 0) {
-					memmove(&value[count2 + 1], &value[count2], (insertion << 1));
-					memmove(&id[count2 + 1], &id[count2], insertion);
+					memmove(&value[count2 + 1], &value[count2], insertion * sizeof(long));
+					memmove(&id[count2 + 1], &id[count2], insertion * sizeof(int));
 				}
 				value[count2] = my_value;
 				id[count2] = my_id;
