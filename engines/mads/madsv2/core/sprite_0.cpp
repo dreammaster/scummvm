@@ -274,11 +274,9 @@ ys = sprite->ys;
 		ax--;
 		target_x = ax;
 
-		di -= cx;          /* subtract original stop_x from size */
-		di = -di;          /* negate for pointer calculations */
-		skip_x = di;
+		di -= stop_x;		/* subtract original stop_x from size */
+		skip_x = -di;
 
-		di = -di;          /* make positive again */
 		di += draw_x;
 		stop_x = di;
 	}
