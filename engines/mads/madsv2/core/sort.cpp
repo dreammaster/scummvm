@@ -96,7 +96,7 @@ void sort_insertion_16(int elements, byte *id, word *value) {
 		int deletion = limit - si - 1;
 		if (deletion > 0) {
 			memmove(&value[si + 1], &value[si + 2], deletion * sizeof(word));
-			memmove(&id[si + 1], &id[si + 2], deletion);
+			memmove(&id[si + 1], &id[si + 2], deletion * sizeof(byte));
 		}
 
 		/* quest_loop: find correct insertion point for my_value in [0..limit-1] */
@@ -111,7 +111,7 @@ void sort_insertion_16(int elements, byte *id, word *value) {
 		int insertion = limit - count2;
 		if (insertion > 0) {
 			memmove(&value[count2 + 1], &value[count2], insertion * sizeof(word));
-			memmove(&id[count2 + 1], &id[count2], insertion);
+			memmove(&id[count2 + 1], &id[count2], insertion * sizeof(byte));
 		}
 
 		/* Insert saved element at its correct position */
@@ -148,8 +148,8 @@ void sort_insertion_8(int elements, byte *id, byte *value) {
 		/* Delete element at si+1 by shifting everything above it down one */
 		int deletion = limit - si - 1;
 		if (deletion > 0) {
-			memmove(&value[si + 1], &value[si + 2], deletion);
-			memmove(&id[si + 1], &id[si + 2], deletion);
+			memmove(&value[si + 1], &value[si + 2], deletion * sizeof(byte));
+			memmove(&id[si + 1], &id[si + 2], deletion * sizeof(byte));
 		}
 
 		/* quest_loop: find correct insertion point for my_value in [0..limit-1] */
@@ -164,8 +164,8 @@ void sort_insertion_8(int elements, byte *id, byte *value) {
 		int insertion = limit - count2;
 		if (insertion > 0) {
 			/* shift backwards (std / rep movsb in original) */
-			memmove(&value[count2 + 1], &value[count2], insertion);
-			memmove(&id[count2 + 1], &id[count2], insertion);
+			memmove(&value[count2 + 1], &value[count2], insertion * sizeof(byte));
+			memmove(&id[count2 + 1], &id[count2], insertion * sizeof(byte));
 		}
 
 		/* Insert saved element at its correct position */
