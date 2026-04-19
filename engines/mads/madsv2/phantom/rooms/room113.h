@@ -144,11 +144,11 @@ typedef struct {        /* Room local variables */
 #define ROOM_113_RAOUL_START_TALKING	 62
 #define ROOM_113_FLORENT_START_TALKING2	 64
 #define ROOM_113_FLORENT_START_TALKING	 66
-#define ROOM_113_TAKE_NOTE				 74
 #define ROOM_113_MADE_IT_TO_FLORENT		 78
 #define ROOM_113_AT_COUCH				 80
 #define ROOM_113_BEFORE_COUCH			 82
 #define ROOM_113_BETWEEN_COUCH			 84
+#define ROOM_113_TAKE_NOTE				 86
 #define ROOM_113_DELAY_BEFORE_WALK		 92
 #define ROOM_113_PUT_ON_HOLD			 96
 #define ROOM_113_HOLD_HAND				 98

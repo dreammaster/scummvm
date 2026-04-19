@@ -1014,7 +1014,7 @@ static void process_conversation_florent() {
 
 	case conv004_anything_take:
 		local->florent_action = CONV4_FLORENT_POINT;
-		conv_you_trigger(86); // ROOM_113_TAKE_NOTE);
+		conv_you_trigger(ROOM_113_TAKE_NOTE);
 		break;
 
 	case conv004_imgone_bye:
