@@ -111,13 +111,19 @@ void ConvScriptParams::load(Common::SeekableReadStream *src) {
 
 void ConvVariable::load(Common::SeekableReadStream *src) {
 	uint16 flag = src->readUint16LE();
-	assert(flag != 0xffff);	// TODO: See if original game has pointers for any conv
 	isPtr = flag == MKTAG16('V', 'M');
 
 	val = src->readSint16LE();
-	type = src->readUint16LE();
+	type = src->readSint16LE();
 
-	if (isPtr) {
+	if (flag == 0xffff) {
+		// Original shouldn't have pointer variables by default, except for
+		// some placeholder entries in the Manager's Office, which have
+		// matching segment & offset values. So are obviously not used
+		assert(val == type);
+		val = type = 0;
+
+	} else if (isPtr) {
 		switch (type) {
 		case PTRTYPE_GLOBAL:
 			ptr = global + val;
