@@ -199,7 +199,7 @@ RoomPtr room_load(int id, int variant, const char *base_path, Buffer *picture,
 		goto done;
 	}
 
-	memcpy(&roomPtr->misc[0], &roomfile.misc[0], sizeof(int) * 10);
+	Common::copy(roomfile.misc, roomfile.misc + 10, roomPtr->misc);
 	roomPtr->num_variants = roomfile.num_variants;
 	roomPtr->num_hotspots = roomfile.num_hotspots;
 	roomPtr->num_rails = roomfile.num_rails;
@@ -207,10 +207,10 @@ RoomPtr room_load(int id, int variant, const char *base_path, Buffer *picture,
 	roomPtr->back_y = roomfile.back_y;
 	roomPtr->front_scale = roomfile.front_scale;
 	roomPtr->back_scale = roomfile.back_scale;
-	memcpy(&roomPtr->depth_table[0], &roomfile.depth_table[0], sizeof(int) << 4);
+	Common::copy(roomfile.depth_table, roomfile.depth_table + 16, roomPtr->depth_table);
 
 	for (count = 0; count < roomfile.num_rails; count++) {
-		memcpy(&roomPtr->rail[count], &roomfile.rail[count], sizeof(Rail));
+		roomPtr->rail[count] = roomfile.rail[count];
 	}
 
 	if (master_shadow != NULL) {
@@ -302,8 +302,8 @@ int room_load_variant(int id, int variant, const char *base_path, RoomPtr roomPt
 				room_load_error = 5100 + tile_load_error;
 				goto done;
 			} else if (tile_load_error == 1) {
-				xx = MIN(video_x, roomPtr->xs);
-				yy = MIN(display_y, roomPtr->ys);
+				xx = MIN<int16>(video_x, roomPtr->xs);
+				yy = MIN<int16>(display_y, roomPtr->ys);
 
 				buffer_init_name(depth, xx >> 1, yy, "$scrdpth");
 				if (depth->data == NULL) {

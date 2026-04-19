@@ -209,27 +209,27 @@ struct RoomFile {
 
 /* Run-time room definition structure (in memory) */
 
-typedef struct {
+struct Room {
 	/* int       id;                       Room number                   */
 	/* int       picture_id;               Room whose ART file is needed */
 	/* int       format;                   Room format (panning/normal)  */
-	int       xs, ys;                   /* X and Y size of room picture  */
+	int16       xs, ys;                   /* X and Y size of room picture  */
 
-	int       misc[10];                 /* Padding for future updates    */
-	int       num_variants;             /* Number of attribute variants  */
-	int       num_hotspots;             /* Number of hotspots            */
-	int       num_rails;                /* Number of rail nodes          */
-	int       front_y, back_y;          /* Player scaling baselines      */
-	int       front_scale, back_scale;  /* Player scaling factors        */
-	int       depth_table[16];          /* Player depth table            */
+	uint16      misc[10];                /* Padding for future updates    */
+	uint16      num_variants;             /* Number of attribute variants  */
+	uint16      num_hotspots;             /* Number of hotspots            */
+	uint16      num_rails;                /* Number of rail nodes          */
+	int16       front_y, back_y;          /* Player scaling baselines      */
+	int16       front_scale, back_scale;  /* Player scaling factors        */
+	uint16      depth_table[16];          /* Player depth table            */
 
-	int       color_handle;             /* Background color handle       */
-	int       variant_loaded;           /* Current attribute variant     */
+	int16       color_handle;             /* Background color handle       */
+	int16       variant_loaded;           /* Current attribute variant     */
 
-	CycleList cycle_list;               /* Active color cycling ranges   */
+	CycleList   cycle_list;               /* Active color cycling ranges   */
 
-	Rail      rail[1];                  /* Rail nodes begin here...      */
-} Room;
+	Rail        rail[1];                  /* Rail nodes begin here...      */
+};
 typedef Room *RoomPtr;
 
 extern RoomDef roomdef;
