@@ -277,7 +277,7 @@ void phantom_main() {
 			switch (selected_item) {
 			case 0:
 				game_main(2, CMD_LINE);
-				break;
+				return;
 
 			case 4:
 				// Exit
