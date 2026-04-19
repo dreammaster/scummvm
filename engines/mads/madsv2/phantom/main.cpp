@@ -145,7 +145,7 @@ static void main_cold_data_init() {
 	Common::strcpy_s(kernel_cheating_password, "WIDECHEW");
 	kernel_cheating_allowed = strlen(kernel_cheating_password);
 
-	kernel.cheating = (byte)kernel_cheating_allowed;
+	kernel.cheating = gDebugLevel == 9 ? kernel_cheating_allowed : 0;
 }
 
 static void game_main(int argc, const char **argv) {
