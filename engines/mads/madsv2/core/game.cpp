@@ -1034,7 +1034,6 @@ int game_parse_keystroke(int mykey) {
 		}
 	}
 
-
 	if (kernel.cheating < (byte)kernel_cheating_allowed) {
 		if (mykey == (kernel_cheating_password[kernel.cheating] - '@')) {
 			kernel.cheating++;

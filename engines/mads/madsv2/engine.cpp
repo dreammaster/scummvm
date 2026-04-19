@@ -21,6 +21,7 @@
 
 #include "common/system.h"
 #include "engines/util.h"
+#include "mads/mads.h"
 #include "mads/madsv2/engine.h"
 #include "mads/madsv2/core/camera.h"
 #include "mads/madsv2/core/config.h"
@@ -41,6 +42,15 @@ constexpr int GAME_FRAME_RATE = 50;
 constexpr int GAME_FRAME_TIME = 1000 / GAME_FRAME_RATE;
 
 MADSV2Engine *g_engine;
+
+static const Common::KeyCode KEYBINDING_ACTIONS[kActionRestartAnimation + 1] = {
+	Common::KEYCODE_INVALID, Common::KEYCODE_ESCAPE, Common::KEYCODE_F1,
+	Common::KEYCODE_F5, Common::KEYCODE_7, Common::KEYCODE_PAGEUP,
+	Common::KEYCODE_PAGEDOWN, Common::KEYCODE_F1, Common::KEYCODE_F2,
+	Common::KEYCODE_F3, Common::KEYCODE_F4, Common::KEYCODE_F5,
+	Common::KEYCODE_INVALID
+};
+
 
 MADSV2Engine::MADSV2Engine(OSystem *syst, const MADSGameDescription *gameDesc) :
 	MADSEngine(syst, gameDesc) {
@@ -196,7 +206,10 @@ void MADSV2Engine::pollEvents() {
 			_mousePos = e.mouse;
 
 		if (e.type == Common::EVENT_KEYDOWN)
-			_keyEvents.push(e);
+			_keyEvents.push(e.kbd);
+		if (e.type == Common::EVENT_CUSTOM_ENGINE_ACTION_START &&
+				KEYBINDING_ACTIONS[e.customType] != Common::KEYCODE_INVALID)
+			_keyEvents.push(Common::KeyState(KEYBINDING_ACTIONS[e.customType]));
 	}
 }
 
@@ -210,8 +223,8 @@ int MADSV2Engine::getKey() {
 	pollEvents();
 
 	if (!_keyEvents.empty()) {
-		Common::Event e = _keyEvents.pop();
-		return (e.kbd.keycode & 0xff) | 0x100;
+		Common::KeyState ks = _keyEvents.pop();
+		return (ks.ascii && !ks.flags) ? ks.ascii : (ks.flags << 16) | ks.keycode;
 	}
 
 	return 0;

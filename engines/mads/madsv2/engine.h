@@ -42,7 +42,7 @@ private:
 
 protected:
 	Graphics::Screen *_screen = nullptr;
-	Common::Stack<Common::Event> _keyEvents;
+	Common::Stack<Common::KeyState> _keyEvents;
 	uint32 _nextFrameTime = 0;
 	Common::Point _mousePos;
 	int _mouseButtons = 0;

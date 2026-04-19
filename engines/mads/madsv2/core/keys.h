@@ -22,13 +22,14 @@
 #ifndef MADS_CORE_KEYS_H
 #define MADS_CORE_KEYS_H
 
+#include "common/keyboard.h"
 #include "mads/madsv2/core/general.h"
 
 namespace MADS {
 namespace MADSV2 {
 
 /* keystroke defines */
-
+#if 0
 #define key_status_1            (byte *) 0x00400017 /* key status 1 */
 #define key_status_2            (byte *) 0x00400018 /* key status 2 */
 
@@ -40,163 +41,164 @@ namespace MADSV2 {
 #define KS1_CTRL                0x04    /* Ctrl key state    */
 #define KS1_LEFTSHIFT           0x02    /* Left shift state  */
 #define KS1_RIGHTSHIFT          0x01    /* Right shift state */
+#endif
 
-#define left_key                0x14b
-#define right_key               0x14d
-#define up_key                  0x148
-#define down_key                0x150
+#define left_key                Common::KEYCODE_LEFT
+#define right_key               Common::KEYCODE_RIGHT
+#define up_key                  Common::KEYCODE_UP
+#define down_key                Common::KEYCODE_DOWN
 
-#define ins_key                 0x152
-#define del_key                 0x153
-#define delete_key              0x153
+#define ins_key                 Common::KEYCODE_INSERT
+#define del_key                 Common::KEYCODE_DELETE
+#define delete_key              Common::KEYCODE_DELETE
 
-#define home_key                0x147
-#define end_key                 0x14f
+#define home_key                Common::KEYCODE_HOME
+#define end_key                 Common::KEYCODE_END
 
-#define pgup_key                0x149
-#define pgdn_key                0x151
+#define pgup_key                Common::KEYCODE_PAGEUP
+#define pgdn_key                Common::KEYCODE_PAGEDOWN
 
-#define enter_key               0x0d
-#define esc_key                 0x1b
-#define bksp_key                0x08
-#define ctrl_del_key            0x193
-#define tab_key                 0x09
-#define backtab_key             0x10f
+#define enter_key               Common::KEYCODE_RETURN
+#define esc_key                 Common::KEYCODE_ESCAPE
+#define bksp_key                Common::KEYCODE_BACKSPACE
+#define ctrl_del_key            ((Common::KBD_CTRL << 16) | Common::KEYCODE_DELETE)
+#define tab_key                 Common::KEYCODE_TAB
+#define backtab_key             ((Common::KBD_SHIFT << 16) | Common::KEYCODE_TAB)
 
-#define space_key               0x20
+#define space_key               Common::KEYCODE_SPACE
 
-#define A_key                   0x41
-#define B_key                   0x42
-#define C_key                   0x43
-#define D_key                   0x44
-#define E_key                   0x45
-#define F_key                   0x46
-#define G_key                   0x47
-#define H_key                   0x48
-#define I_key                   0x49
-#define J_key                   0x4a
-#define K_key                   0x4b
-#define L_key                   0x4c
-#define M_key                   0x4d
-#define N_key                   0x4e
-#define O_key                   0x4f
-#define P_key                   0x50
-#define Q_key                   0x51
-#define R_key                   0x52
-#define S_key                   0x53
-#define T_key                   0x54
-#define U_key                   0x55
-#define V_key                   0x56
-#define W_key                   0x57
-#define X_key                   0x58
-#define Y_key                   0x59
-#define Z_key                   0x5a
+#define A_key                   'A'
+#define B_key                   'B'
+#define C_key                   'C'
+#define D_key                   'D'
+#define E_key                   'E'
+#define F_key                   'F'
+#define G_key                   'G'
+#define H_key                   'H'
+#define I_key                   'I'
+#define J_key                   'J'
+#define K_key                   'K'
+#define L_key                   'L'
+#define M_key                   'M'
+#define N_key                   'N'
+#define O_key                   'O'
+#define P_key                   'P'
+#define Q_key                   'Q'
+#define R_key                   'R'
+#define S_key                   'S'
+#define T_key                   'T'
+#define U_key                   'U'
+#define V_key                   'V'
+#define W_key                   'W'
+#define X_key                   'X'
+#define Y_key                   'Y'
+#define Z_key                   'Z'
 
-#define a_key                   0x61
-#define b_key                   0x62
-#define g_key                   0x67
-#define i_key                   0x69
-#define j_key                   0x6a
-#define m_key                   0x6d
-#define z_key                   0x7a
+#define a_key                   'a'
+#define b_key                   'b'
+#define g_key                   'g'
+#define i_key                   'i'
+#define j_key                   'j'
+#define m_key                   'm'
+#define z_key                   'z'
 
-#define alt_a_key               0x11e
-#define alt_b_key               0x130
-#define alt_c_key               0x12e
-#define alt_d_key               0x120
-#define alt_e_key               0x112
-#define alt_f_key               0x121
-#define alt_g_key               0x122
-#define alt_h_key               0x123
-#define alt_i_key               0x117
-#define alt_j_key               0x124
-#define alt_k_key               0x125
-#define alt_l_key               0x126
-#define alt_m_key               0x132
-#define alt_n_key               0x131
-#define alt_o_key               0x118
-#define alt_p_key               0x119
-#define alt_q_key               0x110
-#define alt_r_key               0x113
-#define alt_s_key               0x11f
-#define alt_t_key               0x114
-#define alt_u_key               0x116
-#define alt_v_key               0x12f
-#define alt_w_key               0x111
-#define alt_x_key               0x12d
-#define alt_y_key               0x115
-#define alt_z_key               0x12c
+#define alt_a_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_a)
+#define alt_b_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_b)
+#define alt_c_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_c)
+#define alt_d_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_d)
+#define alt_e_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_e)
+#define alt_f_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_f)
+#define alt_g_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_g)
+#define alt_h_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_h)
+#define alt_i_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_i)
+#define alt_j_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_j)
+#define alt_k_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_k)
+#define alt_l_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_l)
+#define alt_m_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_m)
+#define alt_n_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_n)
+#define alt_o_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_o)
+#define alt_p_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_p)
+#define alt_q_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_q)
+#define alt_r_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_r)
+#define alt_s_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_s)
+#define alt_t_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_t)
+#define alt_u_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_u)
+#define alt_v_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_v)
+#define alt_w_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_w)
+#define alt_x_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_x)
+#define alt_y_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_y)
+#define alt_z_key               ((Common::KBD_ALT << 16) | Common::KEYCODE_z)
 
-#define f1_key                  0x13b
-#define f2_key                  0x13c
-#define f3_key                  0x13d
-#define f4_key                  0x13e
-#define f5_key                  0x13f
-#define f6_key                  0x140
-#define f7_key                  0x141
-#define f8_key                  0x142
-#define f9_key                  0x143
-#define f10_key                 0x144
+#define f1_key                  Common::KEYCODE_F1
+#define f2_key                  Common::KEYCODE_F2
+#define f3_key                  Common::KEYCODE_F3
+#define f4_key                  Common::KEYCODE_F4
+#define f5_key                  Common::KEYCODE_F5
+#define f6_key                  Common::KEYCODE_F6
+#define f7_key                  Common::KEYCODE_F7
+#define f8_key                  Common::KEYCODE_F8
+#define f9_key                  Common::KEYCODE_F9
+#define f10_key                 Common::KEYCODE_F10
 
-#define shift_f1_key            0x154
-#define shift_f2_key            0x155
-#define shift_f3_key            0x156
-#define shift_f4_key            0x157
-#define shift_f5_key            0x158
-#define shift_f6_key            0x159
-#define shift_f7_key            0x15a
-#define shift_f8_key            0x15b
-#define shift_f9_key            0x15c
-#define shift_f10_key           0x15d
+#define shift_f1_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F1)
+#define shift_f2_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F2)
+#define shift_f3_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F3)
+#define shift_f4_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F4)
+#define shift_f5_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F5)
+#define shift_f6_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F6)
+#define shift_f7_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F7)
+#define shift_f8_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F8)
+#define shift_f9_key            ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F9)
+#define shift_f10_key           ((Common::KBD_SHIFT << 16) | Common::KEYCODE_F10)
 
-#define ctrl_f1_key             0x15e
-#define ctrl_f2_key             0x15f
-#define ctrl_f3_key             0x160
-#define ctrl_f4_key             0x161
-#define ctrl_f5_key             0x162
-#define ctrl_f6_key             0x163
-#define ctrl_f7_key             0x164
-#define ctrl_f8_key             0x165
-#define ctrl_f9_key             0x166
-#define ctrl_f10_key            0x167
+#define ctrl_f1_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F1)
+#define ctrl_f2_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F2)
+#define ctrl_f3_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F3)
+#define ctrl_f4_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F4)
+#define ctrl_f5_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F5)
+#define ctrl_f6_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F6)
+#define ctrl_f7_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F7)
+#define ctrl_f8_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F8)
+#define ctrl_f9_key             ((Common::KBD_CTRL << 16) | Common::KEYCODE_F9)
+#define ctrl_f10_key            ((Common::KBD_CTRL << 16) | Common::KEYCODE_F10)
 
-#define alt_f1_key              0x168
-#define alt_f2_key              0x169
-#define alt_f3_key              0x16a
-#define alt_f4_key              0x16b
-#define alt_f5_key              0x16c
-#define alt_f6_key              0x16d
-#define alt_f7_key              0x16e
-#define alt_f8_key              0x16f
-#define alt_f9_key              0x170
-#define alt_f10_key             0x171
+#define alt_f1_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F1)
+#define alt_f2_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F2)
+#define alt_f3_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F3)
+#define alt_f4_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F4)
+#define alt_f5_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F5)
+#define alt_f6_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F6)
+#define alt_f7_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F7)
+#define alt_f8_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F8)
+#define alt_f9_key              ((Common::KBD_ALT << 16) | Common::KEYCODE_F9)
+#define alt_f10_key             ((Common::KBD_ALT << 16) | Common::KEYCODE_F10)
 
-#define ctrl_a_key              0x01
-#define ctrl_b_key              0x02
-#define ctrl_c_key              0x03
-#define ctrl_d_key              0x04
-#define ctrl_e_key              0x05
-#define ctrl_f_key              0x06
-#define ctrl_g_key              0x07
-#define ctrl_h_key              0x08
-#define ctrl_i_key              0x09
-#define ctrl_j_key              0x0a
-#define ctrl_k_key              0x0b
-#define ctrl_l_key              0x0c
-#define ctrl_m_key              0x0d
-#define ctrl_n_key              0x0e
-#define ctrl_o_key              0x0f
-#define ctrl_p_key              0x10
-#define ctrl_q_key              0x11
-#define ctrl_r_key              0x12
-#define ctrl_s_key              0x13
-#define ctrl_t_key              0x14
-#define ctrl_u_key              0x15
-#define ctrl_v_key              0x16
-#define ctrl_w_key              0x17
-#define ctrl_x_key              0x18
-#define ctrl_y_key              0x19
-#define ctrl_z_key              0x1a
+#define ctrl_a_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_a)
+#define ctrl_b_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_b)
+#define ctrl_c_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_c)
+#define ctrl_d_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_d)
+#define ctrl_e_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_e)
+#define ctrl_f_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_f)
+#define ctrl_g_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_g)
+#define ctrl_h_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_h)
+#define ctrl_i_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_i)
+#define ctrl_j_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_j)
+#define ctrl_k_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_k)
+#define ctrl_l_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_l)
+#define ctrl_m_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_m)
+#define ctrl_n_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_n)
+#define ctrl_o_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_o)
+#define ctrl_p_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_p)
+#define ctrl_q_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_q)
+#define ctrl_r_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_r)
+#define ctrl_s_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_s)
+#define ctrl_t_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_t)
+#define ctrl_u_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_u)
+#define ctrl_v_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_v)
+#define ctrl_w_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_w)
+#define ctrl_x_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_x)
+#define ctrl_y_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_y)
+#define ctrl_z_key              ((Common::KBD_CTRL << 16) | Common::KEYCODE_z)
 
 #define KEYS_MAX_BUF_CHARS        32
 

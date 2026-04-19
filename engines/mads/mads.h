@@ -49,6 +49,21 @@ enum ScreenFade {
 	SCREEN_FADE_FAST = 2
 };
 
+enum MADSActions {
+	kActionNone,
+	kActionEscape,
+	kActionGameMenu,
+	kActionSave,
+	kActionRestore,
+	kActionScrollUp,
+	kActionScrollDown,
+	kActionStartGame,
+	kActionResumeGame,
+	kActionShowIntro,
+	kActionCredits,
+	kActionQuotes,
+	kActionRestartAnimation
+};
 
 class MADSEngine : public Engine {
 protected:

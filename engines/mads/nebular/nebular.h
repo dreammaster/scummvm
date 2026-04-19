@@ -47,22 +47,6 @@ namespace MADS {
 #define DEBUG_INTERMEDIATE 2
 #define DEBUG_DETAILED 3
 
-enum MADSActions {
-	kActionNone,
-	kActionEscape,
-	kActionGameMenu,
-	kActionSave,
-	kActionRestore,
-	kActionScrollUp,
-	kActionScrollDown,
-	kActionStartGame,
-	kActionResumeGame,
-	kActionShowIntro,
-	kActionCredits,
-	kActionQuotes,
-	kActionRestartAnimation
-};
-
 class RexNebularEngine : public MADSEngine {
 private:
 	/**
