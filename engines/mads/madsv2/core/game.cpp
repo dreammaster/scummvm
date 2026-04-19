@@ -1387,7 +1387,10 @@ void game_control() {
 
 			kernel_mode = KERNEL_ROOM_PRELOAD;
 
-			player.walker_must_reload = (byte)(!player.walker_is_loaded);
+			// Return of the Phantom has this hardcoded true, due to text cutscenes like
+			// "5 Minutes Later" zeroing out the palette
+			player.walker_must_reload = (byte)(g_engine->getGameID() == GType_Phantom ||
+				!player.walker_is_loaded);
 
 			quote_emergency = false;
 			/* vocab_emergency = false; */
@@ -1690,9 +1693,7 @@ emergency:
 			kernel_unload_all_series();
 		}
 
-		/* player_dump_walker(); */
-
-		if (room_id != KERNEL_RESTORING_GAME) {
+		if (room_id != KERNEL_RESTORING_GAME && g_engine->getGameID() == GType_Forest) {
 			if (int_sprite[fx_int_journal] != -1) {
 				matte_deallocate_series(int_sprite[fx_int_candle_on], true);
 				matte_deallocate_series(int_sprite[fx_int_dooropen], true);
