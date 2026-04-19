@@ -62,6 +62,7 @@ MODULE_OBJS += \
 	forest/game_forest.o \
 	forest/forest_scenes.o \
 	forest/globals_forest.o \
+	madsv2/console.o \
 	madsv2/engine.o \
 	madsv2/core/anim.o \
 	madsv2/core/attr.o \

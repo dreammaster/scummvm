@@ -20,6 +20,7 @@
  */
 
 #include "engines/util.h"
+#include "mads/madsv2/console.h"
 #include "mads/madsv2/core/conv.h"
 #include "mads/madsv2/core/copy.h"
 #include "mads/madsv2/core/env.h"
@@ -52,9 +53,14 @@ Common::Error PhantomEngine::run() {
 	_screen = new Graphics::Screen();
 	scr_live.data = (byte *)_screen->getPixels();
 
+	// Create a debugger console
+	setDebugger(new Console());
+
+	// Set up sound manager
 	_soundManager = new PhantomSoundManager(_mixer, _soundFlag);
 	_soundManager->validate();
 
+	// Run the game
 	Phantom::phantom_main();
 
 	return Common::kNoError;

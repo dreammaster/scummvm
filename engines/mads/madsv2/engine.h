@@ -33,7 +33,6 @@
 #include "mads/madsv2/core/speech.h"
 
 namespace MADS {
-
 namespace MADSV2 {
 
 class MADSV2Engine : public MADSEngine {
