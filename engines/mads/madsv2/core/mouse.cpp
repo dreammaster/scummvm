@@ -137,11 +137,17 @@ void mouse_cursor_sprite(SeriesPtr series, int id) {
 		if (work_area[16][count] != 255) hot_x = count;
 	}
 
-	if (work_area[0][16] == 9 && work_area[16][0] == 9) {
-		work_area[0][16] = work_area[16][0] = 0xff;
-	}
+	// Form a 16x16 surface around the data, ignoring the last column/row,
+	// which are only used for designating the hotspot position
+	Graphics::Surface s;
+	s.format = Graphics::PixelFormat::createFormatCLUT8();
+	s.setPixels(work_area);
+	s.w = 16;
+	s.pitch = 17;
+	s.h = 16;
 
-	CursorMan.replaceCursor(load_buffer.data, load_buffer.x, load_buffer.y, hot_x, hot_y, 0xff);
+	// Set the cursor
+	CursorMan.replaceCursor(s, hot_x, hot_y, 0xff);
 	CursorMan.disableCursorPalette(true);
 }
 
