@@ -20,6 +20,7 @@
  */
 
 #include "common/textconsole.h"
+#include "mads/madsv2/core/matte.h"
 #include "mads/madsv2/core/extra.h"
 
 namespace MADS {
@@ -63,7 +64,7 @@ void stamp_sprite_to_interface(int x, int y, int sprite, int series) {
 }
 
 void delete_sprite_in_interface(int series) {
-	error("TODO: delete_sprite_in_interface");
+	matte_deallocate_series(series, false);
 }
 
 void extra_change_animation(int handle, int x, int y, byte scale, byte depth) {
