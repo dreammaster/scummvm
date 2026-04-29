@@ -37,15 +37,29 @@ class OPL;
 
 namespace MADS {
 
+struct CachedDataEntry {
+	int _offset;
+	byte *_data;
+	byte *_dataEnd;
+};
+
 class SoundDriver {
 protected:
 	Audio::Mixer *_mixer;
 	OPL::OPL *_opl;
+	Common::File _soundFile;
+	Common::List<CachedDataEntry> _dataCache;
+	int _dataOffset;
+
+	/**
+	 * Loads a data block from the sound file, caching the result for any future
+	 * calls for the same data
+	 */
+	byte *loadData(int offset, int size);
 
 public:
-	SoundDriver(Audio::Mixer *mixer, OPL::OPL *opl) : _mixer(mixer), _opl(opl) {}
-	virtual ~SoundDriver() {
-	}
+	SoundDriver(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset);
+	virtual ~SoundDriver();
 
 	/**
 	 * Execute a player command. Most commands represent sounds to play, but some

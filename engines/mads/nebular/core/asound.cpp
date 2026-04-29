@@ -155,11 +155,7 @@ AdlibSample::AdlibSample(Common::SeekableReadStream &s) {
 /*-----------------------------------------------------------------------*/
 
 ASound::ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset) :
-	SoundDriver(mixer, opl) {
-	// Open up the appropriate sound file
-	if (!_soundFile.open(filename))
-		error("Could not open file - %s", filename.toString().c_str());
-
+	SoundDriver(mixer, opl, filename, dataOffset) {
 	// Initialize fields
 	_commandParam = 0;
 	_activeChannelPtr = nullptr;
@@ -199,11 +195,6 @@ ASound::ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
 
 	AdlibChannel::_channelsEnabled = false;
 
-	// Store passed parameters, and setup OPL
-	_dataOffset = dataOffset;
-	_mixer = mixer;
-	_opl = opl;
-
 	// Initialize the Adlib
 	adlibInit();
 
@@ -212,15 +203,6 @@ ASound::ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
 
 	_opl->start(new Common::Functor0Mem<void, ASound>(this, &ASound::onTimer), CALLBACKS_PER_SECOND);
 }
-
-ASound::~ASound() {
-	_opl->stop();
-
-	Common::List<CachedDataEntry>::iterator i;
-	for (i = _dataCache.begin(); i != _dataCache.end(); ++i)
-		delete[](*i)._data;
-}
-
 
 void ASound::adlibInit() {
 	write(4, 0x60);
@@ -314,28 +296,6 @@ void ASound::resultCheck() {
 		_resultFlag = 1;
 		_pollResult = 1;
 	}
-}
-
-byte *ASound::loadData(int offset, int size) {
-	// First scan for an existing copy
-	Common::List<CachedDataEntry>::iterator i;
-	for (i = _dataCache.begin(); i != _dataCache.end(); ++i) {
-		CachedDataEntry &e = *i;
-		if (e._offset == offset)
-			return e._data;
-	}
-
-	// No existing entry found, so load up data and store as a new entry
-	CachedDataEntry rec;
-	rec._offset = offset;
-	rec._data = new byte[size];
-	rec._dataEnd = rec._data + size - 1;
-	_soundFile.seek(_dataOffset + offset);
-	_soundFile.read(rec._data, size);
-	_dataCache.push_back(rec);
-
-	// Return the data
-	return rec._data;
 }
 
 void ASound::playSound(int offset, int size) {

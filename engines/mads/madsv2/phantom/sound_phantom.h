@@ -22,14 +22,11 @@
 #ifndef MADS_PHANTOM_SOUND_H
 #define MADS_PHANTOM_SOUND_H
 
-#include "mads/nebular/core/asound.h"
+#include "mads/madsv2/core/asound.h"
 
 namespace MADS {
 namespace MADSV2 {
 namespace Phantom {
-
-using Nebular::AdlibChannel;
-using Nebular::AdlibSample;
 
 class PhantomSoundManager : public SoundManager {
 protected:
@@ -42,29 +39,6 @@ public:
 	}
 
 	void validate() override;
-};
-
-class PhantomASound : public Nebular::ASound {
-protected:
-	// Per-driver scripting register file (256 byte-sized registers)
-	byte _scratchArr[256];
-
-	// Music synchronisation state variables (mirrors word_11F32 etc.)
-	int _w11F32 = 0, _w11F42 = 0, _w11F44 = 0;
-	int _w11F46 = 0, _w11F48 = 0, _w11F4A = 0;
-	int _w11F4C = 0, _w11F4E = 0, _w11F50 = 0;
-
-	void channelCommand(byte *&pSrc, bool &updateFlag) override;
-
-public:
-	/**
-	 * Constructor
-	 * @param mixer			Mixer
-	 * @param opl			OPL
-	 * @param filename		Specifies the adlib sound player file to use
-	 * @param dataOffset	Offset in the file of the data segment
-	 */
-	PhantomASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset);
 };
 
 /**
@@ -85,7 +59,7 @@ public:
  * randomly picks from four music loaders and plays it, storing the choice
  * in _musicIndex (mirrors word_11F5E in the original).
  */
-class ASound1 : public PhantomASound {
+class ASound1 : public ASound {
 private:
 	typedef int (ASound1::*CommandPtr)();
 	static const CommandPtr _commandList[40];
@@ -141,7 +115,7 @@ public:
  *   asound_commands4: commands 32–35  (max=0x23, base=0x20, 4 entries)
  *   asound_commands5: commands 64–72  (max=0x48, base=0x40, 9 entries)
  */
-class ASound2 : public PhantomASound {
+class ASound2 : public ASound {
 private:
 	typedef int (ASound2::*CommandPtr)();
 	static const CommandPtr _commandList[73];
@@ -195,7 +169,7 @@ public:
  *   asound_commands5: commands 64–75  (max=0x4B, base=0x40, 12 entries)
  *     (command 76 = nullsub_8, silently ignored by bounds check)
  */
-class ASound3 : public PhantomASound {
+class ASound3 : public ASound {
 private:
 	typedef int (ASound3::*CommandPtr)();
 	static const CommandPtr _commandList[77];
@@ -259,7 +233,7 @@ public:
  *
  * commands 24 and 25 share the same handler (sub_11D0A).
  */
-class ASound4 : public PhantomASound {
+class ASound4 : public ASound {
 private:
 	typedef int (ASound4::*CommandPtr)();
 	static const CommandPtr _commandList[71];
@@ -309,7 +283,7 @@ public:
  * commands 36/35/34 load channels in non-sequential data order.
  * commands 70, 77, and 78 all play the same 0x40BA sound block.
  */
-class ASound5 : public PhantomASound {
+class ASound5 : public ASound {
 private:
 	typedef int (ASound5::*CommandPtr)();
 	static const CommandPtr _commandList[79];
@@ -362,7 +336,7 @@ public:
 	int command(int commandId, int param) override;
 };
 
-class ASound9 : public PhantomASound {
+class ASound9 : public ASound {
 private:
 	typedef int (ASound9:: *CommandPtr)();
 	int command0() override;

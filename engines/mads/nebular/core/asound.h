@@ -131,18 +131,11 @@ struct RegisterValue {
 #define ADLIB_CHANNEL_MIDWAY 5
 #define CALLBACKS_PER_SECOND 60
 
-struct CachedDataEntry {
-	int _offset;
-	byte *_data;
-	byte *_dataEnd;
-};
-
 /**
  * Base class for the sound player resource files
  */
 class ASound : public SoundDriver {
 private:
-	Common::List<CachedDataEntry> _dataCache;
 	uint16 _randomSeed;
 	int _masterVolume;
 
@@ -233,12 +226,6 @@ protected:
 	void resultCheck();
 
 	/**
-	 * Loads a data block from the sound file, caching the result for any future
-	 * calls for the same data
-	 */
-	byte *loadData(int offset, int size);
-
-	/**
 	 * Play the specified sound
 	 * @param offset	Offset of sound data within sound player data segment
 	 * @param size		Size of sound data block
@@ -292,10 +279,8 @@ public:
 	AdlibChannelData _channelData[11];
 	Common::Array<AdlibSample> _samples;
 	AdlibSample *_samplePtr;
-	Common::File _soundFile;
 	Common::Queue<RegisterValue> _queue;
 	Common::Mutex _driverMutex;
-	int _dataOffset;
 	int _frameCounter;
 	bool _isDisabled;
 	int _v1;
@@ -331,7 +316,8 @@ public:
 	/**
 	 * Destructor
 	 */
-	~ASound() override;
+	~ASound() override {
+	}
 
 	/**
 	 * Validates the Adlib sound files

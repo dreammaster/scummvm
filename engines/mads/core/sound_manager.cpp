@@ -121,4 +121,44 @@ void SoundManager::noise() {
 		_driver->noise();
 }
 
+//====================================================================
+
+SoundDriver::SoundDriver(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset) :
+	_mixer(mixer), _opl(opl), _dataOffset(dataOffset) {
+	// Open up the appropriate sound file
+	if (!_soundFile.open(filename))
+		error("Could not open file - %s", filename.toString().c_str());
+}
+
+SoundDriver::~SoundDriver() {
+	_opl->stop();
+
+	Common::List<CachedDataEntry>::iterator i;
+	for (i = _dataCache.begin(); i != _dataCache.end(); ++i)
+		delete[](*i)._data;
+}
+
+byte *SoundDriver::loadData(int offset, int size) {
+	// First scan for an existing copy
+	Common::List<CachedDataEntry>::iterator i;
+	for (i = _dataCache.begin(); i != _dataCache.end(); ++i) {
+		CachedDataEntry &e = *i;
+		if (e._offset == offset)
+			return e._data;
+	}
+
+	// No existing entry found, so load up data and store as a new entry
+	CachedDataEntry rec;
+	rec._offset = offset;
+	rec._data = new byte[size];
+	rec._dataEnd = rec._data + size - 1;
+	_soundFile.seek(_dataOffset + offset);
+	_soundFile.read(rec._data, size);
+	_dataCache.push_back(rec);
+
+	// Return the data
+	return rec._data;
+}
+
+
 } // namespace MADS
