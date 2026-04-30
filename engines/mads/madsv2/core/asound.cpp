@@ -32,10 +32,10 @@ bool AdlibChannel::_isDisabled;
  * ========================================================================= */
 
  /*
-  * byte_12072 - Patch-attenuation to OPL total-level conversion table.
+  * PATCH_ATTEN_TO_TL - Patch-attenuation to OPL total-level conversion table.
   * Index is the patchAttenuation value (0-127); output is the 6-bit TL field.
   */
-static const uint8 byte_12072[128] = {
+static const uint8 PATCH_ATTEN_TO_TL[128] = {
 	0x3F,0x36,0x31,0x2D,0x2A,0x28,0x26,0x24,0x22,0x21,0x20,
 	0x1F,0x1E,0x1D,0x1C,0x1B,0x1A,0x19,0x19,0x18,0x17,0x17,
 	0x16,0x16,0x15,0x15,0x14,0x14,0x13,0x13,0x12,0x12,0x12,
@@ -51,10 +51,10 @@ static const uint8 byte_12072[128] = {
 };
 
 /*
- * byte_120F2 - Volume/velocity to OPL attenuation step table.
+ * VOL_VEL_TO_ATTEN_STEP - Volume/velocity to OPL attenuation step table.
  * 128 entries; each group of 4 maps to the same step value (1..32).
  */
-static const uint8 byte_120F2[128] = {
+static const uint8 VOL_VEL_TO_ATTEN_STEP[128] = {
 	0x01,0x01,0x01,0x01, 0x02,0x02,0x02,0x02, 0x03,0x03,0x03,0x03,
 	0x04,0x04,0x04,0x04, 0x05,0x05,0x05,0x05, 0x06,0x06,0x06,0x06,
 	0x07,0x07,0x07,0x07, 0x08,0x08,0x08,0x08, 0x09,0x09,0x09,0x09,
@@ -68,32 +68,32 @@ static const uint8 byte_120F2[128] = {
 	0x1F,0x1F,0x1F,0x1F, 0x20,0x20,0x20,0x20
 };
 
-/* Carrier operator slot offset per voice (byte_12190, index 0 = unused pad) */
-static const uint8 byte_12190[18] = {
+/* Carrier operator slot offset per voice (CARRIER_SLOT_FOR_VOICE, index 0 = unused pad) */
+static const uint8 CARRIER_SLOT_FOR_VOICE[18] = {
 	0,3,1,4,2,5,6,9,10,8,11,12,15,13,16,14,17,0
 };
 
 /*
- * byte_12191 - Modulator operator slot offset per voice.
+ * MODULATOR_SLOT_FOR_VOICE - Modulator operator slot offset per voice.
  * 17 entries used (voices 0-8 -> modulator slots, voices 0-8 -> carrier slots).
  */
-static const uint8 byte_12191[17] = {
+static const uint8 MODULATOR_SLOT_FOR_VOICE[17] = {
 	3,1,4,2,5,6,9,7,10,8,11,12,15,13,16,14,17
 };
 
 /*
- * byte_121A2 - Operator slot index to OPL register offset.
+ * SLOT_TO_REG_OFFSET - Operator slot index to OPL register offset.
  * Maps an operator slot (0-17) to its base register offset within a group.
  */
-static const uint8 byte_121A2[18] = {
+static const uint8 SLOT_TO_REG_OFFSET[18] = {
 	0,1,2,3,4,5,8,9,10,11,12,13,16,17,18,19,20,21
 };
 
 /*
- * word_12174 - F-number table: one entry per semitone within an octave.
+ * SEMITONE_FREQ_TABLE - F-number table: one entry per semitone within an octave.
  * 12 entries (C through B).
  */
-static const uint16 word_12174[12] = {
+static const uint16 SEMITONE_FREQ_TABLE[12] = {
 	0x0200,0x021E,0x023F,0x0261,0x0285,0x02AB,
 	0x02D4,0x02FF,0x032D,0x035D,0x0390,0x03C7
 };
@@ -296,7 +296,7 @@ int ASound::command6() {
 	_channel2._savedFreqSweep = _channel2._freqSweepCounter;
 	_channel3._savedFreqSweep = _channel3._freqSweepCounter;
 	_channel4._savedFreqSweep = _channel4._freqSweepCounter;
-	byte_16B5D = byte_16B5C;   /* channel5 shadow */
+	_ch5SweepSaved = _ch5SweepLive;   /* channel5 shadow */
 	_channel6._savedFreqSweep = _channel6._freqSweepCounter;
 	_channel7._savedFreqSweep = _channel7._freqSweepCounter;
 	_channel8._savedFreqSweep = _channel8._freqSweepCounter;
@@ -307,7 +307,7 @@ int ASound::command6() {
 	_channel2._freqSweepCounter = 0;
 	_channel3._freqSweepCounter = 0;
 	_channel4._freqSweepCounter = 0;
-	byte_16B5C = 0;
+	_ch5SweepLive = 0;
 	_channel6._freqSweepCounter = 0;
 	_channel7._freqSweepCounter = 0;
 	_channel8._freqSweepCounter = 0;
@@ -347,7 +347,7 @@ int ASound::command7() {
 		_channel2._savedFreqSweep |
 		_channel3._savedFreqSweep |
 		_channel4._savedFreqSweep |
-		byte_16B5D |
+		_ch5SweepSaved |
 		_channel6._savedFreqSweep |
 		_channel7._savedFreqSweep |
 		_channel8._savedFreqSweep;
@@ -359,7 +359,7 @@ int ASound::command7() {
 		_channel2._savedFreqSweep = _channel2._freqSweepCounter;
 		_channel3._savedFreqSweep = _channel3._freqSweepCounter;
 		_channel4._savedFreqSweep = _channel4._freqSweepCounter;
-		byte_16B5D = byte_16B5C;
+		_ch5SweepSaved = _ch5SweepLive;
 		_channel6._savedFreqSweep = _channel6._freqSweepCounter;
 		_channel7._savedFreqSweep = _channel7._freqSweepCounter;
 		_channel8._savedFreqSweep = _channel8._freqSweepCounter;
@@ -377,7 +377,7 @@ int ASound::command8() {
 	result |= _channel2._activeCount;
 	result |= _channel3._activeCount;
 	result |= _channel4._activeCount;
-	result |= (uint8)(_channel5._activeCount); /* byte_16B63 area */
+	result |= (uint8)(_channel5._activeCount); /* _ch5PendingStop area */
 	result |= _channel6._activeCount;
 	result |= _channel7._activeCount;
 	result |= _channel8._activeCount;
@@ -439,9 +439,9 @@ void ASound::signalSoundPlaying() {
 }
 
 void ASound::clearCallback() {
-	word_12C06 = 0;
-	word_12C08 = 0;
-	word_12C0A = 0;
+	_callbackCounter = 0;
+	_callbackPeriod = 0;
+	_callbackFnPtr = 0;
 }
 
 /* =========================================================================
@@ -451,23 +451,23 @@ void ASound::clearCallback() {
  *
  * Two paths depending on _adlib_v5660_2:
  *   < 0x18  -> simple linear mapping of (volume + velocity) -> TL
- *   >= 0x18 -> patch-attenuation-aware mapping using byte_12072 table
+ *   >= 0x18 -> patch-attenuation-aware mapping using PATCH_ATTEN_TO_TL table
  * ========================================================================= */
 
 void ASound::writeVolume() {
 	AdlibChannel *ch = _activeChannelPtr;
 	int16_t var4, var6 = 0;
 
-	/* Step 1: map volume through byte_120F2 */
-	int16_t volStep = (int16_t)byte_120F2[(uint8)ch->_volume];
-	/* Step 2: map velocity through byte_120F2 */
-	int16_t velStep = (int16_t)byte_120F2[(int8_t)ch->_velocity];
+	/* Step 1: map volume through VOL_VEL_TO_ATTEN_STEP */
+	int16_t volStep = (int16_t)VOL_VEL_TO_ATTEN_STEP[(uint8)ch->_volume];
+	/* Step 2: map velocity through VOL_VEL_TO_ATTEN_STEP */
+	int16_t velStep = (int16_t)VOL_VEL_TO_ATTEN_STEP[(int8_t)ch->_velocity];
 	int16_t var8 = volStep + velStep - 1;   /* combined attenuation step */
 
 	/* Determine carrier operator register for this voice */
 	uint8 chanNum = _activeChannelNumber;
-	uint8 slot = byte_12191[chanNum * 2];          /* modulator slot index */
-	uint8 regOff = byte_121A2[slot];
+	uint8 slot = MODULATOR_SLOT_FOR_VOICE[chanNum * 2];          /* modulator slot index */
+	uint8 regOff = SLOT_TO_REG_OFFSET[slot];
 	uint16 siReg = (uint16)regOff + 0x40;         /* TL register base */
 
 	/* KSL flags from port shadow */
@@ -483,21 +483,21 @@ void ASound::writeVolume() {
 		/* ---- OPL3 patch-attenuation path ---- */
 		/* Modulator TL */
 		int16_t patchAtt = (int16_t)ch->_patchAttenuation;
-		int16_t tl1 = byte_12072[patchAtt];
+		int16_t tl1 = PATCH_ATTEN_TO_TL[patchAtt];
 		var4 = -(tl1 - var8);           /* negate of (table[patchAtt] - combined) */
 		if (var4 < 0)  var4 = 0;
 		if (var4 > 63) var4 = 63;
 		var4 = (0x3F - var4) | kslBits;
 		write((uint8)siReg, (uint8)var4);
 
-		/* Carrier TL (uses complementary lookup at unk_120F1 - patchAtt) */
-		int16_t tl2 = byte_12072[127 - patchAtt];   /* unk_120F1 offset */
+		/* Carrier TL (uses complementary lookup at PATCH_ATTEN_TO_TL - patchAtt) */
+		int16_t tl2 = PATCH_ATTEN_TO_TL[127 - patchAtt];   /* PATCH_ATTEN_TO_TL offset */
 		var6 = -(tl2 - var8);
 		if (var6 < 0)  var6 = 0;
 		if (var6 > 63) var6 = 63;
 		/* carrier register */
-		uint8 cslot = byte_12190[chanNum * 2];
-		uint8 cregOff = byte_121A2[cslot];
+		uint8 cslot = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
+		uint8 cregOff = SLOT_TO_REG_OFFSET[cslot];
 		uint16 cReg = (uint16)cregOff + 0x40;
 		uint8  cksl = _adlibPorts[cReg] & 0xC0;
 		var6 = (0x3F - var6) | cksl;
@@ -516,8 +516,8 @@ void ASound::writeVolume() {
 		return;   /* FM: only one operator carries volume */
 
 	/* Second operator TL register */
-	uint8 slot2 = byte_12190[chanNum * 2];
-	uint8 roff2 = byte_121A2[slot2];
+	uint8 slot2 = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 roff2 = SLOT_TO_REG_OFFSET[slot2];
 	uint16 siReg2 = (uint16)roff2 + 0x40;
 	uint8  ksl2 = _adlibPorts[siReg2] & 0xC0;
 
@@ -532,14 +532,14 @@ void ASound::writeVolume() {
 		write((uint8)siReg2, (uint8)val2);
 	} else {
 		int16_t patchAtt2 = (int16_t)ch->_patchAttenuation;
-		int16_t tl1b = byte_12072[patchAtt2];
+		int16_t tl1b = PATCH_ATTEN_TO_TL[patchAtt2];
 		var4 = -(tl1b - var8b);
 		if (var4 < 0)  var4 = 0;
 		if (var4 > 63) var4 = 63;
 		var4 = (0x3F - var4) | ksl2;
 		write((uint8)siReg2, (uint8)var4);
 
-		int16_t tl2b = byte_12072[127 - patchAtt2];
+		int16_t tl2b = PATCH_ATTEN_TO_TL[127 - patchAtt2];
 		var6 = -(tl2b - var8b);
 		if (var6 < 0)  var6 = 0;
 		if (var6 > 63) var6 = 63;
@@ -568,7 +568,7 @@ void ASound::writeFrequency() {
 	}
 
 	/* F-number from table, offset by transpose */
-	int16_t fnumLow = (int16_t)word_12174[semi] + (int16_t)(int8_t)ch->_transpose;
+	int16_t fnumLow = (int16_t)SEMITONE_FREQ_TABLE[semi] + (int16_t)(int8_t)ch->_transpose;
 
 	/* Write F-number low byte to 0xA0+ch */
 	write((uint8)aReg, (uint8)fnumLow);
@@ -635,17 +635,17 @@ void ASound::noteOn() {
 
 void ASound::writeSampleRegs() {
 	AdlibSample *smp = _samplePtr;
-	uint16 base = word_16CF6;
+	uint16 base = _currentOpBase;
 
 	/* --- Register 0xBD: Percussion/tremolo/vibrato depth --- */
 	uint8 bdVal = 0;
-	if (byte_1218C != 1) bdVal |= 0x80;
-	if (byte_1218D != 1) bdVal |= 0x40;
+	if (_rhythmHiHat != 1) bdVal |= 0x80;
+	if (_rhythmCymbal != 1) bdVal |= 0x40;
 	bdVal |= _adlibPorts[0xBD] & 0x3F;
 	write(0xBD, bdVal);
 
 	/* --- Register 0x08: Note-select (CSM/keyboardsplit) --- */
-	uint8 ns = (byte_1218E != 1) ? 0x40 : 0x00;
+	uint8 ns = (_rhythmEnable != 1) ? 0x40 : 0x00;
 	write(0x08, ns);
 
 	/* --- Register 0xC0+voice: Feedback / algorithm --- */
@@ -679,20 +679,20 @@ void ASound::loadSample() {
 	uint8 chanNum = _activeChannelNumber;
 
 	/* --- Silence modulator operator first --- */
-	uint8 mSlot = byte_12191[chanNum * 2];
-	uint8 mReg = byte_121A2[mSlot];
-	word_16CF6 = mReg;
+	uint8 mSlot = MODULATOR_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 mReg = SLOT_TO_REG_OFFSET[mSlot];
+	_currentOpBase = mReg;
 
-	write((uint8)(word_16CF6 + 0x80), 0xFF);  /* max release */
-	write((uint8)(word_16CF6 + 0x40), 63);    /* full attenuation */
+	write((uint8)(_currentOpBase + 0x80), 0xFF);  /* max release */
+	write((uint8)(_currentOpBase + 0x40), 63);    /* full attenuation */
 
 	/* --- Silence carrier operator --- */
-	uint8 cSlot = byte_12190[chanNum * 2];
-	uint8 cReg = byte_121A2[cSlot];
-	word_16CF6 = (uint16)cReg;
+	uint8 cSlot = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 cReg = SLOT_TO_REG_OFFSET[cSlot];
+	_currentOpBase = (uint16)cReg;
 
-	write((uint8)(word_16CF6 + 0x80), 0xFF);
-	write((uint8)(word_16CF6 + 0x40), 63);
+	write((uint8)(_currentOpBase + 0x80), 0xFF);
+	write((uint8)(_currentOpBase + 0x40), 63);
 
 	/* --- Set active register for C0 writes --- */
 	_activeChannelReg = (uint16)chanNum;
@@ -702,30 +702,30 @@ void ASound::loadSample() {
 	_samplePtr = &_samples[sampleIdx];
 
 	/* Modulator operator regs (operator 1) */
-	uint8 ms1 = byte_12191[chanNum * 2];
-	uint8 mr1 = byte_121A2[ms1];
-	word_16CF6 = (uint16)mr1;
+	uint8 ms1 = MODULATOR_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 mr1 = SLOT_TO_REG_OFFSET[ms1];
+	_currentOpBase = (uint16)mr1;
 	writeSampleRegs();
 
 	/* Carrier operator regs (operator 2, offset by 490 bytes = next pair) */
 	_samplePtr = (AdlibSample *)((uint8 *)&_samples[sampleIdx] + 490);
 
-	uint8 ms2 = byte_12190[chanNum * 2];
-	uint8 mr2 = byte_121A2[ms2];
-	word_16CF6 = (uint16)mr2;
+	uint8 ms2 = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 mr2 = SLOT_TO_REG_OFFSET[ms2];
+	_currentOpBase = (uint16)mr2;
 	writeSampleRegs();
 
 	/* Write carrier TL: noteOffset shifts the level */
 	AdlibSample *smp2 = _samplePtr;
 	uint8 noteOffBits = (uint8)((smp2->_attackRate << 6) | 0x3F);
-	write((uint8)(word_16CF6 + 0x40), noteOffBits);
+	write((uint8)(_currentOpBase + 0x40), noteOffBits);
 
 	/* --- Third operator (if present, offset 0x2C * sampleIndex[5]) --- */
 	int smp3idx = (int)ch->_noteOffset;
 	_samplePtr = &_samples[smp3idx * 2];
 
-	uint8 s3slot = byte_12190[chanNum * 2];
-	uint8 s3reg = byte_121A2[s3slot];
+	uint8 s3slot = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 s3reg = SLOT_TO_REG_OFFSET[s3slot];
 	uint16 s3Reg = (uint16)s3reg + 0x40;
 
 	AdlibSample *smp3 = _samplePtr;
@@ -761,7 +761,7 @@ void ASound::update1(int channelIndex) {
 	if (ch->_freqSweepCounter == 0)
 		return;
 
-	byte_12036 = 1;
+	_anySweepActive = 1;
 	ch->_freqAccum += ch->_freqStep;
 	ch->_freqSweepCounter--;
 
@@ -799,7 +799,7 @@ void ASound::updateAllChannels() {
 }
 
 void ASound::findFreeChannel(byte *soundData) {
-	byte_12050 = 1;
+	_findChannelMode = 1;
 
 	for (int chan = 0; chan < 6; ++chan) {
 		if (_channels[chan]->_activeCount == 0) {
@@ -814,7 +814,7 @@ void ASound::findFreeChannel(byte *soundData) {
 
 void ASound::findFreeChannelFull(byte *soundData) {
 	int chan;
-	byte_12050 = 2;
+	_findChannelMode = 2;
 
 	// Check channels 6-8 for empty slots
 	for (chan = 6; chan < ADLIB_CHANNEL_COUNT; ++chan) {
@@ -833,7 +833,7 @@ void ASound::findFreeChannelFull(byte *soundData) {
 	}
 
 	// Fall through to check channels 0-5 pending-stop
-	if (byte_16B63 != 0xFF) {
+	if (_ch5PendingStop != 0xFF) {
 		for (chan = 4; chan >= 0; --chan) {
 			if (_channels[chan]->_pendingStop == 0xff) {
 				_channels[chan]->load(soundData);
@@ -1234,7 +1234,7 @@ vol_advance:
 				var_C = *pSrc;
 				pSrc++;
 				byte *base = pSrc;
-				uint8_t  indIdx = byte_16A30[var_6];
+				uint8_t  indIdx = _scriptVars[var_6];
 				uint8_t  chosen = *(base + (uintptr_t)indIdx);
 				uint8_t  target = *(base + var_C);
 				*(base + target + 1) = chosen;
@@ -1250,7 +1250,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				uint8_t val = *pSrc;
-				byte_16A30[var_6] = val;
+				_scriptVars[var_6] = val;
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1262,7 +1262,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] = byte_16A30[var_C];
+				_scriptVars[var_6] = _scriptVars[var_C];
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1275,7 +1275,7 @@ vol_advance:
 				pSrc++;
 				var_C = *pSrc;
 				byte *base = pSrc;
-				uint8_t  src = byte_16A30[var_6];
+				uint8_t  src = _scriptVars[var_6];
 				*(base + var_C + 1) = src;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1286,7 +1286,7 @@ vol_advance:
 			{
 				pSrc++;
 				var_6 = *pSrc;
-				byte_16A30[var_6]++;
+				_scriptVars[var_6]++;
 				ch->_pSrc += 2;
 				goto dispatch;
 			}
@@ -1296,7 +1296,7 @@ vol_advance:
 			{
 				pSrc++;
 				var_6 = *pSrc;
-				byte_16A30[var_6]--;
+				_scriptVars[var_6]--;
 				ch->_pSrc += 2;
 				goto dispatch;
 			}
@@ -1308,7 +1308,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				uint8_t imm = *pSrc;
-				byte_16A30[var_6] += imm;
+				_scriptVars[var_6] += imm;
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1320,7 +1320,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] += byte_16A30[var_C];
+				_scriptVars[var_6] += _scriptVars[var_C];
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1332,7 +1332,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				uint8_t imm = *pSrc;
-				byte_16A30[var_6] -= imm;
+				_scriptVars[var_6] -= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1344,7 +1344,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] -= byte_16A30[var_C];
+				_scriptVars[var_6] -= _scriptVars[var_C];
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1356,7 +1356,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] *= byte_16A30[var_C];
+				_scriptVars[var_6] *= _scriptVars[var_C];
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1368,7 +1368,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				uint8_t imm = *pSrc;
-				byte_16A30[var_6] *= imm;
+				_scriptVars[var_6] *= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1380,7 +1380,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] = (uint8_t)((int8_t)byte_16A30[var_6] / (int8_t)var_C);
+				_scriptVars[var_6] = (uint8_t)((int8_t)_scriptVars[var_6] / (int8_t)var_C);
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1392,7 +1392,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] = (uint8_t)((uint8_t)byte_16A30[var_6] / (uint8_t)byte_16A30[var_C]);
+				_scriptVars[var_6] = (uint8_t)((uint8_t)_scriptVars[var_6] / (uint8_t)_scriptVars[var_C]);
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1404,7 +1404,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] = (uint8_t)((int8_t)byte_16A30[var_6] % (int8_t)var_C);
+				_scriptVars[var_6] = (uint8_t)((int8_t)_scriptVars[var_6] % (int8_t)var_C);
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1416,7 +1416,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] = (uint8_t)((uint8_t)byte_16A30[var_6] % (uint8_t)byte_16A30[var_C]);
+				_scriptVars[var_6] = (uint8_t)((uint8_t)_scriptVars[var_6] % (uint8_t)_scriptVars[var_C]);
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1428,7 +1428,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				uint8_t imm = *pSrc;
-				byte_16A30[var_6] &= imm;
+				_scriptVars[var_6] &= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1440,7 +1440,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] &= byte_16A30[var_C];
+				_scriptVars[var_6] &= _scriptVars[var_C];
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1452,7 +1452,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				uint8_t imm = *pSrc;
-				byte_16A30[var_6] |= imm;
+				_scriptVars[var_6] |= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1464,7 +1464,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] |= byte_16A30[var_C];
+				_scriptVars[var_6] |= _scriptVars[var_C];
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1476,7 +1476,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				uint8_t imm = *pSrc;
-				byte_16A30[var_6] ^= imm;
+				_scriptVars[var_6] ^= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1488,7 +1488,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				byte_16A30[var_6] ^= byte_16A30[var_C];
+				_scriptVars[var_6] ^= _scriptVars[var_C];
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1505,7 +1505,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				uint8_t v = byte_16A30[var_6];
+				uint8_t v = _scriptVars[var_6];
 				if ((uint16_t)var_C == (uint16_t)v) goto branch_taken;
 				goto branch_skip5;
 			}
@@ -1515,7 +1515,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C != (uint16_t)byte_16A30[var_6]) goto branch_taken;
+				if ((uint16_t)var_C != (uint16_t)_scriptVars[var_6]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1524,7 +1524,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C > (uint16_t)byte_16A30[var_6]) goto branch_taken;
+				if ((uint16_t)var_C > (uint16_t)_scriptVars[var_6]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1533,7 +1533,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C >= (uint16_t)byte_16A30[var_6]) goto branch_taken;
+				if ((uint16_t)var_C >= (uint16_t)_scriptVars[var_6]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1542,7 +1542,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if (byte_16A30[var_6] == byte_16A30[var_C]) goto branch_taken;
+				if (_scriptVars[var_6] == _scriptVars[var_C]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1551,7 +1551,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if (byte_16A30[var_6] != byte_16A30[var_C]) goto branch_taken;
+				if (_scriptVars[var_6] != _scriptVars[var_C]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1560,7 +1560,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if (byte_16A30[var_6] > byte_16A30[var_C]) goto branch_taken;
+				if (_scriptVars[var_6] > _scriptVars[var_C]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1569,7 +1569,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if (byte_16A30[var_6] < byte_16A30[var_C]) goto branch_taken;
+				if (_scriptVars[var_6] < _scriptVars[var_C]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1578,7 +1578,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C == (uint16_t)byte_16A30[var_6]) goto branch_taken2;
+				if ((uint16_t)var_C == (uint16_t)_scriptVars[var_6]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1587,7 +1587,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C != (uint16_t)byte_16A30[var_6]) goto branch_taken2;
+				if ((uint16_t)var_C != (uint16_t)_scriptVars[var_6]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1596,7 +1596,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C > (uint16_t)byte_16A30[var_6]) goto branch_taken2;
+				if ((uint16_t)var_C > (uint16_t)_scriptVars[var_6]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1605,7 +1605,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C < (uint16_t)byte_16A30[var_6]) goto branch_taken2;
+				if ((uint16_t)var_C < (uint16_t)_scriptVars[var_6]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1614,7 +1614,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if (byte_16A30[var_6] == byte_16A30[var_C]) goto branch_taken2;
+				if (_scriptVars[var_6] == _scriptVars[var_C]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1623,7 +1623,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if (byte_16A30[var_6] != byte_16A30[var_C]) goto branch_taken2;
+				if (_scriptVars[var_6] != _scriptVars[var_C]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1632,7 +1632,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if (byte_16A30[var_6] > byte_16A30[var_C]) goto branch_taken2;
+				if (_scriptVars[var_6] > _scriptVars[var_C]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1641,7 +1641,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if (byte_16A30[var_6] < byte_16A30[var_C]) goto branch_taken2;
+				if (_scriptVars[var_6] < _scriptVars[var_C]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1692,11 +1692,11 @@ branch_skip5:
 				goto dispatch;
 			}
 
-			/* ---- opcode -63 (0xC1): set word_12070 ---- */
+			/* ---- opcode -63 (0xC1): set _tempoScale ---- */
 			case 1:
 			{
 				pSrc++;
-				word_12070 = *pSrc;
+				_tempoScale = *pSrc;
 				ch->_pSrc += 2;
 				goto dispatch;
 			}
@@ -1705,11 +1705,11 @@ branch_skip5:
 			case 0:
 			{
 				pSrc++;
-				word_12066 = *pSrc;
+				_tempoReload = *pSrc;
 				ch->_pSrc += 2;
 				if (_frameNumber2 != 0)
 					goto dispatch;
-				word_1206E = word_12066;
+				_tempoCurrent = _tempoReload;
 				goto dispatch;
 			}
 

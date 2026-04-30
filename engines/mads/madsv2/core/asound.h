@@ -127,13 +127,13 @@ class ASound : public SoundDriver {
 private:
 	Common::Mutex _driverMutex;
 	Common::Queue< Common::Pair<byte, byte> > _queue;
-	uint16 word_12C06 = 0;  // period counter
-	uint16 word_12C08 = 0;  // period reload
-	uint16 word_12C0A = 0;  // callback function pointer (not used in C)
+	uint16 _callbackCounter = 0;  // period counter
+	uint16 _callbackPeriod = 0;  // period reload
+	uint16 _callbackFnPtr = 0;  // callback function pointer (not used in C)
 	AdlibChannel *_activeChannelPtr = NULL;
 	uint8 _activeChannelNumber = 0;
 	uint16 _activeChannelReg = 0;
-	uint16 word_16CF6 = 0;				// Current operator base
+	uint16 _currentOpBase = 0;				// Current operator base
 	AdlibSample *_samplePtr = NULL;
 	byte *pSrc = nullptr;				// current read pointer
 	uint8 _adlib_v5660_2 = 0;			// OPL version flag
@@ -141,26 +141,26 @@ private:
 	uint16 _resultFlag = 0;
 	uint16 _randomSeed = 0x4D2;
 	uint8  _isDisabled = 0;
-	uint8  byte_12050 = 0;				// findFreeChannel mode
-	uint8  byte_16B5C = 0;				// channel5 savedFreqSweep shadow
-	uint8  byte_16B5D = 0;				// channel5 savedFreqSweep shadow 2
-	uint8  byte_16B63 = 0;				// channel5 pendingStop shadow
-	/* Percussion flags (byte_1218C/D/E) */
-	uint8 byte_1218C;					// rhythm mode: hi-hat
-	uint8 byte_1218D;					// rhythm mode: cymbal
-	uint8 byte_1218E;					// rhythm mode: enable
+	uint8  _findChannelMode = 0;				// findFreeChannel mode
+	uint8  _ch5SweepLive = 0;				// channel5 savedFreqSweep shadow
+	uint8  _ch5SweepSaved = 0;				// channel5 savedFreqSweep shadow 2
+	uint8  _ch5PendingStop = 0;				// channel5 pendingStop shadow
+	/* Percussion flags (_rhythmHiHat/D/E) */
+	uint8 _rhythmHiHat;					// rhythm mode: hi-hat
+	uint8 _rhythmCymbal;					// rhythm mode: cymbal
+	uint8 _rhythmEnable;					// rhythm mode: enable
 
-	uint8 byte_12036 = 0;				// any-sweep-active flag
+	uint8 _anySweepActive = 0;				// any-sweep-active flag
 	int _frameNumber2 = 0;
-	uint8 byte_16A30[32];				// General-purpose script registers
-	uint16 word_12052 = 1;
-	uint16 word_12062 = 0;
-	uint16 word_12066 = 0;
-	uint16 word_12068 = 0;
-	uint16 word_1206A = 0;
-	uint16 word_1206C = 0xA0;
-	uint16 word_1206E = 0x28;
-	uint16 word_12070 = 0x0A;
+	uint8 _scriptVars[32];				// General-purpose script registers
+	uint16 _tickEnabled = 1;
+	uint16 _tickCounter = 0;
+	uint16 _tempoReload = 0;
+	uint16 _tempoTarget = 0;
+	uint16 _tempoShift = 0;
+	uint16 _tempoBase = 0xA0;
+	uint16 _tempoCurrent = 0x28;
+	uint16 _tempoScale = 0x0A;
 
 	/**
 	 * Timer function for OPL
@@ -189,7 +189,7 @@ private:
 	 *
 	 * Two paths depending on _adlib_v5660_2:
 	 *   < 0x18  -> simple linear mapping of (volume + velocity) -> TL
-	 *   >= 0x18 -> patch-attenuation-aware mapping using byte_12072 table
+	 *   >= 0x18 -> patch-attenuation-aware mapping using _patchAttenToTL table
 	 */
 	void writeVolume();
 
@@ -220,7 +220,7 @@ private:
 
 	/**
 	 * Writes a full set of OPL operator registers for the sample pointed to
-	 * by the global asound_samplePtr, using word_16CF6 as the operator base.
+	 * by the global asound_samplePtr, using _currentOpBase as the operator base.
 	 */
 	void writeSampleRegs();
 
@@ -337,7 +337,7 @@ protected:
 	 *
 	 * Searches channels 0-5 for an empty slot, falling through to
 	 * asound_findFreeChannelFull (channels 6-8) if none found.
-	 * byte_12050 == 1 means "only search 0-5".
+	 * _findChannelMode == 1 means "only search 0-5".
 	  */
 	void findFreeChannel(byte *soundData);
 
