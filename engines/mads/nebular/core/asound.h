@@ -129,7 +129,6 @@ struct RegisterValue {
 
 #define ADLIB_CHANNEL_COUNT 9
 #define ADLIB_CHANNEL_MIDWAY 5
-#define CALLBACKS_PER_SECOND 60
 
 /**
  * Base class for the sound player resource files
@@ -310,8 +309,10 @@ public:
 	 * @param opl			OPL
 	 * @param filename		Specifies the adlib sound player file to use
 	 * @param dataOffset	Offset in the file of the data segment
+	 * @param dataSize		Size of the data segment
 	 */
-	ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset);
+	ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
+		int dataOffset, int dataSize);
 
 	/**
 	 * Destructor
@@ -345,11 +346,6 @@ public:
 	int getFrameCounter() {
 		return _frameCounter;
 	}
-
-	/**
-	 * Return the cached data block record for previously loaded sound data
-	 */
-	CachedDataEntry &getCachedData(byte *pData);
 
 	/**
 	 * Set the volume

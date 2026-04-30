@@ -110,7 +110,7 @@ void AdlibChannel::load(byte *pData) {
 	_field17 = 0;
 	_field19 = 0;
 
-	CachedDataEntry &cacheEntry = _owner->getCachedData(pData);
+	auto &cacheEntry = _owner->getCachedData(pData);
 	_ptrEnd = cacheEntry._dataEnd;
 }
 
@@ -154,8 +154,8 @@ AdlibSample::AdlibSample(Common::SeekableReadStream &s) {
 
 /*-----------------------------------------------------------------------*/
 
-ASound::ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset) :
-	SoundDriver(mixer, opl, filename, dataOffset) {
+ASound::ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
+		int dataOffset, int dataSize) : SoundDriver(mixer, opl, filename, dataOffset, dataSize) {
 	// Initialize fields
 	_commandParam = 0;
 	_activeChannelPtr = nullptr;
@@ -240,27 +240,6 @@ void ASound::noise() {
 	if (_v2) {
 		setFrequency(_channelNum2, (randomVal & _freqMask2) + _freqBase2);
 	}
-}
-
-byte *ASound::getDataPtr(int nearPtr) {
-	for (auto i = _dataCache.begin(); i != _dataCache.end(); ++i) {
-		CachedDataEntry &e = *i;
-		int entrySize = (int)(e._dataEnd - e._data) + 1;
-		if (nearPtr >= e._offset && nearPtr < e._offset + entrySize)
-			return e._data + (nearPtr - e._offset);
-	}
-	return nullptr;
-}
-
-CachedDataEntry &ASound::getCachedData(byte *pData) {
-	Common::List<CachedDataEntry>::iterator i;
-	for (i = _dataCache.begin(); i != _dataCache.end(); ++i) {
-		CachedDataEntry &e = *i;
-		if (e._data == pData)
-			return e;
-	}
-
-	error("Could not find previously loaded data");
 }
 
 void ASound::write(int reg, int val) {

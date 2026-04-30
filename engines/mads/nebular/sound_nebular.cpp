@@ -21,6 +21,7 @@
 
 #include "audio/fmopl.h"
 #include "common/algorithm.h"
+#include "common/file.h"
 #include "common/md5.h"
 #include "mads/nebular/sound_nebular.h"
 
@@ -96,8 +97,8 @@ void RexSoundManager::loadDriver(int sectionNumber) {
 /*-----------------------------------------------------------------------*/
 
 RexASound::RexASound(Audio::Mixer *mixer, OPL::OPL *opl,
-		const Common::Path &filename, int dataOffset) :
-		ASound(mixer, opl, filename, dataOffset) {
+		const Common::Path &filename, int dataOffset, int dataSize) :
+		ASound(mixer, opl, filename, dataOffset, dataSize) {
 	_chanCommandCount = 15;
 }
 
@@ -279,13 +280,13 @@ const ASound1::CommandPtr ASound1::_commandList[42] = {
 };
 
 ASound1::ASound1(Audio::Mixer *mixer, OPL::OPL *opl)
-	: RexASound(mixer, opl, "asound.001", 0x1520) {
+	: RexASound(mixer, opl, "asound.001", 0x1520, 0x17b0) {
 	_cmd23Toggle = false;
 
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x12C);
+	auto samplesStream = getDataStream(0x12C);
 	for (int i = 0; i < 98; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound1::command(int commandId, int param) {
@@ -579,13 +580,14 @@ const ASound2::CommandPtr ASound2::_commandList[44] = {
 	&ASound2::command40, &ASound2::command41, &ASound2::command42, &ASound2::command43
 };
 
-ASound2::ASound2(Audio::Mixer *mixer, OPL::OPL *opl) : RexASound(mixer, opl, "asound.002", 0x15E0) {
+ASound2::ASound2(Audio::Mixer *mixer, OPL::OPL *opl) :
+		RexASound(mixer, opl, "asound.002", 0x15E0, 0x4b70) {
 	_command12Param = 0xFD;
 
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x144);
+	auto samplesStream = getDataStream(0x144);
 	for (int i = 0; i < 164; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound2::command(int commandId, int param) {
@@ -950,13 +952,14 @@ const ASound3::CommandPtr ASound3::_commandList[61] = {
 	&ASound3::command60
 };
 
-ASound3::ASound3(Audio::Mixer *mixer, OPL::OPL *opl) : RexASound(mixer, opl, "asound.003", 0x15B0) {
+ASound3::ASound3(Audio::Mixer *mixer, OPL::OPL *opl) :
+		RexASound(mixer, opl, "asound.003", 0x15B0, 0x5020) {
 	_command39Flag = false;
 
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x122);
+	auto samplesStream = getDataStream(0x122);
 	for (int i = 0; i < 192; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound3::command(int commandId, int param) {
@@ -1354,11 +1357,12 @@ const ASound4::CommandPtr ASound4::_commandList[61] = {
 	&ASound4::command60
 };
 
-ASound4::ASound4(Audio::Mixer *mixer, OPL::OPL *opl) : RexASound(mixer, opl, "asound.004", 0x14F0) {
+ASound4::ASound4(Audio::Mixer *mixer, OPL::OPL *opl) :
+		RexASound(mixer, opl, "asound.004", 0x14F0, 0x2930) {
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x122);
+	auto samplesStream = getDataStream(0x122);
 	for (int i = 0; i < 210; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound4::command(int commandId, int param) {
@@ -1610,11 +1614,12 @@ const ASound5::CommandPtr ASound5::_commandList[42] = {
 	&ASound5::command40, &ASound5::command41
 };
 
-ASound5::ASound5(Audio::Mixer *mixer, OPL::OPL *opl) : RexASound(mixer, opl, "asound.002", 0x15E0) {
+ASound5::ASound5(Audio::Mixer *mixer, OPL::OPL *opl) :
+		RexASound(mixer, opl, "asound.005", 0x15E0, 0x2200) {
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x144);
+	auto samplesStream = getDataStream(0x144);
 	for (int i = 0; i < 164; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound5::command(int commandId, int param) {
@@ -1851,11 +1856,12 @@ const ASound6::CommandPtr ASound6::_commandList[30] = {
 	&ASound6::nullCommand, &ASound6::command29
 };
 
-ASound6::ASound6(Audio::Mixer *mixer, OPL::OPL *opl) : RexASound(mixer, opl, "asound.006", 0x1390) {
+ASound6::ASound6(Audio::Mixer *mixer, OPL::OPL *opl) :
+		RexASound(mixer, opl, "asound.006", 0x1390, 0x22d0) {
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x122);
+	auto samplesStream = getDataStream(0x122);
 	for (int i = 0; i < 200; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound6::command(int commandId, int param) {
@@ -2007,11 +2013,12 @@ const ASound7::CommandPtr ASound7::_commandList[38] = {
 	&ASound7::command36, &ASound7::command37
 };
 
-ASound7::ASound7(Audio::Mixer *mixer, OPL::OPL *opl) : RexASound(mixer, opl, "asound.007", 0x1460) {
+ASound7::ASound7(Audio::Mixer *mixer, OPL::OPL *opl) :
+		RexASound(mixer, opl, "asound.007", 0x1460, 0x2cf0) {
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x122);
+	auto samplesStream = getDataStream(0x122);
 	for (int i = 0; i < 214; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound7::command(int commandId, int param) {
@@ -2213,11 +2220,12 @@ const ASound8::CommandPtr ASound8::_commandList[38] = {
 	&ASound8::command36, &ASound8::command37
 };
 
-ASound8::ASound8(Audio::Mixer *mixer, OPL::OPL *opl) : RexASound(mixer, opl, "asound.008", 0x1490) {
+ASound8::ASound8(Audio::Mixer *mixer, OPL::OPL *opl) :
+		RexASound(mixer, opl, "asound.008", 0x1490, 0x1810) {
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x122);
+	auto samplesStream = getDataStream(0x122);
 	for (int i = 0; i < 174; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound8::command(int commandId, int param) {
@@ -2469,14 +2477,15 @@ const ASound9::CommandPtr ASound9::_commandList[52] = {
 	&ASound9::command48, &ASound9::command49, &ASound9::command50, &ASound9::command51
 };
 
-ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) : RexASound(mixer, opl, "asound.009", 0x16F0) {
+ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) :
+		RexASound(mixer, opl, "asound.009", 0x16F0, 0x85a0) {
 	_v1 = _v2 = 0;
 	_soundPtr = nullptr;
 
 	// Load sound samples
-	_soundFile.seek(_dataOffset + 0x50);
+	auto samplesStream = getDataStream(0x50);
 	for (int i = 0; i < 94; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound9::command(int commandId, int param) {

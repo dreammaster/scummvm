@@ -46,7 +46,7 @@ protected:
 
 public:
 	RexASound(Audio::Mixer *mixer, OPL::OPL *opl,
-		const Common::Path &filename, int dataOffset);
+		const Common::Path &filename, int dataOffset, int dataSize);
 };
 
 class ASound1 : public RexASound {

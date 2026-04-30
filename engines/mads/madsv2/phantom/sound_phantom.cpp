@@ -20,6 +20,7 @@
  */
 
 #include "common/endian.h"
+#include "common/file.h"
 #include "common/md5.h"
 #include "common/textconsole.h"
 #include "mads/madsv2/phantom/sound_phantom.h"
@@ -83,559 +84,6 @@ void PhantomSoundManager::loadDriver(int sectionNumber) {
 }
 
 /*-----------------------------------------------------------------------*/
-
-PhantomASound::PhantomASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset) :
-		ASound(mixer, opl, filename, dataOffset) {
-	_chanCommandCount = 66;
-	memset(_scratchArr, 0, sizeof(_scratchArr));
-
-	// Load sound samples - all the asound drivers have an identical set of 120
-	// samples starting at offset 1d4h in their data segment
-	_soundFile.seek(_dataOffset + 0x1d4);
-	for (int i = 0; i < 120; ++i)
-		_samples.push_back(AdlibSample(_soundFile));
-}
-
-void PhantomASound::channelCommand(byte *&pSrc, bool &updateFlag) {
-	AdlibChannel *chan = _activeChannelPtr;
-	int cmdNum = (int8)*pSrc;   // -1 .. -66
-
-	switch (cmdNum) {
-
-	case -1:
-		// Single-level repeat loop (uses _field17 / _ptr3)
-		if (!chan->_field17) {
-			if (pSrc[1] == 0) {
-				chan->_pSrc += 2;
-				chan->_ptr3 = chan->_pSrc;
-				chan->_field17 = 0;
-			} else {
-				chan->_field17 = (int8)pSrc[1];
-				chan->_pSrc = chan->_ptr3;
-			}
-		} else {
-			--chan->_field17;
-			if (!chan->_field17) {
-				chan->_pSrc += 2;
-				chan->_ptr3 = chan->_pSrc;
-			} else {
-				chan->_pSrc = chan->_ptr3;
-			}
-		}
-		break;
-
-	case -2:
-		// Double-level repeat loop (uses _field19/_ptr4 outer, _field17/_ptr3 inner)
-		if (!chan->_field19) {
-			if (pSrc[1] == 0) {
-				chan->_pSrc += 2;
-				chan->_ptr4 = chan->_pSrc;
-				chan->_ptr3 = chan->_pSrc;
-				chan->_field17 = 0;
-				chan->_field19 = 0;
-			} else {
-				chan->_field19 = (int8)pSrc[1];
-				chan->_pSrc = chan->_ptr4;
-				chan->_ptr3 = chan->_ptr4;
-			}
-		} else {
-			--chan->_field19;
-			if (!chan->_field19) {
-				chan->_pSrc += 2;
-				chan->_ptr4 = chan->_pSrc;
-				chan->_ptr3 = chan->_pSrc;
-			} else {
-				chan->_pSrc = chan->_ptr4;
-				chan->_ptr3 = chan->_ptr4;
-			}
-		}
-		break;
-
-	case -3:
-		// Reset channel to soundData start
-		chan->_fieldE = 0;      // original stored soundData near ptr here
-		chan->_pSrc     = chan->_soundData;
-		chan->_ptr3     = chan->_soundData;
-		chan->_ptr4     = chan->_soundData;
-		chan->_field1   = 0;
-		chan->_field2   = 0;
-		chan->_field3   = 0;
-		chan->_field26  = 0;
-		chan->_volumeOffset = 0;
-		chan->_field28  = 0;
-		chan->_volume   = 0;
-		chan->_field9   = 0;
-		chan->_fieldB   = 0;
-		chan->_field17  = 0;
-		chan->_field19  = 0;
-		chan->_field7   = 0;
-		break;
-
-	case -4: {
-		// Jump: set all four data pointers from a near-pointer word argument
-		++pSrc;
-		int nearPtr = (int16)READ_LE_UINT16(pSrc);
-		byte *p = getDataPtr(nearPtr);
-		chan->_fieldE    = nearPtr;
-		chan->_pSrc      = p;
-		chan->_ptr3      = p;
-		chan->_ptr4      = p;
-		chan->_soundData = p;
-		break;
-	}
-
-	case -5: {
-		// Unconditional jump to near-pointer target (no return address saved)
-		++pSrc;
-		int nearPtr = (int16)READ_LE_UINT16(pSrc);
-		chan->_pSrc = getDataPtr(nearPtr);
-		break;
-	}
-
-	case -6: {
-		// Unconditional call to near-pointer target (saves return address in _ptrEnd)
-		++pSrc;
-		int nearPtr = (int16)READ_LE_UINT16(pSrc);
-		chan->_ptrEnd = chan->_pSrc + 3;
-		chan->_pSrc   = getDataPtr(nearPtr);
-		break;
-	}
-
-	case -7:
-		// Return from call (restores _pSrc from _ptrEnd)
-		if (chan->_ptrEnd) {
-			chan->_pSrc   = chan->_ptrEnd;
-			chan->_ptrEnd = nullptr;
-		} else {
-			chan->_pSrc += 1;
-		}
-		break;
-
-	case -8:
-		// Load sample: byte argument is sample index
-		chan->_sampleIndex = pSrc[1];
-		chan->_pSrc += 2;
-		loadSample(chan->_sampleIndex);
-		break;
-
-	case -9:
-		// Set _field7 (pitch source), clear _field2C (frequency counter)
-		chan->_field7  = pSrc[1];
-		chan->_field2C = 0;
-		chan->_pSrc += 2;
-		break;
-
-	case -10:
-		// Set _field2C (frequency counter), clear _field7
-		chan->_field2C = pSrc[1];
-		chan->_field7  = 0;
-		chan->_pSrc += 2;
-		break;
-
-	case -11:
-		// Set _field1 (envelope / modulation)
-		chan->_field1 = pSrc[1];
-		chan->_pSrc += 2;
-		break;
-
-	case -12:
-		// Set volume, capped downward if _field2B (mute flag) is active
-		{
-			int val = (int8)pSrc[1];
-			if (chan->_field2B) {
-				if (chan->_volume > val)
-					chan->_volume = val;
-			} else {
-				chan->_volume = val;
-			}
-			updateFlag = true;
-			chan->_pSrc += 2;
-		}
-		break;
-
-	case -13:
-		// Set _fieldA and _field2 (vibrato params), or skip if muted
-		if (chan->_field2B) {
-			chan->_pSrc += 3;
-		} else {
-			chan->_fieldA = pSrc[1];
-			chan->_field2 = pSrc[2];
-			chan->_field9 = 1;
-			chan->_pSrc += 3;
-		}
-		break;
-
-	case -14:
-		// Set _field26 (pitch delta)
-		chan->_field26 = pSrc[1];
-		chan->_pSrc += 2;
-		break;
-
-	case -15:
-		// Set _volumeOffset, capped downward if _field2B (mute flag) is active
-		{
-			int val = (int8)pSrc[1];
-			if (chan->_field2B) {
-				if ((int8)chan->_volumeOffset > val)
-					chan->_volumeOffset = val;
-			} else {
-				chan->_volumeOffset = val;
-			}
-			updateFlag = true;
-			chan->_pSrc += 2;
-		}
-		break;
-
-	case -16:
-		// Set _fieldD (volume increment step)
-		chan->_fieldD = pSrc[1];
-		updateFlag = true;
-		chan->_pSrc += 2;
-		break;
-
-	case -17:
-		// Set _fieldC (period) and _field3 (volume slide), enable slide (_fieldB=1)
-		chan->_fieldC = pSrc[1];
-		chan->_field3 = pSrc[2];
-		chan->_fieldB = 1;
-		chan->_pSrc += 3;
-		break;
-
-	case -18:
-		// Set _field2A
-		chan->_field2A = pSrc[1];
-		chan->_pSrc += 2;
-		break;
-
-	case -19:
-		// Relative skip: advance by (signed byte arg) + 3
-		chan->_pSrc += (int8)pSrc[1] + 3;
-		break;
-
-	case -20: {
-		// Pick random element from array[0..N-1], write chosen value to a
-		// self-modifying offset within the sound data
-		int n    = (byte)pSrc[1];
-		byte *base = pSrc + 2;
-		int rnd  = getRandomNumber() & 0x7FFF;
-		int idx  = rnd % n;
-		byte chosen = base[idx];
-		int destIdx = (int8)base[n];
-		base[destIdx + n + 1] = chosen;
-		chan->_pSrc += n + 3;
-		break;
-	}
-
-	case -21: {
-		// Pick random value in [lower..upper], write to a self-modifying offset
-		int lower = (int8)pSrc[1];
-		int upper = (int8)pSrc[2];
-		int range = upper - lower + 1;
-		int rnd   = getRandomNumber() & 0x7FFF;
-		byte *base = pSrc + 3;
-		int destIdx = (int8)base[0];
-		base[destIdx + 1] = (byte)(rnd % range + lower);
-		chan->_pSrc += 4;
-		break;
-	}
-
-	case -22: {
-		// Like -20 but array index is read from _scratchArr[regIdx]
-		int regIdx = (byte)pSrc[1];
-		int n      = (byte)pSrc[2];
-		byte *base = pSrc + 3;
-		int arrVal = _scratchArr[regIdx];
-		byte chosen = base[arrVal];
-		int destOffset = (int8)base[n];
-		base[destOffset + n + 1] = chosen;
-		chan->_pSrc += n + 4;
-		break;
-	}
-
-	case -23:
-		// arr[dest] = literal
-		_scratchArr[(byte)pSrc[1]] = (byte)pSrc[2];
-		chan->_pSrc += 3;
-		break;
-
-	case -24:
-		// arr[dest] = arr[src]
-		_scratchArr[(byte)pSrc[1]] = _scratchArr[(byte)pSrc[2]];
-		chan->_pSrc += 3;
-		break;
-
-	case -25:
-		// Write arr[regIdx] into sound data at pSrc[offset+3]
-		pSrc[(int8)pSrc[2] + 3] = _scratchArr[(byte)pSrc[1]];
-		chan->_pSrc += 3;
-		break;
-
-	case -26:
-		// arr[idx]++
-		++_scratchArr[(byte)pSrc[1]];
-		chan->_pSrc += 2;
-		break;
-
-	case -27:
-		// arr[idx]--
-		--_scratchArr[(byte)pSrc[1]];
-		chan->_pSrc += 2;
-		break;
-
-	case -28:
-		// arr[dest] += literal
-		_scratchArr[(byte)pSrc[1]] += (byte)pSrc[2];
-		chan->_pSrc += 3;
-		break;
-
-	case -29:
-		// arr[dest] += arr[src]
-		_scratchArr[(byte)pSrc[1]] += _scratchArr[(byte)pSrc[2]];
-		chan->_pSrc += 3;
-		break;
-
-	case -30:
-		// arr[dest] -= literal
-		_scratchArr[(byte)pSrc[1]] -= (byte)pSrc[2];
-		chan->_pSrc += 3;
-		break;
-
-	case -31:
-		// arr[dest] -= arr[src]
-		_scratchArr[(byte)pSrc[1]] -= _scratchArr[(byte)pSrc[2]];
-		chan->_pSrc += 3;
-		break;
-
-	case -32:
-		// arr[dest] = literal * arr[dest]  (byte multiply, low byte)
-		_scratchArr[(byte)pSrc[1]] = (byte)((byte)pSrc[2] * _scratchArr[(byte)pSrc[1]]);
-		chan->_pSrc += 3;
-		break;
-
-	case -33:
-		// arr[dest] = arr[src] * arr[dest]  (byte multiply, low byte)
-		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[2]] * _scratchArr[(byte)pSrc[1]]);
-		chan->_pSrc += 3;
-		break;
-
-	case -34:
-		// arr[dest] /= literal  (quotient)
-		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[1]] / (int8)pSrc[2]);
-		chan->_pSrc += 3;
-		break;
-
-	case -35:
-		// arr[dest] /= arr[src]  (quotient, unsigned)
-		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[1]] / _scratchArr[(byte)pSrc[2]]);
-		chan->_pSrc += 3;
-		break;
-
-	case -36:
-		// arr[dest] %= literal  (remainder)
-		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[1]] % (int8)pSrc[2]);
-		chan->_pSrc += 3;
-		break;
-
-	case -37:
-		// arr[dest] %= arr[src]  (remainder, unsigned)
-		_scratchArr[(byte)pSrc[1]] = (byte)(_scratchArr[(byte)pSrc[1]] % _scratchArr[(byte)pSrc[2]]);
-		chan->_pSrc += 3;
-		break;
-
-	case -38:
-		// arr[dest] &= literal
-		_scratchArr[(byte)pSrc[1]] &= (byte)pSrc[2];
-		chan->_pSrc += 3;
-		break;
-
-	case -39:
-		// arr[dest] &= arr[src]
-		_scratchArr[(byte)pSrc[1]] &= _scratchArr[(byte)pSrc[2]];
-		chan->_pSrc += 3;
-		break;
-
-	case -40:
-		// arr[dest] |= literal
-		_scratchArr[(byte)pSrc[1]] |= (byte)pSrc[2];
-		chan->_pSrc += 3;
-		break;
-
-	case -41:
-		// arr[dest] |= arr[src]
-		_scratchArr[(byte)pSrc[1]] |= _scratchArr[(byte)pSrc[2]];
-		chan->_pSrc += 3;
-		break;
-
-	case -42:
-		// arr[dest] ^= literal
-		_scratchArr[(byte)pSrc[1]] ^= (byte)pSrc[2];
-		chan->_pSrc += 3;
-		break;
-
-	case -43:
-		// arr[dest] ^= arr[src]
-		_scratchArr[(byte)pSrc[1]] ^= _scratchArr[(byte)pSrc[2]];
-		chan->_pSrc += 3;
-		break;
-
-	// Cases -44 to -51: conditional jumps (5-byte: cmd, idx, literal/idx2, ptr_lo, ptr_hi)
-	// Branch taken  → jump to near-pointer target (bytes 3-4)
-	// Branch not taken → skip 5 bytes
-
-#define PHANTOM_COND_JUMP(cond) \
-	do { \
-		if (cond) { \
-			int nearPtr = (int16)READ_LE_UINT16(pSrc + 3); \
-			chan->_pSrc = getDataPtr(nearPtr); \
-		} else { \
-			chan->_pSrc += 5; \
-		} \
-	} while (0)
-
-	case -44:
-		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[1]] == (byte)pSrc[2]);
-		break;
-
-	case -45:
-		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[1]] != (byte)pSrc[2]);
-		break;
-
-	case -46:
-		// arr[idx] < literal  (jmp if below the cap)
-		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[1]] < (byte)pSrc[2]);
-		break;
-
-	case -47:
-		// arr[idx] > literal
-		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[1]] > (byte)pSrc[2]);
-		break;
-
-	case -48:
-		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[2]] == _scratchArr[(byte)pSrc[1]]);
-		break;
-
-	case -49:
-		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[2]] != _scratchArr[(byte)pSrc[1]]);
-		break;
-
-	case -50:
-		// arr[idx2] > arr[idx1]  (unsigned)
-		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[2]] > _scratchArr[(byte)pSrc[1]]);
-		break;
-
-	case -51:
-		// arr[idx2] < arr[idx1]  (unsigned)
-		PHANTOM_COND_JUMP(_scratchArr[(byte)pSrc[2]] < _scratchArr[(byte)pSrc[1]]);
-		break;
-
-#undef PHANTOM_COND_JUMP
-
-	// Cases -52 to -59: conditional calls — same as -44..-51 but save return address
-	// Branch taken  → save (chan->_pSrc + 5) in _ptrEnd, then jump to target
-	// Branch not taken → skip 5 bytes
-
-#define PHANTOM_COND_CALL(cond) \
-	do { \
-		if (cond) { \
-			int nearPtr = (int16)READ_LE_UINT16(pSrc + 3); \
-			chan->_ptrEnd = chan->_pSrc + 5; \
-			chan->_pSrc   = getDataPtr(nearPtr); \
-		} else { \
-			chan->_pSrc += 5; \
-		} \
-	} while (0)
-
-	case -52:
-		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[1]] == (byte)pSrc[2]);
-		break;
-
-	case -53:
-		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[1]] != (byte)pSrc[2]);
-		break;
-
-	case -54:
-		// arr[idx] < literal
-		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[1]] < (byte)pSrc[2]);
-		break;
-
-	case -55:
-		// arr[idx] > literal
-		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[1]] > (byte)pSrc[2]);
-		break;
-
-	case -56:
-		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[2]] == _scratchArr[(byte)pSrc[1]]);
-		break;
-
-	case -57:
-		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[2]] != _scratchArr[(byte)pSrc[1]]);
-		break;
-
-	case -58:
-		// arr[idx2] > arr[idx1]  (unsigned)
-		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[2]] > _scratchArr[(byte)pSrc[1]]);
-		break;
-
-	case -59:
-		// arr[idx2] < arr[idx1]  (unsigned)
-		PHANTOM_COND_CALL(_scratchArr[(byte)pSrc[2]] < _scratchArr[(byte)pSrc[1]]);
-		break;
-
-#undef PHANTOM_COND_CALL
-
-	case -60:
-		// Call near function pointer — not translatable to C++; skip 3-byte command
-		chan->_pSrc += 3;
-		break;
-
-	case -61:
-		// No-op with 2-byte command (original called a null stub)
-		chan->_pSrc += 2;
-		break;
-
-	case -62:
-		// Skip 4 bytes (advance past this 4-byte command)
-		chan->_pSrc += 4;
-		break;
-
-	case -63:
-		// Store signed byte into _w11F50 music state variable
-		_w11F50 = (int8)pSrc[1];
-		chan->_pSrc += 2;
-		break;
-
-	case -64:
-		// Store signed byte into _w11F46; if _w11F44 == 0, also copy to _w11F4E
-		_w11F46 = (int8)pSrc[1];
-		chan->_pSrc += 2;
-		if (!_w11F44)
-			_w11F4E = _w11F46;
-		break;
-
-	case -65: {
-		// Store 16-bit word into _w11F48; signal music sync (_w11F32/_w11F42 = 1)
-		++pSrc;
-		_w11F48 = (int16)READ_LE_UINT16(pSrc);
-		chan->_pSrc = pSrc + 2;     // advance 3 bytes total from command
-		if (!_w11F44)
-			_w11F4C = _w11F48;
-		_w11F32 = 1;
-		_w11F42 = 1;
-		break;
-	}
-
-	case -66:
-		// Store signed byte into _w11F4A music state variable
-		_w11F4A = (int8)pSrc[1];
-		chan->_pSrc += 2;
-		break;
-
-	default:
-		break;
-	}
-}
-
-/*-----------------------------------------------------------------------*/
 /* ASound1  (asound.ph1)                                                  *
  *                                                                        *
  * Channel-load helpers in the original:                                  *
@@ -643,9 +91,9 @@ void PhantomASound::channelCommand(byte *&pSrc, bool &updateFlag) {
  *   sub_1040E=ch3, sub_10413=ch4, sub_10418=ch5                         *
  *   loc_1041D=ch6, loc_10422=ch7, loc_10427=ch8                         *
  *                                                                        *
- * sub_106DF = isSoundActive guard (non-zero BX → already playing)       *
- * sub_1039C = playSoundData(pData, ADLIB_CHANNEL_MIDWAY)  (upper pool)  *
- * sub_10352 = playSoundData(pData, 0)                     (lower pool)  *
+ * sub_106DF = isSoundActive guard (non-zero BX -> already playing)       *
+ * sub_1039C = findFreeChannel(pData, ADLIB_CHANNEL_MIDWAY)  (upper pool)  *
+ * sub_10352 = findFreeChannel(pData, 0)                     (lower pool)  *
  *-----------------------------------------------------------------------*/
 
 const ASound1::CommandPtr ASound1::_commandList[40] = {
@@ -662,7 +110,7 @@ const ASound1::CommandPtr ASound1::_commandList[40] = {
 };
 
 ASound1::ASound1(Audio::Mixer *mixer, OPL::OPL *opl)
-		: PhantomASound(mixer, opl, "asound.ph1", 0x21e0) {
+		: ASound(mixer, opl, "asound.ph1", 0x21e0, 0x4d20) {
 }
 
 int ASound1::command(int commandId, int param) {
@@ -670,9 +118,7 @@ int ASound1::command(int commandId, int param) {
 	// near-pointer table (unk_13C3E) that cannot be safely reconstructed.
 	if (commandId > 39 || !_commandList[commandId])
 		return 0;
-
-	_commandParam = param;
-	_frameCounter = 0;
+	
 	return (this->*_commandList[commandId])();
 }
 
@@ -690,7 +136,7 @@ int ASound1::command8() { return ASound::command8(); }
 // ---------------------------------------------------------------------------
 // Background-music loaders (sub_11D84, sub_11EE6, sub_11F0E, sub_11F36)
 // Each calls command1() then loads six channels.
-// The five cx values that command16 checks against _channels[0]._field17
+// The five cx values that command16 checks against _channels[0]->_field17
 // are the starting offsets of each piece: 0x1ECA, 0x21C4, 0x3418, 0x3688,
 // 0x3D52.  (0x21C4 is the start of dead code following commandMusic0 that
 // was never reached by any dispatch table entry.)
@@ -698,45 +144,45 @@ int ASound1::command8() { return ASound::command8(); }
 
 int ASound1::commandMusic0() {
 	ASound::command1();
-	_channels[0].load(loadData(0x1ECA, 245));
-	_channels[1].load(loadData(0x1FBF, 120));
-	_channels[2].load(loadData(0x2037, 183));
-	_channels[3].load(loadData(0x20EE, 173));
-	_channels[4].load(loadData(0x219B,  20));
-	_channels[5].load(loadData(0x21AF,  21));
+	_channels[0]->load(loadData(0x1ECA, 245));
+	_channels[1]->load(loadData(0x1FBF, 120));
+	_channels[2]->load(loadData(0x2037, 183));
+	_channels[3]->load(loadData(0x20EE, 173));
+	_channels[4]->load(loadData(0x219B,  20));
+	_channels[5]->load(loadData(0x21AF,  21));
 	return 0;
 }
 
 int ASound1::commandMusic1() {
 	ASound::command1();
-	_channels[0].load(loadData(0x3418, 211));
-	_channels[1].load(loadData(0x34EB, 176));
-	_channels[2].load(loadData(0x359B, 189));
-	_channels[3].load(loadData(0x3658,  15));
-	_channels[4].load(loadData(0x3667,  16));
-	_channels[5].load(loadData(0x3677,  17));
+	_channels[0]->load(loadData(0x3418, 211));
+	_channels[1]->load(loadData(0x34EB, 176));
+	_channels[2]->load(loadData(0x359B, 189));
+	_channels[3]->load(loadData(0x3658,  15));
+	_channels[4]->load(loadData(0x3667,  16));
+	_channels[5]->load(loadData(0x3677,  17));
 	return 0;
 }
 
 int ASound1::commandMusic2() {
 	ASound::command1();
-	_channels[0].load(loadData(0x3688, 499));
-	_channels[1].load(loadData(0x387B, 390));
-	_channels[2].load(loadData(0x3A01, 453));
-	_channels[3].load(loadData(0x3BC6, 363));
-	_channels[4].load(loadData(0x3D31,  16));
-	_channels[5].load(loadData(0x3D41,  17));
+	_channels[0]->load(loadData(0x3688, 499));
+	_channels[1]->load(loadData(0x387B, 390));
+	_channels[2]->load(loadData(0x3A01, 453));
+	_channels[3]->load(loadData(0x3BC6, 363));
+	_channels[4]->load(loadData(0x3D31,  16));
+	_channels[5]->load(loadData(0x3D41,  17));
 	return 0;
 }
 
 int ASound1::commandMusic3() {
 	ASound::command1();
-	_channels[0].load(loadData(0x3D52, 641));
-	_channels[1].load(loadData(0x3FD3, 556));
-	_channels[2].load(loadData(0x41FF,  13));
-	_channels[3].load(loadData(0x420C,  13));
-	_channels[4].load(loadData(0x4219,  16));
-	_channels[5].load(loadData(0x4229,  17));
+	_channels[0]->load(loadData(0x3D52, 641));
+	_channels[1]->load(loadData(0x3FD3, 556));
+	_channels[2]->load(loadData(0x41FF,  13));
+	_channels[3]->load(loadData(0x420C,  13));
+	_channels[4]->load(loadData(0x4219,  16));
+	_channels[5]->load(loadData(0x4229,  17));
 	return 0;
 }
 
@@ -747,13 +193,13 @@ int ASound1::commandMusic3() {
 // pieces (identified by their starting offset in field_17), leave it alone.
 // Otherwise pick a piece at random: the original uses getRandomNumber() & 7,
 // discarding 0 and indexing a four-entry table repeated twice (entries 1–3
-// → pieces 1–3, entries 4–7 → same pieces again with entry 4 wrapping to
+// -> pieces 1–3, entries 4–7 -> same pieces again with entry 4 wrapping to
 // piece 0).  We reproduce this with a modulo-4 on a non-zero value.
 // ---------------------------------------------------------------------------
 int ASound1::command16() {
-	if (_channels[0]._activeCount) {
-		int f = _channels[0]._field17;
-		if (f == 0x1ECA || f == 0x21C4 ||
+	if (_channels[0]->_activeCount) {
+		int f = getDataOffset(_channels[0]->_loopStartPtr);
+		if (f == 0 || f == 0x1ECA || f == 0x21C4 ||
 		    f == 0x3418 || f == 0x3688 || f == 0x3D52)
 			return 0;
 	}
@@ -806,12 +252,12 @@ int ASound1::command27() {
 
 // command32 (sub_11DD4) – no guard, no fade, load ch0–5
 int ASound1::command32() {
-	_channels[0].load(loadData(0x2522, 59));
-	_channels[1].load(loadData(0x255D, 52));
-	_channels[2].load(loadData(0x2591, 42));
-	_channels[3].load(loadData(0x25BB, 44));
-	_channels[4].load(loadData(0x25E7, 44));
-	_channels[5].load(loadData(0x2613, 89));
+	_channels[0]->load(loadData(0x2522, 59));
+	_channels[1]->load(loadData(0x255D, 52));
+	_channels[2]->load(loadData(0x2591, 42));
+	_channels[3]->load(loadData(0x25BB, 44));
+	_channels[4]->load(loadData(0x25E7, 44));
+	_channels[5]->load(loadData(0x2613, 89));
 	return 0;
 }
 
@@ -820,12 +266,12 @@ int ASound1::command33() {
 	byte *pData = loadData(0x266C, 701);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x2929, 500));
-		_channels[2].load(loadData(0x2B1D, 538));
-		_channels[3].load(loadData(0x2D37, 396));
-		_channels[4].load(loadData(0x2EC3, 368));
-		_channels[5].load(loadData(0x3033, 493));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x2929, 500));
+		_channels[2]->load(loadData(0x2B1D, 538));
+		_channels[3]->load(loadData(0x2D37, 396));
+		_channels[4]->load(loadData(0x2EC3, 368));
+		_channels[5]->load(loadData(0x3033, 493));
 	}
 	return 0;
 }
@@ -835,12 +281,12 @@ int ASound1::command34() {
 	byte *pData = loadData(0x1852, 599);
 	if (!isSoundActive(pData)) {
 		stop();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x1AA9, 283));
-		_channels[2].load(loadData(0x1BC4, 301));
-		_channels[3].load(loadData(0x1CF1, 257));
-		_channels[4].load(loadData(0x1DF2, 204));
-		_channels[5].load(loadData(0x1EBE,  12));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x1AA9, 283));
+		_channels[2]->load(loadData(0x1BC4, 301));
+		_channels[3]->load(loadData(0x1CF1, 257));
+		_channels[4]->load(loadData(0x1DF2, 204));
+		_channels[5]->load(loadData(0x1EBE,  12));
 	}
 	return 0;
 }
@@ -851,12 +297,12 @@ int ASound1::command35() {
 	byte *pData = loadData(0x0C36, 329);
 	if (!isSoundActive(pData)) {
 		ASound::command2();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x0D7F, 201));
-		_channels[2].load(loadData(0x0E48, 200));
-		_channels[3].load(loadData(0x0F10, 162));
-		_channels[4].load(loadData(0x0FB2, 228));
-		_channels[5].load(loadData(0x1096, 250));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x0D7F, 201));
+		_channels[2]->load(loadData(0x0E48, 200));
+		_channels[3]->load(loadData(0x0F10, 162));
+		_channels[4]->load(loadData(0x0FB2, 228));
+		_channels[5]->load(loadData(0x1096, 250));
 	}
 	return 0;
 }
@@ -867,26 +313,26 @@ int ASound1::command36() {
 	byte *pData = loadData(0x1190, 327);
 	if (!isSoundActive(pData)) {
 		ASound::command2();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x12D7, 211));
-		_channels[2].load(loadData(0x13AA, 204));
-		_channels[3].load(loadData(0x1476, 178));
-		_channels[4].load(loadData(0x1528, 236));
-		_channels[5].load(loadData(0x1614, 294));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x12D7, 211));
+		_channels[2]->load(loadData(0x13AA, 204));
+		_channels[3]->load(loadData(0x1476, 178));
+		_channels[4]->load(loadData(0x1528, 236));
+		_channels[5]->load(loadData(0x1614, 294));
 	}
 	return 0;
 }
 
 // command37 (sub_11E32) – isSoundActive guard, command1, four loadAny
-// calls starting from channel 0 (sub_10352 = playSoundData(pData, 0))
+// calls starting from channel 0 (sub_10352 = findFreeChannel(pData, 0))
 int ASound1::command37() {
 	byte *pData = loadData(0x3220, 74);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		playSoundData(pData, 0);
-		playSoundData(loadData(0x326A, 41), 0);
-		playSoundData(loadData(0x3293, 25), 0);
-		playSoundData(loadData(0x32AC, 14), 0);
+		findFreeChannel(pData);
+		findFreeChannel(loadData(0x326A, 41));
+		findFreeChannel(loadData(0x3293, 25));
+		findFreeChannel(loadData(0x32AC, 14));
 	}
 	return 0;
 }
@@ -902,12 +348,12 @@ int ASound1::command39() {
 	byte *pData = loadData(0x423A, 421);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x43DF, 280));
-		_channels[2].load(loadData(0x44F7, 246));
-		_channels[3].load(loadData(0x45ED, 268));
-		_channels[4].load(loadData(0x46F9, 438));
-		_channels[5].load(loadData(0x48AF,   0));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x43DF, 280));
+		_channels[2]->load(loadData(0x44F7, 246));
+		_channels[3]->load(loadData(0x45ED, 268));
+		_channels[4]->load(loadData(0x46F9, 438));
+		_channels[5]->load(loadData(0x48AF,   0));
 	}
 	return 0;
 }
@@ -937,8 +383,8 @@ int ASound1::command39() {
  * loc_10548 = command7                                                   *
  * unk_106B2 = command8 (OR of all channel activeCount fields)            *
  * sub_106DF = isSoundActive guard                                        *
- * sub_1039C = playSoundData(pData, ADLIB_CHANNEL_MIDWAY)  (upper pool)  *
- * sub_10352 = playSoundData(pData, 0)                     (lower pool)  *
+ * sub_1039C = findFreeChannel(pData, ADLIB_CHANNEL_MIDWAY)  (upper pool)  *
+ * sub_10352 = findFreeChannel(pData, 0)                     (lower pool)  *
  *                                                                        *
  * commands5 entry 4 (command 68) = nullsub_3 = no-op                    *
  *-----------------------------------------------------------------------*/
@@ -977,15 +423,13 @@ const ASound2::CommandPtr ASound2::_commandList[73] = {
 };
 
 ASound2::ASound2(Audio::Mixer *mixer, OPL::OPL *opl)
-		: PhantomASound(mixer, opl, "asound.ph2", 0x2040) {
+		: ASound(mixer, opl, "asound.ph2", 0x2040, 0x2300) {
 }
 
 int ASound2::command(int commandId, int param) {
 	if (commandId > 72 || !_commandList[commandId])
 		return 0;
 
-	_commandParam = param;
-	_frameCounter = 0;
 	return (this->*_commandList[commandId])();
 }
 
@@ -1007,12 +451,12 @@ int ASound2::command16() {
 	byte *pData = loadData(0x0C36, 88);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x0C8E, 102));
-		_channels[2].load(loadData(0x0CF4,  90));
-		_channels[3].load(loadData(0x0D4E,  85));
-		_channels[4].load(loadData(0x0DA3,  14));
-		_channels[5].load(loadData(0x0DB1,  15));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x0C8E, 102));
+		_channels[2]->load(loadData(0x0CF4,  90));
+		_channels[3]->load(loadData(0x0D4E,  85));
+		_channels[4]->load(loadData(0x0DA3,  14));
+		_channels[5]->load(loadData(0x0DB1,  15));
 	}
 	return 0;
 }
@@ -1052,15 +496,15 @@ int ASound2::command27() {
 // ---------------------------------------------------------------------------
 
 // command32 (sub_11DDC) – command1, six loadAny calls from channel 0
-// (sub_10352 = playSoundData(pData, 0))
+// (sub_10352 = findFreeChannel(pData, 0))
 int ASound2::command32() {
 	ASound::command1();
-	playSoundData(loadData(0x1BE4, 211), 0);
-	playSoundData(loadData(0x1CB7, 359), 0);
-	playSoundData(loadData(0x1E1E, 170), 0);
-	playSoundData(loadData(0x1EC8,  16), 0);
-	playSoundData(loadData(0x1ED8,  23), 0);
-	playSoundData(loadData(0x1EEF,  19), 0);
+	findFreeChannel(loadData(0x1BE4, 211));
+	findFreeChannel(loadData(0x1CB7, 359));
+	findFreeChannel(loadData(0x1E1E, 170));
+	findFreeChannel(loadData(0x1EC8,  16));
+	findFreeChannel(loadData(0x1ED8,  23));
+	findFreeChannel(loadData(0x1EEF,  19));
 	return 0;
 }
 
@@ -1069,14 +513,14 @@ int ASound2::command33() {
 	byte *pData = loadData(0x1B62, 53);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x1B97, 14));
-		_channels[2].load(loadData(0x1BA5, 14));
-		_channels[3].load(loadData(0x1BB3, 14));
-		_channels[4].load(loadData(0x1BC1,  4));
-		_channels[5].load(loadData(0x1BC5,  4));
-		_channels[6].load(loadData(0x1BC9, 12));
-		_channels[7].load(loadData(0x1BD5, 15));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x1B97, 14));
+		_channels[2]->load(loadData(0x1BA5, 14));
+		_channels[3]->load(loadData(0x1BB3, 14));
+		_channels[4]->load(loadData(0x1BC1,  4));
+		_channels[5]->load(loadData(0x1BC5,  4));
+		_channels[6]->load(loadData(0x1BC9, 12));
+		_channels[7]->load(loadData(0x1BD5, 15));
 	}
 	return 0;
 }
@@ -1086,13 +530,13 @@ int ASound2::command34() {
 	byte *pData = loadData(0x0DC0, 495);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x0FAF, 599));
-		_channels[2].load(loadData(0x1206, 404));
-		_channels[3].load(loadData(0x139A, 459));
-		_channels[4].load(loadData(0x1565, 718));
-		_channels[5].load(loadData(0x1833, 154));
-		_channels[6].load(loadData(0x18CD,  91));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x0FAF, 599));
+		_channels[2]->load(loadData(0x1206, 404));
+		_channels[3]->load(loadData(0x139A, 459));
+		_channels[4]->load(loadData(0x1565, 718));
+		_channels[5]->load(loadData(0x1833, 154));
+		_channels[6]->load(loadData(0x18CD,  91));
 	}
 	return 0;
 }
@@ -1102,13 +546,13 @@ int ASound2::command35() {
 	byte *pData = loadData(0x1F02, 100);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x1F66,  10));
-		_channels[2].load(loadData(0x1F70,  29));
-		_channels[3].load(loadData(0x1F8D,  65));
-		_channels[4].load(loadData(0x1FCE,  41));
-		_channels[5].load(loadData(0x1FF7,  55));
-		_channels[6].load(loadData(0x202E,  34));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x1F66,  10));
+		_channels[2]->load(loadData(0x1F70,  29));
+		_channels[3]->load(loadData(0x1F8D,  65));
+		_channels[4]->load(loadData(0x1FCE,  41));
+		_channels[5]->load(loadData(0x1FF7,  55));
+		_channels[6]->load(loadData(0x202E,  34));
 	}
 	return 0;
 }
@@ -1194,7 +638,7 @@ int ASound2::command72() {
  *   loc_10427 =ch8                                                       *
  *                                                                        *
  * sub_106DF = isSoundActive guard                                        *
- * sub_1039C = playSoundData(pData, ADLIB_CHANNEL_MIDWAY) (upper pool)   *
+ * sub_1039C = findFreeChannel(pData, ADLIB_CHANNEL_MIDWAY) (upper pool)   *
  *                                                                        *
  * sub_11CC6 (helper) – isSoundActive guard on 0xC36, command1,          *
  *   loads ch0–7; called by command34 which then adds ch8 at 0x298E.     *
@@ -1237,15 +681,13 @@ const ASound3::CommandPtr ASound3::_commandList[77] = {
 };
 
 ASound3::ASound3(Audio::Mixer *mixer, OPL::OPL *opl)
-		: PhantomASound(mixer, opl, "asound.ph3", 0x20c0) {
+		: ASound(mixer, opl, "asound.ph3", 0x20c0, 0x31a0) {
 }
 
 int ASound3::command(int commandId, int param) {
 	if (commandId > 76 || !_commandList[commandId])
 		return 0;
-
-	_commandParam = param;
-	_frameCounter = 0;
+	
 	return (this->*_commandList[commandId])();
 }
 
@@ -1270,14 +712,14 @@ void ASound3::sub11CC6() {
 	byte *pData = loadData(0x0C36, 53);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x0C6B, 14));
-		_channels[2].load(loadData(0x0C79, 14));
-		_channels[3].load(loadData(0x0C87, 14));
-		_channels[4].load(loadData(0x0C95,  4));
-		_channels[5].load(loadData(0x0C99,  4));
-		_channels[6].load(loadData(0x0C9D, 12));
-		_channels[7].load(loadData(0x0CA9, 15));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x0C6B, 14));
+		_channels[2]->load(loadData(0x0C79, 14));
+		_channels[3]->load(loadData(0x0C87, 14));
+		_channels[4]->load(loadData(0x0C95,  4));
+		_channels[5]->load(loadData(0x0C99,  4));
+		_channels[6]->load(loadData(0x0C9D, 12));
+		_channels[7]->load(loadData(0x0CA9, 15));
 	}
 }
 
@@ -1288,12 +730,12 @@ int ASound3::command16() {
 	byte *pData = loadData(0x24F2, 172);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x259E, 137));
-		_channels[2].load(loadData(0x2627, 135));
-		_channels[3].load(loadData(0x26AE, 179));
-		_channels[4].load(loadData(0x2761, 175));
-		_channels[5].load(loadData(0x2810, 186));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x259E, 137));
+		_channels[2]->load(loadData(0x2627, 135));
+		_channels[3]->load(loadData(0x26AE, 179));
+		_channels[4]->load(loadData(0x2761, 175));
+		_channels[5]->load(loadData(0x2810, 186));
 	}
 	return 0;
 }
@@ -1337,14 +779,14 @@ int ASound3::command32() {
 	byte *pData = loadData(0x2B94, 108);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x2C00,  73));
-		_channels[2].load(loadData(0x2C49,  67));
-		_channels[3].load(loadData(0x2C8C, 151));
-		_channels[4].load(loadData(0x2D23, 171));
-		_channels[5].load(loadData(0x2DCE,  87));
-		_channels[6].load(loadData(0x2E25,  95));
-		_channels[7].load(loadData(0x2E84, 110));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x2C00,  73));
+		_channels[2]->load(loadData(0x2C49,  67));
+		_channels[3]->load(loadData(0x2C8C, 151));
+		_channels[4]->load(loadData(0x2D23, 171));
+		_channels[5]->load(loadData(0x2DCE,  87));
+		_channels[6]->load(loadData(0x2E25,  95));
+		_channels[7]->load(loadData(0x2E84, 110));
 	}
 	return 0;
 }
@@ -1354,13 +796,13 @@ int ASound3::command33() {
 	byte *pData = loadData(0x149E, 525);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x16AB, 648));
-		_channels[2].load(loadData(0x1933, 252));
-		_channels[3].load(loadData(0x1A2F, 502));
-		_channels[4].load(loadData(0x1C25, 680));
-		_channels[5].load(loadData(0x1ECD, 418));
-		_channels[6].load(loadData(0x206F,   3));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x16AB, 648));
+		_channels[2]->load(loadData(0x1933, 252));
+		_channels[3]->load(loadData(0x1A2F, 502));
+		_channels[4]->load(loadData(0x1C25, 680));
+		_channels[5]->load(loadData(0x1ECD, 418));
+		_channels[6]->load(loadData(0x206F,   3));
 	}
 	return 0;
 }
@@ -1369,7 +811,7 @@ int ASound3::command33() {
 // then unconditionally loads ch8 at 0x298E
 int ASound3::command34() {
 	sub11CC6();
-	_channels[8].load(loadData(0x298E, 10));
+	_channels[8]->load(loadData(0x298E, 10));
 	return 0;
 }
 
@@ -1378,12 +820,12 @@ int ASound3::command35() {
 	byte *pData = loadData(0x0CB8, 413);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x0E55, 270));
-		_channels[2].load(loadData(0x0F63, 238));
-		_channels[3].load(loadData(0x1051, 264));
-		_channels[4].load(loadData(0x1159, 434));
-		_channels[5].load(loadData(0x130B, 403));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x0E55, 270));
+		_channels[2]->load(loadData(0x0F63, 238));
+		_channels[3]->load(loadData(0x1051, 264));
+		_channels[4]->load(loadData(0x1159, 434));
+		_channels[5]->load(loadData(0x130B, 403));
 	}
 	return 0;
 }
@@ -1393,12 +835,12 @@ int ASound3::command36() {
 	byte *pData = loadData(0x2072, 196);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x2136, 692));
-		_channels[2].load(loadData(0x23EA,  83));
-		_channels[3].load(loadData(0x243D,  24));
-		_channels[4].load(loadData(0x2455,  78));
-		_channels[5].load(loadData(0x24A3,  79));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x2136, 692));
+		_channels[2]->load(loadData(0x23EA,  83));
+		_channels[3]->load(loadData(0x243D,  24));
+		_channels[4]->load(loadData(0x2455,  78));
+		_channels[5]->load(loadData(0x24A3,  79));
 	}
 	return 0;
 }
@@ -1420,23 +862,23 @@ int ASound3::command37() {
 
 // sub_11DC8 – ch6 + ch8
 int ASound3::command64() {
-	_channels[6].load(loadData(0x28CA, 50));
-	_channels[8].load(loadData(0x28FC, 29));
+	_channels[6]->load(loadData(0x28CA, 50));
+	_channels[8]->load(loadData(0x28FC, 29));
 	return 0;
 }
 
 // sub_11DD4 – ch6 + ch8
 int ASound3::command65() {
-	_channels[6].load(loadData(0x2919, 17));
-	_channels[8].load(loadData(0x292A, 13));
+	_channels[6]->load(loadData(0x2919, 17));
+	_channels[8]->load(loadData(0x292A, 13));
 	return 0;
 }
 
 // sub_11DE0 – ch6 + ch7 + ch8
 int ASound3::command66() {
-	_channels[6].load(loadData(0x2937, 31));
-	_channels[7].load(loadData(0x2956, 15));
-	_channels[8].load(loadData(0x2965, 31));
+	_channels[6]->load(loadData(0x2937, 31));
+	_channels[7]->load(loadData(0x2956, 15));
+	_channels[8]->load(loadData(0x2965, 31));
 	return 0;
 }
 
@@ -1474,8 +916,8 @@ int ASound3::command71() {
 
 // sub_11E22 – ch7 + ch8
 int ASound3::command72() {
-	_channels[7].load(loadData(0x29EA, 17));
-	_channels[8].load(loadData(0x2A18, 17));
+	_channels[7]->load(loadData(0x29EA, 17));
+	_channels[8]->load(loadData(0x2A18, 17));
 	return 0;
 }
 
@@ -1493,8 +935,8 @@ int ASound3::command74() {
 
 // sub_11E47 – ch7 + ch8
 int ASound3::command75() {
-	_channels[7].load(loadData(0x29FB, 29));
-	_channels[8].load(loadData(0x2A29, 27));
+	_channels[7]->load(loadData(0x29FB, 29));
+	_channels[8]->load(loadData(0x2A29, 27));
 	return 0;
 }
 
@@ -1516,7 +958,7 @@ int ASound3::command75() {
  *   sub_10413=ch4  sub_10418=ch5  sub_1041D=ch6                         *
  *                                                                        *
  * sub_106DF = isSoundActive guard                                        *
- * sub_1039C = playSoundData(pData, ADLIB_CHANNEL_MIDWAY) (upper pool)   *
+ * sub_1039C = findFreeChannel(pData, ADLIB_CHANNEL_MIDWAY) (upper pool)   *
  *                                                                        *
  * commands 24 and 25 share the same handler (sub_11D0A).                *
  * Two unreferenced subs (sub_11D5E, sub_11D6B) contain dead sound data  *
@@ -1556,15 +998,13 @@ const ASound4::CommandPtr ASound4::_commandList[71] = {
 };
 
 ASound4::ASound4(Audio::Mixer *mixer, OPL::OPL *opl)
-		: PhantomASound(mixer, opl, "asound.ph4", 0x1f90) {
+		: ASound(mixer, opl, "asound.ph4", 0x1f90, 0x14d0) {
 }
 
 int ASound4::command(int commandId, int param) {
 	if (commandId > 70 || !_commandList[commandId])
 		return 0;
-
-	_commandParam = param;
-	_frameCounter = 0;
+	
 	return (this->*_commandList[commandId])();
 }
 
@@ -1586,13 +1026,13 @@ int ASound4::command16() {
 	byte *pData = loadData(0x0C36, 63);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x0C75, 636));
-		_channels[2].load(loadData(0x0EF1,  40));
-		_channels[3].load(loadData(0x0F19,  40));
-		_channels[4].load(loadData(0x0F41,  38));
-		_channels[5].load(loadData(0x0F67,  41));
-		_channels[6].load(loadData(0x0F90, 106));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x0C75, 636));
+		_channels[2]->load(loadData(0x0EF1,  40));
+		_channels[3]->load(loadData(0x0F19,  40));
+		_channels[4]->load(loadData(0x0F41,  38));
+		_channels[5]->load(loadData(0x0F67,  41));
+		_channels[6]->load(loadData(0x0F90, 106));
 	}
 	return 0;
 }
@@ -1699,8 +1139,8 @@ int ASound4::command70() {
  *                                                                        *
  * In this driver IDA named the lower-pool loadAny as AdlibChannel_loadAny*
  * (starts from ch0) and sub_1039C as the upper-pool loader (ch6-8).     *
- *   AdlibChannel_loadAny → playSoundData(pData, 0)                      *
- *   sub_1039C            → playSound() / playSoundData(pData, MIDWAY)   *
+ *   AdlibChannel_loadAny -> findFreeChannel(pData, 0)                      *
+ *   sub_1039C            -> playSound() / findFreeChannel(pData, MIDWAY)   *
  *                                                                        *
  * loc_11D42 (cmd37) and loc_11D72 (cmd36) load channels in non-         *
  * sequential order — the sound data for each channel is not stored       *
@@ -1745,15 +1185,13 @@ const ASound5::CommandPtr ASound5::_commandList[79] = {
 };
 
 ASound5::ASound5(Audio::Mixer *mixer, OPL::OPL *opl)
-		: PhantomASound(mixer, opl, "asound.ph5", 0x2140) {
+		: ASound(mixer, opl, "asound.ph5", 0x2140, 0x5cd0) {
 }
 
 int ASound5::command(int commandId, int param) {
 	if (commandId > 78 || !_commandList[commandId])
 		return 0;
-
-	_commandParam = param;
-	_frameCounter = 0;
+	
 	return (this->*_commandList[commandId])();
 }
 
@@ -1775,12 +1213,12 @@ int ASound5::command16() {
 	byte *pData = loadData(0x4142, 120);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x41BA, 146));
-		_channels[2].load(loadData(0x424C, 133));
-		_channels[3].load(loadData(0x42D1,  69));
-		_channels[4].load(loadData(0x4316, 152));
-		_channels[5].load(loadData(0x43AE,  14));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x41BA, 146));
+		_channels[2]->load(loadData(0x424C, 133));
+		_channels[3]->load(loadData(0x42D1,  69));
+		_channels[4]->load(loadData(0x4316, 152));
+		_channels[5]->load(loadData(0x43AE,  14));
 	}
 	return 0;
 }
@@ -1824,14 +1262,14 @@ int ASound5::command27() {
 // sub_11EB4 – command1, eight loadAny (lower pool, AdlibChannel_loadAny)
 int ASound5::command32() {
 	ASound::command1();
-	playSoundData(loadData(0x43BC, 689), 0);
-	playSoundData(loadData(0x466D, 262), 0);
-	playSoundData(loadData(0x4773, 480), 0);
-	playSoundData(loadData(0x4953, 504), 0);
-	playSoundData(loadData(0x4B4B, 584), 0);
-	playSoundData(loadData(0x4D93, 308), 0);
-	playSoundData(loadData(0x4EC7, 426), 0);
-	playSoundData(loadData(0x5071, 357), 0);
+	findFreeChannel(loadData(0x43BC, 689));
+	findFreeChannel(loadData(0x466D, 262));
+	findFreeChannel(loadData(0x4773, 480));
+	findFreeChannel(loadData(0x4953, 504));
+	findFreeChannel(loadData(0x4B4B, 584));
+	findFreeChannel(loadData(0x4D93, 308));
+	findFreeChannel(loadData(0x4EC7, 426));
+	findFreeChannel(loadData(0x5071, 357));
 	return 0;
 }
 
@@ -1840,13 +1278,13 @@ int ASound5::command33() {
 	byte *pData = loadData(0x21C6, 609);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x2427, 652));
-		_channels[2].load(loadData(0x26B3, 272));
-		_channels[3].load(loadData(0x27C3, 558));
-		_channels[4].load(loadData(0x29F1, 712));
-		_channels[5].load(loadData(0x2CB9, 464));
-		_channels[6].load(loadData(0x2E89,  21));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x2427, 652));
+		_channels[2]->load(loadData(0x26B3, 272));
+		_channels[3]->load(loadData(0x27C3, 558));
+		_channels[4]->load(loadData(0x29F1, 712));
+		_channels[5]->load(loadData(0x2CB9, 464));
+		_channels[6]->load(loadData(0x2E89,  21));
 	}
 	return 0;
 }
@@ -1857,12 +1295,12 @@ int ASound5::command34() {
 	byte *pData = loadData(0x2E9E, 1521);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x4003,    7));
-		_channels[2].load(loadData(0x348F, 1424));
-		_channels[3].load(loadData(0x400A,    7));
-		_channels[4].load(loadData(0x3A1F, 1508));
-		_channels[5].load(loadData(0x4011,    9));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x4003,    7));
+		_channels[2]->load(loadData(0x348F, 1424));
+		_channels[3]->load(loadData(0x400A,    7));
+		_channels[4]->load(loadData(0x3A1F, 1508));
+		_channels[5]->load(loadData(0x4011,    9));
 	}
 	return 0;
 }
@@ -1873,12 +1311,12 @@ int ASound5::command35() {
 	byte *pData = loadData(0x1D0A, 320);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x2196,  18));
-		_channels[2].load(loadData(0x1E4A, 304));
-		_channels[3].load(loadData(0x21A8,  18));
-		_channels[4].load(loadData(0x1F7A, 540));
-		_channels[5].load(loadData(0x21BA,  12));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x2196,  18));
+		_channels[2]->load(loadData(0x1E4A, 304));
+		_channels[3]->load(loadData(0x21A8,  18));
+		_channels[4]->load(loadData(0x1F7A, 540));
+		_channels[5]->load(loadData(0x21BA,  12));
 	}
 	return 0;
 }
@@ -1889,12 +1327,12 @@ int ASound5::command36() {
 	byte *pData = loadData(0x15F5, 740);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x18E2, 326));
-		_channels[2].load(loadData(0x1A28, 561));
-		_channels[3].load(loadData(0x1C59, 177));
-		_channels[4].load(loadData(0x15EC,   9));
-		_channels[5].load(loadData(0x18D9,   9));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x18E2, 326));
+		_channels[2]->load(loadData(0x1A28, 561));
+		_channels[3]->load(loadData(0x1C59, 177));
+		_channels[4]->load(loadData(0x15EC,   9));
+		_channels[5]->load(loadData(0x18D9,   9));
 	}
 	return 0;
 }
@@ -1904,15 +1342,15 @@ int ASound5::command37() {
 	byte *pData = loadData(0x1190, 397);
 	if (!isSoundActive(pData)) {
 		ASound::command1();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x131D, 378));
-		_channels[2].load(loadData(0x1497,  60));
-		_channels[3].load(loadData(0x14D3,  64));
-		_channels[4].load(loadData(0x1513,  44));
-		_channels[5].load(loadData(0x153F,  44));
-		_channels[6].load(loadData(0x156B,  50));
-		_channels[7].load(loadData(0x159D,  52));
-		_channels[8].load(loadData(0x15D1,  27));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x131D, 378));
+		_channels[2]->load(loadData(0x1497,  60));
+		_channels[3]->load(loadData(0x14D3,  64));
+		_channels[4]->load(loadData(0x1513,  44));
+		_channels[5]->load(loadData(0x153F,  44));
+		_channels[6]->load(loadData(0x156B,  50));
+		_channels[7]->load(loadData(0x159D,  52));
+		_channels[8]->load(loadData(0x15D1,  27));
 	}
 	return 0;
 }
@@ -1922,12 +1360,12 @@ int ASound5::command38() {
 	byte *pData = loadData(0x0C36, 329);
 	if (!isSoundActive(pData)) {
 		ASound::command2();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x0D7F, 201));
-		_channels[2].load(loadData(0x0E48, 200));
-		_channels[3].load(loadData(0x0F10, 162));
-		_channels[4].load(loadData(0x0FB2, 228));
-		_channels[5].load(loadData(0x1096, 250));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x0D7F, 201));
+		_channels[2]->load(loadData(0x0E48, 200));
+		_channels[3]->load(loadData(0x0F10, 162));
+		_channels[4]->load(loadData(0x0FB2, 228));
+		_channels[5]->load(loadData(0x1096, 250));
 	}
 	return 0;
 }
@@ -1937,12 +1375,12 @@ int ASound5::command39() {
 	byte *pData = loadData(0x5312, 599);
 	if (!isSoundActive(pData)) {
 		ASound::command3();
-		_channels[0].load(pData);
-		_channels[1].load(loadData(0x5569, 275));
-		_channels[2].load(loadData(0x567C, 289));
-		_channels[3].load(loadData(0x579D, 243));
-		_channels[4].load(loadData(0x5890, 196));
-		_channels[5].load(loadData(0x5954, 206));
+		_channels[0]->load(pData);
+		_channels[1]->load(loadData(0x5569, 275));
+		_channels[2]->load(loadData(0x567C, 289));
+		_channels[3]->load(loadData(0x579D, 243));
+		_channels[4]->load(loadData(0x5890, 196));
+		_channels[5]->load(loadData(0x5954, 206));
 	}
 	return 0;
 }
@@ -2064,15 +1502,14 @@ const ASound9::CommandPtr ASound9::_commandList[72] = {
 	&ASound9::command68, &ASound9::command69, &ASound9::command70, &ASound9::command71
 };
 
-ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) : PhantomASound(mixer, opl, "asound.ph9", 0x20c0) {
+ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) :
+		ASound(mixer, opl, "asound.ph9", 0x20c0, 0x3690) {
 }
 
 int ASound9::command(int commandId, int param) {
 	if (commandId > 71 || !_commandList[commandId])
 		return 0;
-
-	_commandParam = param;
-	_frameCounter = 0;
+	
 	return (this->*_commandList[commandId])();
 }
 

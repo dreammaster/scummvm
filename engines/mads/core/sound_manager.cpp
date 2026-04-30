@@ -20,6 +20,7 @@
  */
 
 #include "audio/fmopl.h"
+#include "common/file.h"
 #include "common/memstream.h"
 #include "mads/core/sound_manager.h"
 
@@ -123,42 +124,46 @@ void SoundManager::noise() {
 
 //====================================================================
 
-SoundDriver::SoundDriver(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset) :
-	_mixer(mixer), _opl(opl), _dataOffset(dataOffset) {
+SoundDriver::SoundDriver(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
+		int dataOffset, int dataSize) : _mixer(mixer), _opl(opl) {
 	// Open up the appropriate sound file
-	if (!_soundFile.open(filename))
+	Common::File soundFile;
+	if (!soundFile.open(filename))
 		error("Could not open file - %s", filename.toString().c_str());
+
+	_soundData.resize(dataSize);
+	soundFile.seek(dataOffset);
+	soundFile.read(&_soundData[0], dataSize);
 }
 
 SoundDriver::~SoundDriver() {
 	_opl->stop();
-
-	Common::List<CachedDataEntry>::iterator i;
-	for (i = _dataCache.begin(); i != _dataCache.end(); ++i)
-		delete[](*i)._data;
 }
 
 byte *SoundDriver::loadData(int offset, int size) {
-	// First scan for an existing copy
-	Common::List<CachedDataEntry>::iterator i;
-	for (i = _dataCache.begin(); i != _dataCache.end(); ++i) {
-		CachedDataEntry &e = *i;
-		if (e._offset == offset)
-			return e._data;
+	byte *ptr = &_soundData[offset];
+
+	// Check for an existing cache entry
+	uint idx;
+	for (idx = 0; idx < _dataCache.size() && _dataCache[idx]._dataStart != ptr; ++idx) {
 	}
 
-	// No existing entry found, so load up data and store as a new entry
-	CachedDataEntry rec;
-	rec._offset = offset;
-	rec._data = new byte[size];
-	rec._dataEnd = rec._data + size - 1;
-	_soundFile.seek(_dataOffset + offset);
-	_soundFile.read(rec._data, size);
-	_dataCache.push_back(rec);
+	if (idx == _dataCache.size())
+		_dataCache.push_back(CachedDataEntry(ptr, size));
 
-	// Return the data
-	return rec._data;
+	// Return the data pointer
+	return ptr;
 }
 
+SoundDriver::CachedDataEntry &SoundDriver::getCachedData(byte *pData) {
+	Common::Array<CachedDataEntry>::iterator i;
+	for (i = _dataCache.begin(); i != _dataCache.end(); ++i) {
+		CachedDataEntry &e = *i;
+		if (e._dataStart == pData)
+			return e;
+	}
+
+	error("Could not find previously loaded data");
+}
 
 } // namespace MADS

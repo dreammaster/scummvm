@@ -23,7 +23,7 @@
 #define MADS_CORE_SOUND_MANAGER_H
 
 #include "common/array.h"
-#include "common/file.h"
+#include "common/memstream.h"
 #include "common/mutex.h"
 #include "common/queue.h"
 
@@ -37,29 +37,52 @@ class OPL;
 
 namespace MADS {
 
-struct CachedDataEntry {
-	int _offset;
-	byte *_data;
-	byte *_dataEnd;
-};
+#define CALLBACKS_PER_SECOND 60
 
 class SoundDriver {
 protected:
+	struct CachedDataEntry {
+		byte *_dataStart = nullptr;
+		byte *_dataEnd = nullptr;
+		CachedDataEntry(byte *dataStart, size_t size) : _dataStart(dataStart),
+			_dataEnd(dataStart + size - 1) {
+		}
+	};
+
+private:
+	Common::Array<CachedDataEntry> _dataCache;
+
+protected:
 	Audio::Mixer *_mixer;
 	OPL::OPL *_opl;
-	Common::File _soundFile;
-	Common::List<CachedDataEntry> _dataCache;
-	int _dataOffset;
+	Common::Array<byte> _soundData;
 
 	/**
-	 * Loads a data block from the sound file, caching the result for any future
-	 * calls for the same data
+	 * Returns data for the specified offset. It also caches the data size for that
+	 * offset, for any future references that need it.
 	 */
 	byte *loadData(int offset, int size);
 
+	/**
+	 * Gets a stream starting at a given offset in the loaded sound data
+	 */
+	Common::MemoryReadStream getDataStream(int offset) const {
+		return Common::MemoryReadStream(&_soundData[offset], _soundData.size() - offset);
+	}
+
+	int getDataOffset(byte *ptr) const {
+		return ptr - &_soundData[0];
+	}
+
 public:
-	SoundDriver(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename, int dataOffset);
+	SoundDriver(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
+		int dataOffset, int dataSize);
 	virtual ~SoundDriver();
+
+	/**
+	 * Return the cached data block record for previously loaded sound data
+	 */
+	CachedDataEntry &getCachedData(byte *pData);
 
 	/**
 	 * Execute a player command. Most commands represent sounds to play, but some
@@ -77,9 +100,7 @@ public:
 	/**
 	 * Main poll method to allow sounds to progress
 	 */
-	virtual int poll() {
-		return 0;
-	}
+	virtual int poll() = 0;
 
 	/**
 	 * General noise/note output
@@ -176,7 +197,6 @@ public:
 
 	//@}
 };
-
 
 } // namespace MADS
 
