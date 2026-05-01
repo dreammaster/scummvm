@@ -179,6 +179,7 @@ void AdlibChannel::processChannelFade() {
 ASound::ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
 		int dataOffset, int dataSize) :
 		SoundDriver(mixer, opl, filename, dataOffset, dataSize) {
+	AdlibChannel::_isDisabled = false;
 	_opl->start(new Common::Functor0Mem<void, ASound>(this, &ASound::onTimer), CALLBACKS_PER_SECOND);
 }
 
@@ -409,6 +410,7 @@ void ASound::flush() {
 
 	while (!_queue.empty()) {
 		auto v = _queue.pop();
+		warning("%.2x %.2x", v.first, v.second);
 		_opl->writeReg(v.first, v.second);
 	}
 }
@@ -441,7 +443,6 @@ void ASound::signalSoundPlaying() {
 void ASound::clearCallback() {
 	_callbackCounter = 0;
 	_callbackPeriod = 0;
-	_callbackFnPtr = 0;
 }
 
 /* =========================================================================
@@ -752,6 +753,20 @@ void ASound::update() {
 	if (!_isDisabled) {
 		(void)getRandomNumber();
 		++_frameNumber2;
+
+		pollAllChannels();
+		updateAllChannels();
+		_anySweepActive = false;
+
+		for (int chan = 0; chan < ADLIB_CHANNEL_COUNT; ++chan)
+			update1(chan);
+
+		if (!_anySweepActive) {
+			if (_resultFlag != -1) {
+				_resultFlag = -1;
+				_pollResult = -1;
+			}
+		}
 	}
 }
 

@@ -34,40 +34,40 @@ namespace MADSV2 {
 
 struct AdlibChannel {
 	static bool _isDisabled;
-	uint8  _activeCount;
-	uint8  _pitchBend;
-	uint8  _volumeFadeStep;
-	uint8  _vibratoDepth;
-	uint8  _note;
-	uint8  _sampleIndex;
-	uint8  _volume;
-	uint8  _noteOffset;
-	uint8  _keyOnDelay;
-	uint8  _fadePeriodCounter;
-	uint8  _fadePeriodReload;
-	uint8  _vibPeriodCounter;
-	uint8  _vibPeriodReload;
-	uint8  _patchAttenuation;
-	byte *_loopStartPtr;
-	byte *_pSrc;
-	byte *_innerLoopPtr;
-	byte *_outerLoopPtr;
-	byte *_soundData;
-	byte *_branchTargetPtr;
-	uint16 _innerLoopCount;
-	uint16 _outerLoopCount;
-	uint16 _noiseFreqMask;
-	uint16 _freqAccum;
-	uint16 _freqStep;
-	uint8  _freqSweepCounter;
-	uint8  _savedFreqSweep;
-	uint8  _transpose;
-	uint8  _velocity;
-	uint8  _opVolBytes;
-	uint8  _opVolBytes2;
-	uint8  _octaveTranspose;
-	uint8  _pendingStop;
-	uint8  _durationOverride;
+	uint8  _activeCount = 0;
+	uint8  _pitchBend = 0;
+	uint8  _volumeFadeStep = 0;
+	uint8  _vibratoDepth = 0;
+	uint8  _note = 0;
+	uint8  _sampleIndex = 0;
+	uint8  _volume = 0;
+	uint8  _noteOffset = 0;
+	uint8  _keyOnDelay = 0;
+	uint8  _fadePeriodCounter = 0;
+	uint8  _fadePeriodReload = 0;
+	uint8  _vibPeriodCounter = 0;
+	uint8  _vibPeriodReload = 0;
+	uint8  _patchAttenuation = 0;
+	byte *_loopStartPtr = nullptr;
+	byte *_pSrc = nullptr;
+	byte *_innerLoopPtr = nullptr;
+	byte *_outerLoopPtr = nullptr;
+	byte *_soundData = nullptr;
+	byte *_branchTargetPtr = nullptr;
+	uint16 _innerLoopCount = 0;
+	uint16 _outerLoopCount = 0;
+	uint16 _noiseFreqMask = 0;
+	uint16 _freqAccum = 0;
+	uint16 _freqStep = 0;
+	uint8  _freqSweepCounter = 0;
+	uint8  _savedFreqSweep = 0;
+	uint8  _transpose = 0;
+	uint8  _velocity = 0;
+	uint8  _opVolBytes = 0;
+	uint8  _opVolBytes2 = 0;
+	uint8  _octaveTranspose = 0;
+	uint8  _pendingStop = 0;
+	uint8  _durationOverride = 0;
 
 	/**
 	 * Zeroes the "live" fields of one channel without touching loop/sound-data
@@ -102,53 +102,52 @@ struct AdlibChannel {
 };
 
 struct AdlibSample {
-	uint8  _attackRate;
-	uint8  _decayRate;
-	uint8  _sustainLevel;
-	uint8  _releaseRate;
-	uint8  _egTyp;
-	uint8  _ksr;
-	uint8  _totalLevel;
-	uint8  _scalingLevel;
-	uint8  _waveformSelect;
-	uint8  _freqMultiple;
-	uint8  _feedback;
-	uint8  _ampMod;
-	uint8  _vib;
-	uint8  _alg;
-	uint8  _freqSweepInit;
-	uint8  _reserved;
-	uint16 _freqMask;
-	uint16 _freqBase;
-	uint16 _outerLoopPtr;
+	uint8  _attackRate = 0;
+	uint8  _decayRate = 0;
+	uint8  _sustainLevel = 0;
+	uint8  _releaseRate = 0;
+	uint8  _egTyp = 0;
+	uint8  _ksr = 0;
+	uint8  _totalLevel = 0;
+	uint8  _scalingLevel = 0;
+	uint8  _waveformSelect = 0;
+	uint8  _freqMultiple = 0;
+	uint8  _feedback = 0;
+	uint8  _ampMod = 0;
+	uint8  _vib = 0;
+	uint8  _alg = 0;
+	uint8  _freqSweepInit = 0;
+	uint8  _reserved = 0;
+	uint16 _freqMask = 0;
+	uint16 _freqBase = 0;
+	uint16 _outerLoopPtr = 0;
 };
 
 class ASound : public SoundDriver {
 private:
 	Common::Mutex _driverMutex;
 	Common::Queue< Common::Pair<byte, byte> > _queue;
-	uint16 _callbackCounter = 0;  // period counter
-	uint16 _callbackPeriod = 0;  // period reload
-	uint16 _callbackFnPtr = 0;  // callback function pointer (not used in C)
+	uint16 _callbackCounter = 0;		// Period counter
+	uint16 _callbackPeriod = 0;			// Period reload
 	AdlibChannel *_activeChannelPtr = NULL;
 	uint8 _activeChannelNumber = 0;
 	uint16 _activeChannelReg = 0;
-	uint16 _currentOpBase = 0;				// Current operator base
+	uint16 _currentOpBase = 0;			// Current operator base
 	AdlibSample *_samplePtr = NULL;
-	byte *pSrc = nullptr;				// current read pointer
+	byte *pSrc = nullptr;				// Current read pointer
 	uint8 _adlib_v5660_2 = 0;			// OPL version flag
-	uint16 _pollResult = 0;
-	uint16 _resultFlag = 0;
+	int16 _pollResult = 0;
+	int16 _resultFlag = 0;
 	uint16 _randomSeed = 0x4D2;
 	uint8  _isDisabled = 0;
-	uint8  _findChannelMode = 0;				// findFreeChannel mode
-	uint8  _ch5SweepLive = 0;				// channel5 savedFreqSweep shadow
-	uint8  _ch5SweepSaved = 0;				// channel5 savedFreqSweep shadow 2
-	uint8  _ch5PendingStop = 0;				// channel5 pendingStop shadow
+	uint8  _findChannelMode = 0;		// findFreeChannel mode
+	uint8  _ch5SweepLive = 0;			// Channel5 savedFreqSweep shadow
+	uint8  _ch5SweepSaved = 0;			// Channel5 savedFreqSweep shadow 2
+	uint8  _ch5PendingStop = 0;			// Channel5 pendingStop shadow
 	/* Percussion flags (_rhythmHiHat/D/E) */
-	uint8 _rhythmHiHat;					// rhythm mode: hi-hat
-	uint8 _rhythmCymbal;					// rhythm mode: cymbal
-	uint8 _rhythmEnable;					// rhythm mode: enable
+	uint8 _rhythmHiHat = 0;				// Rhythm mode: hi-hat
+	uint8 _rhythmCymbal = 0;			// Rhythm mode: cymbal
+	uint8 _rhythmEnable = 0;			// Rhythm mode: enable
 
 	uint8 _anySweepActive = 0;				// any-sweep-active flag
 	int _frameNumber2 = 0;
