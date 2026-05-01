@@ -121,6 +121,9 @@ struct AdlibSample {
 	uint16 _freqMask = 0;
 	uint16 _freqBase = 0;
 	uint16 _outerLoopPtr = 0;
+
+	AdlibSample() {}
+	AdlibSample(Common::SeekableReadStream &s);
 };
 
 class ASound : public SoundDriver {

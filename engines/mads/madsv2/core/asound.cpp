@@ -109,6 +109,30 @@ static uint8 ADLIB_NULLDATA[] = {
 
 // =========================================================================
 
+AdlibSample::AdlibSample(Common::SeekableReadStream &s) {
+	_attackRate = s.readByte();
+	_decayRate = s.readByte();
+	_sustainLevel = s.readByte();
+	_releaseRate = s.readByte();
+	_egTyp = s.readByte();
+	_ksr = s.readByte();
+	_totalLevel = s.readByte();
+	_scalingLevel = s.readByte();
+	_waveformSelect = s.readByte();
+	_freqMultiple = s.readByte();
+	_feedback = s.readByte();
+	_ampMod = s.readByte();
+	_vib = s.readByte();
+	_alg = s.readByte();
+	_freqSweepInit = s.readByte();
+	_reserved = s.readByte();
+	_freqMask = s.readUint16LE();
+	_freqBase = s.readUint16LE();
+	_outerLoopPtr = s.readUint16LE();
+}
+
+// =========================================================================
+
 void AdlibChannel::reset() {
 	_activeCount = 0;
 	_pitchBend = 0;

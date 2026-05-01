@@ -111,6 +111,10 @@ const ASound1::CommandPtr ASound1::_commandList[40] = {
 
 ASound1::ASound1(Audio::Mixer *mixer, OPL::OPL *opl)
 		: ASound(mixer, opl, "asound.ph1", 0x21e0, 0x4d20) {
+	// Load sound samples
+	auto samplesStream = getDataStream(0x1d4);
+	for (int i = 0; i < 120; ++i)
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound1::command(int commandId, int param) {
@@ -424,6 +428,10 @@ const ASound2::CommandPtr ASound2::_commandList[73] = {
 
 ASound2::ASound2(Audio::Mixer *mixer, OPL::OPL *opl)
 		: ASound(mixer, opl, "asound.ph2", 0x2040, 0x2300) {
+	// Load sound samples
+	auto samplesStream = getDataStream(0x1d4);
+	for (int i = 0; i < 120; ++i)
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound2::command(int commandId, int param) {
@@ -682,6 +690,10 @@ const ASound3::CommandPtr ASound3::_commandList[77] = {
 
 ASound3::ASound3(Audio::Mixer *mixer, OPL::OPL *opl)
 		: ASound(mixer, opl, "asound.ph3", 0x20c0, 0x31a0) {
+	// Load sound samples
+	auto samplesStream = getDataStream(0x1d4);
+	for (int i = 0; i < 120; ++i)
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound3::command(int commandId, int param) {
@@ -999,6 +1011,10 @@ const ASound4::CommandPtr ASound4::_commandList[71] = {
 
 ASound4::ASound4(Audio::Mixer *mixer, OPL::OPL *opl)
 		: ASound(mixer, opl, "asound.ph4", 0x1f90, 0x14d0) {
+	// Load sound samples
+	auto samplesStream = getDataStream(0x1d4);
+	for (int i = 0; i < 120; ++i)
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound4::command(int commandId, int param) {
@@ -1186,6 +1202,10 @@ const ASound5::CommandPtr ASound5::_commandList[79] = {
 
 ASound5::ASound5(Audio::Mixer *mixer, OPL::OPL *opl)
 		: ASound(mixer, opl, "asound.ph5", 0x2140, 0x5cd0) {
+	// Load sound samples
+	auto samplesStream = getDataStream(0x1d4);
+	for (int i = 0; i < 120; ++i)
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound5::command(int commandId, int param) {
@@ -1504,6 +1524,10 @@ const ASound9::CommandPtr ASound9::_commandList[72] = {
 
 ASound9::ASound9(Audio::Mixer *mixer, OPL::OPL *opl) :
 		ASound(mixer, opl, "asound.ph9", 0x20c0, 0x3690) {
+	// Load sound samples
+	auto samplesStream = getDataStream(0x1d4);
+	for (int i = 0; i < 120; ++i)
+		_samples.push_back(AdlibSample(samplesStream));
 }
 
 int ASound9::command(int commandId, int param) {
