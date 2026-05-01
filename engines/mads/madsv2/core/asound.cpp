@@ -918,8 +918,35 @@ dispatch:
 
 		/* High bit set - it is a command.  Commands above 0xBD go to switch. */
 		if (b > 0xBD) {
-			/* Decode the command opcode: ax = b - (-66) = b + 66          */
-			/* Switch range is 0..65 (opcodes -66 .. -1 mapped to 0..65)   */
+			/*
+			 * Decode the command opcode.
+			 * The byte is sign-extended to int8 (0xFF..-0x80 -> -1..-128),
+			 * then ax = int8(b) - (-66).
+			 *
+			 * Opcode -> ax mapping (selected):
+			 *   0xFF (-1)  -> 65    0xFE (-2)  -> 64    0xFD (-3)  -> 63
+			 *   0xFC (-4)  -> 62    0xFB (-5)  -> 61    0xFA (-6)  -> 60
+			 *   0xF9 (-7)  -> 59    0xF8 (-8)  -> 58    0xF7 (-9)  -> 57
+			 *   0xF6 (-10) -> 56    0xF5 (-11) -> 55    0xF4 (-12) -> 54
+			 *   0xF3 (-13) -> 53    0xF2 (-14) -> 52    0xF1 (-15) -> 51
+			 *   0xF0 (-16) -> 50    0xEF (-17) -> 49    0xEE (-18) -> 48
+			 *   0xED (-19) -> 47    0xEC (-20) -> 46    0xEB (-21) -> 45
+			 *   0xEA (-22) -> 44    0xE9 (-23) -> 43    0xE8 (-24) -> 42
+			 *   0xE7 (-25) -> 41    0xE6 (-26) -> 40    0xE5 (-27) -> 39
+			 *   0xE4 (-28) -> 38    0xE3 (-29) -> 37    0xE2 (-30) -> 36
+			 *   0xE1 (-31) -> 35    0xE0 (-32) -> 34    0xDF (-33) -> 33
+			 *   0xDE (-34) -> 32    0xDD (-35) -> 31    0xDC (-36) -> 30
+			 *   0xDB (-37) -> 29    0xDA (-38) -> 28    0xD9 (-39) -> 27
+			 *   0xD8 (-40) -> 26    0xD7 (-41) -> 25    0xD6 (-42) -> 24
+			 *   0xD5 (-43) -> 23    0xD4 (-44) -> 22    0xD3 (-45) -> 21
+			 *   0xD2 (-46) -> 20    0xD1 (-47) -> 19    0xD0 (-48) -> 18
+			 *   0xCF (-49) -> 17    0xCE (-50) -> 16    0xCD (-51) -> 15
+			 *   0xCC (-52) -> 14    0xCB (-53) -> 13    0xCA (-54) -> 12
+			 *   0xC9 (-55) -> 11    0xC8 (-56) -> 10    0xC7 (-57) ->  9
+			 *   0xC6 (-58) ->  8    0xC5 (-59) ->  7    0xC4 (-60) ->  6
+			 *   0xC3 (-61) ->  5    0xC2 (-62) ->  4    0xC1 (-63) ->  3
+			 *   0xC0 (-64) ->  2
+			 */
 			int16 ax = (int16)(int8)b;   /* sign-extend */
 			var_8 = 0;
 			ax = (int16)(ax - (-66));
@@ -1053,7 +1080,7 @@ dispatch:
 				goto dispatch;
 			}
 
-			/* ---- opcode -9  (0xF7): set note (with 0 duration override) ---- */
+			/* ---- opcode -9  (0xF7): set note offset (with 0 duration override) ---- */
 			case 57:
 			{
 				pSrc++;
@@ -1083,7 +1110,7 @@ dispatch:
 			}
 
 			/* ---- opcode -12 (0xF4): set volume ---- */
-			case 52:
+			case 54:
 			{
 				pSrc++;
 				uint8 vol = *pSrc;
@@ -1104,7 +1131,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -13 (0xF3): set fade ---- */
-			case 51:
+			case 53:
 			{
 				if (ch->_pendingStop != 0) {
 					ch->_pSrc += 3;
@@ -1120,7 +1147,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -14 (0xF2): set transpose ---- */
-			case 50:
+			case 52:
 			{
 				pSrc++;
 				ch->_transpose = *pSrc;
@@ -1129,7 +1156,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -15 (0xF1): set velocity ---- */
-			case 49:
+			case 51:
 			{
 				pSrc++;
 				uint8 vel = *pSrc;
@@ -1146,7 +1173,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -16 (0xF0): set patch attenuation ---- */
-			case 48:
+			case 50:
 			{
 				pSrc++;
 				ch->_patchAttenuation = *pSrc;
@@ -1156,7 +1183,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -17 (0xEF): set vibrato ---- */
-			case 47:
+			case 49:
 			{
 				pSrc++;
 				ch->_vibPeriodReload = *pSrc;
@@ -1168,7 +1195,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -18 (0xEE): set octave transpose ---- */
-			case 46:
+			case 48:
 			{
 				pSrc++;
 				ch->_octaveTranspose = *pSrc;
@@ -1177,7 +1204,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -19 (0xED): skip forward by N+3 bytes ---- */
-			case 45:
+			case 47:
 			{
 				pSrc++;
 				var_C = *pSrc;
@@ -1187,7 +1214,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -20 (0xEC): random pick from table ---- */
-			case 44:
+			case 46:
 			{
 				pSrc++;
 				uint8 tblSize = *pSrc;
@@ -1211,7 +1238,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -21 (0xEB): random value in range [lo..hi] ---- */
-			case 43:
+			case 45:
 			{
 				pSrc++;
 				var_A = *pSrc;
@@ -1233,15 +1260,8 @@ vol_advance:
 				goto dispatch;
 			}
 
-			/* ---- opcode -62 (0xC2): advance pSrc by 4 ---- */
-			case 4:
-			{
-				ch->_pSrc += 4;
-				goto dispatch;
-			}
-
 			/* ---- opcode -22 (0xEA): indirect random pick from var table ---- */
-			case 42:
+			case 44:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1259,7 +1279,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -23 (0xE9): store immediate into script var ---- */
-			case 41:
+			case 43:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1271,7 +1291,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -24 (0xE8): var-to-var copy ---- */
-			case 40:
+			case 42:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1283,7 +1303,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -25 (0xE7): indirect copy to stream ---- */
-			case 39:
+			case 41:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1297,7 +1317,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -26 (0xE6): increment script var ---- */
-			case 38:
+			case 40:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1307,7 +1327,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -27 (0xE5): decrement script var ---- */
-			case 37:
+			case 39:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1317,7 +1337,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -28 (0xE4): add immediate to script var ---- */
-			case 36:
+			case 38:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1329,7 +1349,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -29 (0xE3): add var to script var ---- */
-			case 35:
+			case 37:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1341,7 +1361,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -30 (0xE2): subtract immediate from script var ---- */
-			case 34:
+			case 36:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1353,7 +1373,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -31 (0xE1): subtract var from script var ---- */
-			case 33:
+			case 35:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1365,7 +1385,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -32 (0xE0): multiply script var by var ---- */
-			case 32:
+			case 34:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1377,7 +1397,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -33 (0xDF): multiply script var by immediate ---- */
-			case 31:
+			case 33:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1389,7 +1409,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -34 (0xDE): divide script var by immediate -> quotient ---- */
-			case 30:
+			case 32:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1401,7 +1421,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -35 (0xDD): divide var by var -> quotient to dst ---- */
-			case 29:
+			case 31:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1413,7 +1433,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -36 (0xDC): divide script var by immediate -> remainder ---- */
-			case 28:
+			case 30:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1425,7 +1445,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -37 (0xDB): divide var by var -> remainder to dst ---- */
-			case 27:
+			case 29:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1437,7 +1457,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -38 (0xDA): AND script var by immediate ---- */
-			case 26:
+			case 28:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1449,7 +1469,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -39 (0xD9): AND var by var ---- */
-			case 25:
+			case 27:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1461,7 +1481,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -40 (0xD8): OR script var by immediate ---- */
-			case 24:
+			case 26:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1473,7 +1493,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -41 (0xD7): OR var by var ---- */
-			case 23:
+			case 25:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1485,7 +1505,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -42 (0xD6): XOR script var by immediate ---- */
-			case 22:
+			case 24:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1497,7 +1517,7 @@ vol_advance:
 			}
 
 			/* ---- opcode -43 (0xD5): XOR var by var ---- */
-			case 21:
+			case 23:
 			{
 				pSrc++;
 				var_6 = *pSrc;
@@ -1515,8 +1535,8 @@ vol_advance:
 			 * For opcodes -52..-59 they are: var[idx] vs var[idx2].
 			 */
 
-			 /* -44 (0xD4): branch if imm == var */
-			case 20:
+			 /* ---- opcode -44 (0xD4): branch if imm == var ---- */
+			case 22:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1525,8 +1545,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -45 (0xD3): branch if imm != var */
-			case 19:
+			/* ---- opcode -45 (0xD3): branch if imm != var ---- */
+			case 21:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1534,8 +1554,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -46 (0xD2): branch if imm > var */
-			case 18:
+			/* ---- opcode -46 (0xD2): branch if imm > var ---- */
+			case 20:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1543,8 +1563,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -47 (0xD1): branch if imm >= var */
-			case 17:
+			/* ---- opcode -47 (0xD1): branch if imm >= var ---- */
+			case 19:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1552,8 +1572,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -48 (0xD0): branch if var[idx1] == var[idx2] */
-			case 16:
+			/* ---- opcode -48 (0xD0): branch if var[idx1] == var[idx2] ---- */
+			case 18:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1561,8 +1581,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -49 (0xCF): branch if var[idx1] != var[idx2] */
-			case 15:
+			/* ---- opcode -49 (0xCF): branch if var[idx1] != var[idx2] ---- */
+			case 17:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1570,8 +1590,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -50 (0xCE): branch if var[idx1] > var[idx2] */
-			case 14:
+			/* ---- opcode -50 (0xCE): branch if var[idx1] > var[idx2] ---- */
+			case 16:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1579,8 +1599,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -51 (0xCD): branch if var[idx1] < var[idx2] */
-			case 13:
+			/* ---- opcode -51 (0xCD): branch if var[idx1] < var[idx2] ---- */
+			case 15:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1588,8 +1608,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -52 (0xCC): branch if imm == var (extended) - same as -44 logic */
-			case 12:
+			/* ---- opcode -52 (0xCC): branch if imm == var (extended) ---- */
+			case 14:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1597,8 +1617,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -53 (0xCB): branch if imm != var (extended) */
-			case 11:
+			/* ---- opcode -53 (0xCB): branch if imm != var (extended) ---- */
+			case 13:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1606,8 +1626,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -54 (0xCA): branch if imm > var (extended) */
-			case 10:
+			/* ---- opcode -54 (0xCA): branch if imm > var (extended) ---- */
+			case 12:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1615,8 +1635,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -55 (0xC9): branch if imm < var (extended) */
-			case 9:
+			/* ---- opcode -55 (0xC9): branch if imm < var (extended) ---- */
+			case 11:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1624,8 +1644,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -56 (0xC8): branch if var[idx1] == var[idx2] (extended) */
-			case 8:
+			/* ---- opcode -56 (0xC8): branch if var[idx1] == var[idx2] (extended) ---- */
+			case 10:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1633,8 +1653,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -57 (0xC7): branch if var[idx1] != var[idx2] (extended) */
-			case 7:
+			/* ---- opcode -57 (0xC7): branch if var[idx1] != var[idx2] (extended) ---- */
+			case 9:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1642,8 +1662,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -58 (0xC6): branch if var[idx1] > var[idx2] (extended) */
-			case 6:
+			/* ---- opcode -58 (0xC6): branch if var[idx1] > var[idx2] (extended) ---- */
+			case 8:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1651,8 +1671,8 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* -59 (0xC5): branch if var[idx1] < var[idx2] (extended) */
-			case 5:
+			/* ---- opcode -59 (0xC5): branch if var[idx1] < var[idx2] (extended) ---- */
+			case 7:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
@@ -1660,7 +1680,7 @@ vol_advance:
 				goto branch_skip5;
 			}
 
-			/* Shared branch-taken logic for -44..-51: save +5 as return target */
+			/* Shared branch-taken logic for -44..-51: save pSrc+5 as return target */
 branch_taken:
 			{
 				ch->_branchTargetPtr = ch->_pSrc + 5;
@@ -1669,11 +1689,10 @@ branch_taken:
 				goto dispatch;
 			}
 
-			/* Shared branch-taken logic for -52..-59: read immediate target word */
+			/* Shared branch-taken logic for -52..-59: same, different label for clarity */
 branch_taken2:
 			{
 				ch->_branchTargetPtr = ch->_pSrc + 5;
-				/* fall through to reading the target word */
 				byte *dest = &_soundData[readWord_impl()];
 				ch->_pSrc = dest;
 				goto dispatch;
@@ -1687,18 +1706,16 @@ branch_skip5:
 			}
 
 			/* ---- opcode -60 (0xC4): call a function pointer ---- */
-			case 2: {
+			case 6:
+			{
 				uint16 fptr = readWord_impl();
-
-				// Call the function
 				callFunction(fptr);
-
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
 
 			/* ---- opcode -61 (0xC3): call nullsub_1 with byte arg ---- */
-			case 3:
+			case 5:
 			{
 				pSrc++;
 				uint8 arg = *pSrc;
@@ -1707,8 +1724,15 @@ branch_skip5:
 				goto dispatch;
 			}
 
+			/* ---- opcode -62 (0xC2): advance pSrc by 4 ---- */
+			case 4:
+			{
+				ch->_pSrc += 4;
+				goto dispatch;
+			}
+
 			/* ---- opcode -63 (0xC1): set _tempoScale ---- */
-			case 1:
+			case 3:
 			{
 				pSrc++;
 				_tempoScale = *pSrc;
@@ -1717,7 +1741,7 @@ branch_skip5:
 			}
 
 			/* ---- opcode -64 (0xC0): set tempo / frame sync ---- */
-			case 0:
+			case 2:
 			{
 				pSrc++;
 				_tempoReload = *pSrc;
@@ -1728,19 +1752,32 @@ branch_skip5:
 				goto dispatch;
 			}
 
+			/* ---- opcode -65 (0xBF): set _tempoTarget / _tempoBase, enable tick ---- */
+			case 1:
+			{
+				uint16 w = readWord_impl();
+				_tempoTarget = w;
+				ch->_pSrc += 3;
+				if (_frameNumber2 == 0)
+					_tempoBase = _tempoTarget;
+				_tickEnabled = 1;
+				_tickCounter = 1;
+				goto dispatch;
+			}
+
+			/* ---- opcode -66 (0xBE): set _tempoShift ---- */
+			case 0:
+			{
+				pSrc++;
+				_tempoShift = (int16)(int8)*pSrc;
+				ch->_pSrc += 2;
+				goto dispatch;
+			}
 			default:
+				error("Unhandled sound opcode");
 				break;
 			} /* end switch */
-
-			goto dispatch;
 		}
-
-		/* --- 0xBE or 0xBF range (> 0xBD but <0xC0): treated as commands -65/-64 ---
-		 * 0xBF -> ax = 0xBF + 66 - 66 = 0xBF; not in [0,65], falls to default in dispatch.
-		 * The asm handles 0xBD and below as notes, >0xBD as the big switch.
-		 * 0xBE / 0xBF would land in the switch default (no-op) which falls through
-		 * to the re-dispatch. Handled by the goto dispatch above.
-		 */
 	} /* end command decode block */
 
 	/* Should not reach here in normal execution */
