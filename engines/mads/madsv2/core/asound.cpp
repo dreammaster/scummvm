@@ -457,13 +457,13 @@ void ASound::clearCallback() {
 
 void ASound::writeVolume() {
 	AdlibChannel *ch = _activeChannelPtr;
-	int16_t var4, var6 = 0;
+	int16 var4, var6 = 0;
 
 	/* Step 1: map volume through VOL_VEL_TO_ATTEN_STEP */
-	int16_t volStep = (int16_t)VOL_VEL_TO_ATTEN_STEP[(uint8)ch->_volume];
+	int16 volStep = (int16)VOL_VEL_TO_ATTEN_STEP[(uint8)ch->_volume];
 	/* Step 2: map velocity through VOL_VEL_TO_ATTEN_STEP */
-	int16_t velStep = (int16_t)VOL_VEL_TO_ATTEN_STEP[(int8_t)ch->_velocity];
-	int16_t var8 = volStep + velStep - 1;   /* combined attenuation step */
+	int16 velStep = (int16)VOL_VEL_TO_ATTEN_STEP[(int8)ch->_velocity];
+	int16 var8 = volStep + velStep - 1;   /* combined attenuation step */
 
 	/* Determine carrier operator register for this voice */
 	uint8 chanNum = _activeChannelNumber;
@@ -483,8 +483,8 @@ void ASound::writeVolume() {
 	} else {
 		/* ---- OPL3 patch-attenuation path ---- */
 		/* Modulator TL */
-		int16_t patchAtt = (int16_t)ch->_patchAttenuation;
-		int16_t tl1 = PATCH_ATTEN_TO_TL[patchAtt];
+		int16 patchAtt = (int16)ch->_patchAttenuation;
+		int16 tl1 = PATCH_ATTEN_TO_TL[patchAtt];
 		var4 = -(tl1 - var8);           /* negate of (table[patchAtt] - combined) */
 		if (var4 < 0)  var4 = 0;
 		if (var4 > 63) var4 = 63;
@@ -492,7 +492,7 @@ void ASound::writeVolume() {
 		write((uint8)siReg, (uint8)var4);
 
 		/* Carrier TL (uses complementary lookup at PATCH_ATTEN_TO_TL - patchAtt) */
-		int16_t tl2 = PATCH_ATTEN_TO_TL[127 - patchAtt];   /* PATCH_ATTEN_TO_TL offset */
+		int16 tl2 = PATCH_ATTEN_TO_TL[127 - patchAtt];   /* PATCH_ATTEN_TO_TL offset */
 		var6 = -(tl2 - var8);
 		if (var6 < 0)  var6 = 0;
 		if (var6 > 63) var6 = 63;
@@ -500,7 +500,7 @@ void ASound::writeVolume() {
 		uint8 cslot = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
 		uint8 cregOff = SLOT_TO_REG_OFFSET[cslot];
 		uint16 cReg = (uint16)cregOff + 0x40;
-		uint8  cksl = _adlibPorts[cReg] & 0xC0;
+		uint8 cksl = _adlibPorts[cReg] & 0xC0;
 		var6 = (0x3F - var6) | cksl;
 		write((uint8)(siReg + 2), (uint8)var4);   /* mod in OPL3 second pair */
 		write((uint8)cReg, (uint8)var6);
@@ -520,27 +520,27 @@ void ASound::writeVolume() {
 	uint8 slot2 = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
 	uint8 roff2 = SLOT_TO_REG_OFFSET[slot2];
 	uint16 siReg2 = (uint16)roff2 + 0x40;
-	uint8  ksl2 = _adlibPorts[siReg2] & 0xC0;
+	uint8 ksl2 = _adlibPorts[siReg2] & 0xC0;
 
-	int16_t tl_s = (int16_t)smp->_totalLevel - 63;
+	int16 tl_s = (int16)smp->_totalLevel - 63;
 	tl_s = -tl_s;   /* neg */
-	int16_t var8b = (int16_t)var8 - tl_s;   /* subtract from combined */
+	int16 var8b = (int16)var8 - tl_s;   /* subtract from combined */
 
 	if (_adlib_v5660_2 < 0x18) {
 		if (var8b < 0)  var8b = 0;
 		if (var8b > 63) var8b = 63;
-		int16_t val2 = (0x3F - var8b) | ksl2;
+		int16 val2 = (0x3F - var8b) | ksl2;
 		write((uint8)siReg2, (uint8)val2);
 	} else {
-		int16_t patchAtt2 = (int16_t)ch->_patchAttenuation;
-		int16_t tl1b = PATCH_ATTEN_TO_TL[patchAtt2];
+		int16 patchAtt2 = (int16)ch->_patchAttenuation;
+		int16 tl1b = PATCH_ATTEN_TO_TL[patchAtt2];
 		var4 = -(tl1b - var8b);
 		if (var4 < 0)  var4 = 0;
 		if (var4 > 63) var4 = 63;
 		var4 = (0x3F - var4) | ksl2;
 		write((uint8)siReg2, (uint8)var4);
 
-		int16_t tl2b = PATCH_ATTEN_TO_TL[127 - patchAtt2];
+		int16 tl2b = PATCH_ATTEN_TO_TL[127 - patchAtt2];
 		var6 = -(tl2b - var8b);
 		if (var6 < 0)  var6 = 0;
 		if (var6 > 63) var6 = 63;
@@ -552,7 +552,7 @@ void ASound::writeVolume() {
 
 void ASound::writeFrequency() {
 	AdlibChannel *ch = _activeChannelPtr;
-	uint8  chanNum = _activeChannelNumber;
+	uint8 chanNum = _activeChannelNumber;
 	uint16 aReg = (uint16)chanNum + 0xA0;   /* freq-low register */
 	uint16 bReg = aReg + 0x10;                /* freq-high / keyon register */
 
@@ -569,7 +569,7 @@ void ASound::writeFrequency() {
 	}
 
 	/* F-number from table, offset by transpose */
-	int16_t fnumLow = (int16_t)SEMITONE_FREQ_TABLE[semi] + (int16_t)(int8_t)ch->_transpose;
+	int16 fnumLow = (int16)SEMITONE_FREQ_TABLE[semi] + (int16)(int8)ch->_transpose;
 
 	/* Write F-number low byte to 0xA0+ch */
 	write((uint8)aReg, (uint8)fnumLow);
@@ -583,7 +583,7 @@ void ASound::writeFrequency() {
 
 void ASound::writePitchBend() {
 	AdlibChannel *ch = _activeChannelPtr;
-	uint8  chanNum = _activeChannelNumber;
+	uint8 chanNum = _activeChannelNumber;
 	uint16 aReg = (uint16)chanNum + 0xA0;
 	uint16 bReg = aReg + 0x10;
 
@@ -592,7 +592,7 @@ void ASound::writePitchBend() {
 		| ((uint16)(_adlibPorts[bReg] & 0x1F) << 8);
 
 	/* Add signed pitch bend */
-	int16_t bent = (int16_t)fnum + (int16_t)(int8_t)ch->_pitchBend;
+	int16 bent = (int16)fnum + (int16)(int8)ch->_pitchBend;
 
 	/* Write low byte */
 	write((uint8)aReg, (uint8)bent);
@@ -604,9 +604,9 @@ void ASound::writePitchBend() {
 }
 
 void ASound::updateOctave() {
-	uint8  chanNum = _activeChannelNumber;
+	uint8 chanNum = _activeChannelNumber;
 	uint16 bReg = (uint16)chanNum + 0xB0;
-	uint8  val = _adlibPorts[bReg] & 0xDF;   /* clear bit 5 */
+	uint8 val = _adlibPorts[bReg] & 0xDF;   /* clear bit 5 */
 	write((uint8)bReg, val);
 }
 
@@ -628,9 +628,9 @@ void ASound::noteOn() {
 	/* No sweep: write frequency and key on */
 	writeFrequency();
 
-	uint8  chanNum = _activeChannelNumber;
+	uint8 chanNum = _activeChannelNumber;
 	uint16 bReg = (uint16)chanNum + 0xB0;
-	uint8  bVal = _adlibPorts[bReg] | 0x20;   /* set key-on bit */
+	uint8 bVal = _adlibPorts[bReg] | 0x20;   /* set key-on bit */
 	write((uint8)bReg, bVal);
 }
 
@@ -736,7 +736,7 @@ void ASound::loadSample() {
 		write((uint8)s3Reg, scl3);
 	} else {
 		/* Additive: write actual total level */
-		int16_t tl3 = (int16_t)smp3->_totalLevel - 63;
+		int16 tl3 = (int16)smp3->_totalLevel - 63;
 		tl3 = -tl3;
 		uint8 scl3 = (uint8)((smp3->_scalingLevel << 6) | (tl3 & 0x3F));
 		write((uint8)s3Reg, scl3);
@@ -870,11 +870,11 @@ void ASound::pollAllChannels() {
 
 void ASound::pollActiveChannel() {
 	AdlibChannel *ch = _activeChannelPtr;
-	uint8_t var_8 = 0;		// volume-dirty flag
+	uint8 var_8 = 0;		// volume-dirty flag
 	uint16 var_6;			// temp word
-	uint16_t var_4 = 0;		// temp word 2
-	uint16_t var_A = 0;		// temp word 3
-	uint16_t var_C = 0;		// temp word 4
+	uint16 var_4 = 0;		// temp word 2
+	uint16 var_A = 0;		// temp word 3
+	uint16 var_C = 0;		// temp word 4
 
 	/* Channel inactive - nothing to do */
 	if (ch->_activeCount == 0) goto done;
@@ -896,7 +896,7 @@ dispatch:
 	{
 		/* Load pSrc from channel and read the first byte */
 		pSrc = ch->_pSrc;
-		uint8_t b = *pSrc;
+		uint8 b = *pSrc;
 
 		if (!(b & 0x80)) {
 			/*
@@ -920,10 +920,10 @@ dispatch:
 		if (b > 0xBD) {
 			/* Decode the command opcode: ax = b - (-66) = b + 66          */
 			/* Switch range is 0..65 (opcodes -66 .. -1 mapped to 0..65)   */
-			int16_t ax = (int16_t)(int8_t)b;   /* sign-extend */
+			int16 ax = (int16)(int8)b;   /* sign-extend */
 			var_8 = 0;
-			ax = (int16_t)(ax - (-66));
-			if ((uint16_t)ax > 65) goto dispatch;  /* unknown - skip */
+			ax = (int16)(ax - (-66));
+			if ((uint16)ax > 65) goto dispatch;  /* unknown - skip */
 
 			switch (ax) {
 
@@ -932,14 +932,14 @@ dispatch:
 			{
 				if (ch->_innerLoopCount == 0) {
 					pSrc++;
-					uint8_t cnt = *pSrc;
+					uint8 cnt = *pSrc;
 					if (cnt == 0) {
 						ch->_pSrc += 2;
 						ch->_innerLoopPtr = ch->_pSrc;
 						ch->_innerLoopCount = 0;
 						goto dispatch;
 					}
-					ch->_innerLoopCount = (uint16_t)cnt;
+					ch->_innerLoopCount = (uint16)cnt;
 				}
 				ch->_innerLoopCount--;
 				if (ch->_innerLoopCount == 0) {
@@ -956,7 +956,7 @@ dispatch:
 			{
 				if (ch->_outerLoopCount == 0) {
 					pSrc++;
-					uint8_t cnt = *pSrc;
+					uint8 cnt = *pSrc;
 					if (cnt == 0) {
 						ch->_pSrc += 2;
 						ch->_outerLoopPtr = ch->_pSrc;
@@ -965,7 +965,7 @@ dispatch:
 						ch->_outerLoopCount = 0;
 						goto dispatch;
 					}
-					ch->_outerLoopCount = (uint16_t)cnt;
+					ch->_outerLoopCount = (uint16)cnt;
 				}
 				ch->_outerLoopCount--;
 				if (ch->_outerLoopCount == 0) {
@@ -1086,14 +1086,14 @@ dispatch:
 			case 52:
 			{
 				pSrc++;
-				uint8_t vol = *pSrc;
-				var_6 = (uint16_t)vol;
+				uint8 vol = *pSrc;
+				var_6 = (uint16)vol;
 				if (ch->_pendingStop != 0) {
 					/* Clamp: don't raise volume above current when fading out */
-					if ((uint16_t)ch->_volume <= var_6)
+					if ((uint16)ch->_volume <= var_6)
 						goto set_vol_patch;
 				}
-				ch->_volume = (uint8_t)var_6;
+				ch->_volume = (uint8)var_6;
 				goto vol_advance;
 set_vol_patch:
 				ch->_volume = vol;
@@ -1132,10 +1132,10 @@ vol_advance:
 			case 49:
 			{
 				pSrc++;
-				uint8_t vel = *pSrc;
-				var_6 = (uint16_t)vel;
+				uint8 vel = *pSrc;
+				var_6 = (uint16)vel;
 				if (ch->_pendingStop != 0) {
-					if ((uint16_t)ch->_velocity > var_6)
+					if ((uint16)ch->_velocity > var_6)
 						ch->_velocity = vel;
 				} else {
 					ch->_velocity = vel;
@@ -1181,7 +1181,7 @@ vol_advance:
 			{
 				pSrc++;
 				var_C = *pSrc;
-				uint16_t skip = var_C + 3;
+				uint16 skip = var_C + 3;
 				ch->_pSrc += skip;
 				goto dispatch;
 			}
@@ -1190,22 +1190,22 @@ vol_advance:
 			case 44:
 			{
 				pSrc++;
-				uint8_t tblSize = *pSrc;
-				var_C = (uint16_t)tblSize;
+				uint8 tblSize = *pSrc;
+				var_C = (uint16)tblSize;
 				pSrc++;
 				byte *base = pSrc;
 
 				(void)getRandomNumber();
-				uint16_t rnd = _randomSeed & 0x7FFF;
-				uint16_t idx = (uint16_t)((int16_t)rnd % (int16_t)var_C);
+				uint16 rnd = _randomSeed & 0x7FFF;
+				uint16 idx = (uint16)((int16)rnd % (int16)var_C);
 				var_6 = idx;
 
-				uint8_t  chosen = *(base + idx);
-				uint8_t  target = *(base + var_C);
+				uint8 chosen = *(base + idx);
+				uint8 target = *(base + var_C);
 				/* Write chosen into table[target+1] */
 				*(base + target + 1) = chosen;
 
-				uint16_t advance = var_C + 3;
+				uint16 advance = var_C + 3;
 				ch->_pSrc += advance;
 				goto dispatch;
 			}
@@ -1221,12 +1221,12 @@ vol_advance:
 				var_C = var_4 - var_A + 1;
 
 				(void)getRandomNumber();
-				uint16_t rnd = _randomSeed & 0x7FFF;
-				var_6 = (uint16_t)((int16_t)rnd % (int16_t)var_C);
+				uint16 rnd = _randomSeed & 0x7FFF;
+				var_6 = (uint16)((int16)rnd % (int16)var_C);
 
 				byte *base = pSrc;
-				uint8_t  targetSlot = *base;
-				uint8_t  result = var_6 + var_A;
+				uint8 targetSlot = *base;
+				uint8 result = var_6 + var_A;
 				*(base + targetSlot + 1) = result;
 
 				ch->_pSrc += 4;
@@ -1249,11 +1249,11 @@ vol_advance:
 				var_C = *pSrc;
 				pSrc++;
 				byte *base = pSrc;
-				uint8_t  indIdx = _scriptVars[var_6];
-				uint8_t  chosen = *(base + (uintptr_t)indIdx);
-				uint8_t  target = *(base + var_C);
+				uint8 indIdx = _scriptVars[var_6];
+				uint8 chosen = *(base + (uintptr_t)indIdx);
+				uint8 target = *(base + var_C);
 				*(base + target + 1) = chosen;
-				uint16_t advance = (uint16_t)(var_C + 4);
+				uint16 advance = (uint16)(var_C + 4);
 				ch->_pSrc += advance;
 				goto dispatch;
 			}
@@ -1264,7 +1264,7 @@ vol_advance:
 				pSrc++;
 				var_6 = *pSrc;
 				pSrc++;
-				uint8_t val = *pSrc;
+				uint8 val = *pSrc;
 				_scriptVars[var_6] = val;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1290,7 +1290,7 @@ vol_advance:
 				pSrc++;
 				var_C = *pSrc;
 				byte *base = pSrc;
-				uint8_t  src = _scriptVars[var_6];
+				uint8 src = _scriptVars[var_6];
 				*(base + var_C + 1) = src;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1322,7 +1322,7 @@ vol_advance:
 				pSrc++;
 				var_6 = *pSrc;
 				pSrc++;
-				uint8_t imm = *pSrc;
+				uint8 imm = *pSrc;
 				_scriptVars[var_6] += imm;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1346,7 +1346,7 @@ vol_advance:
 				pSrc++;
 				var_6 = *pSrc;
 				pSrc++;
-				uint8_t imm = *pSrc;
+				uint8 imm = *pSrc;
 				_scriptVars[var_6] -= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1382,7 +1382,7 @@ vol_advance:
 				pSrc++;
 				var_6 = *pSrc;
 				pSrc++;
-				uint8_t imm = *pSrc;
+				uint8 imm = *pSrc;
 				_scriptVars[var_6] *= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1395,7 +1395,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				_scriptVars[var_6] = (uint8_t)((int8_t)_scriptVars[var_6] / (int8_t)var_C);
+				_scriptVars[var_6] = (uint8)((int8)_scriptVars[var_6] / (int8)var_C);
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1407,7 +1407,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				_scriptVars[var_6] = (uint8_t)((uint8_t)_scriptVars[var_6] / (uint8_t)_scriptVars[var_C]);
+				_scriptVars[var_6] = (uint8)((uint8)_scriptVars[var_6] / (uint8)_scriptVars[var_C]);
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1419,7 +1419,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				_scriptVars[var_6] = (uint8_t)((int8_t)_scriptVars[var_6] % (int8_t)var_C);
+				_scriptVars[var_6] = (uint8)((int8)_scriptVars[var_6] % (int8)var_C);
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1431,7 +1431,7 @@ vol_advance:
 				var_6 = *pSrc;
 				pSrc++;
 				var_C = *pSrc;
-				_scriptVars[var_6] = (uint8_t)((uint8_t)_scriptVars[var_6] % (uint8_t)_scriptVars[var_C]);
+				_scriptVars[var_6] = (uint8)((uint8)_scriptVars[var_6] % (uint8)_scriptVars[var_C]);
 				ch->_pSrc += 3;
 				goto dispatch;
 			}
@@ -1442,7 +1442,7 @@ vol_advance:
 				pSrc++;
 				var_6 = *pSrc;
 				pSrc++;
-				uint8_t imm = *pSrc;
+				uint8 imm = *pSrc;
 				_scriptVars[var_6] &= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1466,7 +1466,7 @@ vol_advance:
 				pSrc++;
 				var_6 = *pSrc;
 				pSrc++;
-				uint8_t imm = *pSrc;
+				uint8 imm = *pSrc;
 				_scriptVars[var_6] |= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1490,7 +1490,7 @@ vol_advance:
 				pSrc++;
 				var_6 = *pSrc;
 				pSrc++;
-				uint8_t imm = *pSrc;
+				uint8 imm = *pSrc;
 				_scriptVars[var_6] ^= imm;
 				ch->_pSrc += 3;
 				goto dispatch;
@@ -1520,8 +1520,8 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				uint8_t v = _scriptVars[var_6];
-				if ((uint16_t)var_C == (uint16_t)v) goto branch_taken;
+				uint8 v = _scriptVars[var_6];
+				if ((uint16)var_C == (uint16)v) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1530,7 +1530,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C != (uint16_t)_scriptVars[var_6]) goto branch_taken;
+				if ((uint16)var_C != (uint16)_scriptVars[var_6]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1539,7 +1539,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C > (uint16_t)_scriptVars[var_6]) goto branch_taken;
+				if ((uint16)var_C > (uint16)_scriptVars[var_6]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1548,7 +1548,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C >= (uint16_t)_scriptVars[var_6]) goto branch_taken;
+				if ((uint16)var_C >= (uint16)_scriptVars[var_6]) goto branch_taken;
 				goto branch_skip5;
 			}
 
@@ -1593,7 +1593,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C == (uint16_t)_scriptVars[var_6]) goto branch_taken2;
+				if ((uint16)var_C == (uint16)_scriptVars[var_6]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1602,7 +1602,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C != (uint16_t)_scriptVars[var_6]) goto branch_taken2;
+				if ((uint16)var_C != (uint16)_scriptVars[var_6]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1611,7 +1611,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C > (uint16_t)_scriptVars[var_6]) goto branch_taken2;
+				if ((uint16)var_C > (uint16)_scriptVars[var_6]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1620,7 +1620,7 @@ vol_advance:
 			{
 				pSrc++; var_6 = *pSrc;
 				pSrc++; var_C = *pSrc;
-				if ((uint16_t)var_C < (uint16_t)_scriptVars[var_6]) goto branch_taken2;
+				if ((uint16)var_C < (uint16)_scriptVars[var_6]) goto branch_taken2;
 				goto branch_skip5;
 			}
 
@@ -1688,7 +1688,7 @@ branch_skip5:
 
 			/* ---- opcode -60 (0xC4): call a function pointer ---- */
 			case 2: {
-				uint16_t fptr = readWord_impl();
+				uint16 fptr = readWord_impl();
 
 				// Call the function
 				callFunction(fptr);
@@ -1701,7 +1701,7 @@ branch_skip5:
 			case 3:
 			{
 				pSrc++;
-				uint8_t arg = *pSrc;
+				uint8 arg = *pSrc;
 				(void)arg;   /* nullsub_1 is a no-op */
 				ch->_pSrc += 2;
 				goto dispatch;
@@ -1787,15 +1787,15 @@ post_keyon:
 					}
 				} else {
 					/* Normal fade: clamp velocity at 0..127 */
-					if ((int8_t)ch->_volumeFadeStep > 0) {
+					if ((int8)ch->_volumeFadeStep > 0) {
 						ch->_velocity += ch->_volumeFadeStep;
 						ch = _activeChannelPtr;
-						if ((int16_t)ch->_velocity > 0x7F)
+						if ((int16)ch->_velocity > 0x7F)
 							ch->_velocity = 0x7F;
 					} else {
 						ch->_velocity += ch->_volumeFadeStep;
 						ch = _activeChannelPtr;
-						if ((int8_t)ch->_velocity < 0)
+						if ((int8)ch->_velocity < 0)
 							ch->_velocity = 0;
 					}
 				}
@@ -1812,19 +1812,19 @@ post_keyon:
 			ch->_vibPeriodCounter = ch->_vibPeriodReload;
 			ch = _activeChannelPtr;
 
-			if ((int8_t)ch->_vibratoDepth != 0) {
-				int16_t pa = (int16_t)(int8_t)ch->_patchAttenuation;
-				int16_t vib = (int16_t)(int8_t)ch->_vibratoDepth;
-				int16_t sum = pa + vib;
+			if ((int8)ch->_vibratoDepth != 0) {
+				int16 pa = (int16)(int8)ch->_patchAttenuation;
+				int16 vib = (int16)(int8)ch->_vibratoDepth;
+				int16 sum = pa + vib;
 
-				if ((int8_t)ch->_vibratoDepth > 0) {
+				if ((int8)ch->_vibratoDepth > 0) {
 					/* Positive vibrato: bounce if above 0x7F */
 					if (sum > 0x7F)
-						ch->_vibratoDepth = (uint8_t)(-ch->_vibratoDepth);
+						ch->_vibratoDepth = (uint8)(-ch->_vibratoDepth);
 				} else {
 					/* Negative vibrato: bounce if below zero */
 					if (sum < 0)
-						ch->_vibratoDepth = (uint8_t)(-ch->_vibratoDepth);
+						ch->_vibratoDepth = (uint8)(-ch->_vibratoDepth);
 				}
 
 				ch = _activeChannelPtr;
