@@ -279,7 +279,6 @@ public:
 	Common::Array<AdlibSample> _samples;
 	AdlibSample *_samplePtr;
 	Common::Queue<RegisterValue> _queue;
-	Common::Mutex _driverMutex;
 	int _frameCounter;
 	bool _isDisabled;
 	int _v1;

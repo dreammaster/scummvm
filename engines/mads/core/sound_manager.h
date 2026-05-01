@@ -56,6 +56,7 @@ protected:
 	Audio::Mixer *_mixer;
 	OPL::OPL *_opl;
 	Common::Array<byte> _soundData;
+	Common::Mutex _driverMutex;
 
 	/**
 	 * Returns data for the specified offset. It also caches the data size for that

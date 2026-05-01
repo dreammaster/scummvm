@@ -128,7 +128,6 @@ struct AdlibSample {
 
 class ASound : public SoundDriver {
 private:
-	Common::Mutex _driverMutex;
 	Common::Queue< Common::Pair<byte, byte> > _queue;
 	uint16 _callbackCounter = 0;		// Period counter
 	uint16 _callbackPeriod = 0;			// Period reload

@@ -254,8 +254,6 @@ int ASound::write2(int state, int reg, int val) {
 }
 
 void ASound::flush() {
-	Common::StackLock slock(_driverMutex);
-
 	while (!_queue.empty()) {
 		RegisterValue v = _queue.pop();
 		_opl->writeReg(v._regNum, v._value);

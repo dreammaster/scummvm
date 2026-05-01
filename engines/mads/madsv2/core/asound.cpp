@@ -20,6 +20,7 @@
  */
 
 #include "audio/fmopl.h"
+#include "common/debug.h"
 #include "mads/madsv2/core/asound.h"
 
 namespace MADS {
@@ -204,6 +205,16 @@ ASound::ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
 		int dataOffset, int dataSize) :
 		SoundDriver(mixer, opl, filename, dataOffset, dataSize) {
 	AdlibChannel::_isDisabled = false;
+
+	write(4, 0x60);		// Mask off both adlib timers
+	write(4, 0x80);		// IRQ reset timer flags
+	write(2, 0xff);		// Timer 1 rate 80us
+	write(4, 0x21);		// Activate timer 1
+	write(4, 0x60);
+	write(4, 0x80);
+
+	command0();
+
 	_opl->start(new Common::Functor0Mem<void, ASound>(this, &ASound::onTimer), CALLBACKS_PER_SECOND);
 }
 
@@ -430,11 +441,9 @@ void ASound::onTimer() {
 }
 
 void ASound::flush() {
-	Common::StackLock slock(_driverMutex);
-
 	while (!_queue.empty()) {
 		auto v = _queue.pop();
-		warning("%.2x %.2x", v.first, v.second);
+		debug("%.2x %.2x", v.first, v.second);
 		_opl->writeReg(v.first, v.second);
 	}
 }
