@@ -431,6 +431,8 @@ void ASound::callFunction(uint16 offset) {
 
 
 void ASound::write(uint8 reg, uint8 value) {
+	if (reg != 2 && reg != 3 && reg != 4)
+		debug("%.2x %.2x", reg, value);
 	_queue.push(Common::Pair<byte, byte>(reg, value));
 }
 
@@ -733,7 +735,7 @@ void ASound::loadSample() {
 
 	/* --- Point samplePtr at operator 1 data and write registers --- */
 	int sampleIdx = (int)ch->_sampleIndex;
-	_samplePtr = &_samples[sampleIdx];
+	_samplePtr = &_samples[sampleIdx * 2];
 
 	/* Modulator operator regs (operator 1) */
 	uint8 ms1 = MODULATOR_SLOT_FOR_VOICE[chanNum * 2];
@@ -742,7 +744,7 @@ void ASound::loadSample() {
 	writeSampleRegs();
 
 	/* Carrier operator regs (operator 2, offset by 490 bytes = next pair) */
-	_samplePtr = (AdlibSample *)((uint8 *)&_samples[sampleIdx] + 490);
+	_samplePtr = &_samples[sampleIdx * 2 + 1];
 
 	uint8 ms2 = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
 	uint8 mr2 = SLOT_TO_REG_OFFSET[ms2];
