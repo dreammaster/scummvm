@@ -37,18 +37,14 @@ bool AdlibChannel::_isDisabled;
   * Index is the patchAttenuation value (0-127); output is the 6-bit TL field.
   */
 static const uint8 PATCH_ATTEN_TO_TL[128] = {
-	0x3F,0x36,0x31,0x2D,0x2A,0x28,0x26,0x24,0x22,0x21,0x20,
-	0x1F,0x1E,0x1D,0x1C,0x1B,0x1A,0x19,0x19,0x18,0x17,0x17,
-	0x16,0x16,0x15,0x15,0x14,0x14,0x13,0x13,0x12,0x12,0x12,
-	0x11,0x11,0x10,0x10,0x10,0x0F,0x0F,0x0F,0x0E,0x0E,0x0E,
-	0x0E,0x0D,0x0D,0x0D,0x0C,0x0C,0x0C,0x0C,0x0B,0x0B,0x0B,
-	0x0B,0x0B,0x0A,0x0A,0x0A,0x0A,0x0A,0x09,0x09,0x09,0x09,
-	0x09,0x08,0x08,0x08,0x08,0x08,0x07,0x07,0x07,0x07,0x07,
-	0x07,0x06,0x06,0x06,0x06,0x06,0x06,0x05,0x05,0x05,0x05,
-	0x05,0x05,0x05,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x03,
-	0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x02,0x02,0x02,0x02,
-	0x02,0x02,0x02,0x02,0x02,0x01,0x01,0x01,0x01,0x01,0x01,
-	0x01,0x01,0x01,0x01,0x00,0x00,0x00
+	63, 54, 49, 45, 42, 40, 38, 36, 34, 33, 32, 31, 30, 29, 28, 27,
+	26, 25, 25, 24, 23, 23, 22, 22, 21, 21, 20, 20, 19, 19, 18, 18,
+	18, 17, 17, 16, 16, 16, 15, 15, 15, 14, 14, 14, 14, 13, 13, 13,
+	12, 12, 12, 12, 11, 11, 11, 11, 11, 10, 10, 10, 10, 9, 9, 9,
+	9, 9, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 6, 6, 6,
+	6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4,
+	4, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0
 };
 
 /*
@@ -69,17 +65,10 @@ static const uint8 VOL_VEL_TO_ATTEN_STEP[128] = {
 	0x1F,0x1F,0x1F,0x1F, 0x20,0x20,0x20,0x20
 };
 
-/* Carrier operator slot offset per voice (CARRIER_SLOT_FOR_VOICE, index 0 = unused pad) */
-static const uint8 CARRIER_SLOT_FOR_VOICE[18] = {
-	0,3,1,4,2,5,6,9,10,8,11,12,15,13,16,14,17,0
-};
-
-/*
- * MODULATOR_SLOT_FOR_VOICE - Modulator operator slot offset per voice.
- * 17 entries used (voices 0-8 -> modulator slots, voices 0-8 -> carrier slots).
- */
-static const uint8 MODULATOR_SLOT_FOR_VOICE[17] = {
-	3,1,4,2,5,6,9,7,10,8,11,12,15,13,16,14,17
+/* Carrier and operator slot offset per voice */
+static const uint8 VOICE_SLOTS[ADLIB_CHANNEL_COUNT][2] = {
+	{ 0, 3 }, { 1, 4 }, { 2, 5 }, { 6, 9 }, { 7, 10 },
+	{ 8, 11 }, { 12, 15 }, { 13, 16 }, { 14, 17 }
 };
 
 /*
@@ -449,10 +438,9 @@ bool timerFlag = false;
 void ASound::onTimer() {
 	if (!timerFlag) return; //***DEBUG****
 	Common::StackLock slock(_driverMutex);
-debug("---TIMER START");
+
 	poll();
 	flush();
-debug("---TIMER END");
 }
 
 void ASound::flush() {
@@ -514,7 +502,7 @@ void ASound::writeVolume() {
 
 	/* Determine carrier operator register for this voice */
 	uint8 chanNum = _activeChannelNumber;
-	uint8 slot = MODULATOR_SLOT_FOR_VOICE[chanNum * 2];          /* modulator slot index */
+	uint8 slot = VOICE_SLOTS[chanNum][1];          /* modulator slot index */
 	uint8 regOff = SLOT_TO_REG_OFFSET[slot];
 	uint16 siReg = (uint16)regOff + 0x40;         /* TL register base */
 
@@ -544,7 +532,7 @@ void ASound::writeVolume() {
 		if (var6 < 0)  var6 = 0;
 		if (var6 > 63) var6 = 63;
 		/* carrier register */
-		uint8 cslot = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
+		uint8 cslot = VOICE_SLOTS[chanNum][1];
 		uint8 cregOff = SLOT_TO_REG_OFFSET[cslot];
 		uint16 cReg = (uint16)cregOff + 0x40;
 		uint8 cksl = _adlibPorts[cReg] & 0xC0;
@@ -564,7 +552,7 @@ void ASound::writeVolume() {
 		return;   /* FM: only one operator carries volume */
 
 	/* Second operator TL register */
-	uint8 slot2 = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 slot2 = VOICE_SLOTS[chanNum][0];
 	uint8 roff2 = SLOT_TO_REG_OFFSET[slot2];
 	uint16 siReg2 = (uint16)roff2 + 0x40;
 	uint8 ksl2 = _adlibPorts[siReg2] & 0xC0;
@@ -727,13 +715,13 @@ void ASound::loadSample() {
 	uint8 chanNum = _activeChannelNumber;
 
 	/* --- Phase 1: Silence modulator operator --- */
-	uint8 mSlot = MODULATOR_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 mSlot = VOICE_SLOTS[chanNum][1];
 	_currentOpBase = SLOT_TO_REG_OFFSET[mSlot];
 	write(_currentOpBase + 0x80, 0xFF);
 	write(_currentOpBase + 0x40, 63);
 
 	/* --- Phase 2: Silence carrier operator --- */
-	uint8 cSlot = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
+	uint8 cSlot = VOICE_SLOTS[chanNum][0];
 	_currentOpBase = SLOT_TO_REG_OFFSET[cSlot];
 	write(_currentOpBase + 0x80, 0xFF);
 	write(_currentOpBase + 0x40, 63);
@@ -745,7 +733,7 @@ void ASound::loadSample() {
 
 	/* --- Phase 4: Second writeSampleRegs --- */
 	_samplePtr = &_samples[ch->_sampleIndex * 2 + 1];  // operator 2
-	_currentOpBase = SLOT_TO_REG_OFFSET[MODULATOR_SLOT_FOR_VOICE[chanNum * 2]];
+	_currentOpBase = SLOT_TO_REG_OFFSET[VOICE_SLOTS[chanNum][1]];
 	writeSampleRegs();
 
 	/* --- Phase 5: Carrier TL write --- */
@@ -755,7 +743,7 @@ void ASound::loadSample() {
 	uint8 thirdIdx = *((uint8 *)ch + 5);
 	_samplePtr = &_samples[thirdIdx * 2];   // operator 1 of third sample
 	AdlibSample *smp3 = _samplePtr;
-	uint16 cRegPlus40 = SLOT_TO_REG_OFFSET[CARRIER_SLOT_FOR_VOICE[chanNum * 2]] + 0x40;
+	uint16 cRegPlus40 = SLOT_TO_REG_OFFSET[VOICE_SLOTS[chanNum][0]] + 0x40;
 
 	if (smp3->_alg == 0) {
 		write(cRegPlus40, (uint8)((smp3->_scalingLevel << 6) | 0x3F));
