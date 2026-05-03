@@ -29,7 +29,7 @@
 
 namespace MADS {
 namespace MADSV2 {
-extern bool timerFlag; //***DEBUG***
+
 #define ADLIB_CHANNEL_COUNT 9
 
 struct AdlibChannel {

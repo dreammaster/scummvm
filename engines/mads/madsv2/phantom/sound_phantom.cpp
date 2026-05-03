@@ -85,15 +85,6 @@ void PhantomSoundManager::loadDriver(int sectionNumber) {
 
 /*-----------------------------------------------------------------------*/
 /* ASound1  (asound.ph1)                                                  *
- *                                                                        *
- * Channel-load helpers in the original:                                  *
- *   sub_103FF=ch0, sub_10404=ch1, sub_10409=ch2                         *
- *   sub_1040E=ch3, sub_10413=ch4, sub_10418=ch5                         *
- *   loc_1041D=ch6, loc_10422=ch7, loc_10427=ch8                         *
- *                                                                        *
- * sub_106DF = isSoundActive guard (non-zero BX -> already playing)       *
- * sub_1039C = findFreeChannel(pData, ADLIB_CHANNEL_MIDWAY)  (upper pool)  *
- * sub_10352 = findFreeChannel(pData, 0)                     (lower pool)  *
  *-----------------------------------------------------------------------*/
 
 const ASound1::CommandPtr ASound1::_commandList[40] = {
@@ -118,8 +109,6 @@ ASound1::ASound1(Audio::Mixer *mixer, OPL::OPL *opl)
 }
 
 int ASound1::command(int commandId, int param) {
-	// The original dispatcher also handles commands 64–76 via a raw-data
-	// near-pointer table (unk_13C3E) that cannot be safely reconstructed.
 	if (commandId > 39 || !_commandList[commandId])
 		return 0;
 	
@@ -136,15 +125,6 @@ int ASound1::command5() { return ASound::command5(); }
 int ASound1::command6() { return ASound::command6(); }
 int ASound1::command7() { return ASound::command7(); }
 int ASound1::command8() { return ASound::command8(); }
-
-// ---------------------------------------------------------------------------
-// Background-music loaders (sub_11D84, sub_11EE6, sub_11F0E, sub_11F36)
-// Each calls command1() then loads six channels.
-// The five cx values that command16 checks against _channels[0]->_field17
-// are the starting offsets of each piece: 0x1ECA, 0x21C4, 0x3418, 0x3688,
-// 0x3D52.  (0x21C4 is the start of dead code following commandMusic0 that
-// was never reached by any dispatch table entry.)
-// ---------------------------------------------------------------------------
 
 int ASound1::commandMusic0() {
 	ASound::command1();
@@ -191,7 +171,7 @@ int ASound1::commandMusic3() {
 }
 
 // ---------------------------------------------------------------------------
-// command16 (sub_11F70) – random background music
+// command16 – random background music
 //
 // If channel 0 is active and already playing one of the five known music
 // pieces (identified by their starting offset in field_17), leave it alone.
@@ -225,7 +205,7 @@ int ASound1::command16() {
 }
 
 // ---------------------------------------------------------------------------
-// commands 24–27 (off_11C46) – upper channel pool (sub_1039C per entry)
+// commands 24–27 – upper channel pool
 // ---------------------------------------------------------------------------
 
 int ASound1::command24() {
@@ -251,10 +231,10 @@ int ASound1::command27() {
 }
 
 // ---------------------------------------------------------------------------
-// commands 32–39 (off_11C4E, entries 0–7)
+// commands 32–39
 // ---------------------------------------------------------------------------
 
-// command32 (sub_11DD4) – no guard, no fade, load ch0–5
+// command32 – no guard, no fade, load ch0–5
 int ASound1::command32() {
 	_channels[0]->load(loadData(0x2522, 59));
 	_channels[1]->load(loadData(0x255D, 52));
@@ -265,7 +245,7 @@ int ASound1::command32() {
 	return 0;
 }
 
-// command33 (sub_11E02) – isSoundActive guard, command1, load ch0–5
+// command33 – isSoundActive guard, command1, load ch0–5
 int ASound1::command33() {
 	byte *pData = loadData(0x266C, 701);
 	if (!isSoundActive(pData)) {
@@ -280,7 +260,7 @@ int ASound1::command33() {
 	return 0;
 }
 
-// command34 (sub_11D54) – isSoundActive guard, stop(), load ch0–5
+// command34 – isSoundActive guard, stop(), load ch0–5
 int ASound1::command34() {
 	byte *pData = loadData(0x1852, 599);
 	if (!isSoundActive(pData)) {
@@ -295,7 +275,7 @@ int ASound1::command34() {
 	return 0;
 }
 
-// command35 (sub_11CCC) – isSoundActive guard, command2 (lower-bank fade),
+// command35 – isSoundActive guard, command2 (lower-bank fade),
 // load ch0–5
 int ASound1::command35() {
 	byte *pData = loadData(0x0C36, 329);
@@ -311,7 +291,7 @@ int ASound1::command35() {
 	return 0;
 }
 
-// command36 (sub_11CFC) – isSoundActive guard, command2 (lower-bank fade),
+// command36 – isSoundActive guard, command2 (lower-bank fade),
 // load ch0–5
 int ASound1::command36() {
 	byte *pData = loadData(0x1190, 327);
@@ -327,8 +307,8 @@ int ASound1::command36() {
 	return 0;
 }
 
-// command37 (sub_11E32) – isSoundActive guard, command1, four loadAny
-// calls starting from channel 0 (sub_10352 = findFreeChannel(pData, 0))
+// command37 – isSoundActive guard, command1, four loadAny
+// calls starting from channel 0
 int ASound1::command37() {
 	byte *pData = loadData(0x3220, 74);
 	if (!isSoundActive(pData)) {
@@ -341,15 +321,13 @@ int ASound1::command37() {
 	return 0;
 }
 
-// command38 (sub_11D84) – alias for commandMusic0; also the direct dispatch
+// command38 – alias for commandMusic0; also the direct dispatch
 // target for command 38.
 int ASound1::command38() {
-	commandMusic0();
-	timerFlag = true; //****DEBUG****
-	return 0;
+	return commandMusic0();
 }
 
-// command39 (sub_11FAE) – isSoundActive guard, command1, load ch0–5
+// command39 – isSoundActive guard, command1, load ch0–5
 int ASound1::command39() {
 	byte *pData = loadData(0x423A, 421);
 	if (!isSoundActive(pData)) {
@@ -368,31 +346,6 @@ int ASound1::command39() {
 
 /*-----------------------------------------------------------------------*/
 /* ASound2  (asound.ph2)                                                  *
- *                                                                        *
- * Dispatch table layout:                                                 *
- *   asound_commands1: commands  0– 8  (max=8,    base=0)                *
- *   asound_commands2: command     16  (max=0x10, base=0x10, 1 entry)    *
- *   asound_commands3: commands 24–27  (max=0x1B, base=0x18, 4 entries)  *
- *   asound_commands4: commands 32–35  (max=0x23, base=0x20, 4 entries)  *
- *   asound_commands5: commands 64–72  (max=0x48, base=0x40, 9 entries)  *
- *                                                                        *
- * Channel-load helpers:                                                  *
- *   sub_103FF=ch0  sub_10404=ch1  sub_10409=ch2  sub_1040E=ch3          *
- *   sub_10413=ch4  sub_10418=ch5  loc_1041D=ch6  loc_10422=ch7          *
- *   (ch8 not used in any sound command)                                  *
- *                                                                        *
- * sub_105F3 = command1 (fade both banks)                                 *
- * sub_10481 = command2 (lower setPtr2, cx=0x1A26)                       *
- * sub_105FA = command3 (lower bank fade helper)                          *
- * sub_104A9 = command4 (upper setPtr2, cx=0x1A26)                       *
- * sub_104BF = command6                                                   *
- * loc_10548 = command7                                                   *
- * unk_106B2 = command8 (OR of all channel activeCount fields)            *
- * sub_106DF = isSoundActive guard                                        *
- * sub_1039C = findFreeChannel(pData, ADLIB_CHANNEL_MIDWAY)  (upper pool)  *
- * sub_10352 = findFreeChannel(pData, 0)                     (lower pool)  *
- *                                                                        *
- * commands5 entry 4 (command 68) = nullsub_3 = no-op                    *
  *-----------------------------------------------------------------------*/
 
 const ASound2::CommandPtr ASound2::_commandList[73] = {
@@ -455,7 +408,7 @@ int ASound2::command7() { return ASound::command7(); }
 int ASound2::command8() { return ASound::command8(); }
 
 // ---------------------------------------------------------------------------
-// command16 (sub_11CBC) – isSoundActive guard, command1, load ch0–5
+// command16 – isSoundActive guard, command1, load ch0–5
 // ---------------------------------------------------------------------------
 int ASound2::command16() {
 	byte *pData = loadData(0x0C36, 88);
@@ -472,30 +425,26 @@ int ASound2::command16() {
 }
 
 // ---------------------------------------------------------------------------
-// commands 24–27 (asound_commands3) – upper channel pool via sub_1039C
+// commands 24–27 (asound_commands3) – upper channel pool
 // ---------------------------------------------------------------------------
 
-// sub_11D78
 int ASound2::command24() {
 	playSound(0x1A4A, 51);
 	playSound(0x1A7D, 46);
 	return 0;
 }
 
-// sub_11D85
 int ASound2::command25() {
 	playSound(0x1AAB, 44);
 	playSound(0x1AD7, 46);
 	return 0;
 }
 
-// sub_11D92
 int ASound2::command26() {
 	playSound(0x1B05, 12);
 	return 0;
 }
 
-// sub_11D99
 int ASound2::command27() {
 	playSound(0x1B11, 81);
 	return 0;
@@ -505,8 +454,7 @@ int ASound2::command27() {
 // commands 32–35 (asound_commands4)
 // ---------------------------------------------------------------------------
 
-// command32 (sub_11DDC) – command1, six loadAny calls from channel 0
-// (sub_10352 = findFreeChannel(pData, 0))
+// command32 – command1, six loadAny calls from channel 0
 int ASound2::command32() {
 	ASound::command1();
 	findFreeChannel(loadData(0x1BE4, 211));
@@ -518,7 +466,7 @@ int ASound2::command32() {
 	return 0;
 }
 
-// command33 (sub_11DA0) – isSoundActive guard, command1, load ch0–7
+// command33 – isSoundActive guard, command1, load ch0–7
 int ASound2::command33() {
 	byte *pData = loadData(0x1B62, 53);
 	if (!isSoundActive(pData)) {
@@ -535,7 +483,7 @@ int ASound2::command33() {
 	return 0;
 }
 
-// command34 (sub_11CEC) – isSoundActive guard, command1, load ch0–6
+// command34 – isSoundActive guard, command1, load ch0–6
 int ASound2::command34() {
 	byte *pData = loadData(0x0DC0, 495);
 	if (!isSoundActive(pData)) {
@@ -551,7 +499,7 @@ int ASound2::command34() {
 	return 0;
 }
 
-// command35 (sub_11E04) – isSoundActive guard, command1, load ch0–6
+// command35 – isSoundActive guard, command1, load ch0–6
 int ASound2::command35() {
 	byte *pData = loadData(0x1F02, 100);
 	if (!isSoundActive(pData)) {
@@ -568,40 +516,35 @@ int ASound2::command35() {
 }
 
 // ---------------------------------------------------------------------------
-// commands 64–72 (asound_commands5) – upper channel pool via sub_1039C
+// commands 64–72 (asound_commands5) – upper channel pool
 // ---------------------------------------------------------------------------
 
-// sub_11D22
 int ASound2::command64() {
 	playSound(0x1928, 20);
 	return 0;
 }
 
-// sub_11D29
 int ASound2::command65() {
 	playSound(0x193C, 10);
 	return 0;
 }
 
-// sub_11D30
 int ASound2::command66() {
 	playSound(0x1946, 22);
 	playSound(0x195C, 17);
 	return 0;
 }
 
-// sub_11D3D
 int ASound2::command67() {
 	playSound(0x196D, 18);
 	return 0;
 }
 
-// nullsub_3 – no-op
+// no-op
 int ASound2::command68() {
 	return 0;
 }
 
-// sub_11D45
 int ASound2::command69() {
 	playSound(0x197F, 38);
 	playSound(0x19A5, 38);
@@ -609,20 +552,17 @@ int ASound2::command69() {
 	return 0;
 }
 
-// sub_11D58
 int ASound2::command70() {
 	playSound(0x19E5, 12);
 	playSound(0x19F1, 14);
 	return 0;
 }
 
-// sub_11D65
 int ASound2::command71() {
 	playSound(0x19FF, 14);
 	return 0;
 }
 
-// sub_11D6C
 int ASound2::command72() {
 	playSound(0x1A0D,  3);
 	playSound(0x1A10, 22);
@@ -633,25 +573,6 @@ int ASound2::command72() {
 
 /*-----------------------------------------------------------------------*/
 /* ASound3  (asound.ph3)                                                  *
- *                                                                        *
- * Dispatch table layout:                                                 *
- *   asound_commands1: commands  0–8   (max=8,    base=0)                *
- *   asound_commands2: command   16    (max=0x10, base=0x10, 1 entry)    *
- *   asound_commands3: commands 24–27  (max=0x1B, base=0x18, 4 entries)  *
- *   asound_commands4: commands 32–37  (max=0x25, base=0x20, 6 entries)  *
- *   asound_commands5: commands 64–76  (max=0x4B, base=0x40, 12 entries) *
- *     (entry 12, command 76 = nullsub_8, is a no-op)                    *
- *                                                                        *
- * Channel-load helpers:                                                  *
- *   sub_103FF=ch0  sub_10404=ch1  sub_10409=ch2  sub_1040E=ch3          *
- *   sub_10413=ch4  sub_10418=ch5  sub_1041D=ch6  sub_10422=ch7          *
- *   loc_10427 =ch8                                                       *
- *                                                                        *
- * sub_106DF = isSoundActive guard                                        *
- * sub_1039C = findFreeChannel(pData, ADLIB_CHANNEL_MIDWAY) (upper pool)   *
- *                                                                        *
- * sub_11CC6 (helper) – isSoundActive guard on 0xC36, command1,          *
- *   loads ch0–7; called by command34 which then adds ch8 at 0x298E.     *
  *-----------------------------------------------------------------------*/
 
 const ASound3::CommandPtr ASound3::_commandList[77] = {
@@ -738,7 +659,7 @@ void ASound3::sub11CC6() {
 }
 
 // ---------------------------------------------------------------------------
-// command16 (sub_11D98) – isSoundActive guard, command1, load ch0–5
+// command16 – isSoundActive guard, command1, load ch0–5
 // ---------------------------------------------------------------------------
 int ASound3::command16() {
 	byte *pData = loadData(0x24F2, 172);
@@ -755,30 +676,26 @@ int ASound3::command16() {
 }
 
 // ---------------------------------------------------------------------------
-// commands 24–27 (asound_commands3) – upper channel pool (sub_1039C)
+// commands 24–27 (asound_commands3) – upper channel pool
 // ---------------------------------------------------------------------------
 
-// sub_11E54
 int ASound3::command24() {
 	playSound(0x2A7C, 51);
 	playSound(0x2AAF, 46);
 	return 0;
 }
 
-// sub_11E61
 int ASound3::command25() {
 	playSound(0x2ADD, 44);
 	playSound(0x2B09, 46);
 	return 0;
 }
 
-// sub_11E6E
 int ASound3::command26() {
 	playSound(0x2B37, 12);
 	return 0;
 }
 
-// sub_11E75
 int ASound3::command27() {
 	playSound(0x2B43, 12);
 	return 0;
@@ -788,7 +705,7 @@ int ASound3::command27() {
 // commands 32–37 (asound_commands4)
 // ---------------------------------------------------------------------------
 
-// command32 (sub_11E7C) – isSoundActive guard, command1, load ch0–7
+// command32 – isSoundActive guard, command1, load ch0–7
 int ASound3::command32() {
 	byte *pData = loadData(0x2B94, 108);
 	if (!isSoundActive(pData)) {
@@ -805,7 +722,7 @@ int ASound3::command32() {
 	return 0;
 }
 
-// command33 (sub_11D32) – isSoundActive guard, command1, load ch0–6
+// command33 – isSoundActive guard, command1, load ch0–6
 int ASound3::command33() {
 	byte *pData = loadData(0x149E, 525);
 	if (!isSoundActive(pData)) {
@@ -821,7 +738,7 @@ int ASound3::command33() {
 	return 0;
 }
 
-// command34 (sub_11E2F) – calls sub11CC6 (loads ch0–7 if not active),
+// command34 – calls sub11CC6 (loads ch0–7 if not active),
 // then unconditionally loads ch8 at 0x298E
 int ASound3::command34() {
 	sub11CC6();
@@ -829,7 +746,7 @@ int ASound3::command34() {
 	return 0;
 }
 
-// command35 (sub_11D02) – isSoundActive guard, command1, load ch0–5
+// command35 – isSoundActive guard, command1, load ch0–5
 int ASound3::command35() {
 	byte *pData = loadData(0x0CB8, 413);
 	if (!isSoundActive(pData)) {
@@ -844,7 +761,7 @@ int ASound3::command35() {
 	return 0;
 }
 
-// command36 (sub_11D68) – isSoundActive guard, command1, load ch0–5
+// command36 – isSoundActive guard, command1, load ch0–5
 int ASound3::command36() {
 	byte *pData = loadData(0x2072, 196);
 	if (!isSoundActive(pData)) {
@@ -859,7 +776,7 @@ int ASound3::command36() {
 	return 0;
 }
 
-// command37 (sub_11DF8) – single upper-pool voice
+// command37 – single upper-pool voice
 int ASound3::command37() {
 	playSound(0x298E, 10);
 	return 0;
@@ -867,28 +784,20 @@ int ASound3::command37() {
 
 // ---------------------------------------------------------------------------
 // commands 64–75 (asound_commands5)
-//
-// sub_11DC8/sub_11DD4: load ch6 and ch8 directly (skipping ch7).
-// sub_11DE0: loads ch6, ch7, ch8.
-// sub_11E22/sub_11E47: load ch7 and ch8 directly.
-// Remaining entries use the upper pool (sub_1039C).
 // ---------------------------------------------------------------------------
 
-// sub_11DC8 – ch6 + ch8
 int ASound3::command64() {
 	_channels[6]->load(loadData(0x28CA, 50));
 	_channels[8]->load(loadData(0x28FC, 29));
 	return 0;
 }
 
-// sub_11DD4 – ch6 + ch8
 int ASound3::command65() {
 	_channels[6]->load(loadData(0x2919, 17));
 	_channels[8]->load(loadData(0x292A, 13));
 	return 0;
 }
 
-// sub_11DE0 – ch6 + ch7 + ch8
 int ASound3::command66() {
 	_channels[6]->load(loadData(0x2937, 31));
 	_channels[7]->load(loadData(0x2956, 15));
@@ -896,13 +805,11 @@ int ASound3::command66() {
 	return 0;
 }
 
-// sub_11DF2 – upper pool x1
 int ASound3::command67() {
 	playSound(0x2984, 10);
 	return 0;
 }
 
-// sub_11DFE – upper pool x3
 int ASound3::command68() {
 	playSound(0x2998, 22);
 	playSound(0x29AE, 20);
@@ -910,44 +817,37 @@ int ASound3::command68() {
 	return 0;
 }
 
-// sub_11E10 – upper pool x1
 int ASound3::command69() {
 	playSound(0x29D8, 18);
 	return 0;
 }
 
-// sub_11E16 – upper pool x1
 int ASound3::command70() {
 	playSound(0x2B4F, 15);
 	return 0;
 }
 
-// sub_11E1C – upper pool x1
 int ASound3::command71() {
 	playSound(0x2B5E, 54);
 	return 0;
 }
 
-// sub_11E22 – ch7 + ch8
 int ASound3::command72() {
 	_channels[7]->load(loadData(0x29EA, 17));
 	_channels[8]->load(loadData(0x2A18, 17));
 	return 0;
 }
 
-// sub_11E39 – upper pool x1
 int ASound3::command73() {
 	playSound(0x2A44, 10);
 	return 0;
 }
 
-// sub_11E40 – upper pool x1
 int ASound3::command74() {
 	playSound(0x2A4E, 46);
 	return 0;
 }
 
-// sub_11E47 – ch7 + ch8
 int ASound3::command75() {
 	_channels[7]->load(loadData(0x29FB, 29));
 	_channels[8]->load(loadData(0x2A29, 27));
@@ -958,27 +858,6 @@ int ASound3::command75() {
 
 /*-----------------------------------------------------------------------*/
 /* ASound4  (asound.ph4)                                                  *
- *                                                                        *
- * Dispatch table layout:                                                 *
- *   asound_commands1: commands  0–8   (max=8,    base=0)                *
- *   asound_commands2: command   16    (max=0x10, base=0x10, 1 entry)    *
- *   asound_commands3: commands 24–27  (max=0x1B, base=0x18, 4 entries)  *
- *   asound_commands4: commands 64–70  (max=0x46, base=0x40, 7 entries)  *
- *     (The 0x20-range table also points at asound_commands4 but has     *
- *      max=0, making commands 32–63 unreachable.)                       *
- *                                                                        *
- * Channel-load helpers:                                                  *
- *   sub_103FF=ch0  sub_10404=ch1  sub_10409=ch2  sub_1040E=ch3          *
- *   sub_10413=ch4  sub_10418=ch5  sub_1041D=ch6                         *
- *                                                                        *
- * sub_106DF = isSoundActive guard                                        *
- * sub_1039C = findFreeChannel(pData, ADLIB_CHANNEL_MIDWAY) (upper pool)   *
- *                                                                        *
- * commands 24 and 25 share the same handler (sub_11D0A).                *
- * Two unreferenced subs (sub_11D5E, sub_11D6B) contain dead sound data  *
- * that is never played; they are omitted.                                *
- * An unreferenced random-pitch stub exists between sub_11CAB and        *
- * sub_11CD3; it was never wired into any command.                        *
  *-----------------------------------------------------------------------*/
 
 const ASound4::CommandPtr ASound4::_commandList[71] = {
@@ -1038,7 +917,7 @@ int ASound4::command7() { return ASound::command7(); }
 int ASound4::command8() { return ASound::command8(); }
 
 // ---------------------------------------------------------------------------
-// command16 (sub_11CD3) – isSoundActive guard, command1, load ch0–6
+// command16 – isSoundActive guard, command1, load ch0–6
 // ---------------------------------------------------------------------------
 int ASound4::command16() {
 	byte *pData = loadData(0x0C36, 63);
@@ -1056,13 +935,12 @@ int ASound4::command16() {
 }
 
 // ---------------------------------------------------------------------------
-// commands 24–27 (asound_commands3) – upper pool (sub_1039C)
+// commands 24–27 (asound_commands3) – upper pool
 //
-// commands 24 and 25 are both wired to the same handler (sub_11D0A),
+// commands 24 and 25 are both wired to the same handler,
 // which loads two upper-pool sounds.
 // ---------------------------------------------------------------------------
 
-// sub_11D0A  (shared by both command24 and command25)
 int ASound4::command24() {
 	playSound(0x0FFA, 18);
 	playSound(0x100C, 11);
@@ -1073,13 +951,11 @@ int ASound4::command25() {
 	return command24();
 }
 
-// sub_11D78
 int ASound4::command26() {
 	playSound(0x119D, 12);
 	return 0;
 }
 
-// sub_11D7F
 int ASound4::command27() {
 	playSound(0x11A9, 121);
 	return 0;
@@ -1087,50 +963,43 @@ int ASound4::command27() {
 
 // ---------------------------------------------------------------------------
 // commands 64–70 (asound_commands4, base 0x40)
-// All entries use the upper pool (sub_1039C).
+// All entries use the upper pool
 // ---------------------------------------------------------------------------
 
-// sub_11D16
 int ASound4::command64() {
 	playSound(0x1017, 26);
 	playSound(0x1031, 17);
 	return 0;
 }
 
-// sub_11D22
 int ASound4::command65() {
 	playSound(0x1042,  9);
 	playSound(0x104B, 20);
 	return 0;
 }
 
-// sub_11D2E
 int ASound4::command66() {
 	playSound(0x105F,  9);
 	playSound(0x1068, 16);
 	return 0;
 }
 
-// sub_11D3A
 int ASound4::command67() {
 	playSound(0x1078,  9);
 	playSound(0x1081, 14);
 	return 0;
 }
 
-// sub_11D46
 int ASound4::command68() {
 	playSound(0x108F, 12);
 	return 0;
 }
 
-// sub_11D4C
 int ASound4::command69() {
 	playSound(0x109B, 10);
 	return 0;
 }
 
-// sub_11D52
 int ASound4::command70() {
 	playSound(0x10A5,  3);
 	playSound(0x10A8, 58);
@@ -1141,31 +1010,6 @@ int ASound4::command70() {
 
 /*-----------------------------------------------------------------------*/
 /* ASound5  (asound.ph5)                                                  *
- *                                                                        *
- * Dispatch table layout:                                                 *
- *   asound_commands1: commands  0–8   (max=8,    base=0)                *
- *   asound_commands2: command   16    (max=0x10, base=0x10, 1 entry)    *
- *   asound_commands3: commands 24–27  (max=0x1B, base=0x18, 4 entries)  *
- *   asound_commands4: commands 32–39  (max=0x27, base=0x20, 8 entries)  *
- *   asound_commands5: commands 64–78  (max=0x4E, base=0x40, 15 entries) *
- *     (entry 15, command 79 = nullsub_8, silently ignored)              *
- *                                                                        *
- * Channel-load helpers:                                                  *
- *   sub_103FF=ch0  sub_10404=ch1  sub_10409=ch2  sub_1040E=ch3          *
- *   sub_10413=ch4  sub_10418=ch5  loc_1041D=ch6  loc_10422=ch7          *
- *   loc_10427=ch8                                                        *
- *                                                                        *
- * In this driver IDA named the lower-pool loadAny as AdlibChannel_loadAny*
- * (starts from ch0) and sub_1039C as the upper-pool loader (ch6-8).     *
- *   AdlibChannel_loadAny -> findFreeChannel(pData, 0)                      *
- *   sub_1039C            -> playSound() / findFreeChannel(pData, MIDWAY)   *
- *                                                                        *
- * loc_11D42 (cmd37) and loc_11D72 (cmd36) load channels in non-         *
- * sequential order — the sound data for each channel is not stored       *
- * contiguously. Block sizes are derived from the full sorted data map.   *
- *                                                                        *
- * commands 70/77/78 all reference the same data block at 0x40BA.        *
- * A dead sub (sub_11F09) and a dead random-pitch stub are ignored.       *
  *-----------------------------------------------------------------------*/
 
 const ASound5::CommandPtr ASound5::_commandList[79] = {
@@ -1229,7 +1073,7 @@ int ASound5::command7() { return ASound::command7(); }
 int ASound5::command8() { return ASound::command8(); }
 
 // ---------------------------------------------------------------------------
-// command16 (sub_11E84) – isSoundActive guard, command1, load ch0–5
+// command16 – isSoundActive guard, command1, load ch0–5
 // ---------------------------------------------------------------------------
 int ASound5::command16() {
 	byte *pData = loadData(0x4142, 120);
@@ -1246,30 +1090,27 @@ int ASound5::command16() {
 }
 
 // ---------------------------------------------------------------------------
-// commands 24–27 (asound_commands3) – upper pool (sub_1039C)
+// commands 24–27 (asound_commands3) – upper pool
 // ---------------------------------------------------------------------------
 
-// sub_11EE8
 int ASound5::command24() {
 	playSound(0x51FA, 51);
 	playSound(0x522D, 46);
 	return 0;
 }
 
-// sub_11EF5
 int ASound5::command25() {
 	playSound(0x525B, 44);
 	playSound(0x5287, 46);
 	return 0;
 }
 
-// sub_11F02
 int ASound5::command26() {
 	playSound(0x52B5, 12);
 	return 0;
 }
 
-// sub_11E71 – three upper-pool voices
+// three upper-pool voices
 int ASound5::command27() {
 	playSound(0x4040, 10);
 	playSound(0x404A, 23);
@@ -1281,7 +1122,7 @@ int ASound5::command27() {
 // commands 32–39 (asound_commands4)
 // ---------------------------------------------------------------------------
 
-// sub_11EB4 – command1, eight loadAny (lower pool, AdlibChannel_loadAny)
+// command1, eight loadAny (lower pool, AdlibChannel_loadAny)
 int ASound5::command32() {
 	ASound::command1();
 	findFreeChannel(loadData(0x43BC, 689));
@@ -1295,7 +1136,7 @@ int ASound5::command32() {
 	return 0;
 }
 
-// sub_11DA2 – isSoundActive guard, command1, load ch0–6
+// isSoundActive guard, command1, load ch0–6
 int ASound5::command33() {
 	byte *pData = loadData(0x21C6, 609);
 	if (!isSoundActive(pData)) {
@@ -1311,7 +1152,7 @@ int ASound5::command33() {
 	return 0;
 }
 
-// sub_11DD8 – isSoundActive guard, command1, load ch0–5 (non-sequential)
+// isSoundActive guard, command1, load ch0–5 (non-sequential)
 // ch1 and ch3 use data from the 0x4000 region; ch0/ch2/ch4 from 0x2E9E region
 int ASound5::command34() {
 	byte *pData = loadData(0x2E9E, 1521);
@@ -1327,7 +1168,7 @@ int ASound5::command34() {
 	return 0;
 }
 
-// loc_11D72 – isSoundActive guard, command1, load ch0–5 (non-sequential)
+// isSoundActive guard, command1, load ch0–5 (non-sequential)
 // ch1/ch3/ch5 use data from the 0x2196 region interleaved with ch0/ch2/ch4
 int ASound5::command35() {
 	byte *pData = loadData(0x1D0A, 320);
@@ -1343,7 +1184,7 @@ int ASound5::command35() {
 	return 0;
 }
 
-// loc_11D42 – isSoundActive guard, command1, load ch0–5 (non-sequential)
+// isSoundActive guard, command1, load ch0–5 (non-sequential)
 // ch4 and ch5 reuse blocks at 0x15EC and 0x18D9 that precede ch0's data
 int ASound5::command36() {
 	byte *pData = loadData(0x15F5, 740);
@@ -1359,7 +1200,7 @@ int ASound5::command36() {
 	return 0;
 }
 
-// loc_11D00 – isSoundActive guard, command1, load ch0–8
+// isSoundActive guard, command1, load ch0–8
 int ASound5::command37() {
 	byte *pData = loadData(0x1190, 397);
 	if (!isSoundActive(pData)) {
@@ -1377,7 +1218,7 @@ int ASound5::command37() {
 	return 0;
 }
 
-// loc_11CD0 – isSoundActive guard, command2 (lower-bank fade), load ch0–5
+// isSoundActive guard, command2 (lower-bank fade), load ch0–5
 int ASound5::command38() {
 	byte *pData = loadData(0x0C36, 329);
 	if (!isSoundActive(pData)) {
@@ -1392,7 +1233,7 @@ int ASound5::command38() {
 	return 0;
 }
 
-// sub_11F10 – isSoundActive guard, command3 (lower-bank fade only), load ch0–5
+// isSoundActive guard, command3 (lower-bank fade only), load ch0–5
 int ASound5::command39() {
 	byte *pData = loadData(0x5312, 599);
 	if (!isSoundActive(pData)) {
@@ -1408,94 +1249,82 @@ int ASound5::command39() {
 }
 
 // ---------------------------------------------------------------------------
-// commands 64–78 (asound_commands5) – upper pool (sub_1039C) unless noted
+// commands 64–78 (asound_commands5) – upper pool unless noted
 // ---------------------------------------------------------------------------
 
-// sub_11E08
 int ASound5::command64() {
 	playSound(0x4101, 10);
 	return 0;
 }
 
-// sub_11E0E
 int ASound5::command65() {
 	playSound(0x401A, 18);
 	return 0;
 }
 
-// sub_11E14
 int ASound5::command66() {
 	playSound(0x402C, 10);
 	return 0;
 }
 
-// sub_11E1A
 int ASound5::command67() {
 	playSound(0x4036, 10);
 	return 0;
 }
 
-// sub_11E21
 int ASound5::command68() {
 	playSound(0x407A, 18);
 	return 0;
 }
 
-// sub_11E27
 int ASound5::command69() {
 	playSound(0x408C, 46);
 	return 0;
 }
 
-// sub_11E2D – also shared by command77 and command78
+// also shared by command77 and command78
 int ASound5::command70() {
 	playSound(0x40BA, 14);
 	return 0;
 }
 
-// sub_11E33
 int ASound5::command71() {
 	playSound(0x40C8, 10);
 	return 0;
 }
 
-// sub_11E39
 int ASound5::command72() {
 	playSound(0x40D2, 10);
 	return 0;
 }
 
-// sub_11E3F
 int ASound5::command73() {
 	playSound(0x40DC, 11);
 	playSound(0x40E7, 26);
 	return 0;
 }
 
-// sub_11E4C
 int ASound5::command74() {
 	playSound(0x410B, 20);
 	return 0;
 }
 
-// sub_11E52
 int ASound5::command75() {
 	playSound(0x4129, 11);
 	playSound(0x4134, 14);
 	return 0;
 }
 
-// sub_11E5F – same block as command70
+// same block as command70
 int ASound5::command76() {
 	return command70();
 }
 
-// sub_11E65 – same block as command70
+// same block as command70
 int ASound5::command77() {
 	return command70();
 }
 
-// sub_11E6B
 int ASound5::command78() {
 	playSound(0x411F, 10);
 	return 0;

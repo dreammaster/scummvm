@@ -20,7 +20,6 @@
  */
 
 #include "audio/fmopl.h"
-#include "common/debug.h"
 #include "mads/madsv2/core/asound.h"
 
 namespace MADS {
@@ -410,7 +409,7 @@ int ASound::command8() {
 	result |= _channel2._activeCount;
 	result |= _channel3._activeCount;
 	result |= _channel4._activeCount;
-	result |= (uint8)(_channel5._activeCount); /* _ch5PendingStop area */
+	result |= _channel5._activeCount;
 	result |= _channel6._activeCount;
 	result |= _channel7._activeCount;
 	result |= _channel8._activeCount;
@@ -428,15 +427,10 @@ void ASound::callFunction(uint16 offset) {
 
 void ASound::write(uint8 reg, uint8 value) {
 	_adlibPorts[reg] = value;
-
-	if (reg != 2 && reg != 3 && reg != 4)
-		debug("%.2x %.2x", reg, value);
 	_queue.push(Common::Pair<byte, byte>(reg, value));
 }
-bool timerFlag = false;
 
 void ASound::onTimer() {
-	if (!timerFlag) return; //***DEBUG****
 	Common::StackLock slock(_driverMutex);
 
 	poll();
