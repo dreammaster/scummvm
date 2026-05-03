@@ -182,7 +182,9 @@ int ASound1::commandMusic3() {
 // ---------------------------------------------------------------------------
 int ASound1::command16() {
 	if (_channels[0]->_activeCount) {
-		int f = getDataOffset(_channels[0]->_loopStartPtr);
+		// Special offset checks
+		int f = _channels[0]->_loopStartPtr - &_soundData[0];
+
 		if (f == 0 || f == 0x1ECA || f == 0x21C4 ||
 		    f == 0x3418 || f == 0x3688 || f == 0x3D52)
 			return 0;

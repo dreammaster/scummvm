@@ -134,6 +134,18 @@ struct RegisterValue {
  * Base class for the sound player resource files
  */
 class ASound : public SoundDriver {
+protected:
+	struct CachedDataEntry {
+		byte *_dataStart = nullptr;
+		byte *_dataEnd = nullptr;
+		CachedDataEntry(byte *dataStart, size_t size) : _dataStart(dataStart),
+			_dataEnd(dataStart + size - 1) {
+		}
+	};
+
+private:
+	Common::Array<CachedDataEntry> _dataCache;
+
 private:
 	uint16 _randomSeed;
 	int _masterVolume;
@@ -188,6 +200,16 @@ protected:
 	int _commandParam;
 
 	virtual void channelCommand(byte *&pSrc, bool &updateFlag) = 0;
+
+	/**
+	 * Returns data for the specified offset. It also caches the data size for that
+	 * offset, for any future references that need it.
+	 */
+	byte *loadData(int offset, int size);
+
+	int getDataOffset(byte *ptr) const {
+		return ptr - &_soundData[0];
+	}
 
 	/**
 	 * Loads up the specified sample
@@ -323,6 +345,11 @@ public:
 	 * Validates the Adlib sound files
 	 */
 	static void validate();
+
+	/**
+	 * Return the cached data block record for previously loaded sound data
+	 */
+	CachedDataEntry &getCachedData(byte *pData);
 
 	/**
 	 * Stop all currently playing sounds

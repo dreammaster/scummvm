@@ -342,6 +342,13 @@ protected:
 	 */
 	void findFreeChannelFull(byte *soundData);
 
+	/**
+	 * Returns data for the specified offset.
+	 */
+	byte *loadData(int offset, int /*size*/) {
+		return &_soundData[offset];
+	}
+
 protected:
 	/**
 	 * Silences every voice and mutes the hardware:

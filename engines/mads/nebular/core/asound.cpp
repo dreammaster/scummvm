@@ -213,6 +213,33 @@ void ASound::adlibInit() {
 	write(4, 0x80);
 }
 
+
+byte *ASound::loadData(int offset, int size) {
+	byte *ptr = &_soundData[offset];
+
+	// Check for an existing cache entry
+	uint idx;
+	for (idx = 0; idx < _dataCache.size() && _dataCache[idx]._dataStart != ptr; ++idx) {
+	}
+
+	if (idx == _dataCache.size())
+		_dataCache.push_back(CachedDataEntry(ptr, size));
+
+	// Return the data pointer
+	return ptr;
+}
+
+ASound::CachedDataEntry &ASound::getCachedData(byte *pData) {
+	Common::Array<CachedDataEntry>::iterator i;
+	for (i = _dataCache.begin(); i != _dataCache.end(); ++i) {
+		CachedDataEntry &e = *i;
+		if (e._dataStart == pData)
+			return e;
+	}
+
+	error("Could not find previously loaded data");
+}
+
 int ASound::stop() {
 	command0();
 	int result = _pollResult;
