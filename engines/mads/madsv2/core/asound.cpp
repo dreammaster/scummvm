@@ -110,6 +110,13 @@ static uint8 ADLIB_NULLDATA[] = {
 
 // =========================================================================
 
+constexpr uint8 OPL_VERSION_FLAG = 18;	// OPL version flag
+constexpr bool RHYTHM_HI_HAT = true;	// Rhythm mode: hi-hat
+constexpr bool RHYTHM_CYMBAL = true;	// Rhythm mode: cymbal
+constexpr bool RHYTHM_ENABLE = true;	// Rhythm mode: enable
+
+// =========================================================================
+
 AdlibSample::AdlibSample(Common::SeekableReadStream &s) {
 	_attackRate = s.readByte();
 	_decayRate = s.readByte();
@@ -213,6 +220,7 @@ ASound::ASound(Audio::Mixer *mixer, OPL::OPL *opl, const Common::Path &filename,
 	write(4, 0x60);
 	write(4, 0x80);
 
+	Common::fill(_adlibPorts, _adlibPorts + 256, 0);
 	command0();
 
 	_opl->start(new Common::Functor0Mem<void, ASound>(this, &ASound::onTimer), CALLBACKS_PER_SECOND);
@@ -429,23 +437,27 @@ void ASound::callFunction(uint16 offset) {
  * Support functions
  * ========================================================================= */
 
-
 void ASound::write(uint8 reg, uint8 value) {
+	_adlibPorts[reg] = value;
+
 	if (reg != 2 && reg != 3 && reg != 4)
 		debug("%.2x %.2x", reg, value);
 	_queue.push(Common::Pair<byte, byte>(reg, value));
 }
+bool timerFlag = false;
 
 void ASound::onTimer() {
+	if (!timerFlag) return; //***DEBUG****
 	Common::StackLock slock(_driverMutex);
+debug("---TIMER START");
 	poll();
 	flush();
+debug("---TIMER END");
 }
 
 void ASound::flush() {
 	while (!_queue.empty()) {
 		auto v = _queue.pop();
-		debug("%.2x %.2x", v.first, v.second);
 		_opl->writeReg(v.first, v.second);
 	}
 }
@@ -509,7 +521,7 @@ void ASound::writeVolume() {
 	/* KSL flags from port shadow */
 	uint8 kslBits = _adlibPorts[siReg] & 0xC0;
 
-	if (_adlib_v5660_2 < 0x18) {
+	if (OPL_VERSION_FLAG < 0x18) {
 		/* ---- OPL2 simple path ---- */
 		if (var8 < 0)  var8 = 0;
 		if (var8 > 63) var8 = 63;
@@ -547,7 +559,7 @@ void ASound::writeVolume() {
 
 	/* ---- Second operator (alg == 0 check) ---- */
 	int sampleIdx = (int)ch->_sampleIndex;
-	AdlibSample *smp = &_samples[sampleIdx];
+	AdlibSample *smp = &_samples[sampleIdx * 2];
 	if (smp->_alg != 0)
 		return;   /* FM: only one operator carries volume */
 
@@ -561,7 +573,7 @@ void ASound::writeVolume() {
 	tl_s = -tl_s;   /* neg */
 	int16 var8b = (int16)var8 - tl_s;   /* subtract from combined */
 
-	if (_adlib_v5660_2 < 0x18) {
+	if (OPL_VERSION_FLAG < 0x18) {
 		if (var8b < 0)  var8b = 0;
 		if (var8b > 63) var8b = 63;
 		int16 val2 = (0x3F - var8b) | ksl2;
@@ -673,36 +685,36 @@ void ASound::writeSampleRegs() {
 	AdlibSample *smp = _samplePtr;
 	uint16 base = _currentOpBase;
 
-	/* --- Register 0xBD: Percussion/tremolo/vibrato depth --- */
+	/* --- Register 0xBD: Hi-hat / Cymbal / percussion bits --- */
 	uint8 bdVal = 0;
-	if (_rhythmHiHat != 1) bdVal |= 0x80;
-	if (_rhythmCymbal != 1) bdVal |= 0x40;
+	if (RHYTHM_HI_HAT) bdVal |= 0x80;
+	if (RHYTHM_CYMBAL) bdVal |= 0x40;
 	bdVal |= _adlibPorts[0xBD] & 0x3F;
 	write(0xBD, bdVal);
 
-	/* --- Register 0x08: Note-select (CSM/keyboardsplit) --- */
-	uint8 ns = (_rhythmEnable != 1) ? 0x40 : 0x00;
+	/* --- Register 0x08: Note-select --- */
+	uint8 ns = RHYTHM_ENABLE ? 0x40 : 0x00;  // was !=, should be ==
 	write(0x08, ns);
 
 	/* --- Register 0xC0+voice: Feedback / algorithm --- */
-	uint8 fb = (uint8)(smp->_feedback << 1);
-	if (smp->_vib) fb |= 0x01;   /* _alg field in struct */
-	write((uint8)(_activeChannelReg + 0xC0), fb);
+	uint8 value = ((uint16)smp->_feedback << 1) | (smp->_alg == 1 ? 0 : 1);
+	write(_activeChannelReg + 0xC0, value);
 
 	/* --- Register 0x60+base: Attack/Decay --- */
-	uint8 ad = (uint8)((smp->_attackRate << 4) | (smp->_decayRate & 0x0F));
+	uint8 ad = (uint8)(((smp->_attackRate & 0x0F) << 4) | (smp->_decayRate & 0x0F));
 	write((uint8)(base + 0x60), ad);
 
 	/* --- Register 0x80+base: Sustain/Release --- */
-	uint8 sr = (uint8)((smp->_sustainLevel << 4) | (smp->_releaseRate & 0x0F));
+	uint8 sr = (uint8)(((smp->_sustainLevel & 0x0F) << 4) | (smp->_releaseRate & 0x0F));
 	write((uint8)(base + 0x80), sr);
 
-	/* --- Register 0x20+base: Tremolo/vibrato/sustain/KSR/multiplier --- */
+	/* --- Register 0x20+base: Tremolo/Vibrato/Sustain/KSR/Multiplier --- */
+	// Each flag: bit set when field == 1 (sbb/neg pattern with cmc)
 	uint8 am = 0;
-	if (smp->_egTyp != 1) am |= 0x20;
-	if (smp->_ksr != 1) am |= 0x10;
-	if (smp->_ampMod != 1) am |= 0x80;
-	if (smp->_vib != 1) am |= 0x40;   /* NB: vib doubles as "AM" flag here */
+	if (smp->_egTyp == 1) am |= 0x20;
+	if (smp->_vib == 1) am |= 0x40;
+	if (smp->_ksr == 1) am |= 0x10;
+	if (smp->_ampMod == 1) am |= 0x80;
 	am |= smp->_freqMultiple & 0x0F;
 	write((uint8)(base + 0x20), am);
 
@@ -714,70 +726,45 @@ void ASound::loadSample() {
 	AdlibChannel *ch = _activeChannelPtr;
 	uint8 chanNum = _activeChannelNumber;
 
-	/* --- Silence modulator operator first --- */
+	/* --- Phase 1: Silence modulator operator --- */
 	uint8 mSlot = MODULATOR_SLOT_FOR_VOICE[chanNum * 2];
-	uint8 mReg = SLOT_TO_REG_OFFSET[mSlot];
-	_currentOpBase = mReg;
+	_currentOpBase = SLOT_TO_REG_OFFSET[mSlot];
+	write(_currentOpBase + 0x80, 0xFF);
+	write(_currentOpBase + 0x40, 63);
 
-	write((uint8)(_currentOpBase + 0x80), 0xFF);  /* max release */
-	write((uint8)(_currentOpBase + 0x40), 63);    /* full attenuation */
-
-	/* --- Silence carrier operator --- */
+	/* --- Phase 2: Silence carrier operator --- */
 	uint8 cSlot = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
-	uint8 cReg = SLOT_TO_REG_OFFSET[cSlot];
-	_currentOpBase = (uint16)cReg;
+	_currentOpBase = SLOT_TO_REG_OFFSET[cSlot];
+	write(_currentOpBase + 0x80, 0xFF);
+	write(_currentOpBase + 0x40, 63);
 
-	write((uint8)(_currentOpBase + 0x80), 0xFF);
-	write((uint8)(_currentOpBase + 0x40), 63);
-
-	/* --- Set active register for C0 writes --- */
+	/* --- Phase 3: First writeSampleRegs --- */
 	_activeChannelReg = (uint16)chanNum;
-
-	/* --- Point samplePtr at operator 1 data and write registers --- */
-	int sampleIdx = (int)ch->_sampleIndex;
-	_samplePtr = &_samples[sampleIdx * 2];
-
-	/* Modulator operator regs (operator 1) */
-	uint8 ms1 = MODULATOR_SLOT_FOR_VOICE[chanNum * 2];
-	uint8 mr1 = SLOT_TO_REG_OFFSET[ms1];
-	_currentOpBase = (uint16)mr1;
+	_samplePtr = &_samples[ch->_sampleIndex * 2];      // operator 1
 	writeSampleRegs();
 
-	/* Carrier operator regs (operator 2, offset by 490 bytes = next pair) */
-	_samplePtr = &_samples[sampleIdx * 2 + 1];
-
-	uint8 ms2 = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
-	uint8 mr2 = SLOT_TO_REG_OFFSET[ms2];
-	_currentOpBase = (uint16)mr2;
+	/* --- Phase 4: Second writeSampleRegs --- */
+	_samplePtr = &_samples[ch->_sampleIndex * 2 + 1];  // operator 2
+	_currentOpBase = SLOT_TO_REG_OFFSET[MODULATOR_SLOT_FOR_VOICE[chanNum * 2]];
 	writeSampleRegs();
 
-	/* Write carrier TL: noteOffset shifts the level */
-	AdlibSample *smp2 = _samplePtr;
-	uint8 noteOffBits = (uint8)((smp2->_attackRate << 6) | 0x3F);
-	write((uint8)(_currentOpBase + 0x40), noteOffBits);
+	/* --- Phase 5: Carrier TL write --- */
+	write(_currentOpBase + 0x40, (uint8)((_samplePtr->_scalingLevel << 6) | 0x3F));
 
-	/* --- Third operator (if present, offset 0x2C * sampleIndex[5]) --- */
-	int smp3idx = (int)ch->_noteOffset;
-	_samplePtr = &_samples[smp3idx * 2];
-
-	uint8 s3slot = CARRIER_SLOT_FOR_VOICE[chanNum * 2];
-	uint8 s3reg = SLOT_TO_REG_OFFSET[s3slot];
-	uint16 s3Reg = (uint16)s3reg + 0x40;
-
+	/* --- Phase 6: Third sample --- */
+	uint8 thirdIdx = *((uint8 *)ch + 5);
+	_samplePtr = &_samples[thirdIdx * 2];   // operator 1 of third sample
 	AdlibSample *smp3 = _samplePtr;
+	uint16 cRegPlus40 = SLOT_TO_REG_OFFSET[CARRIER_SLOT_FOR_VOICE[chanNum * 2]] + 0x40;
+
 	if (smp3->_alg == 0) {
-		/* FM: write scaling level + max TL */
-		uint8 scl3 = (uint8)((smp3->_scalingLevel << 6) | 0x3F);
-		write((uint8)s3Reg, scl3);
+		write(cRegPlus40, (uint8)((smp3->_scalingLevel << 6) | 0x3F));
 	} else {
-		/* Additive: write actual total level */
-		int16 tl3 = (int16)smp3->_totalLevel - 63;
-		tl3 = -tl3;
-		uint8 scl3 = (uint8)((smp3->_scalingLevel << 6) | (tl3 & 0x3F));
-		write((uint8)s3Reg, scl3);
+		uint8 tl = (uint8)(-(smp3->_totalLevel - 63) & 0xFF);
+		write(cRegPlus40, (uint8)((smp3->_scalingLevel << 6) | (tl & 0x3F)));
 	}
 
-	/* Copy sweep / freq parameters from sample into channel */
+	/* --- Copy sweep/freq parameters from sample into channel --- */
 	ch->_freqSweepCounter = smp3->_freqSweepInit;
 	ch->_noiseFreqMask = smp3->_freqMask;
 	ch->_freqAccum = smp3->_freqBase;

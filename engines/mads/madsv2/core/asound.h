@@ -29,7 +29,7 @@
 
 namespace MADS {
 namespace MADSV2 {
-
+extern bool timerFlag; //***DEBUG***
 #define ADLIB_CHANNEL_COUNT 9
 
 struct AdlibChannel {
@@ -137,7 +137,6 @@ private:
 	uint16 _currentOpBase = 0;			// Current operator base
 	AdlibSample *_samplePtr = NULL;
 	byte *pSrc = nullptr;				// Current read pointer
-	uint8 _adlib_v5660_2 = 0;			// OPL version flag
 	int16 _pollResult = 0;
 	int16 _resultFlag = 0;
 	uint16 _randomSeed = 0x4D2;
@@ -146,12 +145,7 @@ private:
 	uint8  _ch5SweepLive = 0;			// Channel5 savedFreqSweep shadow
 	uint8  _ch5SweepSaved = 0;			// Channel5 savedFreqSweep shadow 2
 	uint8  _ch5PendingStop = 0;			// Channel5 pendingStop shadow
-	/* Percussion flags (_rhythmHiHat/D/E) */
-	uint8 _rhythmHiHat = 0;				// Rhythm mode: hi-hat
-	uint8 _rhythmCymbal = 0;			// Rhythm mode: cymbal
-	uint8 _rhythmEnable = 0;			// Rhythm mode: enable
-
-	uint8 _anySweepActive = 0;				// any-sweep-active flag
+	uint8 _anySweepActive = 0;			// any-sweep-active flag
 	int _frameNumber2 = 0;
 	uint8 _scriptVars[32];				// General-purpose script registers
 	uint16 _tickEnabled = 1;

@@ -344,7 +344,9 @@ int ASound1::command37() {
 // command38 (sub_11D84) – alias for commandMusic0; also the direct dispatch
 // target for command 38.
 int ASound1::command38() {
-	return commandMusic0();
+	commandMusic0();
+	timerFlag = true; //****DEBUG****
+	return 0;
 }
 
 // command39 (sub_11FAE) – isSoundActive guard, command1, load ch0–5
