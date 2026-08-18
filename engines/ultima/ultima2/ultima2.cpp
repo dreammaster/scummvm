@@ -19,8 +19,6 @@
  *
  */
 
-#include "ultima/ultima2/ultima2.h"
-#include "ultima/ultima2/console.h"
 #include "common/scummsys.h"
 #include "common/config-manager.h"
 #include "common/debug-channels.h"
@@ -28,6 +26,9 @@
 #include "common/system.h"
 #include "engines/util.h"
 #include "graphics/paletteman.h"
+#include "ultima/ultima2/ultima2.h"
+#include "ultima/ultima2/console.h"
+#include "ultima/ultima2/views/views.h"
 
 namespace Ultima {
 namespace Ultima2 {
@@ -58,7 +59,9 @@ Common::Error Ultima2Engine::run() {
 	// Set the engine's debugger console
 	setDebugger(new Console());
 
-	runGame();
+	Views::Views views;
+	addView("Startup");
+	runGame(views);
 
 	return Common::kNoError;
 }
