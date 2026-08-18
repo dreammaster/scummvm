@@ -19,24 +19,44 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA_SHARED_GFX_TEXT_INPUT_H
+#define ULTIMA_SHARED_GFX_TEXT_INPUT_H
 
 #include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
 
 namespace Ultima {
-namespace Ultima2 {
-namespace Views {
+namespace Shared {
+namespace Gfx {
 
-struct Views : public Shared::Views {
-	Startup _startup;
-	Title _title;
+class TextInput : public Shared::UIElement {
+private:
+	Common::String _text;
+	bool _isNumeric = false;
+	bool _visible = false;
+	bool _caretVisible = false;
+
+public:
+	TextInput(const Common::String &name, UIElement *parent = nullptr);
+	TextInput(const Common::String &name, UIElement *parent, const Common::Point &pos,
+		int maxChars, bool isNumeric = false);
+	~TextInput() override {
+	}
+
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	void timeout() override;
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgUnfocus(const UnfocusMessage &msg) override;
+
+	void show(const Common::Point &pos, int maxChars, bool isNumeric = false);
+	void show();
+	void hide();
+	void clear();
+	void setTextPos(const Common::Point &pt);
 };
 
-} // namespace Views
-} // namespace Ultima2
+} // namespace Gfx
+} // namespace Shared
 } // namespace Ultima
 
 #endif
