@@ -19,22 +19,37 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_CREATE_CHARACTER_H
+#define ULTIMA2_VIEWS_CREATE_CHARACTER_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/shared/gfx/view.h"
+#include "ultima/shared/gfx/text_input.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Startup _startup;
-	Title _title;
+constexpr int POINTS_REMAINING = 90;
+
+using namespace Shared::Messages;
+
+class CreateCharacter : public Shared::Gfx::View {
+private:
+	Shared::Gfx::TextInput _cursor = Shared::Gfx::TextInput("Cursor", this);
+	int _pointsRemaining = POINTS_REMAINING;
+	int _cursorIndex = 0;	// Which figure waiting input for
+
+	void reset();
+	void done();
+
+public:
+	CreateCharacter() : View("CreateCharacter") {}
+	~CreateCharacter() override {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	void draw() override;
+
+	bool msgGame(const GameMessage &msg) override;
 };
 
 } // namespace Views
