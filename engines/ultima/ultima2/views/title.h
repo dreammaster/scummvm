@@ -19,20 +19,31 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_TITLE_H
+#define ULTIMA2_VIEWS_TITLE_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/shared/gfx/view.h"
+#include "ultima/shared/gfx/text_input.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	Startup _startup;
-	Title _title;
+using namespace Shared::Messages;
+
+class Title : public Shared::Gfx::View {
+private:
+	Shared::Gfx::TextInput _cursor = Shared::Gfx::TextInput("Cursor", this,
+		Common::Point(12, 19), 1);
+
+public:
+	Title() : View("Title") {}
+	~Title() override {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	void draw() override;
+
+	bool msgGame(const GameMessage &msg) override;
 };
 
 } // namespace Views

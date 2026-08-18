@@ -19,24 +19,51 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA_SHARED_CORE_RECT_H
+#define ULTIMA_SHARED_CORE_RECT_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "common/rect.h"
 
 namespace Ultima {
-namespace Ultima2 {
-namespace Views {
+namespace Shared {
+namespace Gfx {
 
-struct Views : public Shared::Views {
-	Startup _startup;
-	Title _title;
+class TextPoint;
+
+typedef Common::Rect Rect;
+
+typedef Common::Point Point;
+
+/**
+ * Simple derived point class that converts text coordinates to graphic screen coordinates
+ */
+class TextPoint : public Common::Point {
+public:
+	TextPoint() : Common::Point() {
+	}
+	TextPoint(int16 x1, int16 y1) : Common::Point(x1 * 8, y1 * 8) {
+	}
 };
 
-} // namespace Views
-} // namespace Ultima2
+/**
+ * Simple derived rect class that converts text coordinates to graphic screen coordinates
+ */
+class TextRect : public Common::Rect {
+public:
+	TextRect() : Common::Rect() {
+	}
+	TextRect(int16 x1, int16 y1, int16 x2, int16 y2) : Common::Rect(x1 * 8, y1 * 8, (x2 + 1) * 8, (y2 + 1) * 8) {
+	}
+};
+
+} // namespace Gfx
+} // namespace Shared
+
+using Shared::Gfx::Rect;
+using Shared::Gfx::Point;
+using Shared::Gfx::TextPoint;
+using Shared::Gfx::TextRect;
+
 } // namespace Ultima
 
 #endif
