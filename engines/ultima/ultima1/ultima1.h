@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef ULTIMA2_H
-#define ULTIMA2_H
+#ifndef ULTIMA1_H
+#define ULTIMA1_H
 
 #include "common/scummsys.h"
 #include "common/system.h"
@@ -36,17 +36,17 @@
 #include "graphics/screen.h"
 #include "ultima/detection.h"
 #include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/data/game.h"
-#include "ultima/ultima2/data/map.h"
-#include "ultima/ultima2/data/player.h"
-#include "ultima/ultima2/data/tiles.h"
+#include "ultima/ultima1/data/game.h"
+#include "ultima/ultima1/data/map.h"
+#include "ultima/ultima1/data/player.h"
+#include "ultima/ultima1/data/tiles.h"
 
 namespace Ultima {
-namespace Ultima2 {
+namespace Ultima1 {
 
-struct Ultima2GameDescription;
+struct Ultima1GameDescription;
 
-class Ultima2Engine : public Engine, public Shared::Events {
+class Ultima1Engine : public Engine, public Shared::Events {
 private:
 	const Ultima::UltimaGameDescription *_gameDescription;
 
@@ -68,8 +68,8 @@ public:
 	Graphics::ManagedSurface _tiles[Data::TILE_COUNT];
 
 public:
-	Ultima2Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);
-	~Ultima2Engine() override;
+	Ultima1Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);
+	~Ultima1Engine() override;
 
 	uint32 getFeatures() const;
 
@@ -113,9 +113,10 @@ public:
 	bool savegamesExist() const;
 };
 
-extern Ultima2Engine *g_engine;
+extern Ultima1Engine *g_engine;
+#define _G(X) (::Ultima1::g_engine->X)
 
-} // namespace Ultima2
+} // namespace Ultima1
 } // namespace Ultima
 
 #endif
