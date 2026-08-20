@@ -19,27 +19,49 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_H
-#define ULTIMA1_VIEWS_H
+#ifndef ULTIMA1_GFX_TEXT_CURSOR_H
+#define ULTIMA1_GFX_TEXT_CURSOR_H
 
 #include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/views/create_character.h"
-#include "ultima/ultima1/views/main_menu.h"
-#include "ultima/ultima1/views/startup.h"
-#include "ultima/ultima1/views/title.h"
 
 namespace Ultima {
 namespace Ultima1 {
-namespace Views {
+namespace Gfx {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
+/**
+ * Animated 8x8 text cursor glyph shown after an input prompt, cycling
+ * through 4 frames while visible. Doesn't handle keypresses itself -
+ * that's left to whichever view owns it.
+ */
+class TextCursor : public Shared::UIElement {
+private:
+	int _frame = 0;
+	bool _visible = true;
+
+public:
+	TextCursor(const Common::String &name, UIElement *parent = nullptr);
+	~TextCursor() override {}
+
+	void draw() override;
+	void timeout() override;
+
+	/**
+	 * Shows the cursor and (re)starts its animation
+	 */
+	void show();
+
+	/**
+	 * Hides the cursor
+	 */
+	void hide();
+
+	/**
+	 * Sets the screen position of the cursor
+	 */
+	void setPosition(const Common::Point &pt);
 };
 
-} // namespace Views
+} // namespace Gfx
 } // namespace Ultima1
 } // namespace Ultima
 
