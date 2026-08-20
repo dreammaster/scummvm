@@ -19,24 +19,32 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_H
-#define ULTIMA1_VIEWS_H
+#ifndef ULTIMA1_VIEWS_MAIN_MENU_H
+#define ULTIMA1_VIEWS_MAIN_MENU_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/views/create_character.h"
-#include "ultima/ultima1/views/main_menu.h"
-#include "ultima/ultima1/views/startup.h"
-#include "ultima/ultima1/views/title.h"
+#include "ultima/ultima1/gfx/text_cursor.h"
+#include "ultima/ultima1/views/dialog.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
+using namespace Shared::Messages;
+
+/**
+ * The game's main menu - offers generating a new character or
+ * continuing a previously saved game.
+ */
+class MainMenu : public Dialog {
+private:
+	Gfx::TextCursor _cursor;
+
+public:
+	MainMenu();
+	~MainMenu() override {}
+
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views

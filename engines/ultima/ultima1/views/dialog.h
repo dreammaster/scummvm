@@ -19,24 +19,28 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_H
-#define ULTIMA1_VIEWS_H
+#ifndef ULTIMA1_VIEWS_DIALOG_H
+#define ULTIMA1_VIEWS_DIALOG_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/views/create_character.h"
-#include "ultima/ultima1/views/main_menu.h"
-#include "ultima/ultima1/views/startup.h"
-#include "ultima/ultima1/views/title.h"
+#include "ultima/shared/gfx/view.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
+/**
+ * Base class for views with the thick beveled-corner frame drawn around the edge of the screen
+ */
+class Dialog : public Shared::Gfx::View {
+protected:
+	/**
+	 * Draws the border frame around the edge of the screen
+	 */
+	void drawFrame();
+
+public:
+	Dialog(const Common::String &name) : View(name) {}
+	~Dialog() override {}
 };
 
 } // namespace Views
