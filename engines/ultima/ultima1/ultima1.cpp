@@ -60,8 +60,9 @@ Common::Error Ultima1Engine::run() {
 	// Set the engine's debugger console
 	setDebugger(new Console());
 
-	// Load the overworld tile sheet
+	// Load needed data
 	Data::loadTiles(_tiles);
+	_map.init();
 
 	Views::Views views;
 	addView("Startup");
