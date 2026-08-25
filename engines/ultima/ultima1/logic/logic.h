@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,50 +20,35 @@
  *
  */
 
-#ifndef ULTIMA1_DATA_TILES_H
-#define ULTIMA1_DATA_TILES_H
+#ifndef ULTIMA2_LOGIC_H
+#define ULTIMA2_LOGIC_H
 
-#include "graphics/managed_surface.h"
+#include "common/events.h"
 
 namespace Ultima {
 namespace Ultima1 {
-namespace Data {
+namespace Logic {
 
-constexpr int TILE_COUNT = 52;
-constexpr int TILE_WIDTH = 16;
-constexpr int TILE_HEIGHT = 16;
-
-enum TileId {
-	TILE_OCEAN = 0,
-	TILE_GRASS = 1,
-	TILE_WOODS = 2,
-	TILE_MOUNTAINS = 3,
-	TILE_CASTLE1 = 4,
-	TILE_CASTLE2 = 5,
-	TILE_SIGNPOST = 6,
-	TILE_CITY1 = 7,
-	TILE_CITY2 = 8,
-	TILE_PLAYER = 10,
-	TILE_HORSE = 11,
-	TILE_CART = 12,
-	TILE_RAFT = 13,
-	TILE_FRIGATE1 = 14,
-	TILE_FRIGATE2 = 15,
-	TILE_AIRCAR = 16,
-	TILE_SHUTTLE = 17,
-	TILE_TIME_MACHINE = 18,
-	TILE_FIRST_MONSTER = 19,
-	TILE_LAST_MONSTER = 47
+enum Direction {
+	DIR_LEFT = 1, DIR_RIGHT = 2, DIR_UP = 3, DIR_DOWN = 4
 };
 
 /**
- * Loads the overworld tile sheet (52 16x16 tiles, 4-bit EGA planar,
- * row-interleaved: each 16-pixel row is 4 planes x 2 bytes) into a
- * caller-supplied array of TILE_COUNT surfaces
+ * Base class for gameplay handling logic used by the Commands class to respond to player actions
+ * or other miscellaneous keypresses.
  */
-void loadTiles(Graphics::ManagedSurface tiles[TILE_COUNT]);
+class Logic {
+public:
+	virtual ~Logic() {
+	}
 
-} // namespace Data
+	virtual void action(int action) {
+	}
+	virtual void keypress(Common::KeyCode keycode) {
+	}
+};
+
+} // namespace Logic
 } // namespace Ultima1
 } // namespace Ultima
 
