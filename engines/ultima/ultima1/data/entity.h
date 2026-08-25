@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,36 +20,30 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_COMMANDS_H
-#define ULTIMA1_VIEWS_COMMANDS_H
+#ifndef ULTIMA2_DATA_ENTITY_H
+#define ULTIMA2_DATA_ENTITY_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/gfx/text_cursor.h"
+#include "common/serializer.h"
 
 namespace Ultima {
 namespace Ultima1 {
-namespace Views {
 
-using namespace Shared::Messages;
+extern const char *OVErWORLD_MONSTERS[];
 
-class Commands : public Shared::UIElement {
-private:
-	Shared::Gfx::GfxSurface _surface;
-	Gfx::TextCursor _textCursor;
+/**
+ * Entity on the overworld map, such as vechiles or creatures
+ */
+struct OverworldEntity {
+	int16 _type;
+	int16 _data;
+	int16 _x;
+	int16 _y;
+	int16 _hits;
+	int16 _unused1, _unused2, _unused3;
 
-public:
-	Commands(UIElement *parent);
-	~Commands() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-
-	void writeString(const Common::String &msg);
-	void prompt();
+	void synchronize(Common::Serializer &s);
 };
 
-} // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
 

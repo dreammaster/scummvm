@@ -19,37 +19,32 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_COMMANDS_H
-#define ULTIMA1_VIEWS_COMMANDS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/gfx/text_cursor.h"
+#include "ultima/ultima1/data/entity.h"
 
 namespace Ultima {
 namespace Ultima1 {
-namespace Views {
 
-using namespace Shared::Messages;
-
-class Commands : public Shared::UIElement {
-private:
-	Shared::Gfx::GfxSurface _surface;
-	Gfx::TextCursor _textCursor;
-
-public:
-	Commands(UIElement *parent);
-	~Commands() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-
-	void writeString(const Common::String &msg);
-	void prompt();
+const char *OVErWORLD_MONSTERS[] = {
+	"Ness creature",
+	"Giant squid",
+	"Dragon turtle",
+	"Pirate ship",
+	"Hood",
+	"Bear",
+	"Hidden archer",
+	"Dark knight",
+	"Evil trent",
+	"Thief",
+	"Orc",
+	"Knight",
+	"Necromancer",
+	"Evil ranger",
+	"Wandering warlock"
 };
 
-} // namespace Views
+void OverworldEntity::synchronize(Common::Serializer &s) {
+	s.syncMultipleLE(_type, _data, _x, _y, _hits, _unused1, _unused2, _unused3);
+}
+
 } // namespace Ultima1
 } // namespace Ultima
-
-#endif

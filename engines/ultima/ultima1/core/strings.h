@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,36 +20,16 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_COMMANDS_H
-#define ULTIMA1_VIEWS_COMMANDS_H
+#ifndef ULTIMA2_CORE_STRINGS_H
+#define ULTIMA2_CORE_STRINGS_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/gfx/text_cursor.h"
+#include "common/scummsys.h"
 
 namespace Ultima {
 namespace Ultima1 {
-namespace Views {
 
-using namespace Shared::Messages;
+extern bool isVowel(char c);
 
-class Commands : public Shared::UIElement {
-private:
-	Shared::Gfx::GfxSurface _surface;
-	Gfx::TextCursor _textCursor;
-
-public:
-	Commands(UIElement *parent);
-	~Commands() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-
-	void writeString(const Common::String &msg);
-	void prompt();
-};
-
-} // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
 
