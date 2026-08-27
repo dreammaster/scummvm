@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,51 +20,46 @@
  *
  */
 
-#include "ultima/ultima1/views/overworld.h"
-#include "ultima/ultima1/data/map.h"
-#include "ultima/ultima1/data/tiles.h"
+#include "ultima/ultima1/logic/locations_logic.h"
 #include "ultima/ultima1/metaengine.h"
-#include "ultima/shared/gfx/rect.h"
+#include "ultima/ultima1/ultima1.h"
 
 namespace Ultima {
 namespace Ultima1 {
-namespace Views {
+namespace Logic {
 
-Overworld::Overworld() : Dialog("Overworld"), _map(this), _commands(this), _stats(this) {
-	_map.setBounds(TextRect(1, 1, 38, 19));
-	_commands.setBounds(TextRect(0, 20, 29, 24));
-	_stats.setBounds(TextRect(31, 21, 39, 24));
+void LocationsLogic::action(int action) {
+	// TODO
 }
 
-bool Overworld::msgFocus(const FocusMessage &msg) {
-	MetaEngine::setKeybindingMode(KBMODE_OVERWORLD);
-	return View::msgFocus(msg);
+void LocationsLogic::keypress(Common::KeyCode keycode) {
+	action(KEYBIND_PASS);
 }
 
-bool Overworld::msgUnfocus(const UnfocusMessage &msg) {
-	MetaEngine::setKeybindingMode(KBMODE_MINIMAL);
-	return View::msgUnfocus(msg);
+/*-------------------------------------------------------------------*/
+
+void CityLogic::enter() {
+	_G(savegame)._locationPosition = Common::Point(19, 17);
 }
 
-void Overworld::draw() {
-	auto s = getSurface();
-	s.clear();
-	drawFrame();
-	drawGameDividers();
+/*-------------------------------------------------------------------*/
+
+void CastleLogic::enter() {
+	_G(savegame)._locationPosition = Common::Point(0, 9);
 }
 
-bool Overworld::msgGame(const GameMessage &msg) {
-	if (msg._name == "UPDATE") {
-		if (msg._stringValue == "MAP")
-			_map.redraw();
-		if (msg._stringValue == "STATS")
-			_stats.redraw();
-		return true;
-	}
+/*-------------------------------------------------------------------*/
 
-	return false;
+void PillarLogic::enter() {
+	//_G(savegame)._locationPosition = Common::Point(0, 9);
 }
 
-} // namespace Views
+/*-------------------------------------------------------------------*/
+
+void DungeonLogic::enter() {
+
+}
+
+} // namespace Logic
 } // namespace Ultima1
 } // namespace Ultima

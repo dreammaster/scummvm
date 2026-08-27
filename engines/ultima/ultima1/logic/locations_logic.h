@@ -20,11 +20,10 @@
  *
  */
 
-#ifndef ULTIMA2_LOGIC_H
-#define ULTIMA2_LOGIC_H
+#ifndef ULTIMA2_LOGIC_LOCATIONS_LOGIC_H
+#define ULTIMA2_LOGIC_LOCATIONS_LOGIC_H
 
-#include "common/events.h"
-#include "ultima/ultima1/data/map.h"
+#include "ultima/ultima1/logic/logic.h"
 
 namespace Ultima {
 namespace Ultima1 {
@@ -34,49 +33,45 @@ namespace Logic {
  * Base class for gameplay handling logic used by the Commands class to respond to player actions
  * or other miscellaneous keypresses.
  */
-class Logic {
-protected:
-	/**
-	 * Dispatches some text to be shown in the Commands window
-	 */
-	void writeString(const Common::String &msg);
-
-	/**
-	 * Triggers a prompt display in the Commands window
-	 */
-	void prompt();
-
-	/**
-	 * Play a sound effect
-	 */
-	void playFX(int num);
-
-	/**
-	 * Returns a random number
-	 */
-	int getRandomNumber(int minNumber, int maxNumber);
-	int getRandomNumber(int maxNumber);
-
-	/**
-	 * Signal the map to redraw
-	 */
-	void redrawMap();
-
-	/**
-	 * Signal the stats to redraw
-	 */
-	void redrawStats();
-
+class LocationsLogic : public Logic {
 public:
-	virtual ~Logic() {
+	~LocationsLogic() override {
 	}
 
-	virtual void action(int action) {
+	void action(int action) override;
+	void keypress(Common::KeyCode keycode) override;
+};
+
+class CityLogic : public LocationsLogic {
+public:
+	~CityLogic() override {
 	}
-	virtual void keypress(Common::KeyCode keycode) {
+
+	void enter() override;
+};
+
+class CastleLogic : public LocationsLogic {
+public:
+	~CastleLogic() override {
 	}
-	virtual void enter() {
+
+	void enter() override;
+};
+
+class PillarLogic : public LocationsLogic {
+public:
+	~PillarLogic() override {
 	}
+
+	void enter() override;
+};
+
+class DungeonLogic : public LocationsLogic {
+public:
+	~DungeonLogic() override {
+	}
+
+	void enter() override;
 };
 
 } // namespace Logic
