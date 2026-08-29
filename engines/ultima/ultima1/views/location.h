@@ -19,28 +19,37 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_H
-#define ULTIMA1_VIEWS_H
+#ifndef ULTIMA1_VIEWS_LOCATION_H
+#define ULTIMA1_VIEWS_LOCATION_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/views/create_character.h"
-#include "ultima/ultima1/views/location.h"
-#include "ultima/ultima1/views/main_menu.h"
-#include "ultima/ultima1/views/overworld.h"
-#include "ultima/ultima1/views/startup.h"
-#include "ultima/ultima1/views/title.h"
+#include "ultima/ultima1/views/dialog.h"
+#include "ultima/ultima1/views/location_map.h"
+#include "ultima/ultima1/views/commands.h"
+#include "ultima/ultima1/views/stats.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Location _location;
-	MainMenu _mainMenu;
-	Overworld _overworld;
-	Startup _startup;
-	Title _title;
+/**
+ * The main in-game screen. Draws the outer frame around the map
+ * viewport, and hosts the map, stats, and command/message log
+ * sub-views. For now, the command/message log area is just left blank.
+ */
+class Location : public Dialog {
+private:
+	LocationMap _map;
+	Commands _commands;
+	Stats _stats;
+
+public:
+	Location();
+	~Location() override {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgUnfocus(const UnfocusMessage &msg) override;
+	bool msgGame(const GameMessage &msg) override;
+	void draw() override;
 };
 
 } // namespace Views
