@@ -19,28 +19,38 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_H
-#define ULTIMA1_VIEWS_H
+#ifndef ULTIMA2_VIEWS_LOCATION_MAP_H
+#define ULTIMA2_VIEWS_LOCATION_MAP_H
 
 #include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/views/create_character.h"
-#include "ultima/ultima1/views/location.h"
-#include "ultima/ultima1/views/main_menu.h"
-#include "ultima/ultima1/views/overworld.h"
-#include "ultima/ultima1/views/startup.h"
-#include "ultima/ultima1/views/title.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Location _location;
-	MainMenu _mainMenu;
-	Overworld _overworld;
-	Startup _startup;
-	Title _title;
+using namespace Shared::Messages;
+
+class LocationMap : public Shared::UIElement {
+private:
+	int _animIndex = 0;
+
+	void prepareMapForDrawing();
+
+	/**
+	 * Returns the tile to draw for a given raw map tile, substituting
+	 * in the appropriate animation frame for the castle and city flags.
+	 * Returns -1 if the tile shouldn't be redrawn this tick (the castle
+	 * flag is only redrawn on 2 of every 6 ticks)
+	 */
+	int animatedTileId(byte tileId) const;
+
+public:
+	LocationMap(Shared::UIElement *parent) : Shared::UIElement("LocationMap", parent) {}
+	~LocationMap() override {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	void draw() override;
+	void timeout() override;
 };
 
 } // namespace Views

@@ -19,7 +19,7 @@
  *
  */
 
-#include "ultima/ultima1/views/overworld.h"
+#include "ultima/ultima1/views/location.h"
 #include "ultima/ultima1/data/map.h"
 #include "ultima/ultima1/data/tiles.h"
 #include "ultima/ultima1/metaengine.h"
@@ -29,30 +29,30 @@ namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-Overworld::Overworld() : Dialog("Overworld"), _map(this), _commands("OverworldCommands", this), _stats(this) {
+Location::Location() : Dialog("Location"), _map(this), _commands("LocationCommands", this), _stats(this) {
 	_map.setBounds(TextRect(1, 1, 38, 19));
 	_commands.setBounds(TextRect(0, 20, 29, 24));
 	_stats.setBounds(TextRect(31, 21, 39, 24));
 }
 
-bool Overworld::msgFocus(const FocusMessage &msg) {
+bool Location::msgFocus(const FocusMessage &msg) {
 	MetaEngine::setKeybindingMode(KBMODE_OVERWORLD);
-	return View::msgFocus(msg);
+	return Dialog::msgFocus(msg);
 }
 
-bool Overworld::msgUnfocus(const UnfocusMessage &msg) {
+bool Location::msgUnfocus(const UnfocusMessage &msg) {
 	MetaEngine::setKeybindingMode(KBMODE_MINIMAL);
-	return View::msgUnfocus(msg);
+	return Dialog::msgUnfocus(msg);
 }
 
-void Overworld::draw() {
+void Location::draw() {
 	auto s = getSurface();
 	s.clear();
 	drawFrame();
 	drawGameDividers();
 }
 
-bool Overworld::msgGame(const GameMessage &msg) {
+bool Location::msgGame(const GameMessage &msg) {
 	if (msg._name == "UPDATE") {
 		if (msg._stringValue == "MAP")
 			_map.redraw();
