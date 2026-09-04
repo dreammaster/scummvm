@@ -19,37 +19,29 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_COMMANDS_H
-#define ULTIMA1_VIEWS_COMMANDS_H
+#ifndef ULTIMA1_VIEWS_INTERACTIONS_DEAD_H
+#define ULTIMA1_VIEWS_INTERACTIONS_DEAD_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/gfx/text_cursor.h"
+#include "ultima/ultima1/views/interactions/interaction.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
+namespace Interactions {
 
-using namespace Shared::Messages;
-
-class Commands : public Shared::UIElement {
-private:
-	Shared::Gfx::GfxSurface _surface;
-	Gfx::TextCursor _textCursor;
-
+/**
+ * Dummy view to go to when the player dies. This allows the game to know
+ * not to allow saving anymore, and to stop on-screen map animations.
+ */
+class Dead : public Interaction {
 public:
-	Commands(UIElement *parent);
-	~Commands() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-
-	void writeString(const Common::String &msg);
-	void resetLine();
-	void showCursor();
-	void prompt();
+	Dead() : Interaction("Dead") {
+	}
+	~Dead() override {
+	}
 };
 
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
