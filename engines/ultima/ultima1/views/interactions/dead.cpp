@@ -19,39 +19,14 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_COMMANDS_H
-#define ULTIMA1_VIEWS_COMMANDS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/gfx/text_cursor.h"
+#include "ultima/ultima1/views/interactions/dead.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
+namespace Interactions {
 
-using namespace Shared::Messages;
-
-class Commands : public Shared::UIElement {
-private:
-	Shared::Gfx::GfxSurface _surface;
-	Gfx::TextCursor _textCursor;
-
-public:
-	Commands(UIElement *parent);
-	~Commands() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-
-	void writeString(const Common::String &msg);
-	void resetLine();
-	void showCursor();
-	void prompt();
-};
-
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
-
-#endif
