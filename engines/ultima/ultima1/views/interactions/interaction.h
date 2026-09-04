@@ -19,37 +19,38 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_COMMANDS_H
-#define ULTIMA1_VIEWS_COMMANDS_H
+#ifndef ULTIMA1_VIEWS_INTERACTIONS_INTERACTION_H
+#define ULTIMA1_VIEWS_INTERACTIONS_INTERACTION_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/gfx/text_cursor.h"
+#include "ultima/shared/gfx/view.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
+namespace Interactions {
 
-using namespace Shared::Messages;
-
-class Commands : public Shared::UIElement {
-private:
-	Shared::Gfx::GfxSurface _surface;
-	Gfx::TextCursor _textCursor;
-
-public:
-	Commands(UIElement *parent);
-	~Commands() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
-
+/**
+ * Base view for any interaction that prompts the user for information.
+ * It creates a dummy 0x0 size window on top of the current one that
+ * can receive input, and does any output in the commands window
+ */
+class Interaction : public Shared::Gfx::View {
+protected:
 	void writeString(const Common::String &msg);
+	void writeString(const char *format, ...);
 	void resetLine();
 	void showCursor();
 	void prompt();
+
+public:
+	Interaction(const Common::String &name);
+	~Interaction() override {
+	}
+
+	bool tick() override;
 };
 
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
