@@ -1,4 +1,3 @@
-
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -20,33 +19,34 @@
  *
  */
 
-#include "ultima/ultima1/logic/dungeon_logic.h"
-#include "ultima/ultima1/metaengine.h"
+#include "ultima/ultima1/views/dungeon_map.h"
 #include "ultima/ultima1/ultima1.h"
+#include "ultima/ultima1/metaengine.h"
 
 namespace Ultima {
 namespace Ultima1 {
-namespace Logic {
+namespace Views {
 
-DungeonLogic::DungeonLogic() {
-	_G(map)._mapType = Data::MAPTYPE_DUNGEON;
+bool DungeonMap::msgFocus(const FocusMessage &msg) {
+	MetaEngine::setKeybindingMode(KBMODE_GAMEPLAY);
+	return Dialog::msgFocus(msg);
 }
 
-void DungeonLogic::entering() {
-	_G(savegame)._locationPosition = Common::Point(1, 1);
-	_G(savegame)._dungeonLevel = 1;
-	_G(savegame)._dungeonDirection = 4;
-	_G(savegame)._dungeonExitHitPoints = 0;
+bool DungeonMap::msgUnfocus(const UnfocusMessage &msg) {
+	MetaEngine::setKeybindingMode(KBMODE_MINIMAL);
+	return Dialog::msgUnfocus(msg);
 }
 
-bool DungeonLogic::move(Data::Direction dir) {
-	return true;
+void DungeonMap::draw() {
+	Dialog::draw();
+	auto s = getSurface();
+
+	// Write title showing the dungeon level
+	s.writeString(Point(15, 0), "\x10 Level %2d \x11", _G(savegame)._dungeonLevel);
+
+	// TODO: Dungeon view rendering
 }
 
-void DungeonLogic::updateCreatures() {
-	// TODO
-}
-
-} // namespace Logic
+} // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
