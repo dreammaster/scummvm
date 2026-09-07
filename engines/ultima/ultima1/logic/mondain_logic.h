@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,29 +20,36 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_SPACE_MAP_H
-#define ULTIMA1_VIEWS_SPACE_MAP_H
+#ifndef ULTIMA2_LOGIC_MONDAIN_LOGIC_H
+#define ULTIMA2_LOGIC_MONDAIN_LOGIC_H
 
-#include "ultima/ultima1/views/dialog.h"
-#include "ultima/ultima1/data/map.h"
+#include "ultima/ultima1/logic/logic.h"
 
 namespace Ultima {
 namespace Ultima1 {
-namespace Views {
+namespace Logic {
 
-using namespace Shared::Messages;
+class MondainLogic : public Logic {
+protected:
+	bool move(Data::Direction dir) override {
+		return true;
+	}
 
-class SpaceMap : public Dialog {
+	/**
+	 * Handles updating creatures/NPCs
+	 */
+	void updateCreatures() override {
+	}
+
 public:
-	SpaceMap() : Dialog("SpaceMap") {}
-	~SpaceMap() override {}
+	MondainLogic();
+	~MondainLogic() override {
+	}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	void draw() override;
+	void entering() override;
 };
 
-} // namespace Views
+} // namespace Logic
 } // namespace Ultima1
 } // namespace Ultima
 
