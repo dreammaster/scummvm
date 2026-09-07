@@ -19,30 +19,24 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_SPACE_MAP_H
-#define ULTIMA1_VIEWS_SPACE_MAP_H
-
-#include "ultima/ultima1/views/dialog.h"
-#include "ultima/ultima1/data/map.h"
+#include "ultima/ultima1/views/mondain_map.h"
+#include "ultima/ultima1/ultima1.h"
+#include "ultima/ultima1/metaengine.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-using namespace Shared::Messages;
+constexpr int TILE_WIDTH = 16;
+constexpr int TILE_HEIGHT = 16;
+constexpr int ATTACK_TILE_DELAY = 100;	// Delay after flashing an attack tile
 
-class SpaceMap : public Dialog {
-public:
-	SpaceMap() : Dialog("SpaceMap") {}
-	~SpaceMap() override {}
+void MondainMap::draw() {
+	Dialog::draw();
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	void draw() override;
-};
+	// TODO
+}
 
 } // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
-
-#endif

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_SPACE_MAP_H
-#define ULTIMA1_VIEWS_SPACE_MAP_H
+#ifndef ULTIMA1_VIEWS_MONDAIN_MAP_H
+#define ULTIMA1_VIEWS_MONDAIN_MAP_H
 
 #include "ultima/ultima1/views/dialog.h"
 #include "ultima/ultima1/data/map.h"
@@ -31,13 +31,11 @@ namespace Views {
 
 using namespace Shared::Messages;
 
-class SpaceMap : public Dialog {
+class MondainMap : public Dialog {
 public:
-	SpaceMap() : Dialog("SpaceMap") {}
-	~SpaceMap() override {}
+	MondainMap() : Dialog("MondainMap") {}
+	~MondainMap() override {}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
 	void draw() override;
 };
 
