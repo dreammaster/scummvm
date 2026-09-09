@@ -19,11 +19,11 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_SPACE_MAP_H
-#define ULTIMA1_VIEWS_SPACE_MAP_H
+#ifndef ULTIMA1_VIEWS_MAP_H
+#define ULTIMA1_VIEWS_MAP_H
 
-#include "ultima/ultima1/views/map.h"
-#include "ultima/ultima1/data/map.h"
+#include "ultima/ultima1/views/dialog.h"
+#include "ultima/shared/engine/messages.h"
 
 namespace Ultima {
 namespace Ultima1 {
@@ -31,14 +31,24 @@ namespace Views {
 
 using namespace Shared::Messages;
 
-class SpaceMap : public Map {
+/**
+ * Base class for map views
+ */
+class Map : public Dialog {
+private:
+	int _passCtr = 0;
 public:
-	SpaceMap() : Map("SpaceMap") {}
-	~SpaceMap() override {}
+	Map(const Common::String &name);
+	~Map() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	void draw() override;
+	bool msgAction(const ActionMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+
+	/**
+	 * Called for game frame ticks
+	 */
+	bool tick() override;
 };
 
 } // namespace Views
