@@ -19,30 +19,49 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_SPACE_MAP_H
-#define ULTIMA1_VIEWS_SPACE_MAP_H
-
 #include "ultima/ultima1/views/map.h"
-#include "ultima/ultima1/data/map.h"
+#include "ultima/ultima1/ultima1.h"
+#include "ultima/ultima1/metaengine.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-using namespace Shared::Messages;
+constexpr int PASS_TIMEOUT = 4 * 60 * FRAME_RATE;
 
-class SpaceMap : public Map {
-public:
-	SpaceMap() : Map("SpaceMap") {}
-	~SpaceMap() override {}
+Map::Map(const Common::String &name) : Dialog(name) {
+}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	void draw() override;
-};
+bool Map::msgFocus(const FocusMessage &msg) {
+	_passCtr = 0;
+	return Dialog::msgFocus(msg);
+}
+
+bool Map::msgAction(const ActionMessage &msg) {
+	_passCtr = 0;
+	g_engine->_logic->action(msg._action);
+	return true;
+}
+
+bool Map::msgKeypress(const KeypressMessage &msg) {
+	_passCtr = 0;
+	g_engine->_logic->keypress(msg.keycode);
+	return true;
+}
+
+bool Map::tick() {
+	if (++_passCtr >= PASS_TIMEOUT) {
+		_passCtr = 0;
+		msgAction(ActionMessage(KEYBIND_PASS));
+	}
+
+	if (_G(logic))
+		_G(logic)->tick();
+
+	return Dialog::tick();
+}
+
 
 } // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
-
-#endif
