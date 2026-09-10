@@ -19,46 +19,33 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_COMMANDS_H
-#define ULTIMA1_VIEWS_COMMANDS_H
+#ifndef ULTIMA1_VIEWS_SPACE_GAME_H
+#define ULTIMA1_VIEWS_SPACE_GAME_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/gfx/text_cursor.h"
+#include "ultima/shared/gfx/view.h"
+#include "ultima/ultima1/views/commands.h"
+#include "ultima/ultima1/views/space_stats.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-using namespace Shared::Messages;
-
-class Commands : public Shared::UIElement {
+/**
+ * The base in-space screen - the outer-space counterpart of Game. Draws the
+ * shared frame and owns the message log and the Shld/Fuel/Exp/Coin corner
+ * readout; SpaceMap or SpaceCockpit is layered on top for the actual view
+ */
+class SpaceGame : public Shared::Gfx::View {
 private:
-	Shared::Gfx::GfxSurface _surface;
-	Gfx::TextCursor _textCursor;
-
-	/**
-	 * Ensures the commands view is updated on-screen, and then delays for a set amount.
-	 * This is useful for ensuring text isn't scrolled too quickly off screen when there's
-	 * more lines than can fit within a single turn
-	 * @param milli		Delay amount in milliseconds
-	 */
-	void delay(uint milli);
-
-	void writeString(const Common::String &msg);
-	void resetLine();
-	void showCursor();
-	void prompt();
-	void space();
+	Commands _commands;
+	SpaceStats _stats;
 
 public:
-	// name lets the space game frame register its own copy ("SpaceCommands")
-	// so it doesn't collide with the land frame's in findView
-	Commands(UIElement *parent, const Common::String &name = "Commands");
-	~Commands() override {}
+	SpaceGame();
+	~SpaceGame() override {
+	}
 
-	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
 };
 
 } // namespace Views
