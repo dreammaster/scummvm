@@ -19,46 +19,26 @@
  *
  */
 
-#ifndef ULTIMA1_VIEWS_COMMANDS_H
-#define ULTIMA1_VIEWS_COMMANDS_H
+#ifndef ULTIMA1_VIEWS_SPACE_STATS_H
+#define ULTIMA1_VIEWS_SPACE_STATS_H
 
 #include "ultima/shared/engine/events.h"
-#include "ultima/ultima1/gfx/text_cursor.h"
 
 namespace Ultima {
 namespace Ultima1 {
 namespace Views {
 
-using namespace Shared::Messages;
-
-class Commands : public Shared::UIElement {
-private:
-	Shared::Gfx::GfxSurface _surface;
-	Gfx::TextCursor _textCursor;
-
-	/**
-	 * Ensures the commands view is updated on-screen, and then delays for a set amount.
-	 * This is useful for ensuring text isn't scrolled too quickly off screen when there's
-	 * more lines than can fit within a single turn
-	 * @param milli		Delay amount in milliseconds
-	 */
-	void delay(uint milli);
-
-	void writeString(const Common::String &msg);
-	void resetLine();
-	void showCursor();
-	void prompt();
-	void space();
-
+/**
+ * The outer-space corner readout - the current ship's Shld and Fuel, plus
+ * the character's Exp. and Coin. The space counterpart of Stats (which
+ * shows Hits/Food instead)
+ */
+class SpaceStats : public Shared::UIElement {
 public:
-	// name lets the space game frame register its own copy ("SpaceCommands")
-	// so it doesn't collide with the land frame's in findView
-	Commands(UIElement *parent, const Common::String &name = "Commands");
-	~Commands() override {}
+	SpaceStats(UIElement *parent) : Shared::UIElement("SpaceStats", parent) {}
+	~SpaceStats() override {}
 
-	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
-	bool msgGame(const GameMessage &msg) override;
 };
 
 } // namespace Views
