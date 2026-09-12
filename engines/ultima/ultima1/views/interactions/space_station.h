@@ -19,8 +19,10 @@
  *
  */
 
+#ifndef ULTIMA1_VIEWS_INTERACTIONS_SPACE_STATION_H
+#define ULTIMA1_VIEWS_INTERACTIONS_SPACE_STATION_H
+
 #include "ultima/ultima1/views/interactions/interaction.h"
-#include "ultima/ultima1/ultima1.h"
 
 namespace Ultima {
 namespace Ultima1 {
@@ -29,43 +31,44 @@ namespace Interactions {
 
 using namespace Ultima::Shared::Messages;
 
-Interaction::Interaction(const Common::String &name) : View(name) {
-	setBounds(Common::Rect(0, 0, 0, 0));
-}
+/**
+ * Shown when the player's ship comes to rest exactly in one of the space
+ * station's docking slots (SpaceMapLogic::tick() - dockAtStation). Charges
+ * the 500gp docking fee and refuels the ship that just docked, refusing if
+ * the player can't pay; kills the player outright if they aren't wearing a
+ * vacuum/reflect suit (space station airlocks don't care); and if more than
+ * one real ship is present in the sector, prompts to choose which one to
+ * fly out in
+ */
+class SpaceStation : public Interaction {
+private:
+	enum State {
+		STATE_DONE,
+		STATE_CHOOSE_SHIP
+	};
 
-bool Interaction::tick() {
-	g_engine->baseView()->findView("Commands")->tick();
-	return Shared::Gfx::View::tick();
-}
+	State _state = STATE_DONE;
 
-void Interaction::writeString(const Common::String &msg) {
-	g_engine->baseView()->findView("Commands")->send(GameMessage("TEXT", msg));
-}
+	/**
+	 * Finishes up: refreshes the fuel/shield/coins HUD and hands control
+	 * back to the map
+	 */
+	void finish();
 
-void Interaction::writeString(const char *format, ...) {
-	va_list alist;
+public:
+	SpaceStation() : Interaction("SpaceStation") {
+	}
+	~SpaceStation() override {
+	}
 
-	// Start reading values
-	va_start(alist, format);
-	Common::String msg = Common::String::vformat(format, alist);
-	va_end(alist);
-
-	writeString(msg);
-}
-
-void Interaction::resetLine() {
-	g_engine->baseView()->findView("Commands")->send(GameMessage("RESET_LINE"));
-}
-
-void Interaction::showCursor() {
-	g_engine->baseView()->findView("Commands")->send(GameMessage("SHOW_CURSOR"));
-}
-
-void Interaction::prompt() {
-	g_engine->baseView()->findView("Commands")->send(GameMessage("PROMPT"));
-}
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgAction(const ActionMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+};
 
 } // namespace Interactions
 } // namespace Views
 } // namespace Ultima1
 } // namespace Ultima
+
+#endif
