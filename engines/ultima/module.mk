@@ -4,16 +4,12 @@ MODULE_OBJS := \
 	metaengine.o \
 	shared/conf/xml_node.o \
 	shared/conf/xml_tree.o \
-	shared/engine/data_archive.o
-
-ifdef ENABLE_ULTIMA1 || ENABLE_ULTIMA2
-MODULE_OBJS += \
+	shared/engine/data_archive.o \
 	shared/engine/events.o \
 	shared/engine/messages.o \
 	shared/gfx/gfx_surface.o \
 	shared/gfx/text_input.o \
 	shared/gfx/view.o
-endif
 
 ifdef ENABLE_AKALABETH
 MODULE_OBJS += \
