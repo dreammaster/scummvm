@@ -19,34 +19,50 @@
  *
  */
 
-#include "ultima/ultima2/views/startup.h"
+#ifndef ULTIMA2_GFX_PIC_DECODER_H
+#define ULTIMA2_GFX_PIC_DECODER_H
+
+#include "graphics/palette.h"
+#include "graphics/surface.h"
+#include "image/image_decoder.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Views {
+namespace Gfx {
 
-#define DELAY_SECONDS 3
+/**
+ * Decodes Ultima II's raw "pic???" full-screen title/demo art: a literal
+ * 16384-byte dump of the CGA mode 4 (320x200, 4-color, palette 1)
+ * framebuffer segment -- two interleaved 8192-byte banks (even scanlines
+ * in the first, odd in the second), 2 bits/pixel, 4 pixels per byte,
+ * MSB-first.
+ */
+class PicDecoder : public Image::ImageDecoder {
+private:
+	Graphics::Palette _palette;
+	Graphics::Surface _surface;
+public:
+	~PicDecoder() {
+		destroy();
+	}
 
-#define COLOR_FOREGROUND 15 // white
+	bool loadStream(Common::SeekableReadStream &stream) override;
 
-bool Startup::msgFocus(const FocusMessage &msg) {
-	delaySeconds(DELAY_SECONDS);
-	return View::msgFocus(msg);
-}
+	void destroy() override {
+		_surface.free();
+	}
 
-void Startup::timeout() {
-	showTitle();
-}
+	const Graphics::Surface *getSurface() const override {
+		return &_surface;
+	}
 
-void Startup::draw() {
-	auto s = getSurface();
-	s.clear();
+	const Graphics::Palette &getPalette() const override {
+		return _palette;
+	}
+};
 
-	s.setColor(COLOR_FOREGROUND);
-	s.writeString(Common::Point(16, 8), "Ultima II");
-	s.writeString(Common::Point(8, 11), "The Revenge of the Enchantress");
-}
-
-} // namespace Views
+} // namespace Gfx
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif
