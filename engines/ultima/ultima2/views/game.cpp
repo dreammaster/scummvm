@@ -19,30 +19,19 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
 #include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/shared/gfx/rect.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
-};
+Game::Game() : Shared::Gfx::View("Game"), _commands(this), _stats(this) {
+	setBounds(TextRect(0, 0, 39, 24));
+	_commands.setBounds(TextRect(0, 20, 28, 23));
+	_stats.setBounds(TextRect(30, 20, 39, 23));
+}
 
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif

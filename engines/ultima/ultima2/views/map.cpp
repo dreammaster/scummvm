@@ -19,30 +19,23 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/ultima2/views/map.h"
+#include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
-};
+bool Map::msgAction(const ActionMessage &msg) {
+	g_engine->_logic->action(msg._action);
+	return true;
+}
+
+bool Map::msgKeypress(const KeypressMessage &msg) {
+	g_engine->_logic->keypress(msg.keycode);
+	return true;
+}
 
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif

@@ -19,26 +19,25 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_STATS_H
+#define ULTIMA2_VIEWS_STATS_H
 
 #include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
+/**
+ * The always-visible H.P./FOOD/EXP./GOLD display in the corner of the
+ * game screen.
+ */
+class Stats : public Shared::UIElement {
+public:
+	Stats(UIElement *parent) : Shared::UIElement("Stats", parent) {}
+	~Stats() override {}
+
+	void draw() override;
 };
 
 } // namespace Views
