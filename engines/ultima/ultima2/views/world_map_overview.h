@@ -19,28 +19,32 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_WORLD_MAP_OVERVIEW_H
+#define ULTIMA2_VIEWS_WORLD_MAP_OVERVIEW_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
-#include "ultima/ultima2/views/world_map_overview.h"
+#include "ultima/shared/gfx/view.h"
+#include "ultima/ultima2/data/tiles.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
-	WorldMapOverview _worldMapOverview;
+using namespace Shared::Messages;
+
+/**
+ * The "view" command's full-map overview, shown as a small icon per world
+ * cell. Closes and resumes the turn on any keypress.
+ */
+class WorldMapOverview : public Shared::Gfx::View {
+private:
+	void plotIcon(Shared::Gfx::GfxSurface &s, int cellX, int cellY, Data::TileId tile);
+
+public:
+	WorldMapOverview();
+	~WorldMapOverview() override {}
+
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views
