@@ -19,37 +19,41 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_OVERWORLD_MAP_H
-#define ULTIMA2_VIEWS_OVERWORLD_MAP_H
-
-#include "ultima/ultima2/views/map.h"
-#include "ultima/ultima2/data/tiles.h"
+#include "ultima/ultima2/views/interactions/interaction.h"
+#include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
+namespace Interactions {
 
-/**
- * Renders the 20x10-tile viewport centered on the player for a planet,
- * village, town, or castle map.
- */
-class OverworldMap : public Map {
-private:
-	Graphics::Surface _tiles[Data::TILE_COUNT];
-	Graphics::ManagedSurface _attackSprite;
+Interaction::Interaction(const Common::String &name) : View(name) {
+	setBounds(Common::Rect(0, 0, 0, 0));
+}
 
-public:
-	OverworldMap();
-	~OverworldMap() override;
+bool Interaction::tick() {
+	g_engine->baseView()->findView("Commands")->tick();
+	return Shared::Gfx::View::tick();
+}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	bool msgAttackTile(const AttackTileMessage &msg) override;
-	void draw() override;
-};
+void Interaction::writeString(const Common::String &msg) {
+	g_engine->baseView()->findView("Commands")->send(GameMessage("TEXT", msg));
+}
 
+void Interaction::writeString(const char *format, ...) {
+	va_list alist;
+	va_start(alist, format);
+	Common::String msg = Common::String::vformat(format, alist);
+	va_end(alist);
+
+	writeString(msg);
+}
+
+void Interaction::prompt() {
+	g_engine->baseView()->findView("Commands")->send(GameMessage("PROMPT"));
+}
+
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif

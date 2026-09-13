@@ -19,37 +19,32 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_OVERWORLD_MAP_H
-#define ULTIMA2_VIEWS_OVERWORLD_MAP_H
-
-#include "ultima/ultima2/views/map.h"
-#include "ultima/ultima2/data/tiles.h"
+#include "ultima/ultima2/data/data.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Views {
+namespace Data {
 
-/**
- * Renders the 20x10-tile viewport centered on the player for a planet,
- * village, town, or castle map.
- */
-class OverworldMap : public Map {
-private:
-	Graphics::Surface _tiles[Data::TILE_COUNT];
-	Graphics::ManagedSurface _attackSprite;
-
-public:
-	OverworldMap();
-	~OverworldMap() override;
-
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	bool msgAttackTile(const AttackTileMessage &msg) override;
-	void draw() override;
+const char *const WEAPON_NAMES[WEAPON_COUNT] = {
+	"HANDS", "DAGGER", "MACE", "AXE", "BOW", "SWORD",
+	"GREAT SWORD", "LIGHT SWORD", "PHASER", "QUICK SWORD"
 };
 
-} // namespace Views
+const char *const ARMOR_NAMES[ARMOR_COUNT] = {
+	"SKIN", "CLOTH", "LEATHER", "CHAIN", "PLATE", "REFLECT", "POWER"
+};
+
+const char *const SPELL_NAMES[SPELL_COUNT] = {
+	"NONE", "LIGHT", "DOWN LADDER", "UP LADDER", "PASSWALL",
+	"SURFACE", "PRAYER", "MAGIC MISSILE", "BLINK", "KILL"
+};
+
+const char *const ITEM_NAMES[ITEM_COUNT] = {
+	"RING", "WAND", "STAFF", "BOOTS", "CLOAK", "HELM", "GEM", "ANKH",
+	"RED GEM", "SKULL KEY", "GREEN GEM", "BRASS BUTTON", "BLUE TASSLE",
+	"STRANGE COIN", "GREEN IDOL", "TRI LITHIUM"
+};
+
+} // namespace Data
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif

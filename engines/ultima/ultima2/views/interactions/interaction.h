@@ -19,35 +19,38 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_OVERWORLD_MAP_H
-#define ULTIMA2_VIEWS_OVERWORLD_MAP_H
+#ifndef ULTIMA2_VIEWS_INTERACTIONS_INTERACTION_H
+#define ULTIMA2_VIEWS_INTERACTIONS_INTERACTION_H
 
-#include "ultima/ultima2/views/map.h"
-#include "ultima/ultima2/data/tiles.h"
+#include "ultima/shared/gfx/view.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
+namespace Interactions {
+
+using namespace Shared::Messages;
 
 /**
- * Renders the 20x10-tile viewport centered on the player for a planet,
- * village, town, or castle map.
+ * Base view for a modal interaction that prompts the player for input and
+ * writes any output through the Commands log view. It's a zero-size dummy
+ * window pushed on top of the current map/game view purely to take input
+ * focus.
  */
-class OverworldMap : public Map {
-private:
-	Graphics::Surface _tiles[Data::TILE_COUNT];
-	Graphics::ManagedSurface _attackSprite;
+class Interaction : public Shared::Gfx::View {
+protected:
+	void writeString(const Common::String &msg);
+	void writeString(const char *format, ...);
+	void prompt();
 
 public:
-	OverworldMap();
-	~OverworldMap() override;
+	Interaction(const Common::String &name);
+	~Interaction() override {}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	bool msgAttackTile(const AttackTileMessage &msg) override;
-	void draw() override;
+	bool tick() override;
 };
 
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima

@@ -19,45 +19,44 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
-#include "ultima/ultima2/views/world_map_overview.h"
-#include "ultima/ultima2/views/zstats.h"
-#include "ultima/ultima2/views/interactions/direction.h"
-#include "ultima/ultima2/views/interactions/ready_spell.h"
 #include "ultima/ultima2/views/interactions/ready_weapon.h"
-#include "ultima/ultima2/views/interactions/wear_armor.h"
-#include "ultima/ultima2/views/interactions/yell.h"
+#include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
+namespace Interactions {
 
-struct Views : public Shared::Views {
-	Interactions::Direction _direction;
-	Interactions::ReadySpell _readySpell;
-	Interactions::ReadyWeapon _readyWeapon;
-	Interactions::WearArmor _wearArmor;
-	Interactions::Yell _yell;
+ReadyWeapon::ReadyWeapon() : Interaction("ReadyWeapon") {
+}
 
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
-	WorldMapOverview _worldMapOverview;
-	ZStats _zstats;
-};
+bool ReadyWeapon::msgFocus(const FocusMessage &msg) {
+	writeString("READY WEAPON:\n1-DA, 2-MA, 3-AX, 4-BO,\n5-SW, 6-GR, 7-LI, 8-PH.\n9-QU, WHICH? ");
+	return Interaction::msgFocus(msg);
+}
 
+bool ReadyWeapon::msgKeypress(const KeypressMessage &msg) {
+	if (msg.ascii < '0' || msg.ascii > '9')
+		return true;
+
+	int digit = msg.ascii - '0';
+	Data::Savegame &sg = _G(savegame);
+
+	if (digit != Data::WEAPON_HANDS && sg._weaponOwned[digit] == 0) {
+		writeString("%d\n%s NOT OWNED!\n", digit, Data::WEAPON_NAMES[digit]);
+	} else if (digit * 8 >= sg._agility) {
+		writeString("%d\n<-THOU ART NOT AGILE ENOUGH TO WIELD!\n", digit);
+	} else {
+		sg._readiedWeapon = (Data::WeaponType)digit;
+		writeString("%d\n%s READY.\n", digit, Data::WEAPON_NAMES[digit]);
+	}
+
+	close();
+	_G(logic)->resumeTurn();
+	return true;
+}
+
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif
