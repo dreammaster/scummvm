@@ -19,24 +19,35 @@
  *
  */
 
-#ifndef ULTIMA2_CONSOLE_H
-#define ULTIMA2_CONSOLE_H
-
-#include "gui/debugger.h"
+#include "common/file.h"
+#include "ultima/ultima2/data/map.h"
 
 namespace Ultima {
 namespace Ultima2 {
+namespace Data {
 
-class Console : public GUI::Debugger {
-private:
-	bool cmdMap(int argc, const char **argv);
-	bool cmdTiles(int argc, const char **argv);
-public:
-	Console();
-	~Console() override;
-};
+Common::String mapFilename(int mapNum1, int mapNum2) {
+	return Common::String::format("MAPX%c%c", '0' + mapNum1, '0' + mapNum2);
+}
 
+Common::String monsterFilename(int mapNum1, int mapNum2) {
+	return Common::String::format("MONX%c%c", '0' + mapNum1, '0' + mapNum2);
+}
+
+void Map::load(int mapNum1, int mapNum2) {
+	Common::File f;
+	Common::String filename = mapFilename(mapNum1, mapNum2);
+	if (!f.open(filename.c_str()))
+		error("Could not open %s", filename.c_str());
+
+	for (int y = 0; y < MAP_HEIGHT; ++y) {
+		for (int x = 0; x < MAP_WIDTH; ++x)
+			_tiles[y][x] = (TileId)(f.readByte() / 4);
+	}
+
+	_monsters.load(mapNum1, mapNum2);
+}
+
+} // namespace Data
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif
