@@ -19,9 +19,12 @@
  *
  */
 
+#include "common/system.h"
+#include "common/savefile.h"
 #include "engines/util.h"
 #include "ultima/ultima2/ultima2.h"
 #include "ultima/ultima2/console.h"
+#include "ultima/ultima2/views/map.h"
 #include "ultima/ultima2/views/views.h"
 
 namespace Ultima {
@@ -57,6 +60,30 @@ Common::Error Ultima2Engine::run() {
 	runGame(views);
 
 	return Common::kNoError;
+}
+
+bool Ultima2Engine::canSaveGameStateCurrently(Common::U32String *msg) {
+	// Only allow saving when any of the different map views are active
+	return dynamic_cast<Views::Map *>(focusedView()) != nullptr;
+}
+
+Common::Error Ultima2Engine::syncGame(Common::Serializer &s) {
+	_savegame.synchronize(s);
+
+	if (s.isLoading()) {
+		_G(map).load(_G(savegame)._mapNum1, _G(savegame)._mapNum2);
+	}
+
+	return Common::kNoError;
+}
+
+bool Ultima2Engine::savegamesExist() const {
+	Common::String slotName = getSaveStateName(1);
+	Common::InSaveFile *saveFile = g_system->getSavefileManager()->openForLoading(slotName);
+	bool result = saveFile != nullptr;
+
+	delete saveFile;
+	return result;
 }
 
 } // namespace Ultima2
