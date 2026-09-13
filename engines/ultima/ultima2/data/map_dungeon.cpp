@@ -19,24 +19,23 @@
  *
  */
 
-#ifndef ULTIMA2_CONSOLE_H
-#define ULTIMA2_CONSOLE_H
-
-#include "gui/debugger.h"
+#include "common/file.h"
+#include "ultima/ultima2/data/map_dungeon.h"
+#include "ultima/ultima2/data/map.h"
 
 namespace Ultima {
 namespace Ultima2 {
+namespace Data {
 
-class Console : public GUI::Debugger {
-private:
-	bool cmdMap(int argc, const char **argv);
-	bool cmdTiles(int argc, const char **argv);
-public:
-	Console();
-	~Console() override;
-};
+void MapDungeon::load(int mapNum1, int mapNum2) {
+	Common::File f;
+	Common::String filename = mapFilename(mapNum1, mapNum2);
+	if (!f.open(filename.c_str()))
+		error("Could not open %s", filename.c_str());
 
+	f.read(_cells, sizeof(_cells));
+}
+
+} // namespace Data
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif
