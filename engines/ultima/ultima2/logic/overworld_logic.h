@@ -19,29 +19,25 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_LOGIC_OVERWORLD_LOGIC_H
+#define ULTIMA2_LOGIC_OVERWORLD_LOGIC_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/ultima2/logic/logic.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Views {
+namespace Logic {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
+/**
+ * Command handling while on a planet's overworld. Movement and the rest
+ * of the overworld-specific commands are added in a later stage.
+ */
+class OverworldLogic : public Logic {
+public:
+	~OverworldLogic() override {}
 };
 
-} // namespace Views
+} // namespace Logic
 } // namespace Ultima2
 } // namespace Ultima
 
