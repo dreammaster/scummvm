@@ -19,33 +19,28 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_OVERWORLD_MAP_H
-#define ULTIMA2_VIEWS_OVERWORLD_MAP_H
+#ifndef ULTIMA2_VIEWS_ZSTATS_H
+#define ULTIMA2_VIEWS_ZSTATS_H
 
-#include "ultima/ultima2/views/map.h"
-#include "ultima/ultima2/data/tiles.h"
+#include "ultima/shared/gfx/view.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
+using namespace Shared::Messages;
+
 /**
- * Renders the 20x10-tile viewport centered on the player for a planet,
- * village, town, or castle map.
+ * The "Z" full character stats screen. Closes and resumes the turn on any
+ * keypress.
  */
-class OverworldMap : public Map {
-private:
-	Graphics::Surface _tiles[Data::TILE_COUNT];
-	Graphics::ManagedSurface _attackSprite;
-
+class ZStats : public Shared::Gfx::View {
 public:
-	OverworldMap();
-	~OverworldMap() override;
+	ZStats();
+	~ZStats() override {}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	bool msgAttackTile(const AttackTileMessage &msg) override;
 	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views

@@ -19,35 +19,29 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_OVERWORLD_MAP_H
-#define ULTIMA2_VIEWS_OVERWORLD_MAP_H
+#ifndef ULTIMA2_VIEWS_INTERACTIONS_WEAR_ARMOR_H
+#define ULTIMA2_VIEWS_INTERACTIONS_WEAR_ARMOR_H
 
-#include "ultima/ultima2/views/map.h"
-#include "ultima/ultima2/data/tiles.h"
+#include "ultima/ultima2/views/interactions/interaction.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
+namespace Interactions {
 
 /**
- * Renders the 20x10-tile viewport centered on the player for a planet,
- * village, town, or castle map.
+ * Prompts for a digit selecting which owned armor to wear
  */
-class OverworldMap : public Map {
-private:
-	Graphics::Surface _tiles[Data::TILE_COUNT];
-	Graphics::ManagedSurface _attackSprite;
-
+class WearArmor : public Interaction {
 public:
-	OverworldMap();
-	~OverworldMap() override;
+	WearArmor();
+	~WearArmor() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
-	bool msgUnfocus(const UnfocusMessage &msg) override;
-	bool msgAttackTile(const AttackTileMessage &msg) override;
-	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima

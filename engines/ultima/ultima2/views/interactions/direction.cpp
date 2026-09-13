@@ -19,45 +19,40 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
-#include "ultima/ultima2/views/world_map_overview.h"
-#include "ultima/ultima2/views/zstats.h"
 #include "ultima/ultima2/views/interactions/direction.h"
-#include "ultima/ultima2/views/interactions/ready_spell.h"
-#include "ultima/ultima2/views/interactions/ready_weapon.h"
-#include "ultima/ultima2/views/interactions/wear_armor.h"
-#include "ultima/ultima2/views/interactions/yell.h"
+#include "ultima/ultima2/ultima2.h"
+#include "ultima/ultima2/metaengine.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
+namespace Interactions {
 
-struct Views : public Shared::Views {
-	Interactions::Direction _direction;
-	Interactions::ReadySpell _readySpell;
-	Interactions::ReadyWeapon _readyWeapon;
-	Interactions::WearArmor _wearArmor;
-	Interactions::Yell _yell;
+Direction::Direction() : Interaction("Direction") {
+}
 
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
-	WorldMapOverview _worldMapOverview;
-	ZStats _zstats;
-};
+bool Direction::msgFocus(const FocusMessage &msg) {
+	MetaEngine::setKeybindingMode(KBMODE_MINIMAL);
+	return Interaction::msgFocus(msg);
+}
 
+bool Direction::msgKeypress(const KeypressMessage &msg) {
+	Data::Direction dir;
+	switch (msg.keycode) {
+	case Common::KEYCODE_UP: dir = Data::DIR_UP; break;
+	case Common::KEYCODE_DOWN: dir = Data::DIR_DOWN; break;
+	case Common::KEYCODE_LEFT: dir = Data::DIR_LEFT; break;
+	case Common::KEYCODE_RIGHT: dir = Data::DIR_RIGHT; break;
+	default:
+		return true;
+	}
+
+	close();
+	_G(logic)->attack(dir);
+	return true;
+}
+
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif
