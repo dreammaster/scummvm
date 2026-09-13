@@ -19,39 +19,43 @@
  *
  */
 
-#include "ultima/ultima2/data/data.h"
+#ifndef ULTIMA2_VIEWS_INTERACTIONS_SHOP_H
+#define ULTIMA2_VIEWS_INTERACTIONS_SHOP_H
+
+#include "ultima/ultima2/views/interactions/interaction.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Data {
+namespace Views {
+namespace Interactions {
 
-const byte CGA_PALETTE1[4 * 3] = {
-	0x00, 0x00, 0x00, // 0: black
-	0x55, 0xff, 0xff, // 1: light cyan
-	0xff, 0x55, 0xff, // 2: light magenta
-	0xff, 0xff, 0xff  // 3: white
+/**
+ * A generic numbered-menu shop: prints an item list, reads a digit, and
+ * on a nonzero digit computes the price (Savegame::computeItemPrice),
+ * charges gold, and grants the item. Covers the weapon/armour/cleric-
+ * spell/wizard-spell shoppes, which all share this exact shape and only
+ * differ in their item list, price-index mapping, and target array
+ */
+class Shop : public Interaction {
+public:
+	enum Kind { WEAPON, ARMOR, SPELL_CLERIC, SPELL_WIZARD };
+
+private:
+	Kind _kind;
+
+	int priceIndexForDigit(int digit) const;
+
+public:
+	Shop(Kind kind, const Common::String &name);
+	~Shop() override {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
-const char *const WEAPON_NAMES[WEAPON_COUNT] = {
-	"HANDS", "DAGGER", "MACE", "AXE", "BOW", "SWORD",
-	"GREAT SWORD", "LIGHT SWORD", "PHASER", "QUICK SWORD"
-};
-
-const char *const ARMOR_NAMES[ARMOR_COUNT] = {
-	"SKIN", "CLOTH", "LEATHER", "CHAIN", "PLATE", "REFLECT", "POWER"
-};
-
-const char *const SPELL_NAMES[SPELL_COUNT] = {
-	"NONE", "LIGHT", "DOWN LADDER", "UP LADDER", "PASSWALL",
-	"SURFACE", "PRAYER", "MAGIC MISSILE", "BLINK", "KILL"
-};
-
-const char *const ITEM_NAMES[ITEM_COUNT] = {
-	"RING", "WAND", "STAFF", "BOOTS", "CLOAK", "HELM", "GEM", "ANKH",
-	"RED GEM", "SKULL KEY", "GREEN GEM", "BRASS BUTTON", "BLUE TASSLE",
-	"STRANGE COIN", "GREEN IDOL", "TRI LITHIUM"
-};
-
-} // namespace Data
+} // namespace Interactions
+} // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif
