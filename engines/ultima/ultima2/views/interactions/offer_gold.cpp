@@ -19,39 +19,30 @@
  *
  */
 
-#include "ultima/ultima2/data/data.h"
+#include "ultima/ultima2/views/interactions/offer_gold.h"
+#include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Data {
+namespace Views {
+namespace Interactions {
 
-const byte CGA_PALETTE1[4 * 3] = {
-	0x00, 0x00, 0x00, // 0: black
-	0x55, 0xff, 0xff, // 1: light cyan
-	0xff, 0x55, 0xff, // 2: light magenta
-	0xff, 0xff, 0xff  // 3: white
-};
+OfferGold::OfferGold() : Interaction("OfferGold") {
+}
 
-const char *const WEAPON_NAMES[WEAPON_COUNT] = {
-	"HANDS", "DAGGER", "MACE", "AXE", "BOW", "SWORD",
-	"GREAT SWORD", "LIGHT SWORD", "PHASER", "QUICK SWORD"
-};
+bool OfferGold::msgKeypress(const KeypressMessage &msg) {
+	if (msg.ascii < '0' || msg.ascii > '9')
+		return true;
 
-const char *const ARMOR_NAMES[ARMOR_COUNT] = {
-	"SKIN", "CLOTH", "LEATHER", "CHAIN", "PLATE", "REFLECT", "POWER"
-};
+	int digit = msg.ascii - '0';
+	writeString("%d\n", digit);
 
-const char *const SPELL_NAMES[SPELL_COUNT] = {
-	"NONE", "LIGHT", "DOWN LADDER", "UP LADDER", "PASSWALL",
-	"SURFACE", "PRAYER", "MAGIC MISSILE", "BLINK", "KILL"
-};
+	close();
+	_G(logic)->completeOffer(digit);
+	return true;
+}
 
-const char *const ITEM_NAMES[ITEM_COUNT] = {
-	"RING", "WAND", "STAFF", "BOOTS", "CLOAK", "HELM", "GEM", "ANKH",
-	"RED GEM", "SKULL KEY", "GREEN GEM", "BRASS BUTTON", "BLUE TASSLE",
-	"STRANGE COIN", "GREEN IDOL", "TRI LITHIUM"
-};
-
-} // namespace Data
+} // namespace Interactions
+} // namespace Views
 } // namespace Ultima2
 } // namespace Ultima

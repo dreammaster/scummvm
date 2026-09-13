@@ -22,8 +22,7 @@
 #include "common/system.h"
 #include "graphics/paletteman.h"
 #include "ultima/ultima2/data/data.h"
-#include "ultima/ultima2/gfx/pic_decoder.h"
-#include "ultima/ultima2/views/overworld_map.h"
+#include "ultima/ultima2/views/location_map.h"
 #include "ultima/ultima2/ultima2.h"
 #include "ultima/ultima2/metaengine.h"
 
@@ -38,29 +37,29 @@ constexpr int VIEWPORT_HEIGHT = 10;
 constexpr int PLAYER_VIEWPORT_X = 9;
 constexpr int PLAYER_VIEWPORT_Y = 5;
 
-OverworldMap::OverworldMap() : Map("OverworldMap") {
+LocationMap::LocationMap() : Map("LocationMap") {
 	Data::loadTiles(_tiles);
 	Data::loadAttackSprite(_attackSprite);
 }
 
-OverworldMap::~OverworldMap() {
+LocationMap::~LocationMap() {
 	for (int i = 0; i < Data::TILE_COUNT; ++i)
 		_tiles[i].free();
 	_attackSprite.free();
 }
 
-bool OverworldMap::msgFocus(const FocusMessage &msg) {
+bool LocationMap::msgFocus(const FocusMessage &msg) {
 	MetaEngine::setKeybindingMode(KBMODE_GAMEPLAY);
 	g_system->getPaletteManager()->setPalette(Graphics::Palette(Data::CGA_PALETTE1, 4));
 	return Map::msgFocus(msg);
 }
 
-bool OverworldMap::msgUnfocus(const UnfocusMessage &msg) {
+bool LocationMap::msgUnfocus(const UnfocusMessage &msg) {
 	MetaEngine::setKeybindingMode(KBMODE_MINIMAL);
 	return Map::msgUnfocus(msg);
 }
 
-bool OverworldMap::msgAttackTile(const AttackTileMessage &msg) {
+bool LocationMap::msgAttackTile(const AttackTileMessage &msg) {
 	Data::Savegame &sg = _G(savegame);
 	int mapLeft = sg._mapX - PLAYER_VIEWPORT_X;
 	int mapTop = sg._mapY - PLAYER_VIEWPORT_Y;
@@ -73,8 +72,6 @@ bool OverworldMap::msgAttackTile(const AttackTileMessage &msg) {
 	Common::Point pt(ox * TILE_WIDTH, oy * TILE_HEIGHT);
 	auto s = getSurface();
 
-	// XOR-flash the hit indicator on, then off again - matches the
-	// original's xorSpriteDrawCenter-twice-with-a-pause-between pattern
 	s.xorBlitFrom(_attackSprite, pt);
 	g_engine->updateScreen();
 	g_engine->pauseMillis(80);
@@ -85,7 +82,7 @@ bool OverworldMap::msgAttackTile(const AttackTileMessage &msg) {
 	return true;
 }
 
-void OverworldMap::draw() {
+void LocationMap::draw() {
 	auto s = getSurface();
 	s.clear();
 
@@ -96,14 +93,21 @@ void OverworldMap::draw() {
 
 	for (int oy = 0; oy < VIEWPORT_HEIGHT; ++oy) {
 		for (int ox = 0; ox < VIEWPORT_WIDTH; ++ox) {
-			int x = (mapLeft + ox + Data::MAP_WIDTH) % Data::MAP_WIDTH;
-			int y = (mapTop + oy + Data::MAP_HEIGHT) % Data::MAP_HEIGHT;
-			Data::TileId tileId = _G(map).tileAt(x, y);
+			int x = mapLeft + ox, y = mapTop + oy;
+			Data::TileId tileId;
 
-			for (int slot = 1; slot <= 31; ++slot) {
-				if (monsters.isActive(slot) && monsters._mapX[slot] == x && monsters._mapY[slot] == y) {
-					tileId = monsters.tileType(slot);
-					break;
+			if (x < 0 || x >= Data::MAP_WIDTH || y < 0 || y >= Data::MAP_HEIGHT) {
+				// Local maps don't wrap - anything off the edge shows as
+				// Mountain, giving villages/towns/castles a walled border
+				tileId = Data::TILE_MOUNTAIN;
+			} else {
+				tileId = _G(map).tileAt(x, y);
+
+				for (int slot = 1; slot <= 31; ++slot) {
+					if (monsters.isActive(slot) && monsters._mapX[slot] == x && monsters._mapY[slot] == y) {
+						tileId = monsters.tileType(slot);
+						break;
+					}
 				}
 			}
 
