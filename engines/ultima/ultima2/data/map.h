@@ -19,23 +19,42 @@
  *
  */
 
-#ifndef ULTIMA2_CONSOLE_H
-#define ULTIMA2_CONSOLE_H
+#ifndef ULTIMA2_DATA_MAP_H
+#define ULTIMA2_DATA_MAP_H
 
-#include "gui/debugger.h"
+#include "common/str.h"
+#include "ultima/ultima2/data/tiles.h"
+#include "ultima/ultima2/data/map_monsters.h"
 
 namespace Ultima {
 namespace Ultima2 {
+namespace Data {
 
-class Console : public GUI::Debugger {
-private:
-	bool cmdMap(int argc, const char **argv);
-	bool cmdTiles(int argc, const char **argv);
-public:
-	Console();
-	~Console() override;
+constexpr int MAP_WIDTH = 64;
+constexpr int MAP_HEIGHT = 64;
+
+// Both build "MAPXnn"/"MONXnn" from the same two map-number digits
+Common::String mapFilename(int mapNum1, int mapNum2);
+Common::String monsterFilename(int mapNum1, int mapNum2);
+
+/**
+ * A planet, village, town, or castle's map: a flat 64x64 grid of tiles,
+ * plus its monster/NPC slots. Towers and dungeons share the same on-disk
+ * mapX??/monX?? files but use a different internal layout for the map
+ * data itself -- see MapDungeon.
+ */
+struct Map {
+	TileId _tiles[MAP_HEIGHT][MAP_WIDTH] = {};
+	MapMonsters _monsters;
+
+	void load(int mapNum1, int mapNum2);
+
+	TileId tileAt(int x, int y) const {
+		return _tiles[y][x];
+	}
 };
 
+} // namespace Data
 } // namespace Ultima2
 } // namespace Ultima
 
