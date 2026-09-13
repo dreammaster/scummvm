@@ -19,39 +19,31 @@
  *
  */
 
-#include "ultima/ultima2/data/data.h"
+#ifndef ULTIMA2_VIEWS_INTERACTIONS_OFFER_GOLD_H
+#define ULTIMA2_VIEWS_INTERACTIONS_OFFER_GOLD_H
+
+#include "ultima/ultima2/views/interactions/interaction.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Data {
+namespace Views {
+namespace Interactions {
 
-const byte CGA_PALETTE1[4 * 3] = {
-	0x00, 0x00, 0x00, // 0: black
-	0x55, 0xff, 0xff, // 1: light cyan
-	0xff, 0x55, 0xff, // 2: light magenta
-	0xff, 0xff, 0xff  // 3: white
+/**
+ * Reads a single digit (gold offered = digit*100) for the "offer" command,
+ * then hands it back to the active Logic's completeOffer()
+ */
+class OfferGold : public Interaction {
+public:
+	OfferGold();
+	~OfferGold() override {}
+
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
-const char *const WEAPON_NAMES[WEAPON_COUNT] = {
-	"HANDS", "DAGGER", "MACE", "AXE", "BOW", "SWORD",
-	"GREAT SWORD", "LIGHT SWORD", "PHASER", "QUICK SWORD"
-};
-
-const char *const ARMOR_NAMES[ARMOR_COUNT] = {
-	"SKIN", "CLOTH", "LEATHER", "CHAIN", "PLATE", "REFLECT", "POWER"
-};
-
-const char *const SPELL_NAMES[SPELL_COUNT] = {
-	"NONE", "LIGHT", "DOWN LADDER", "UP LADDER", "PASSWALL",
-	"SURFACE", "PRAYER", "MAGIC MISSILE", "BLINK", "KILL"
-};
-
-const char *const ITEM_NAMES[ITEM_COUNT] = {
-	"RING", "WAND", "STAFF", "BOOTS", "CLOAK", "HELM", "GEM", "ANKH",
-	"RED GEM", "SKULL KEY", "GREEN GEM", "BRASS BUTTON", "BLUE TASSLE",
-	"STRANGE COIN", "GREEN IDOL", "TRI LITHIUM"
-};
-
-} // namespace Data
+} // namespace Interactions
+} // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif

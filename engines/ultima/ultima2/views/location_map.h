@@ -19,39 +19,39 @@
  *
  */
 
-#include "ultima/ultima2/data/data.h"
+#ifndef ULTIMA2_VIEWS_LOCATION_MAP_H
+#define ULTIMA2_VIEWS_LOCATION_MAP_H
+
+#include "ultima/ultima2/views/map.h"
+#include "ultima/ultima2/data/tiles.h"
 
 namespace Ultima {
 namespace Ultima2 {
-namespace Data {
+namespace Views {
 
-const byte CGA_PALETTE1[4 * 3] = {
-	0x00, 0x00, 0x00, // 0: black
-	0x55, 0xff, 0xff, // 1: light cyan
-	0xff, 0x55, 0xff, // 2: light magenta
-	0xff, 0xff, 0xff  // 3: white
+/**
+ * Renders the 20x10-tile viewport centered on the player for a village,
+ * town, or castle map. Like OverworldMap, but cells outside the map's
+ * 0-63 bounds show as Mountain (there's no wraparound - walking off the
+ * edge instead exits back to the overworld, see CityCastleLogic::move)
+ */
+class LocationMap : public Map {
+private:
+	Graphics::Surface _tiles[Data::TILE_COUNT];
+	Graphics::ManagedSurface _attackSprite;
+
+public:
+	LocationMap();
+	~LocationMap() override;
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgUnfocus(const UnfocusMessage &msg) override;
+	bool msgAttackTile(const AttackTileMessage &msg) override;
+	void draw() override;
 };
 
-const char *const WEAPON_NAMES[WEAPON_COUNT] = {
-	"HANDS", "DAGGER", "MACE", "AXE", "BOW", "SWORD",
-	"GREAT SWORD", "LIGHT SWORD", "PHASER", "QUICK SWORD"
-};
-
-const char *const ARMOR_NAMES[ARMOR_COUNT] = {
-	"SKIN", "CLOTH", "LEATHER", "CHAIN", "PLATE", "REFLECT", "POWER"
-};
-
-const char *const SPELL_NAMES[SPELL_COUNT] = {
-	"NONE", "LIGHT", "DOWN LADDER", "UP LADDER", "PASSWALL",
-	"SURFACE", "PRAYER", "MAGIC MISSILE", "BLINK", "KILL"
-};
-
-const char *const ITEM_NAMES[ITEM_COUNT] = {
-	"RING", "WAND", "STAFF", "BOOTS", "CLOAK", "HELM", "GEM", "ANKH",
-	"RED GEM", "SKULL KEY", "GREEN GEM", "BRASS BUTTON", "BLUE TASSLE",
-	"STRANGE COIN", "GREEN IDOL", "TRI LITHIUM"
-};
-
-} // namespace Data
+} // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif
