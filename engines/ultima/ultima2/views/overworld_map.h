@@ -19,26 +19,31 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_OVERWORLD_MAP_H
+#define ULTIMA2_VIEWS_OVERWORLD_MAP_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/ultima2/views/map.h"
+#include "ultima/ultima2/data/tiles.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
+/**
+ * Renders the 20x10-tile viewport centered on the player for a planet,
+ * village, town, or castle map.
+ */
+class OverworldMap : public Map {
+private:
+	Graphics::Surface _tiles[Data::TILE_COUNT];
+
+public:
+	OverworldMap();
+	~OverworldMap() override;
+
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgUnfocus(const UnfocusMessage &msg) override;
+	void draw() override;
 };
 
 } // namespace Views

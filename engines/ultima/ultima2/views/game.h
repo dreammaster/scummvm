@@ -19,26 +19,29 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_GAME_H
+#define ULTIMA2_VIEWS_GAME_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/shared/gfx/view.h"
+#include "ultima/ultima2/views/commands.h"
+#include "ultima/ultima2/views/stats.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
+/**
+ * The main in-game screen frame. Owns the Commands log/prompt and Stats
+ * panel; the map viewport above them is a separate view pushed on top.
+ */
+class Game : public Shared::Gfx::View {
+private:
+	Commands _commands;
+	Stats _stats;
+
+public:
+	Game();
+	~Game() override {}
 };
 
 } // namespace Views

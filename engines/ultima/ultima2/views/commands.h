@@ -19,26 +19,39 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
+#ifndef ULTIMA2_VIEWS_COMMANDS_H
+#define ULTIMA2_VIEWS_COMMANDS_H
 
 #include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/ultima2/gfx/text_cursor.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
+using namespace Shared::Messages;
+
+/**
+ * The scrolling message log and "CMD: " prompt at the bottom of the
+ * game screen.
+ */
+class Commands : public Shared::UIElement {
+private:
+	Shared::Gfx::GfxSurface _surface;
+	Gfx::TextCursor _textCursor;
+
+	void delay(uint milli);
+	void writeString(const Common::String &msg);
+	void resetLine();
+	void showCursor();
+	void prompt();
+
+public:
+	Commands(UIElement *parent);
+	~Commands() override {}
+
+	void draw() override;
+	bool msgGame(const GameMessage &msg) override;
 };
 
 } // namespace Views

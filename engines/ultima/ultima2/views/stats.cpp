@@ -19,30 +19,44 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_H
-#define ULTIMA2_VIEWS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima2/views/create_character.h"
-#include "ultima/ultima2/views/game.h"
-#include "ultima/ultima2/views/overworld_map.h"
-#include "ultima/ultima2/views/startup.h"
-#include "ultima/ultima2/views/title.h"
+#include "ultima/ultima2/views/stats.h"
+#include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	CreateCharacter _createCharacter;
-	Game _game;
-	OverworldMap _overworldMap;
-	Startup _startup;
-	Title _title;
-};
+constexpr int COLOR_TEXT = 3; // white, within the game's 4-color CGA palette
+
+void Stats::draw() {
+	Data::Savegame &sg = _G(savegame);
+	auto s = getSurface();
+	s.clear();
+
+	s.setColor(COLOR_TEXT);
+	s.writeString(Common::Point(0, 0), "H.P.=");
+	if (sg._hp == 0)
+		s.reverseColor();
+	s.writeString(Common::Point(5, 0), "%4d", sg._hp);
+	if (sg._hp == 0)
+		s.reverseColor();
+
+	s.setColor(COLOR_TEXT);
+	s.writeString(Common::Point(0, 1), "FOOD=");
+	if (sg._food == 0)
+		s.reverseColor();
+	s.writeString(Common::Point(5, 1), "%4d", sg._food);
+	if (sg._food == 0)
+		s.reverseColor();
+
+	s.setColor(COLOR_TEXT);
+	s.writeString(Common::Point(0, 2), "EXP.=");
+	s.writeString(Common::Point(5, 2), "%4d", sg._experience);
+
+	s.writeString(Common::Point(0, 3), "GOLD=");
+	s.writeString(Common::Point(5, 3), "%4d", sg._gold);
+}
 
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif
