@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_INTERACTIONS_SHOP_H
-#define ULTIMA2_VIEWS_INTERACTIONS_SHOP_H
+#ifndef ULTIMA2_VIEWS_INTERACTIONS_PUB_H
+#define ULTIMA2_VIEWS_INTERACTIONS_PUB_H
 
 #include "ultima/ultima2/views/interactions/interaction.h"
 
@@ -30,32 +30,18 @@ namespace Views {
 namespace Interactions {
 
 /**
- * A numbered-menu shop: prints an item list, reads a digit, quotes a price
- * (Savegame::computeItemPrice) and, if the player agrees, charges gold and
- * grants the item. Covers the weapon, armour, cleric-spell and wizard-spell
- * shoppes, which share this shape and differ in their wording, item list,
- * price-index mapping and target array
+ * The town pub, where a drink or a tip buys a hint from the barkeep
  */
-class Shop : public Interaction {
-public:
-	enum Kind { WEAPON, ARMOR, SPELL_CLERIC, SPELL_WIZARD };
-
+class Pub : public Interaction {
 private:
-	enum State { CHOOSE, CONFIRM };
+	enum State { MENU, TIP };
+	State _state = MENU;
 
-	Kind _kind;
-	State _state = CHOOSE;
-	int _item = 0;
-	int _price = 0;
-
-	bool isValidChoice(int digit) const;
-	void finish(const char *message);
-	void chooseItem(int digit);
-	void confirm(char key);
+	void barkeepSays(int hint);
 
 public:
-	Shop(Kind kind, const Common::String &name);
-	~Shop() override {}
+	Pub();
+	~Pub() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
 	bool msgKeypress(const KeypressMessage &msg) override;
