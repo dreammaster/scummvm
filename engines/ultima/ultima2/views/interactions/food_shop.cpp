@@ -19,51 +19,50 @@
  *
  */
 
-#ifndef ULTIMA2_VIEWS_INTERACTIONS_SHOP_H
-#define ULTIMA2_VIEWS_INTERACTIONS_SHOP_H
-
-#include "ultima/ultima2/views/interactions/interaction.h"
+#include "ultima/ultima2/views/interactions/food_shop.h"
+#include "ultima/ultima2/ultima2.h"
+#include "ultima/ultima2/metaengine.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 namespace Interactions {
 
-/**
- * A numbered-menu shop: prints an item list, reads a digit, quotes a price
- * (Savegame::computeItemPrice) and, if the player agrees, charges gold and
- * grants the item. Covers the weapon, armour, cleric-spell and wizard-spell
- * shoppes, which share this shape and differ in their wording, item list,
- * price-index mapping and target array
- */
-class Shop : public Interaction {
-public:
-	enum Kind { WEAPON, ARMOR, SPELL_CLERIC, SPELL_WIZARD };
+constexpr int FOOD_PRICE_INDEX = 3;
+constexpr int MAX_FOOD = 9999;
 
-private:
-	enum State { CHOOSE, CONFIRM };
+FoodShop::FoodShop() : Interaction("FoodShop") {
+}
 
-	Kind _kind;
-	State _state = CHOOSE;
-	int _item = 0;
-	int _price = 0;
+bool FoodShop::msgFocus(const FocusMessage &msg) {
+	MetaEngine::setKeybindingMode(KBMODE_MINIMAL);
+	_price = _G(savegame).computeItemPrice(FOOD_PRICE_INDEX);
+	writeString("THE FOOD HERE COSTS %.4d\nPER 100, WANT ONE? ", _price);
 
-	bool isValidChoice(int digit) const;
-	void finish(const char *message);
-	void chooseItem(int digit);
-	void confirm(char key);
+	return Interaction::msgFocus(msg);
+}
 
-public:
-	Shop(Kind kind, const Common::String &name);
-	~Shop() override {}
+bool FoodShop::msgKeypress(const KeypressMessage &msg) {
+	if (msg.ascii == 0)
+		return true;
 
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-};
+	close();
+	if (toupper(msg.ascii) != 'Y') {
+		writeString("NO\n");
+	} else {
+		writeString("YES,\nNO ONIONS AND TO GO PLEASE!\n");
+		if (_G(logic)->trySpendGold(_price)) {
+			Data::Savegame &sg = _G(savegame);
+			sg._food = MIN(sg._food + 100, MAX_FOOD);
+			writeString("THANK YOU, COME AGAIN!\n");
+		}
+	}
+
+	_G(logic)->resumeTurn();
+	return true;
+}
 
 } // namespace Interactions
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
-
-#endif
