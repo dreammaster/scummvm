@@ -111,6 +111,9 @@ extern void sfxGetEvent(MADEEventStamp *event);
 
 extern void sfxQuit(void);
 
+// Per-frame update, called when the message queue is idle
+extern void GameIdle();
+
 //	Function:	sfxEnvirons
 //
 //	Purpose:	returns various information about the machine

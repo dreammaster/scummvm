@@ -47,6 +47,7 @@ extern int window_right;
 extern int window_bottom;
 extern bool surfaceOK;
 extern MADEEventStamp event;
+extern LRESULT CALLBACK GameWndProc(HWND hWnd, unsigned int message, WPARAM wParam, LPARAM lParam);
 
 // dmade/dirscreen.cpp
 extern int screen_width;

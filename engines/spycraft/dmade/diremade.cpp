@@ -212,11 +212,7 @@ LRESULT CALLBACK GameWndProc(HWND hWnd, unsigned int message, WPARAM wParam, LPA
 
 
 	default:
-#ifdef TODO
-		return DefWindowProc(hWnd, message, wParam, lParam);
-#else
-		warning("TODO: DefWindowProc");
-#endif
+		break;
 	}
 
 	return false;
@@ -356,6 +352,30 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpszCmdLine, 
 	return (msg.wParam);
 }
 #endif
+
+void GameIdle() {
+	if (UserWantsToQuit) {
+		if (!posted) {
+			PostMessage(hGameWnd, WM_CLOSE, 0, 0);
+			posted = true;
+		}
+	} else if (appActive) {
+		/* UPDATE MADE */
+		if (curBack != -1) {
+			sfxReleaseSprites(backgrounds[curBack]);
+			sfxUpdate();
+		}
+
+		UpdateSound();
+
+		if (((yct++) % 8) == 0)
+			UpdateMovie();
+
+		/* UPDATE FRAMEWORK */
+		event.clock_lo = sfxGetTime();
+		OnIdle((MADEEventStamp *)&event);
+	}
+}
 
 void sfxGetEvent(MADEEventStamp *ev) {
 	POINT pCursor;

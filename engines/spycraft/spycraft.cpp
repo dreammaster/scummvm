@@ -45,15 +45,8 @@ extern	int screen_height;
 extern HDC hGameDC;
 
 constexpr HINSTANCE hInstance = nullptr;
-static bool posted = false;
-static bool appActive = false;
-static unsigned yct = 0;
-static SRect screenRect = { 0, 0, 511, 479, 512, 480 };
 
 class CTheApp : public CWinApp {
-private:
-	bool _posted = false;
-
 public:
 	bool InitInstance() override;
 	int ExitInstance() override;
@@ -61,6 +54,11 @@ public:
 };
 
 class CMainWindow : public CFrameWnd {
+protected:
+	LRESULT DefWindowProc(unsigned int nMsg, WPARAM wParam, LPARAM lParam) override {
+		return GameWndProc(m_hWnd, nMsg, wParam, lParam);
+	}
+
 public:
 	CMainWindow();
 };
@@ -86,6 +84,9 @@ bool CTheApp::InitInstance() {
 
 	/* instantiates C++ class object for script */
 	StartScript();
+
+	/* Windows would send this on window activation */
+	win->SendMessage(WM_ACTIVATEAPP, 1, 0);
 	return true;
 }
 
@@ -95,26 +96,7 @@ int CTheApp::ExitInstance() {
 }
 
 bool CTheApp::OnIdle(long lCount) {
-	if (UserWantsToQuit && !_posted) {
-		PostMessage(hGameWnd, WM_CLOSE, 0, 0);
-		_posted = true;
-	} else if (appActive) {
-		/* UPDATE MADE */
-		if (curBack != -1) {
-			sfxReleaseSprites(backgrounds[curBack]);
-			sfxUpdate();
-		}
-
-		UpdateSound();
-
-		if (((yct++) % 8) == 0)
-			UpdateMovie();
-
-		/* UPDATE FRAMEWORK */
-		event.clock_lo = sfxGetTime();
-		Spycraft::OnIdle((MADEEventStamp *)&event);
-	}
-
+	GameIdle();
 	return true;
 }
 
