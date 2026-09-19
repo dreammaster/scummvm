@@ -36,34 +36,10 @@ class Surface;
  */
 class Surface {
 public:
-	class YIterator;
-
-	/**
-	 * Column iterator
-	 */
-	class XIterator {
-	private:
-		Surface *_surface;
-		YIterator *_rowIter;
-		int _x = 0;
-		int _xMin, _xMax;
-		byte *_pixelP = nullptr;
-		byte _dummyPixel = 0;
-
-	public:
-		XIterator(YIterator *rowIter);
-
-		XIterator &operator=(int x);
-		XIterator &operator++();
-		bool operator<(int xEnd) const;
-		operator byte *();
-	};
-
 	/**
 	 * Row iterator
 	 */
 	class YIterator {
-		friend class XIterator;
 	private:
 		Surface *_surface;
 		int _y = 0;
@@ -75,6 +51,84 @@ public:
 		YIterator &operator=(int y);
 		YIterator &operator++();
 		bool operator<(int yMax) const;
+
+		Surface *surface() const {
+			return _surface;
+		}
+		int y() const {
+			return _y;
+		}
+		int yMin() const {
+			return _yMin;
+		}
+		int yMax() const {
+			return _yMax;
+		}
+	};
+
+	/**
+	 * Column iterator. T is the pixel type (byte, uint16, or uint32),
+	 * and should match the bytes per pixel of the surface being iterated
+	 */
+	template<class T>
+	class XIterator {
+	private:
+		Surface *_surface;
+		YIterator *_rowIter;
+		int _x = 0;
+		int _xMin, _xMax;
+		T *_pixelP = nullptr;
+		T _dummyPixel = 0;
+
+	public:
+		XIterator(YIterator *rowIter) :
+				_surface(rowIter->surface()), _rowIter(rowIter) {
+			const CPoint org = _surface->getViewportOrg();
+			_xMin = _surface->_clipRect.left - org.x;
+			_xMax = _surface->_clipRect.right - org.x;
+		}
+
+		XIterator &operator=(int x) {
+			_x = x;
+			int y = _rowIter->y();
+
+			if (x < _xMin || x >= _xMax ||
+					y < _rowIter->yMin() || y >= _rowIter->yMax())
+				_pixelP = &_dummyPixel;
+			else
+				_pixelP = (T *)_surface->getBasePtr(_x, y);
+
+			return *this;
+		}
+
+		XIterator &operator++() {
+			++_x;
+			int y = _rowIter->y();
+
+			if (y < _rowIter->yMin() || y >= _rowIter->yMax())
+				_pixelP = &_dummyPixel;
+			else if (_x == _xMin)
+				_pixelP = (T *)_surface->getBasePtr(_x, y);
+			else if (_x >= _xMax)
+				_pixelP = &_dummyPixel;
+			else if (_x >= _xMin)
+				++_pixelP;
+
+			return *this;
+		}
+
+		bool operator<(int xEnd) const {
+			return _x < xEnd;
+		}
+
+		operator T *() {
+			// Keep resetting the dummy pixel, in case
+			// the pixel pointer is pointing to it
+			_dummyPixel = 0;
+
+			// Return the pixel pointer
+			return _pixelP;
+		}
 	};
 
 private:

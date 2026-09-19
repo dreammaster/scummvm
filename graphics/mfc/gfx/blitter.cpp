@@ -27,10 +27,12 @@ namespace Graphics {
 namespace MFC {
 namespace Gfx {
 
-static inline void copyPixel(const byte *srcP, byte *destP, int mode, const byte &WHITE,
+template<class T>
+static inline void copyPixel(const T *srcP, T *destP, int mode, const T &WHITE,
 		bool isDestMonochrome, uint bgColor, const uint32 *paletteMap) {
-	byte src = *srcP;
-	if (paletteMap)
+	T src = *srcP;
+	// Palette maps are only relevant for 8-bit paletted surfaces
+	if (paletteMap && sizeof(T) == 1)
 		src = paletteMap[src];
 
 	switch (mode) {
@@ -48,14 +50,14 @@ static inline void copyPixel(const byte *srcP, byte *destP, int mode, const byte
 		break;
 	case NOTSRCCOPY:
 		if (isDestMonochrome) {
-			*destP = src == bgColor ? 0 : 0xff;
+			*destP = src == bgColor ? 0 : (T)0xff;
 			return;
 		}
 
-		*destP = ~src;
+		*destP = (T)~src;
 		break;
 	case DSTINVERT:
-		*destP = ~*destP;
+		*destP = (T)~*destP;
 		return;
 	case BLACKNESS:
 		*destP = 0;
@@ -69,22 +71,23 @@ static inline void copyPixel(const byte *srcP, byte *destP, int mode, const byte
 	}
 
 	if (isDestMonochrome)
-		*destP = *destP == bgColor ? 0xff : 0;
+		*destP = *destP == bgColor ? (T)0xff : 0;
 }
 
+template<class T>
 static void blitInner(Gfx::Surface *srcSurface,
 		Gfx::Surface *destSurface,
 		const Common::Rect &srcRect, const Common::Point &destPos,
 		uint bgColor, int mode, const uint32 *paletteMap) {
 	const bool isDestMonochrome = destSurface->format.bytesPerPixel == 1 &&
 		destSurface->format.aLoss == 255;
-	const byte WHITE = 255;
+	const T WHITE = (T)~(T)0;
 	Surface::YIterator ySrc(srcSurface);
-	Surface::XIterator xSrc(&ySrc);
+	Surface::XIterator<T> xSrc(&ySrc);
 	Surface::YIterator yDest(destSurface);
-	Surface::XIterator xDest(&yDest);
-	byte dummy = 0;
-	byte *srcP, *destP;
+	Surface::XIterator<T> xDest(&yDest);
+	T dummy = 0;
+	T *srcP, *destP;
 
 	for (ySrc = srcRect.top, yDest = destPos.y; ySrc < srcRect.bottom; ++ySrc, ++yDest) {
 		for (xSrc = srcRect.left, xDest = destPos.x; xSrc < srcRect.right; ++xSrc, ++xDest) {
@@ -100,21 +103,22 @@ static void blitInner(Gfx::Surface *srcSurface,
 	}
 }
 
+template<class T>
 static void stretchBlitInner(Gfx::Surface *srcSurface,
 		Gfx::Surface *destSurface,
 		const Common::Rect &srcRect, const Common::Rect &dstRect,
 		uint bgColor, int mode, const uint32 *paletteMap) {
 	const bool isDestMonochrome = destSurface->format.bytesPerPixel == 1 &&
 		destSurface->format.aLoss == 255;
-	const byte WHITE = 255;
+	const T WHITE = (T)~(T)0;
 	const int srcWidth = srcRect.right - srcRect.left;
 	const int srcHeight = srcRect.bottom - srcRect.top;
 	const int dstWidth = dstRect.right - dstRect.left;
 	const int dstHeight = dstRect.bottom - dstRect.top;
 	Surface::YIterator ySrc(srcSurface);
-	Surface::XIterator xSrc(&ySrc);
+	Surface::XIterator<T> xSrc(&ySrc);
 	Surface::YIterator yDest(destSurface);
-	Surface::XIterator xDest(&yDest);
+	Surface::XIterator<T> xDest(&yDest);
 
 	if (srcWidth <= 0 || srcHeight <= 0 || dstWidth <= 0 || dstHeight <= 0)
 		return; // Invalid rectangles
@@ -137,15 +141,52 @@ static void stretchBlitInner(Gfx::Surface *srcSurface,
 			if (dstX >= destSurface->w)
 				continue;
 
-			xSrc = srcX;
 			ySrc = srcY;
-			byte *srcP = xSrc;
-			xDest = dstX;
+			xSrc = srcX;
+			T *srcP = xSrc;
 			yDest = dstY;
-			byte *destP = xDest;
+			xDest = dstX;
+			T *destP = xDest;
 
 			copyPixel(srcP, destP, mode, WHITE, isDestMonochrome, bgColor, paletteMap);
 		}
+	}
+}
+
+/**
+ * Picks the pixel type for a blit from the destination's bytes per pixel.
+ * The source has the same format, or is uninitialized (bytesPerPixel == 0)
+ * for modes that don't use a source
+ */
+static void blitByFormat(Gfx::Surface *src, Gfx::Surface *dest,
+		const Common::Rect &srcRect, const Common::Point &destPos,
+		uint bgColor, int mode, const uint32 *paletteMap) {
+	switch (dest->format.bytesPerPixel) {
+	case 2:
+		blitInner<uint16>(src, dest, srcRect, destPos, bgColor, mode, paletteMap);
+		break;
+	case 4:
+		blitInner<uint32>(src, dest, srcRect, destPos, bgColor, mode, paletteMap);
+		break;
+	default:
+		blitInner<byte>(src, dest, srcRect, destPos, bgColor, mode, paletteMap);
+		break;
+	}
+}
+
+static void stretchBlitByFormat(Gfx::Surface *src, Gfx::Surface *dest,
+		const Common::Rect &srcRect, const Common::Rect &destRect,
+		uint bgColor, int mode, const uint32 *paletteMap) {
+	switch (dest->format.bytesPerPixel) {
+	case 2:
+		stretchBlitInner<uint16>(src, dest, srcRect, destRect, bgColor, mode, paletteMap);
+		break;
+	case 4:
+		stretchBlitInner<uint32>(src, dest, srcRect, destRect, bgColor, mode, paletteMap);
+		break;
+	default:
+		stretchBlitInner<byte>(src, dest, srcRect, destRect, bgColor, mode, paletteMap);
+		break;
 	}
 }
 
@@ -160,7 +201,7 @@ void blit(Gfx::Surface *src, Gfx::Surface *dest,
 	assert(dest->format.bytesPerPixel == dest->format.bytesPerPixel ||
 		dest->format.bytesPerPixel == 0);
 
-	blitInner(src, dest, srcRect, destPos, bgColor, mode, paletteMap);
+	blitByFormat(src, dest, srcRect, destPos, bgColor, mode, paletteMap);
 
 	Common::Rect dirtyRect(destPos.x, destPos.y,
 		destPos.x + srcRect.width(), destPos.y + srcRect.height());
@@ -175,7 +216,7 @@ void stretchBlit(Gfx::Surface *src, Gfx::Surface *dest,
 	assert(dest->format.bytesPerPixel == dest->format.bytesPerPixel ||
 		dest->format.bytesPerPixel == 0);
 
-	stretchBlitInner(src, dest, srcRect, destRect, bgColor, mode, paletteMap);
+	stretchBlitByFormat(src, dest, srcRect, destRect, bgColor, mode, paletteMap);
 }
 
 static inline void rasterPixel(byte *pixel, byte) {

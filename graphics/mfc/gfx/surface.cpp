@@ -19,67 +19,16 @@
  *
  */
 
+#include "common/textconsole.h"
 #include "graphics/mfc/gfx/surface.h"
 
 namespace Graphics {
 namespace MFC {
 namespace Gfx {
 
-Surface::XIterator::XIterator(YIterator *rowIter) :
-		_rowIter(rowIter), _surface(rowIter->_surface) {
-	const CPoint org = _surface->getViewportOrg();
-	_xMin = _surface->_clipRect.left - org.x;
-	_xMax = _surface->_clipRect.right - org.x;
-}
-
-Surface::XIterator &Surface::XIterator::operator=(int x) {
-	//const CPoint org = _surface->getViewportOrg();
-	_x = x;
-	int y = _rowIter->_y;
-
-	if (x < _xMin || x >= _xMax ||
-			y < _rowIter->_yMin || y >= _rowIter->_yMax)
-		_pixelP = &_dummyPixel;
-	else
-		_pixelP = _surface->getBasePtr(_x, _rowIter->_y);
-
-	return *this;
-}
-
-Surface::XIterator &Surface::XIterator::operator++() {
-	++_x;
-	int y = _rowIter->_y;
-
-	if (y < _rowIter->_yMin || y >= _rowIter->_yMax)
-		_pixelP = &_dummyPixel;
-	else if (_x == _xMin)
-		_pixelP = _surface->getBasePtr(_x, y);
-	else if (_x >= _xMax)
-		_pixelP = &_dummyPixel;
-	else if (_x >= _xMin)
-		++_pixelP;
-
-	return *this;
-}
-
-bool Surface::XIterator::operator<(int xEnd) const {
-	return _x < xEnd;
-}
-
-Surface::XIterator::operator byte *() {
-	// Keep resetting the dummy pixel, in case
-	// the pixel pointer is pointing to it
-	_dummyPixel = 0;
-
-	// Return the pixel pointer
-	return _pixelP;
-}
-
-
-/*--------------------------------------------*/
-
 Surface::YIterator::YIterator(Surface *surface) : _surface(surface) {
-	assert(surface && surface->format.bytesPerPixel <= 1);
+	assert(surface && (surface->format.bytesPerPixel <= 2 ||
+		surface->format.bytesPerPixel == 4));
 	CPoint org = surface->getViewportOrg();
 
 	_yMin = surface->_clipRect.top - org.y;
@@ -163,7 +112,8 @@ void Surface::offsetViewportOrg(int x, int y) {
 }
 
 byte *Surface::getBasePtr(int x, int y) {
-	assert(format.bytesPerPixel == 1);
+	assert(format.bytesPerPixel == 1 || format.bytesPerPixel == 2 ||
+		format.bytesPerPixel == 4);
 
 	x += _viewportOrg.x;
 	y += _viewportOrg.y;
@@ -230,9 +180,17 @@ uint32 Surface::getPixel(int x, int y) {
 	x += _viewportOrg.x;
 	y += _viewportOrg.y;
 	assert(x >= 0 && y >= 0 && x <= _surface.w && y <= _surface.h);
-	assert(format.bytesPerPixel == 1);
 
-	return *(byte *)getBasePtr(x, y);
+	switch (format.bytesPerPixel) {
+	case 1:
+		return *(byte *)getBasePtr(x, y);
+	case 2:
+		return *(uint16 *)getBasePtr(x, y);
+	case 4:
+		return *(uint32 *)getBasePtr(x, y);
+	default:
+		error("Unsupported bytes per pixel");
+	}
 }
 
 Graphics::ManagedSurface Surface::getSubArea(const Common::Rect &r) {
