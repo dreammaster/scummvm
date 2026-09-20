@@ -19,7 +19,7 @@
  *
  */
 
-#include "ultima/ultima2/views/interactions/interaction.h"
+#include "ultima/ultima2/views/interactions/dead.h"
 #include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
@@ -27,33 +27,25 @@ namespace Ultima2 {
 namespace Views {
 namespace Interactions {
 
-Interaction::Interaction(const Common::String &name) : View(name) {
-	setBounds(Common::Rect(0, 0, 0, 0));
+bool Dead::msgFocus(const FocusMessage &msg) {
+	auto &sg = _G(savegame);
+	sg._hp = 0;
+	sg._food = 0;
+	sg._foodTurnCtr = 0;
+	sg._experience = 0;
+	sg._gold = 0;
+
+	return true;
 }
 
-bool Interaction::tick() {
-	auto *view = g_engine->baseView()->findView("Commands");
-	if (view)
-		view->tick();
-
-	return Shared::Gfx::View::tick();
+bool Dead::msgAction(const ActionMessage &msg) {
+	g_engine->replaceView("Title", true);
+	return true;
 }
 
-void Interaction::writeString(const Common::String &msg) {
-	g_engine->baseView()->findView("Commands")->send(GameMessage("TEXT", msg));
-}
-
-void Interaction::writeString(const char *format, ...) {
-	va_list alist;
-	va_start(alist, format);
-	Common::String msg = Common::String::vformat(format, alist);
-	va_end(alist);
-
-	writeString(msg);
-}
-
-void Interaction::prompt() {
-	g_engine->baseView()->findView("Commands")->send(GameMessage("PROMPT"));
+bool Dead::msgKeypress(const KeypressMessage &msg) {
+	g_engine->replaceView("Title", true);
+	return true;
 }
 
 } // namespace Interactions
