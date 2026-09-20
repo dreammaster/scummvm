@@ -19,44 +19,37 @@
  *
  */
 
+#ifndef ULTIMA2_VIEWS_INTERACTIONS_DEAD_H
+#define ULTIMA2_VIEWS_INTERACTIONS_DEAD_H
+
 #include "ultima/ultima2/views/interactions/interaction.h"
-#include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 namespace Interactions {
 
-Interaction::Interaction(const Common::String &name) : View(name) {
-	setBounds(Common::Rect(0, 0, 0, 0));
-}
+using namespace Ultima::Shared::Messages;
 
-bool Interaction::tick() {
-	auto *view = g_engine->baseView()->findView("Commands");
-	if (view)
-		view->tick();
+/**
+ * Shown when the player dies, to allow them time to see the death message
+ */
+class Dead : public Interaction {
+public:
+	Dead() : Interaction("Dead") {
+	}
+	~Dead() override {
+	}
 
-	return Shared::Gfx::View::tick();
-}
-
-void Interaction::writeString(const Common::String &msg) {
-	g_engine->baseView()->findView("Commands")->send(GameMessage("TEXT", msg));
-}
-
-void Interaction::writeString(const char *format, ...) {
-	va_list alist;
-	va_start(alist, format);
-	Common::String msg = Common::String::vformat(format, alist);
-	va_end(alist);
-
-	writeString(msg);
-}
-
-void Interaction::prompt() {
-	g_engine->baseView()->findView("Commands")->send(GameMessage("PROMPT"));
-}
+	bool msgFocus(const FocusMessage &msg) override;
+	bool msgAction(const ActionMessage &msg) override;
+	bool msgKeypress(const KeypressMessage &msg) override;
+	bool tick() override { return true; }
+};
 
 } // namespace Interactions
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif
