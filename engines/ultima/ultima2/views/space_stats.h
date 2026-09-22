@@ -19,17 +19,29 @@
  *
  */
 
-#include "ultima/ultima2/views/game.h"
-#include "ultima/shared/gfx/rect.h"
+#ifndef ULTIMA2_VIEWS_SPACE_STATS_H
+#define ULTIMA2_VIEWS_SPACE_STATS_H
+
+#include "ultima/shared/engine/events.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-Game::Game() : Shared::Gfx::View("Game"), _commands(this), _stats(this) {
-	setBounds(TextRect(0, 0, 39, 24));
-}
+/**
+ * The stats display shown when in outer space
+ */
+class SpaceStats : public Shared::UIElement {
+public:
+	SpaceStats(UIElement *parent);
+	~SpaceStats() override {
+	}
+
+	void draw() override;
+};
 
 } // namespace Views
 } // namespace Ultima2
 } // namespace Ultima
+
+#endif
