@@ -19,15 +19,34 @@
  *
  */
 
-#include "ultima/ultima2/views/game.h"
+#include "ultima/ultima2/views/space_stats.h"
+#include "ultima/ultima2/logic/space_logic.h"
+#include "ultima/ultima2/ultima2.h"
 #include "ultima/shared/gfx/rect.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
 
-Game::Game() : Shared::Gfx::View("Game"), _commands(this), _stats(this) {
-	setBounds(TextRect(0, 0, 39, 24));
+constexpr int COLOR_TEXT = 3; // white, within the game's 4-color CGA palette
+
+SpaceStats::SpaceStats(UIElement *parent) : Shared::UIElement("SpaceStats", parent) {
+	setBounds(TextRect(30, 20, 39, 23));
+}
+
+void SpaceStats::draw() {
+	auto s = getSurface();
+	s.clear();
+
+	auto *logic = dynamic_cast<Logic::SpaceLogic *>(_G(logic).get());
+	if (!logic)
+		return;
+
+	s.setColor(COLOR_TEXT);
+	s.writeString(Common::Point(0, 0), "  FUEL=%.2d", _G(savegame)._items[Data::ITEM_TRI_LITHIUM] % 100);
+	s.writeString(Common::Point(0, 1), "  XENO=%.2d", logic->coords()[0]);
+	s.writeString(Common::Point(0, 2), "  YAKO=%.2d", logic->coords()[1]);
+	s.writeString(Common::Point(0, 3), "  ZABO=%.2d", logic->coords()[2]);
 }
 
 } // namespace Views
