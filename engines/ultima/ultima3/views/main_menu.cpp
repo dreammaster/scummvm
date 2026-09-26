@@ -19,26 +19,38 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_H
-#define ULTIMA3_VIEWS_H
-
-#include "ultima/shared/engine/events.h"
 #include "ultima/ultima3/views/main_menu.h"
-#include "ultima/ultima3/views/startup.h"
-#include "ultima/ultima3/views/title.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-struct Views {
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
-};
+constexpr int COLOR_TEXT = 3; // white, within CGA_PALETTE1
+
+void MainMenu::draw() {
+	auto s = getSurface();
+	s.clear();
+	s.setColor(COLOR_TEXT);
+
+	s.writeString(Common::Point(11, 8), "R - Return to the View");
+	s.writeString(Common::Point(11, 10), "O - Organize a Party");
+	s.writeString(Common::Point(11, 12), "J - Journey Onward");
+}
+
+bool MainMenu::msgKeypress(const KeypressMessage &msg) {
+	switch (msg.keycode) {
+	case Common::KEYCODE_r:
+	case Common::KEYCODE_o:
+	case Common::KEYCODE_j:
+		// Wired up once the roster/party data model and world engine exist
+		break;
+	default:
+		break;
+	}
+
+	return true;
+}
 
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif
