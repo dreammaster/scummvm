@@ -19,25 +19,22 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_H
-#define ULTIMA3_VIEWS_H
+#ifndef ULTIMA3_DATA_DATA_H
+#define ULTIMA3_DATA_DATA_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima3/views/main_menu.h"
-#include "ultima/ultima3/views/startup.h"
-#include "ultima/ultima3/views/title.h"
+#include "common/scummsys.h"
 
 namespace Ultima {
 namespace Ultima3 {
-namespace Views {
+namespace Data {
 
-struct Views : public Shared::Views {
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
-};
+// Ultima III renders everything (title screens, tiles, in-game text) in a
+// single CGA 4-color palette
+extern const byte CGA_PALETTE1[4 * 3];
 
-} // namespace Views
+void setCGAPalette();
+
+} // namespace Data
 } // namespace Ultima3
 } // namespace Ultima
 

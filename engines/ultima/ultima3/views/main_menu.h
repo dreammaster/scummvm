@@ -19,22 +19,29 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_H
-#define ULTIMA3_VIEWS_H
+#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
+#define ULTIMA3_VIEWS_MAIN_MENU_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima3/views/main_menu.h"
-#include "ultima/ultima3/views/startup.h"
-#include "ultima/ultima3/views/title.h"
+#include "ultima/shared/gfx/view.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
+using namespace Shared::Messages;
+
+/**
+ * BOOTUP.BIN's main menu: Return to the View / Organize a Party /
+ * Journey Onward. The option handlers are wired up as the roster/party
+ * data model and the world engine land in later stages.
+ */
+class MainMenu : public Shared::Gfx::View {
+public:
+	MainMenu() : View("MainMenu") {}
+	~MainMenu() override {}
+
+	void draw() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views

@@ -19,22 +19,46 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_H
-#define ULTIMA3_VIEWS_H
+#ifndef ULTIMA3_VIEWS_STARTUP_H
+#define ULTIMA3_VIEWS_STARTUP_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima3/views/main_menu.h"
-#include "ultima/ultima3/views/startup.h"
-#include "ultima/ultima3/views/title.h"
+#include "ultima/shared/gfx/view.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
+using namespace Shared::Messages;
+
+/**
+ * Brief ScummVM splash shown before handing off to the real attract-mode
+ * Title sequence.
+ */
+class Startup : public Shared::Gfx::View {
+private:
+	void showTitle() {
+		replaceView("Title");
+	}
+public:
+	Startup() : View("Startup") {}
+	~Startup() override {}
+
+	void draw() override;
+
+	bool msgFocus(const FocusMessage &msg) override;
+	void timeout() override;
+	bool msgKeypress(const KeypressMessage &msg) override {
+		showTitle();
+		return true;
+	}
+	bool msgMouseDown(const MouseDownMessage &msg) override {
+		showTitle();
+		return true;
+	}
+	bool msgAction(const ActionMessage &msg) override {
+		showTitle();
+		return true;
+	}
 };
 
 } // namespace Views

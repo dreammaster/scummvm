@@ -25,6 +25,7 @@
 #include "audio/softsynth/pcspk.h"
 #include "ultima/ultima3/ultima3.h"
 #include "ultima/ultima3/console.h"
+#include "ultima/ultima3/data/data.h"
 #include "ultima/ultima3/views/views.h"
 
 namespace Ultima {
@@ -53,6 +54,7 @@ Common::String Ultima3Engine::getGameId() const {
 Common::Error Ultima3Engine::run() {
 	// Initialize 320x200 graphics mode
 	initGraphics(320, 200);
+	Data::setCGAPalette();
 	_pcSpeakerReady = _pcSpeaker->init();
 
 	// Set the engine's debugger console

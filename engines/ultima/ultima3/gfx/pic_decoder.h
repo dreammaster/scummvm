@@ -19,25 +19,49 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_H
-#define ULTIMA3_VIEWS_H
+#ifndef ULTIMA3_GFX_PIC_DECODER_H
+#define ULTIMA3_GFX_PIC_DECODER_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima3/views/main_menu.h"
-#include "ultima/ultima3/views/startup.h"
-#include "ultima/ultima3/views/title.h"
+#include "graphics/palette.h"
+#include "graphics/surface.h"
+#include "image/image_decoder.h"
 
 namespace Ultima {
 namespace Ultima3 {
-namespace Views {
+namespace Gfx {
 
-struct Views : public Shared::Views {
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
+/**
+ * Decodes Ultima III's raw "*.IBM" full-screen title art: a literal
+ * 16384-byte dump of the CGA mode 4 (320x200, 4-color, palette 1)
+ * framebuffer segment -- two interleaved 8192-byte banks (even scanlines
+ * in the first, odd in the second), 2 bits/pixel, 4 pixels per byte,
+ * MSB-first.
+ */
+class PicDecoder : public Image::ImageDecoder {
+private:
+	Graphics::Palette _palette;
+	Graphics::Surface _surface;
+public:
+	~PicDecoder() {
+		destroy();
+	}
+
+	bool loadStream(Common::SeekableReadStream &stream) override;
+
+	void destroy() override {
+		_surface.free();
+	}
+
+	const Graphics::Surface *getSurface() const override {
+		return &_surface;
+	}
+
+	const Graphics::Palette &getPalette() const override {
+		return _palette;
+	}
 };
 
-} // namespace Views
+} // namespace Gfx
 } // namespace Ultima3
 } // namespace Ultima
 

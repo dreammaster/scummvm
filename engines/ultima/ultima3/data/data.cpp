@@ -19,26 +19,27 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_H
-#define ULTIMA3_VIEWS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima3/views/main_menu.h"
-#include "ultima/ultima3/views/startup.h"
-#include "ultima/ultima3/views/title.h"
+#include "common/system.h"
+#include "graphics/paletteman.h"
+#include "ultima/ultima3/data/data.h"
 
 namespace Ultima {
 namespace Ultima3 {
-namespace Views {
+namespace Data {
 
-struct Views : public Shared::Views {
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
+const byte CGA_PALETTE1[4 * 3] = {
+	0x00, 0x00, 0x00, // 0: black
+	0x55, 0xff, 0xff, // 1: light cyan
+	0xff, 0x55, 0xff, // 2: light magenta
+	0xff, 0xff, 0xff  // 3: white
 };
 
-} // namespace Views
+void setCGAPalette() {
+	Graphics::Palette palette(4);
+	palette.set(CGA_PALETTE1, 0, 4);
+	g_system->getPaletteManager()->setPalette(palette);
+}
+
+} // namespace Data
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif

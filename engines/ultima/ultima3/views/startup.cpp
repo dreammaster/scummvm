@@ -19,26 +19,36 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_H
-#define ULTIMA3_VIEWS_H
-
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima3/views/main_menu.h"
 #include "ultima/ultima3/views/startup.h"
-#include "ultima/ultima3/views/title.h"
+#include "ultima/ultima3/data/data.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-struct Views : public Shared::Views {
-	MainMenu _mainMenu;
-	Startup _startup;
-	Title _title;
-};
+#define DELAY_SECONDS 3
+
+#define COLOR_FOREGROUND 3 // white, within CGA_PALETTE1
+
+bool Startup::msgFocus(const FocusMessage &msg) {
+	Data::setCGAPalette();
+	delaySeconds(DELAY_SECONDS);
+	return View::msgFocus(msg);
+}
+
+void Startup::timeout() {
+	showTitle();
+}
+
+void Startup::draw() {
+	auto s = getSurface();
+	s.clear();
+
+	s.setColor(COLOR_FOREGROUND);
+	s.writeString(Common::Point(14, 8), "Ultima III");
+	s.writeString(Common::Point(11, 11), "Exodus");
+}
 
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif
