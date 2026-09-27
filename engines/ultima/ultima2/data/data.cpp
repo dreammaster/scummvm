@@ -29,8 +29,8 @@ namespace Data {
 
 const byte CGA_PALETTE1[4 * 3] = {
 	0x00, 0x00, 0x00, // 0: black
-	0x55, 0xff, 0xff, // 1: light cyan
-	0xff, 0x55, 0xff, // 2: light magenta
+	0x00, 0x9f, 0x5b, // 1: green (composite approximation of dithered cyan)
+	0x14, 0x10, 0xb9, // 2: blue (composite approximation of dithered magenta)
 	0xff, 0xff, 0xff  // 3: white
 };
 
@@ -44,11 +44,14 @@ const byte PLANET_COORDS[PLANET_COUNT + 1][3] = {
 };
 
 void setCGAPalette() {
-	Graphics::Palette palette(PALETTE_PLAYER_MARKER + 1);
+	Graphics::Palette palette(PALETTE_COMPOSITE_RED + 1);
 	palette.set(CGA_PALETTE1, 0, 4);
 
 	const byte green[3] = { 0x55, 0xff, 0x55 };
 	palette.set(green, PALETTE_PLAYER_MARKER, 1);
+
+	const byte red[3] = { 0xa6, 0x00, 0x49 };
+	palette.set(red, PALETTE_COMPOSITE_RED, 1);
 	g_system->getPaletteManager()->setPalette(palette);
 }
 

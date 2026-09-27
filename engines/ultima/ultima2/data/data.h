@@ -28,13 +28,25 @@ namespace Ultima {
 namespace Ultima2 {
 namespace Data {
 
-// CGA mode 4, palette 1 (black/light cyan/light magenta/white), the
-// palette used by both the pic??? art and the embedded tile graphics
+// CGA mode 4, palette 1 - the palette used by both the pic??? art and the
+// embedded tile graphics. Indices 1/2 are not the literal digital
+// cyan/magenta this palette nominally has - this game's art was designed
+// around a composite (not direct digital RGB) video connection, where an
+// alternating pattern of two "digital" colors decodes as a real third
+// color via the NTSC subcarrier; these two entries are hand-picked
+// approximations of what a composite connection actually showed for the
+// most common such patterns, traced from reference composite screenshots
 extern const byte CGA_PALETTE1[4 * 3];
 
 // An extra bright green entry after the four CGA colors, used by the
 // dungeon minimap's player marker
 constexpr int PALETTE_PLAYER_MARKER = 4;
+
+// A second composite-approximation color, for patterns that decode to a
+// visibly different hue than CGA_PALETTE1's index 2 despite using the same
+// underlying "magenta" bit pattern - e.g. the title picture's ]I[ glyph
+// and dragon tongue, versus the "Ultima" wordmark right above them
+constexpr int PALETTE_COMPOSITE_RED = 5;
 
 // Names of the worlds that can be orbited, indexed by Savegame::_orbitTarget
 constexpr int PLANET_COUNT = 9;

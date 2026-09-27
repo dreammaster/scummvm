@@ -91,6 +91,16 @@ void scrollTileRows(Graphics::Surface &tile, int rows) {
 		memcpy(pixels + y * TILE_WIDTH, copy + ((y + rows) % TILE_HEIGHT) * TILE_WIDTH, TILE_WIDTH);
 }
 
+void recolorPixels(Graphics::Surface &surf, byte from, byte to) {
+	for (int y = 0; y < surf.h; ++y) {
+		byte *row = (byte *)surf.getBasePtr(0, y);
+		for (int x = 0; x < surf.w; ++x) {
+			if (row[x] == from)
+				row[x] = to;
+		}
+	}
+}
+
 } // namespace Data
 } // namespace Ultima2
 } // namespace Ultima

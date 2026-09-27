@@ -40,6 +40,11 @@ constexpr int PLAYER_VIEWPORT_Y = 5;
 LocationMap::LocationMap() : Map("LocationMap") {
 	Data::loadTiles(_tiles);
 	Data::loadAttackSprite(_attackSprite);
+
+	// Village/town/castle walls reuse the road tile's brick-like pattern,
+	// which needs the other composite color approximation for magenta in
+	// this context - see CGA_PALETTE1's comment
+	Data::recolorPixels(_tiles[Data::TILE_ROAD], 2, Data::PALETTE_COMPOSITE_RED);
 }
 
 LocationMap::~LocationMap() {

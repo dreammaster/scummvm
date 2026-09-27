@@ -72,6 +72,15 @@ void loadAttackSprite(Graphics::ManagedSurface &sprite);
  */
 void scrollTileRows(Graphics::Surface &tile, int rows);
 
+/**
+ * Replaces every pixel of one palette index with another throughout a CLUT8
+ * surface - used to give a specific tile/picture a different composite
+ * color approximation than CGA_PALETTE1's default for that index, in
+ * contexts where the same source bit pattern is known to decode
+ * differently (see CGA_PALETTE1's comment)
+ */
+void recolorPixels(Graphics::Surface &surf, byte from, byte to);
+
 } // namespace Data
 } // namespace Ultima2
 } // namespace Ultima

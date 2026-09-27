@@ -22,6 +22,7 @@
 #include "common/file.h"
 #include "common/system.h"
 #include "graphics/paletteman.h"
+#include "ultima/ultima2/data/data.h"
 #include "ultima/ultima2/views/title.h"
 #include "ultima/ultima2/gfx/pic_decoder.h"
 #include "ultima/ultima2/ultima2.h"
@@ -46,6 +47,17 @@ void Title::loadPic(const Common::String &filename) {
 
 	_pic.create(320, 200);
 	_pic.blitFrom(*decoder.getSurface());
+
+	if (filename == "PICDRA") {
+		// Manually change the ][ and the dragon tongue to the correct composite red color
+		for (int y = 78; y < _pic.h; ++y) {
+			byte *row = (byte *)_pic.getBasePtr(0, y);
+			for (int x = (y < 80 ? 250 : 0); x < _pic.w; ++x) {
+				if (row[x] == 2)
+					row[x] = Data::PALETTE_COMPOSITE_RED;
+			}
+		}
+	}
 }
 
 bool Title::msgFocus(const FocusMessage &msg) {
