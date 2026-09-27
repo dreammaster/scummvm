@@ -48,6 +48,14 @@ constexpr int PALETTE_PLAYER_MARKER = 4;
 // and dragon tongue, versus the "Ultima" wordmark right above them
 constexpr int PALETTE_COMPOSITE_RED = 5;
 
+// HelmMap's own two-color scheme, traced from a reference composite
+// screenshot of the overhead view specifically - it draws stylized sparse
+// dot icons rather than the real tile bitmaps, so it doesn't reuse
+// CGA_PALETTE1's own composite colors above; structures (walls/mountains)
+// are a bright red, everything else walkable a bright blue
+constexpr int PALETTE_HELM_STRUCTURE = 6;
+constexpr int PALETTE_HELM_TERRAIN = 7;
+
 // Names of the worlds that can be orbited, indexed by Savegame::_orbitTarget
 constexpr int PLANET_COUNT = 9;
 extern const char *const PLANET_NAMES[PLANET_COUNT];

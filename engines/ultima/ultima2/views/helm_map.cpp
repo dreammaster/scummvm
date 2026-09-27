@@ -20,14 +20,13 @@
  */
 
 #include "ultima/ultima2/views/helm_map.h"
+#include "ultima/ultima2/data/data.h"
 #include "ultima/ultima2/data/map.h"
 #include "ultima/ultima2/ultima2.h"
 
 namespace Ultima {
 namespace Ultima2 {
 namespace Views {
-
-constexpr int COLOR_ICON = 3;
 
 // Matches the screen offset used by every other full-screen point/line renderer
 constexpr int VIEW_OFFSET = 16;
@@ -48,12 +47,14 @@ HelmMap::HelmMap() : Shared::Gfx::View("HelmMap") {
 void HelmMap::plotIcon(Shared::Gfx::GfxSurface &s, int cellX, int cellY, Data::TileId tile) {
 	const byte (*points)[2];
 	int count;
+	int color = Data::PALETTE_HELM_TERRAIN;
 
 	if (tile == Data::TILE_WATER) {
 		return;
 	} else if (tile == Data::TILE_MOUNTAIN || (tile >= Data::TILE_WALL && tile <= Data::TILE_COUNTER_END_LEFT)) {
 		points = ICON_MOUNTAIN_OR_SPRITE;
 		count = ARRAYSIZE(ICON_MOUNTAIN_OR_SPRITE);
+		color = Data::PALETTE_HELM_STRUCTURE;
 	} else if (tile == Data::TILE_GRASS) {
 		points = ICON_GRASS;
 		count = ARRAYSIZE(ICON_GRASS);
@@ -73,7 +74,7 @@ void HelmMap::plotIcon(Shared::Gfx::GfxSurface &s, int cellX, int cellY, Data::T
 
 	int px = cellX * 4 + VIEW_OFFSET, py = cellY * 2 + VIEW_OFFSET;
 	for (int i = 0; i < count; ++i)
-		s.setPixel(px + points[i][0], py + points[i][1], COLOR_ICON);
+		s.setPixel(px + points[i][0], py + points[i][1], color);
 }
 
 void HelmMap::draw() {

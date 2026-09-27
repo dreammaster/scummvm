@@ -44,7 +44,7 @@ const byte PLANET_COORDS[PLANET_COUNT + 1][3] = {
 };
 
 void setCGAPalette() {
-	Graphics::Palette palette(PALETTE_COMPOSITE_RED + 1);
+	Graphics::Palette palette(PALETTE_HELM_TERRAIN + 1);
 	palette.set(CGA_PALETTE1, 0, 4);
 
 	const byte green[3] = { 0x55, 0xff, 0x55 };
@@ -52,6 +52,12 @@ void setCGAPalette() {
 
 	const byte red[3] = { 0xa6, 0x00, 0x49 };
 	palette.set(red, PALETTE_COMPOSITE_RED, 1);
+
+	const byte helmStructure[3] = { 0xfd, 0x12, 0x00 };
+	palette.set(helmStructure, PALETTE_HELM_STRUCTURE, 1);
+
+	const byte helmTerrain[3] = { 0x00, 0xc1, 0xfd };
+	palette.set(helmTerrain, PALETTE_HELM_TERRAIN, 1);
 	g_system->getPaletteManager()->setPalette(palette);
 }
 
