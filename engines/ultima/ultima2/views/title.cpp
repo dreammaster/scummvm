@@ -42,6 +42,8 @@ Title::Title() : View("Title"), _cursor("Cursor", this) {
 void Title::loadPic(const Common::String &filename) {
 	Gfx::PicDecoder decoder;
 	Common::File f;
+	byte *row;
+
 	if (!f.open(filename.c_str()) || !decoder.loadStream(f))
 		error("Could not load %s", filename.c_str());
 
@@ -49,12 +51,21 @@ void Title::loadPic(const Common::String &filename) {
 	_pic.blitFrom(*decoder.getSurface());
 
 	if (filename == "PICDRA") {
+		// Merge together close vertical stripes of the title and dragon tongue
+		for (int y = 0; y < _pic.h; ++y) {
+			row = (byte *)_pic.getBasePtr(0, y);
+			for (int x = 0; x < _pic.w - 2; ++x, ++row) {
+				if (row[0] == 2 && row[2] == 2)
+					row[1] = 2;
+			}
+		}
+
 		// Manually change the ][ and the dragon tongue to the correct composite red color
 		for (int y = 78; y < _pic.h; ++y) {
-			byte *row = (byte *)_pic.getBasePtr(0, y);
-			for (int x = (y < 80 ? 250 : 0); x < _pic.w; ++x) {
-				if (row[x] == 2)
-					row[x] = Data::PALETTE_COMPOSITE_RED;
+			row = (byte *)_pic.getBasePtr(0, y);
+			for (int x = (y < 80 ? 250 : 0); x < _pic.w; ++x, ++row) {
+				if (*row == 2)
+					*row = Data::PALETTE_COMPOSITE_RED;
 			}
 		}
 	}
