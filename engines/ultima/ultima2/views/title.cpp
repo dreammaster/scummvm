@@ -63,9 +63,9 @@ void Title::loadPic(const Common::String &filename) {
 		// Manually change the ][ and the dragon tongue to the correct composite red color
 		for (int y = 78; y < _pic.h; ++y) {
 			row = (byte *)_pic.getBasePtr(0, y);
-			for (int x = (y < 80 ? 250 : 0); x < _pic.w; ++x, ++row) {
-				if (*row == 2)
-					*row = Data::PALETTE_COMPOSITE_RED;
+			for (int x = (y < 80 ? 250 : 0); x < _pic.w; ++x) {
+				if (row[x] == 2)
+					row[x] = Data::PALETTE_COMPOSITE_RED;
 			}
 		}
 	}
