@@ -291,6 +291,16 @@ MODULE_OBJS += \
 	mm1/maps/map55.o
 endif
 
+ifdef ENABLE_MM2
+MODULE_OBJS += \
+	mm2/console.o \
+	mm2/events.o \
+	mm2/mm2.o \
+	mm2/messages.o \
+	mm2/metaengine.o \
+	mm2/gfx/gfx_surface.o
+endif
+
 ifdef ENABLE_XEEN
 MODULE_OBJS += \
 	xeen/worldofxeen/clouds_cutscenes.o \

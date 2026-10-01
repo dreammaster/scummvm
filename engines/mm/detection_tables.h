@@ -75,6 +75,21 @@ static const MightAndMagicGameDescription GAME_DESCRIPTIONS[] = {
 	},
 
 	{
+		// Might and Magic 2
+		{
+			"mm2",
+			nullptr,
+			AD_ENTRY1s("monsters.16", "b7fb42ad329e8c84a2e5359f28ac5da5", 168257),
+			Common::EN_ANY,
+			Common::kPlatformDOS,
+			ADGF_UNSTABLE,
+			GUIO0()
+		},
+		GType_MightAndMagic2,
+		0
+	},
+
+	{
 		// World of Xeen
 		{
 			"worldofxeen",

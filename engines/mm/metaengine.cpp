@@ -32,6 +32,9 @@
 #ifdef ENABLE_MM1
 #include "mm/mm1/mm1.h"
 #endif
+#ifdef ENABLE_MM2
+#include "mm/mm2/mm2.h"
+#endif
 #ifdef ENABLE_XEEN
 #include "mm/xeen/xeen.h"
 #include "mm/xeen/metaengine.h"
@@ -137,6 +140,11 @@ Common::Error MMMetaEngine::createInstance(OSystem *syst, Engine **engine, const
 #ifdef ENABLE_MM1
 	case MM::GType_MightAndMagic1:
 		*engine = new MM::MM1::MM1Engine(syst, gd);
+		break;
+#endif
+#ifdef ENABLE_MM2
+	case MM::GType_MightAndMagic2:
+		*engine = new MM::MM2::MM2Engine(syst, gd);
 		break;
 #endif
 #ifdef ENABLE_XEEN

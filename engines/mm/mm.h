@@ -78,6 +78,9 @@ public:
 	uint getRandomNumber(int max) {
 		return _randomSource.getRandomNumber(max);
 	}
+	uint getRandomNumber(int minValue, int maxValue) {
+		return _randomSource.getRandomNumberRng(minValue, maxValue);
+	}
 };
 
 extern MMEngine *g_engine;

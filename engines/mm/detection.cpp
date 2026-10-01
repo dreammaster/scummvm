@@ -26,8 +26,9 @@
 #include "mm/mm.h"
 
 static const PlainGameDescriptor MIGHT_AND_MAGIC_GAMES[] = {
-	{ "mm1", "Might and Magic: Book One - Secret of the Inner Sanctum"},
-	{ "mm1_enh", "Might and Magic: Book One - Secret of the Inner Sanctum - Enhanced"},
+	{ "mm1", "Might and Magic: Book One - Secret of the Inner Sanctum" },
+	{ "mm1_enh", "Might and Magic: Book One - Secret of the Inner Sanctum - Enhanced" },
+	{ "mm2", "Might and Magic II: Gates to Another World" },
 	{ "cloudsofxeen", "Might and Magic IV: Clouds of Xeen" },
 	{ "darksideofxeen", "Might and Magic V: Darkside of Xeen" },
 	{ "worldofxeen", "Might and Magic: World of Xeen" },

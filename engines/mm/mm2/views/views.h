@@ -1,3 +1,4 @@
+
 /* ScummVM - Graphic Adventure Engine
  *
  * ScummVM is the legal property of its developers, whose names
@@ -19,43 +20,18 @@
  *
  */
 
-#ifndef MM_DETECTION_H
-#define MM_DETECTION_H
-
-#include "engines/advancedDetector.h"
+#ifndef MM2_VIEWS_H
+#define MM2_VIEWS_H
 
 namespace MM {
+namespace MM2 {
+namespace Views {
 
-enum {
-	GType_MightAndMagic1,
-	GType_MightAndMagic2,
-	GType_Clouds,
-	GType_DarkSide,
-	GType_WorldOfXeen,
-	GType_Swords
+struct Views {
 };
 
-enum GameFeature {
-	GF_NONE = 0,
-	GF_ENHANCED = 1,
-	GF_GFX_PACK = 2
-};
-
-struct MightAndMagicGameDescription {
-	AD_GAME_DESCRIPTION_HELPERS(desc);
-
-	ADGameDescription desc;
-
-	int gameID;
-	uint32 features;
-};
-
-#define GAMEOPTION_SHOW_ITEM_COSTS	GUIO_GAMEOPTIONS1
-#define GAMEOPTION_DURABLE_ARMOR	GUIO_GAMEOPTIONS2
-#define GAMEOPTION_SHOW_HP_SP_BARS	GUIO_GAMEOPTIONS3
-#define GAMEOPTION_COPY_PROTECTION      GUIO_GAMEOPTIONS4
-#define GAMEOPTION_TTS				GUIO_GAMEOPTIONS5
-
+} // namespace Views
+} // namespace MM2
 } // namespace MM
 
-#endif // MM_DETECTION_H
+#endif

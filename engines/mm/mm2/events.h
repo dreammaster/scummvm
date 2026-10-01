@@ -19,44 +19,54 @@
  *
  */
 
-#ifndef MM1_EVENTS_H
-#define MM1_EVENTS_H
+#ifndef MM2_EVENTS_H
+#define MM2_EVENTS_H
 
 #include "common/array.h"
 #include "common/stack.h"
+#include "mm/mm2/gfx/gfx_surface.h"
+#include "mm/mm2/messages.h"
 #include "graphics/screen.h"
-#include "mm/mm1/messages.h"
-#include "mm/mm1/utils/mouse.h"
 
 namespace MM {
-namespace MM1 {
+namespace MM2 {
 
+using Gfx::GfxSurface;
 class Events;
 
 /**
- * Implements a thunk layer around an element's
- * bounds, allowing access to it as if it were
- * a simple Common::Rect, but any changes to it
- * will also be applied to a linked inner bounds
+ * Implements a thunk layer around an element's bounds,
+ * allowing access to it as if it were a simple Common::Rect,
+ * but any changes to it will also be applied to a linked inner bounds
  */
 struct Bounds {
 private:
 	Common::Rect _bounds;
 	Common::Rect &_innerBounds;
 	int _borderSize = 0;
+
 public:
 	const int16 &left;
 	const int16 &top;
 	const int16 &right;
 	const int16 &bottom;
+
 public:
 	Bounds(Common::Rect &innerBounds);
-	operator const Common::Rect &() const { return _bounds; }
+	operator const Common::Rect &() const {
+		return _bounds;
+	}
 	Bounds &operator=(const Common::Rect &r);
 	void setBorderSize(size_t borderSize);
-	size_t borderSize() const { return _borderSize; }
-	int16 width() const { return _bounds.width(); }
-	int16 height() const { return _bounds.height(); }
+	size_t borderSize() const {
+		return _borderSize;
+	}
+	int16 width() const {
+		return _bounds.width();
+	}
+	int16 height() const {
+		return _bounds.height();
+	}
 };
 
 /**
@@ -64,8 +74,10 @@ public:
  */
 class UIElement {
 	friend class Events;
+
 private:
 	int _timeoutCtr = 0;
+
 protected:
 	UIElement *_parent;
 	Common::Array<UIElement *> _children;
@@ -73,21 +85,11 @@ protected:
 	Bounds _bounds;
 	bool _needsRedraw = true;
 	Common::String _name;
+#ifdef USE_TTS
+	Common::String _previousSaid;
+#endif
+
 protected:
-	Common::Rect getLineBounds(int line1, int line2) const {
-		return Common::Rect(0, line1 * 8, 320, (line2 + 1) * 8);
-	}
-
-	/**
-	 * Set a delay countdown in seconds
-	 */
-	void delaySeconds(uint seconds);
-
-	/**
-	 * Set a delay countdown in frames
-	 */
-	void delayFrames(uint frames);
-
 	/**
 	 * Returns true if a delay is active
 	 */
@@ -103,11 +105,6 @@ protected:
 	}
 
 	/**
-	 * Ends an active delay and calls timeout
-	 */
-	bool endDelay();
-
-	/**
 	 * Called when an active timeout countdown expired
 	 */
 	virtual void timeout();
@@ -117,20 +114,25 @@ private:
 	 * Outer method for doing drawing
 	 *
 	 */
-	void drawElements();
+	virtual void drawElements();
 
 	/**
 	 * Finds a view globally
 	 */
 	static UIElement *findViewGlobally(const Common::String &name);
+
 public:
 	UIElement(const Common::String &name, UIElement *uiParent);
-	virtual ~UIElement() {}
+	UIElement(const Common::String &name);
+	virtual ~UIElement() {
+	}
 
 	/**
 	 * Returns true if the elements needs to be redrawn
 	 */
-	bool needsRedraw() const { return _needsRedraw; }
+	bool needsRedraw() const {
+		return _needsRedraw;
+	}
 
 	/**
 	 * Sets that the element needs to be redrawn
@@ -138,45 +140,32 @@ public:
 	void redraw();
 
 	/**
-	 * Focuses the element as the current view
-	 */
-	void focus();
-
-	/**
 	 * Closes the current view. The view must have been added
 	 * via addView, so there's a remaining view afterwards
 	 */
 	virtual void close();
 
-	/*
-	 * Returns true if the view is focused
-	 */
-	bool isFocused() const;
-
 	/**
 	 * Sets the focus to a new view
 	 */
-	void replaceView(UIElement *ui, bool replaceAllViews = false);
-	void replaceView(const Common::String &name, bool replaceAllViews = false);
+	virtual void replaceView(UIElement *ui, bool replaceAllViews = false);
+	virtual void replaceView(const Common::String &name, bool replaceAllViews = false);
 
 	/**
 	 * Adds a focused view to the view stack without replacing current one
 	 */
-	void addView(UIElement *ui);
-	void addView(const Common::String &name);
+	virtual void addView(UIElement *ui);
+	virtual void addView(const Common::String &name);
 	void addView();
-	void open() { addView(); }
+	void open() {
+		addView();
+	}
 
 	/**
 	 * Returns a random number
 	 */
 	int getRandomNumber(int minNumber, int maxNumber);
 	int getRandomNumber(int maxNumber);
-
-	/**
-	 * Gets the element's name
-	 */
-	Common::String getName() const { return _name; }
 
 	/**
 	 * Sets the element's bounds
@@ -193,14 +182,16 @@ public:
 	}
 
 	/**
-	 * Returns a surface for drawing the element
+	 * Gets a view's name
 	 */
-	Graphics::ManagedSurface getSurface() const;
+	const Common::String &getName() const {
+		return _name;
+	}
 
 	/**
-	 * Clear the surface
+	 * Returns a surface for drawing the element
 	 */
-	virtual void clearSurface();
+	Gfx::GfxSurface getSurface(bool innerBounds = false) const;
 
 	/**
 	 * Draws the element
@@ -220,59 +211,78 @@ public:
 	/**
 	 * Handles events
 	 */
-	#define MESSAGE(NAME) \
-	protected: \
-		virtual bool msg##NAME(const NAME##Message &e) { \
-			for (Common::Array<UIElement *>::iterator it = _children.begin(); \
-					it != _children.end(); ++it) { \
-				if ((*it)->msg##NAME(e)) return true; \
-			} \
-			return false; \
-		} \
-	public: \
-		bool send(const Common::String &viewName, const NAME##Message &msg) { \
-			UIElement *view = UIElement::findViewGlobally(viewName); \
-			assert(view); \
-			return view->msg##NAME(msg); \
-		} \
-		bool send(const NAME##Message &msg) { \
-			return send("Root", msg); \
-		} \
+	 // Mouse move only has a minimal implementation for performance reasons
+protected:
+	virtual bool msgMouseMove(const MouseMoveMessage &msg) {
+		return false;
+	}
+
+#ifdef USE_TTS
+	/**
+	 * Stops TTS voicing and clears the previously spoken text
+	 */
+	void stopTextToSpeech();
+#endif
+
+public:
+	bool send(const MouseMoveMessage &msg) {
+		return msgMouseMove(msg);
+	}
+
+#define MESSAGE(NAME)                                                     \
+protected:                                                                \
+	virtual bool msg##NAME(const NAME##Message &e) {                      \
+		for (Common::Array<UIElement *>::iterator it = _children.begin(); \
+			 it != _children.end(); ++it) {                               \
+			if ((*it)->msg##NAME(e))                                      \
+				return true;                                              \
+		}                                                                 \
+		return false;                                                     \
+	}                                                                     \
+                                                                          \
+public:                                                                   \
+	bool send(const Common::String &viewName, const NAME##Message &msg) { \
+		UIElement *view = UIElement::findViewGlobally(viewName);          \
+		assert(view);                                                     \
+		return view->msg##NAME(msg);                                      \
+	}                                                                     \
+	bool send(const NAME##Message &msg) {                                 \
+		return msg##NAME(msg);                                            \
+	}
 
 	MESSAGE(Focus);
 	MESSAGE(Unfocus);
+	MESSAGE(MouseEnter);
+	MESSAGE(MouseLeave);
 	MESSAGE(Keypress);
 	MESSAGE(MouseDown);
 	MESSAGE(MouseUp);
-	MESSAGE(MouseMove);
 	MESSAGE(Action);
 	MESSAGE(Game);
-	MESSAGE(Header);
-	MESSAGE(Info);
-	MESSAGE(DrawGraphic);
-	#undef MESSAGE
-};
-
-class ViewsBase {
-public:
-	ViewsBase() {}
-	virtual ~ViewsBase() {}
+	MESSAGE(Value);
+#undef MESSAGE
 };
 
 /**
- * Main events and view manager
+ * Main events and view manager. This is kept separate from the engine
+ * class because the engine may add a lot of globals and bring in other
+ * classes. So to save on compilation time, classes that only need to
+ * access basic view management methods like addView or replaceView
+ * only need to include events.h rather than the whole engine.
  */
-class Events : public UIElement, public Mouse {
+class Events : public UIElement {
 private:
 	Graphics::Screen *_screen = nullptr;
 	Common::Stack<UIElement *> _views;
-	bool _enhancedMode;
-protected:
+
+	void nextFrame();
+
 	/**
 	 * Process an event
 	 */
 	void processEvent(Common::Event &ev);
 
+protected:
 	/**
 	 * Returns true if the game should quit
 	 */
@@ -281,22 +291,25 @@ protected:
 	/**
 	 * Overrides events we want to only go to the focused view
 	 */
-	#define MESSAGE(NAME) \
-		bool msg##NAME(const NAME##Message &e) override { \
-			return !_views.empty() ? focusedView()->msg##NAME(e) : false; \
-		}
+#define MESSAGE(NAME)                                                 \
+	bool msg##NAME(const NAME##Message &e) override {                 \
+		return !_views.empty() ? focusedView()->msg##NAME(e) : false; \
+	}
 	MESSAGE(Action);
 	MESSAGE(Focus);
 	MESSAGE(Unfocus);
+	MESSAGE(MouseEnter);
+	MESSAGE(MouseLeave);
 	MESSAGE(Keypress);
 	MESSAGE(MouseDown);
 	MESSAGE(MouseUp);
 	MESSAGE(MouseMove);
-	MESSAGE(DrawGraphic);
-	#undef MESSAGE
+#undef MESSAGE
 public:
-	Events(bool enhancedMode);
+	Events();
 	virtual ~Events();
+
+	virtual bool isDemo() const = 0;
 
 	/**
 	 * Main game loop
@@ -306,14 +319,14 @@ public:
 	/**
 	 * Sets the focus to a new view
 	 */
-	void replaceView(UIElement *ui, bool replaceAllViews = false);
-	void replaceView(const Common::String &name, bool replaceAllViews = false);
+	void replaceView(UIElement *ui, bool replaceAllViews = false) override;
+	void replaceView(const Common::String &name, bool replaceAllViews = false) override;
 
 	/**
 	 * Adds a focused view to the view stack without replacing current one
 	 */
-	void addView(UIElement *ui);
-	void addView(const Common::String &name);
+	void addView(UIElement *ui) override;
+	void addView(const Common::String &name) override;
 
 	/**
 	 * Clears the view list
@@ -326,13 +339,6 @@ public:
 	void popView();
 
 	/**
-	 * Redraws the views in order. This is used in rare cases
-	 * where a view draws outside it's defined area, and needs
-	 * to restore whether the background was before
-	 */
-	void redrawViews();
-
-	/**
 	 * Returns the currently focused view, if any
 	 */
 	UIElement *focusedView() const {
@@ -343,8 +349,14 @@ public:
 	 * Returns the view prior to the current view, if any
 	 */
 	UIElement *priorView() const {
-		return _views.size() < 2 ? nullptr :
-			_views[_views.size() - 2];
+		return _views.size() < 2 ? nullptr : _views[_views.size() - 2];
+	}
+
+	/**
+	 * Returns the first view in the stack
+	 */
+	UIElement *firstView() const {
+		return _views.empty() ? nullptr : _views[0];
 	}
 
 	/**
@@ -360,38 +372,33 @@ public:
 		return isPresent("Combat");
 	}
 
+	/**
+	 * Returns the underlying screen
+	 */
 	Graphics::Screen *getScreen() const {
 		return _screen;
 	}
 
-	void drawElements() {
-		if (!_views.empty())
-			focusedView()->drawElements();
+	/**
+	 * Draws the focused view
+	 */
+	void drawElements() override;
+
+	/**
+	 * Events manager doesn't have any intrinsic drawing
+	 */
+	void draw() override {
 	}
 
 	/**
-	 * Add a keypress to the event queue
+	 * Called once every game frame
 	 */
-	void addKeypress(const Common::KeyCode kc);
-
-	/**
-	 * Add a action to the event queue
-	 */
-	void addAction(KeybindingAction action);
-
-	/**
-	 * Checks whether a keypress is pending
-	 */
-	bool isKeypressPending() const;
-
-	void draw() override {}
-
 	bool tick() override {
 		return !_views.empty() ? focusedView()->tick() : false;
 	}
 
 	/**
-	 * Calling the close method for g_events closes the active window
+	 * Calling the close method for g_events closes the active view
 	 */
 	void close() override {
 		focusedView()->close();
@@ -400,7 +407,7 @@ public:
 
 extern Events *g_events;
 
-} // namespace MM1
+} // namespace MM2
 } // namespace MM
 
 #endif

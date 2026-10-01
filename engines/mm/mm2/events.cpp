@@ -19,25 +19,20 @@
  *
  */
 
-#include "common/system.h"
+#include "common/config-manager.h"
+#include "common/text-to-speech.h"
 #include "graphics/screen.h"
-#include "mm/mm1/events.h"
-#include "mm/mm1/mm1.h"
-#include "mm/mm1/gfx/gfx.h"
-#include "mm/mm1/sound.h"
-#include "mm/mm1/views/dialogs.h"
-#include "mm/mm1/views_enh/dialogs.h"
+#include "mm/mm2/mm2.h"
 
 namespace MM {
-namespace MM1 {
+namespace MM2 {
 
 #define FRAME_RATE 20
 #define FRAME_DELAY (1000 / FRAME_RATE)
 
 Events *g_events;
 
-Events::Events(bool enhancedMode) : UIElement("Root", nullptr),
-		_enhancedMode(enhancedMode) {
+Events::Events() : UIElement("Root", nullptr) {
 	g_events = this;
 }
 
@@ -46,49 +41,47 @@ Events::~Events() {
 }
 
 void Events::runGame() {
-	ViewsBase *allViews = _enhancedMode ?
-		(ViewsBase *)new ViewsEnh::Dialogs() :
-		(ViewsBase *)new Views::Dialogs();
-	uint currTime, nextFrameTime = 0;
+	uint nextFrameTime = 0;
 	_screen = new Graphics::Screen();
 
-	MetaEngine::setKeybindingMode(KeybindingMode::KBMODE_MENUS);
-
-	// Run the game
-	int saveSlot = ConfMan.getInt("save_slot");
-	if (saveSlot == -1 ||
-			g_engine->loadGameState(saveSlot).getCode() != Common::kNoError) {
-		addView("Title");
-	}
-
+	// Main game loop
 	Common::Event e;
-	bool quitFlag = false;
-	while (!quitFlag) {
+	while (!_views.empty() && !shouldQuit()) {
 		while (g_system->getEventManager()->pollEvent(e)) {
 			if (e.type == Common::EVENT_QUIT ||
-					e.type == Common::EVENT_RETURN_TO_LAUNCHER) {
-				quitFlag = true;
+				e.type == Common::EVENT_RETURN_TO_LAUNCHER) {
+				_views.clear();
 				break;
-			} else {
-				processEvent(e);
 			}
+
+			processEvent(e);
 		}
+
+		if (_views.empty())
+			break;
 
 		g_system->delayMillis(10);
-		if ((currTime = g_system->getMillis()) >= nextFrameTime) {
-			nextFrameTime = currTime + FRAME_DELAY;
-			tick();
-			Sound::update();
-			drawElements();
-			_screen->update();
-		}
 
-		quitFlag |= shouldQuit();
+		uint currTime = g_system->getMillis();
+		if (currTime >= nextFrameTime) {
+			nextFrameTime = currTime + FRAME_DELAY;
+			nextFrame();
+		}
 	}
 
 	delete _screen;
-	delete allViews;
 }
+
+void Events::nextFrame() {
+	// Do tick action to the views to handle gameplay logic
+	tick();
+
+	// Draw the current view's elements as needed, and update screen
+	drawElements();
+	_screen->update();
+}
+
+#define LOOP_THRESHOLD 5
 
 void Events::processEvent(Common::Event &ev) {
 	switch (ev.type) {
@@ -97,24 +90,20 @@ void Events::processEvent(Common::Event &ev) {
 			msgKeypress(KeypressMessage(ev.kbd));
 		break;
 	case Common::EVENT_CUSTOM_ENGINE_ACTION_START:
-		if (MetaEngine::getActionKeyState((KeybindingAction)ev.customType).keycode != Common::KEYCODE_INVALID) {
-			msgKeypress(KeypressMessage(MetaEngine::getActionKeyState((KeybindingAction)ev.customType)));
-		} else {
-			msgAction(ActionMessage((KeybindingAction)ev.customType));
-		}
-		break;
-	case Common::EVENT_MOUSEMOVE:
-		msgMouseMove(MouseMoveMessage(ev.mouse));
+		msgAction(ActionMessage(ev.customType));
 		break;
 	case Common::EVENT_LBUTTONDOWN:
 	case Common::EVENT_RBUTTONDOWN:
-		//case Common::EVENT_MBUTTONDOWN:
+	case Common::EVENT_MBUTTONDOWN:
 		msgMouseDown(MouseDownMessage(ev.type, ev.mouse));
 		break;
 	case Common::EVENT_LBUTTONUP:
 	case Common::EVENT_RBUTTONUP:
-	//case Common::EVENT_MBUTTONUP:
+	case Common::EVENT_MBUTTONUP:
 		msgMouseUp(MouseUpMessage(ev.type, ev.mouse));
+		break;
+	case Common::EVENT_MOUSEMOVE:
+		msgMouseMove(MouseMoveMessage(ev.type, ev.mouse));
 		break;
 	default:
 		break;
@@ -123,19 +112,28 @@ void Events::processEvent(Common::Event &ev) {
 
 void Events::replaceView(UIElement *ui, bool replaceAllViews) {
 	assert(ui);
-	UIElement *priorView = focusedView();
+	UIElement *oldView = focusedView();
 
 	if (replaceAllViews) {
 		clearViews();
 
 	} else if (!_views.empty()) {
-		priorView->msgUnfocus(UnfocusMessage());
+		oldView->msgUnfocus(UnfocusMessage());
 		_views.pop();
 	}
 
+	// Redraw any prior views to erase the removed view
+	for (uint i = 0; i < _views.size(); ++i) {
+		_views[i]->redraw();
+		_views[i]->draw();
+	}
+
+	// Add the new view
 	_views.push(ui);
+
 	ui->redraw();
-	ui->msgFocus(FocusMessage(priorView));
+	ui->msgFocus(FocusMessage(oldView));
+	ui->draw();
 }
 
 void Events::replaceView(const Common::String &name, bool replaceAllViews) {
@@ -144,14 +142,14 @@ void Events::replaceView(const Common::String &name, bool replaceAllViews) {
 
 void Events::addView(UIElement *ui) {
 	assert(ui);
-	UIElement *priorView = focusedView();
+	UIElement *oldView = focusedView();
 
 	if (!_views.empty())
-		priorView->msgUnfocus(UnfocusMessage());
+		oldView->msgUnfocus(UnfocusMessage());
 
 	_views.push(ui);
 	ui->redraw();
-	ui->msgFocus(FocusMessage(priorView));
+	ui->msgFocus(FocusMessage(oldView));
 }
 
 void Events::addView(const Common::String &name) {
@@ -159,27 +157,20 @@ void Events::addView(const Common::String &name) {
 }
 
 void Events::popView() {
-	UIElement *priorView = focusedView();
-	priorView->msgUnfocus(UnfocusMessage());
+	UIElement *oldView = focusedView();
+	oldView->msgUnfocus(UnfocusMessage());
 	_views.pop();
 
-	for (int i = 0; i < (int)_views.size() - 1; ++i) {
+	for (uint i = 0; i < _views.size(); ++i) {
 		_views[i]->redraw();
 		_views[i]->draw();
 	}
 
 	if (!_views.empty()) {
 		UIElement *view = focusedView();
-		view->msgFocus(FocusMessage(priorView));
+		view->msgFocus(FocusMessage(oldView));
 		view->redraw();
 		view->draw();
-	}
-}
-
-void Events::redrawViews() {
-	for (uint i = 0; i < _views.size(); ++i) {
-		_views[i]->redraw();
-		_views[i]->draw();
 	}
 }
 
@@ -192,6 +183,11 @@ bool Events::isPresent(const Common::String &name) const {
 	return false;
 }
 
+void Events::drawElements() {
+	if (!_views.empty())
+		focusedView()->drawElements();
+}
+
 void Events::clearViews() {
 	if (!_views.empty())
 		focusedView()->msgUnfocus(UnfocusMessage());
@@ -199,34 +195,12 @@ void Events::clearViews() {
 	_views.clear();
 }
 
-void Events::addKeypress(const Common::KeyCode kc) {
-	Common::KeyState ks;
-	ks.keycode = kc;
-	if (kc >= Common::KEYCODE_SPACE && kc <= Common::KEYCODE_TILDE)
-		ks.ascii = kc;
-
-	focusedView()->msgKeypress(KeypressMessage(ks));
-}
-
-void Events::addAction(KeybindingAction action) {
-	focusedView()->msgAction(ActionMessage(action));
-}
-
-bool Events::isKeypressPending() const {
-	// TODO: Currently the engine doesn't cache keypresses, but rather
-	// processes them immediately after each is pulled from the
-	// SDL event queue. So for this to work, we'd need to rework
-	// the event handler code
-	return false;
-}
-
 /*------------------------------------------------------------------------*/
 
-Bounds::Bounds(Common::Rect &innerBounds) :
-		_bounds(0, 0, 320, 200),
-		_innerBounds(innerBounds),
-		left(_bounds.left), top(_bounds.top),
-		right(_bounds.right), bottom(_bounds.bottom) {
+Bounds::Bounds(Common::Rect &innerBounds) : _bounds(0, 0, 320, 240),
+_innerBounds(innerBounds),
+left(_bounds.left), top(_bounds.top),
+right(_bounds.right), bottom(_bounds.bottom) {
 }
 
 Bounds &Bounds::operator=(const Common::Rect &r) {
@@ -244,9 +218,11 @@ void Bounds::setBorderSize(size_t borderSize) {
 
 /*------------------------------------------------------------------------*/
 
-UIElement::UIElement(const Common::String &name, UIElement *uiParent) :
-		_name(name), _parent(uiParent),
-		_bounds(_innerBounds) {
+UIElement::UIElement(const Common::String &name) : _name(name), _parent(g_engine), _bounds(_innerBounds) {
+	g_engine->_children.push_back(this);
+}
+
+UIElement::UIElement(const Common::String &name, UIElement *uiParent) : _name(name), _parent(uiParent), _bounds(_innerBounds) {
 	if (_parent)
 		_parent->_children.push_back(this);
 }
@@ -272,24 +248,12 @@ UIElement *UIElement::findViewGlobally(const Common::String &name) {
 	return g_events->findView(name);
 }
 
-void UIElement::focus() {
-	g_engine->replaceView(this);
-}
-
 void UIElement::close() {
-	if (g_events->focusedView() != this)
-		return;
-
+	assert(g_events->focusedView() == this);
 	g_events->popView();
-}
-
-bool UIElement::isFocused() const {
-	return g_events->focusedView() == this;
-}
-
-void UIElement::clearSurface() {
-	Graphics::ManagedSurface s = getSurface();
-	s.fillRect(Common::Rect(s.w, s.h), 0);
+#ifdef USE_TTS
+	stopTextToSpeech();
+#endif
 }
 
 void UIElement::draw() {
@@ -315,9 +279,9 @@ UIElement *UIElement::findView(const Common::String &name) {
 	if (_name.equalsIgnoreCase(name))
 		return this;
 
-	UIElement *result;
 	for (size_t i = 0; i < _children.size(); ++i) {
-		if ((result = _children[i]->findView(name)) != nullptr)
+		UIElement *result = _children[i]->findView(name);
+		if (result != nullptr)
 			return result;
 	}
 
@@ -344,39 +308,35 @@ void UIElement::addView() {
 	g_events->addView(this);
 }
 
-Graphics::ManagedSurface UIElement::getSurface() const {
-	return Graphics::ManagedSurface(*g_events->getScreen(), _bounds);
+GfxSurface UIElement::getSurface(bool innerBounds) const {
+	return GfxSurface(*g_events->getScreen(),
+		innerBounds ? _innerBounds : _bounds);
 }
 
 int UIElement::getRandomNumber(int minNumber, int maxNumber) {
-	return g_engine->getRandomNumber(maxNumber - minNumber + 1) + minNumber;
+	return g_engine->getRandomNumber(minNumber, maxNumber);
 }
 
 int UIElement::getRandomNumber(int maxNumber) {
 	return g_engine->getRandomNumber(maxNumber);
 }
 
-void UIElement::delaySeconds(uint seconds) {
-	_timeoutCtr = seconds * FRAME_RATE;
-}
-
-void UIElement::delayFrames(uint frames) {
-	_timeoutCtr = frames;
-}
-
-bool UIElement::endDelay() {
-	if (_timeoutCtr) {
-		_timeoutCtr = 0;
-		timeout();
-		return true;
-	} else {
-		return false;
-	}
-}
-
 void UIElement::timeout() {
 	redraw();
 }
 
-} // namespace MM1
+#ifdef USE_TTS
+
+void UIElement::stopTextToSpeech() {
+	Common::TextToSpeechManager *ttsMan = g_system->getTextToSpeechManager();
+	if (ttsMan && ConfMan.getBool("tts_enabled") && ttsMan->isSpeaking()) {
+		ttsMan->stop();
+	}
+
+	_previousSaid.clear();
+}
+
+#endif
+
+} // namespace MM2
 } // namespace MM

@@ -19,43 +19,44 @@
  *
  */
 
-#ifndef MM_DETECTION_H
-#define MM_DETECTION_H
+#ifndef GOT_METAENGINE_H
+#define GOT_METAENGINE_H
 
 #include "engines/advancedDetector.h"
 
-namespace MM {
+namespace Got {
 
-enum {
-	GType_MightAndMagic1,
-	GType_MightAndMagic2,
-	GType_Clouds,
-	GType_DarkSide,
-	GType_WorldOfXeen,
-	GType_Swords
+enum KeybindingAction {
+	KEYBIND_NONE,
+	KEYBIND_UP,
+	KEYBIND_DOWN,
+	KEYBIND_LEFT,
+	KEYBIND_RIGHT,
+	KEYBIND_SELECT,
+	KEYBIND_FIRE,
+	KEYBIND_MAGIC,
+	KEYBIND_ESCAPE,
+	KEYBIND_THOR_DIES
 };
 
-enum GameFeature {
-	GF_NONE = 0,
-	GF_ENHANCED = 1,
-	GF_GFX_PACK = 2
+} // namespace Got
+
+class GotMetaEngine : public AdvancedMetaEngine<ADGameDescription> {
+public:
+	const char *getName() const override;
+
+	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
+
+	/**
+     * Determine whether the engine supports the specified MetaEngine feature.
+     *
+     * Used by e.g. the launcher to determine whether to enable the Load button.
+     */
+	bool hasFeature(MetaEngineFeature f) const override;
+
+	const ADExtraGuiOptionsMap *getAdvancedExtraGuiOptions() const override;
+
+	Common::Array<Common::Keymap *> initKeymaps(const char *target) const override;
 };
 
-struct MightAndMagicGameDescription {
-	AD_GAME_DESCRIPTION_HELPERS(desc);
-
-	ADGameDescription desc;
-
-	int gameID;
-	uint32 features;
-};
-
-#define GAMEOPTION_SHOW_ITEM_COSTS	GUIO_GAMEOPTIONS1
-#define GAMEOPTION_DURABLE_ARMOR	GUIO_GAMEOPTIONS2
-#define GAMEOPTION_SHOW_HP_SP_BARS	GUIO_GAMEOPTIONS3
-#define GAMEOPTION_COPY_PROTECTION      GUIO_GAMEOPTIONS4
-#define GAMEOPTION_TTS				GUIO_GAMEOPTIONS5
-
-} // namespace MM
-
-#endif // MM_DETECTION_H
+#endif // GOT_METAENGINE_H
