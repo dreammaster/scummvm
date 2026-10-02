@@ -19,28 +19,37 @@
  *
  */
 
-#ifndef XYZZY_VIEW1_H
-#define XYZZY_VIEW1_H
+#ifndef GRAPHICS_VIEWS_RECT_H
+#define GRAPHICS_VIEWS_RECT_H
 
-#include "graphics/views/view.h"
+#include "common/rect.h"
 
-namespace Xyzzy {
+namespace Graphics {
+namespace Views {
 
-class View1 : public Graphics::Views::View {
-private:
-	byte _pal[256 * 3] = { 0 };
-	int _offset = 0;
-
+/**
+ * Simple derived point class that converts text coordinates to graphic screen coordinates
+ */
+class TextPoint : public Common::Point {
 public:
-	View1() : View("View1") {}
-	virtual ~View1() {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-	void draw() override;
-	bool tick() override;
+	TextPoint() : Common::Point() {
+	}
+	TextPoint(int16 x1, int16 y1) : Common::Point(x1 * 8, y1 * 8) {
+	}
 };
 
-} // namespace Xyzzy
+/**
+ * Simple derived rect class that converts text coordinates to graphic screen coordinates
+ */
+class TextRect : public Common::Rect {
+public:
+	TextRect() : Common::Rect() {
+	}
+	TextRect(int16 x1, int16 y1, int16 x2, int16 y2) : Common::Rect(x1 * 8, y1 * 8, (x2 + 1) * 8, (y2 + 1) * 8) {
+	}
+};
+
+} // namespace Views
+} // namespace Graphics
 
 #endif
