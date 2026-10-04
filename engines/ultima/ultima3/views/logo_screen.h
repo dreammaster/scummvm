@@ -19,38 +19,43 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_H
-#define ULTIMA3_VIEWS_H
+#ifndef ULTIMA3_VIEWS_LOGO_SCREEN_H
+#define ULTIMA3_VIEWS_LOGO_SCREEN_H
 
-#include "ultima/shared/engine/events.h"
-#include "ultima/ultima3/views/character_details.h"
-#include "ultima/ultima3/views/create_character.h"
-#include "ultima/ultima3/views/disperse_party.h"
-#include "ultima/ultima3/views/form_party.h"
-#include "ultima/ultima3/views/journey_onward.h"
-#include "ultima/ultima3/views/logo_screen.h"
-#include "ultima/ultima3/views/main_menu.h"
-#include "ultima/ultima3/views/party_menu.h"
-#include "ultima/ultima3/views/register.h"
-#include "ultima/ultima3/views/terminate_character.h"
-#include "ultima/ultima3/views/title.h"
+#include "ultima/ultima3/views/window_view.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-struct Views {
-	CharacterDetails _characterDetails;
-	CreateCharacter _createCharacter;
-	DisperseParty _disperseParty;
-	FormParty _formParty;
-	JourneyOnward _journeyOnward;
-	LogoScreen _logoScreen;
-	MainMenu _mainMenu;
-	PartyMenu _partyMenu;
-	Register _register;
-	TerminateCharacter _terminateCharacter;
-	Title _title;
+constexpr int DEMO_COLS = 19;
+constexpr int DEMO_ROWS = 6;
+constexpr int MOVES_COUNT = 0x200;
+
+/**
+ * The attract-mode screen shown below the title art: a small animated view
+ * of the world, whose tiles are changed over time by a recorded script of
+ * edits. Any key opens the main menu.
+ */
+class LogoScreen : public WindowView {
+private:
+	byte _demo[DEMO_COLS * DEMO_ROWS] = {};
+	// The first half holds the tile each edit changes, and the second its new
+	// value. An edit with a tile of 0xFF is a pause of that many rounds
+	byte _moves[MOVES_COUNT * 2] = {};
+	int _movePos = MOVES_COUNT - 1;
+	int _roundsLeft = 0;
+
+	void fetchMove();
+
+public:
+	LogoScreen() : WindowView("LogoScreen") {}
+	~LogoScreen() override {}
+
+	bool msgFocus(const FocusMessage &msg) override;
+	void draw() override;
+	void timeout() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views
