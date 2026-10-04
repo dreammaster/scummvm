@@ -19,36 +19,31 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
-
-#include "ultima/ultima3/views/menu_input.h"
-#include "ultima/ultima3/views/window_view.h"
+#include "ultima/ultima3/views/journey_onward.h"
+#include "ultima/ultima3/ultima3.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-/**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
- */
-class MainMenu : public WindowView {
-private:
-	MenuChoice _choice;
+void JourneyOnward::draw() {
+	auto s = getSurface();
+	clearWindow(s);
 
-public:
-	MainMenu();
-	~MainMenu() override {}
+	if (_G(savegame)._partySize == 0)
+		s.writeString(Common::Point(15, 21), "(No Party)");
+	else
+		s.writeString(Common::Point(9, 21), "(No Active Players)");
 
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-};
+	drawSpacePrompt(s);
+}
+
+bool JourneyOnward::msgKeypress(const KeypressMessage &msg) {
+	if (isSpaceKey(msg))
+		close();
+	return true;
+}
 
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif

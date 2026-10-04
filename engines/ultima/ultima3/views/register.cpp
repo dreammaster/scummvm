@@ -19,36 +19,49 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
-
-#include "ultima/ultima3/views/menu_input.h"
-#include "ultima/ultima3/views/window_view.h"
+#include "ultima/ultima3/views/register.h"
+#include "ultima/ultima3/ultima3.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-/**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
- */
-class MainMenu : public WindowView {
-private:
-	MenuChoice _choice;
+void Register::draw() {
+	auto s = getSurface();
+	clearWindow(s);
 
-public:
-	MainMenu();
-	~MainMenu() override {}
+	s.writeString(Common::Point(16, 11), "Register");
 
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-};
+	for (int number = 1; number <= Data::ROSTER_COUNT; ++number) {
+		// The first ten fill the left column and the rest the right
+		int col = number <= 10 ? 1 : 20;
+		int row = number <= 10 ? number + 12 : number + 2;
+		const Data::RosterEntry &entry = _G(savegame).entry(number);
+
+		Common::String line = Common::String::format("%02d", number);
+		if (!entry.isEmpty()) {
+			line += entry.isInParty() ? '*' : '-';
+			line += ' ';
+			line += (char)entry._sex;
+			line += (char)entry._race;
+			line += (char)entry._class;
+			line += (char)entry._status;
+			line += ' ';
+			line += entry._name;
+		}
+
+		s.writeString(Common::Point(col, row), line);
+	}
+
+	drawSpacePrompt(s);
+}
+
+bool Register::msgKeypress(const KeypressMessage &msg) {
+	if (isSpaceKey(msg))
+		close();
+	return true;
+}
 
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif

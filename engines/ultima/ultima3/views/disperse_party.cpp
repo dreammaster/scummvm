@@ -19,36 +19,42 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
-
-#include "ultima/ultima3/views/menu_input.h"
-#include "ultima/ultima3/views/window_view.h"
+#include "ultima/ultima3/views/disperse_party.h"
+#include "ultima/ultima3/ultima3.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-/**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
- */
-class MainMenu : public WindowView {
-private:
-	MenuChoice _choice;
+bool DisperseParty::msgFocus(const FocusMessage &msg) {
+	Data::Savegame &save = _G(savegame);
 
-public:
-	MainMenu();
-	~MainMenu() override {}
+	_hadParty = save._partySize != 0;
+	save.clearPartySelection();
 
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-};
+	return View::msgFocus(msg);
+}
+
+void DisperseParty::draw() {
+	auto s = getSurface();
+	clearWindow(s);
+
+	s.writeString(Common::Point(11, 17), "Disperse the Party");
+
+	if (_hadParty)
+		s.writeString(Common::Point(14, 19), "(Dispersed!)");
+	else
+		s.writeString(Common::Point(15, 20), "(No Party)");
+
+	drawSpacePrompt(s);
+}
+
+bool DisperseParty::msgKeypress(const KeypressMessage &msg) {
+	if (isSpaceKey(msg))
+		close();
+	return true;
+}
 
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif

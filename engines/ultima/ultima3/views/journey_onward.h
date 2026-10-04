@@ -19,10 +19,9 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
+#ifndef ULTIMA3_VIEWS_JOURNEY_ONWARD_H
+#define ULTIMA3_VIEWS_JOURNEY_ONWARD_H
 
-#include "ultima/ultima3/views/menu_input.h"
 #include "ultima/ultima3/views/window_view.h"
 
 namespace Ultima {
@@ -30,19 +29,14 @@ namespace Ultima3 {
 namespace Views {
 
 /**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
+ * Explains why the party can't set out yet: there isn't one, or none of its
+ * members are fit to travel
  */
-class MainMenu : public WindowView {
-private:
-	MenuChoice _choice;
-
+class JourneyOnward : public WindowView {
 public:
-	MainMenu();
-	~MainMenu() override {}
+	JourneyOnward() : WindowView("JourneyOnward") {}
+	~JourneyOnward() override {}
 
-	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 };

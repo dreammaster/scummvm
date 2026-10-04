@@ -19,10 +19,9 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
+#ifndef ULTIMA3_VIEWS_DISPERSE_PARTY_H
+#define ULTIMA3_VIEWS_DISPERSE_PARTY_H
 
-#include "ultima/ultima3/views/menu_input.h"
 #include "ultima/ultima3/views/window_view.h"
 
 namespace Ultima {
@@ -30,17 +29,16 @@ namespace Ultima3 {
 namespace Views {
 
 /**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
+ * Breaks up the party as soon as it's shown, returning its members to the
+ * roster
  */
-class MainMenu : public WindowView {
+class DisperseParty : public WindowView {
 private:
-	MenuChoice _choice;
+	bool _hadParty = false;
 
 public:
-	MainMenu();
-	~MainMenu() override {}
+	DisperseParty() : WindowView("DisperseParty") {}
+	~DisperseParty() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;

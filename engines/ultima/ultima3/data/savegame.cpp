@@ -19,36 +19,46 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
-
-#include "ultima/ultima3/views/menu_input.h"
-#include "ultima/ultima3/views/window_view.h"
+#include "ultima/ultima3/data/savegame.h"
 
 namespace Ultima {
 namespace Ultima3 {
-namespace Views {
+namespace Data {
 
-/**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
- */
-class MainMenu : public WindowView {
-private:
-	MenuChoice _choice;
+constexpr byte TRANSPORT_ON_FOOT = 0x3F;
+constexpr byte LOCATION_SOSARIA = 0;
+constexpr byte START_X = 44;
+constexpr byte START_Y = 20;
 
-public:
-	MainMenu();
-	~MainMenu() override {}
+bool Savegame::hasLivingPartyMember() {
+	for (int i = 0; i < _partySize; ++i) {
+		if (partyMember(i).isAlive())
+			return true;
+	}
 
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgKeypress(const KeypressMessage &msg) override;
-};
+	return false;
+}
 
-} // namespace Views
+void Savegame::addToParty(int number) {
+	entry(number)._partyMember = IN_PARTY;
+	_partyEntries[_partySize++] = number;
+}
+
+void Savegame::clearPartySelection() {
+	while (_partySize > 0) {
+		--_partySize;
+		partyMember(_partySize)._partyMember = 0;
+		_partyEntries[_partySize] = 0;
+	}
+}
+
+void Savegame::formParty() {
+	_transport = TRANSPORT_ON_FOOT;
+	_location = LOCATION_SOSARIA;
+	_posX = START_X;
+	_posY = START_Y;
+}
+
+} // namespace Data
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif

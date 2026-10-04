@@ -19,9 +19,10 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
+#ifndef ULTIMA3_VIEWS_FORM_PARTY_H
+#define ULTIMA3_VIEWS_FORM_PARTY_H
 
+#include "ultima/ultima3/data/roster.h"
 #include "ultima/ultima3/views/menu_input.h"
 #include "ultima/ultima3/views/window_view.h"
 
@@ -30,17 +31,29 @@ namespace Ultima3 {
 namespace Views {
 
 /**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
+ * Selects up to four roster characters to form the party. Entering 0 ends
+ * the selection early
  */
-class MainMenu : public WindowView {
+class FormParty : public WindowView {
 private:
-	MenuChoice _choice;
+	enum State {
+		ENTRY,
+		MESSAGE
+	};
+
+	State _state = ENTRY;
+	NumberInput _numbers[Data::PARTY_MAX];
+	bool _showSelection = true;
+	const char *_message = nullptr;
+	int _messageCol = 0, _messageRow = 0;
+
+	void showMessage(const char *message, int col, int row);
+	void fail(const char *message);
+	void finish();
 
 public:
-	MainMenu();
-	~MainMenu() override {}
+	FormParty();
+	~FormParty() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;

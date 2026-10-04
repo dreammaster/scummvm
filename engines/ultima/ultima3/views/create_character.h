@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
+#ifndef ULTIMA3_VIEWS_CREATE_CHARACTER_H
+#define ULTIMA3_VIEWS_CREATE_CHARACTER_H
 
 #include "ultima/ultima3/views/menu_input.h"
 #include "ultima/ultima3/views/window_view.h"
@@ -30,17 +30,42 @@ namespace Ultima3 {
 namespace Views {
 
 /**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
+ * Creates a character in an empty roster slot: name, sex, race and class,
+ * then four attributes drawn from a pool of 50 points
  */
-class MainMenu : public WindowView {
+class CreateCharacter : public WindowView {
 private:
-	MenuChoice _choice;
+	enum State {
+		ENTRY,
+		MESSAGE,
+		NAME,
+		SEX,
+		RACE,
+		CLASS,
+		ATTRIBUTE,
+		CONFIRM,
+		FINISHED
+	};
+
+	State _state = ENTRY;
+	NumberInput _entry;
+	LineInput _name;
+	MenuChoice _sex, _race, _class, _confirm;
+	NumberInput _attributes[4];
+	int _attribute = 0;
+	int _values[4] = {};
+	int _points = 0;
+	int _number = 0;
+	bool _showForm = false;
+	const char *_message = nullptr;
+
+	void drawForm(GfxSurface &s);
+	bool acceptAttribute(int value);
+	void createCharacter();
 
 public:
-	MainMenu();
-	~MainMenu() override {}
+	CreateCharacter();
+	~CreateCharacter() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;

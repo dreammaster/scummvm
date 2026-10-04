@@ -19,32 +19,47 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
+#ifndef ULTIMA3_VIEWS_WINDOW_VIEW_H
+#define ULTIMA3_VIEWS_WINDOW_VIEW_H
 
-#include "ultima/ultima3/views/menu_input.h"
-#include "ultima/ultima3/views/window_view.h"
+#include "graphics/views/view.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
+using namespace Graphics::Views;
+
 /**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
+ * Base for the party management screens, which are all drawn inside the
+ * bordered window at the bottom of the display, over whatever the title
+ * screen left above it
  */
-class MainMenu : public WindowView {
-private:
-	MenuChoice _choice;
+class WindowView : public View {
+protected:
+	/**
+	 * Blanks the inside of the window
+	 */
+	static void clearWindow(GfxSurface &s);
+
+	/**
+	 * Draws the magenta window border
+	 */
+	static void drawBorder(GfxSurface &s);
+
+	/**
+	 * Draws the "Press <Space>" label on the bottom border
+	 */
+	static void drawSpacePrompt(GfxSurface &s);
+
+	/**
+	 * Returns true if the keypress is the space bar
+	 */
+	static bool isSpaceKey(const KeypressMessage &msg);
 
 public:
-	MainMenu();
-	~MainMenu() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
-	void draw() override;
-	bool msgKeypress(const KeypressMessage &msg) override;
+	WindowView(const Common::String &name) : View(name) {}
+	~WindowView() override {}
 };
 
 } // namespace Views

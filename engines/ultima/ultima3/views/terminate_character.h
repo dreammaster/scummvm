@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_MAIN_MENU_H
-#define ULTIMA3_VIEWS_MAIN_MENU_H
+#ifndef ULTIMA3_VIEWS_TERMINATE_CHARACTER_H
+#define ULTIMA3_VIEWS_TERMINATE_CHARACTER_H
 
 #include "ultima/ultima3/views/menu_input.h"
 #include "ultima/ultima3/views/window_view.h"
@@ -30,17 +30,19 @@ namespace Ultima3 {
 namespace Views {
 
 /**
- * The main menu: Return to the View / Organize a Party / Journey Onward.
- * Like the original, it is drawn over whatever the title screen left on the
- * display. Choosing Return is wired up once the world engine lands.
+ * Permanently removes a character from the roster, unless they're in a party
  */
-class MainMenu : public WindowView {
+class TerminateCharacter : public WindowView {
 private:
-	MenuChoice _choice;
+	NumberInput _entry;
+	const char *_message = nullptr;
+	int _messageCol = 0, _messageRow = 0;
+
+	void showMessage(const char *message, int col, int row);
 
 public:
-	MainMenu();
-	~MainMenu() override {}
+	TerminateCharacter();
+	~TerminateCharacter() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
