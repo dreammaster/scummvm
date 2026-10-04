@@ -19,63 +19,64 @@
  *
  */
 
-#ifndef ULTIMA3_DATA_SAVEGAME_H
-#define ULTIMA3_DATA_SAVEGAME_H
+#ifndef ULTIMA3_LOGIC_LOGIC_H
+#define ULTIMA3_LOGIC_LOGIC_H
 
 #include "ultima/ultima3/data/roster.h"
 
 namespace Ultima {
 namespace Ultima3 {
-namespace Data {
 
-/**
- * The persistent game state: the roster of up to 20 characters, and which
- * of them (by 1-based roster number) make up the active party.
- * Party members are referenced in place rather than copied.
- */
-struct Savegame {
-	RosterEntry _roster[ROSTER_COUNT];
-	byte _partyEntries[PARTY_MAX] = {};
-	int _partySize = 0;
-	byte _transport = 0;
-	byte _location = 0;
-	byte _posX = 0;
-	byte _posY = 0;
-	byte _moveCount[4] = {};
-
-	/**
-	 * Returns a roster entry by its 1-based number
-	 */
-	RosterEntry &entry(int number) {
-		return _roster[number - 1];
-	}
-
-	RosterEntry &partyMember(int slot) {
-		return entry(_partyEntries[slot]);
-	}
-
-	/**
-	 * Returns true if any party member is in a condition to adventure
-	 */
-	bool hasLivingPartyMember();
-
-	/**
-	 * Adds a roster entry to the party being selected
-	 */
-	void addToParty(int number);
-
-	/**
-	 * Undoes a partially selected party
-	 */
-	void clearPartySelection();
-
-	/**
-	 * Completes a selected party, placing it at the starting point on foot
-	 */
-	void formParty();
+// The numbering is shared with the wind direction
+enum Direction {
+	DIR_NONE = 0,
+	DIR_NORTH = 1,
+	DIR_EAST = 2,
+	DIR_SOUTH = 3,
+	DIR_WEST = 4
 };
 
-} // namespace Data
+/**
+ * Game rules common to every location: the turn counter, and the upkeep
+ * of the party each turn
+ */
+class Logic {
+private:
+	int _healCounter = 9;
+	int _upkeepCounter = 4;
+
+	/**
+	 * Gives a character a magic point
+	 */
+	void regenerateMagicPoint(Data::RosterEntry &e);
+
+	/**
+	 * Uses up some of a character's food, starving them once it runs out
+	 */
+	void applyHunger(int slot);
+
+public:
+	virtual ~Logic() {}
+
+	/**
+	 * Counts a turn taken by the party
+	 */
+	void incrementMoveCounter();
+
+	/**
+	 * Applies the effects of a turn passing on the party: magic point
+	 * regeneration, hunger, poison and natural healing. Outside the
+	 * overworld this only happens on every fourth turn
+	 */
+	void processPartyTurnEffects(bool everyTurn);
+
+	/**
+	 * Reduces the hit points of a party member, killing them if they run
+	 * out. Returns true if they were killed
+	 */
+	bool damageCharacter(int slot, int amount);
+};
+
 } // namespace Ultima3
 } // namespace Ultima
 
