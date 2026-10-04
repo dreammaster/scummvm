@@ -19,33 +19,24 @@
  *
  */
 
-#ifndef ULTIMA_SHARED_ENGINE_VIEW_H
-#define ULTIMA_SHARED_ENGINE_VIEW_H
-
-#include "graphics/views/view.h"
-#include "ultima/shared/engine/events.h"
+#include "ultima/shared/engine/view.h"
+#include "engines/engine.h"
 
 namespace Ultima {
 namespace Shared {
 
-/**
- * Base class for the Ultima engines' views. Adds handling of
- * the Ultima-specific messages on top of the common View
- */
-class View : public Graphics::Views::View {
-	ULTIMA_CUSTOM_MESSAGES(Graphics::Views::View)
-public:
-	View(const Common::String &name, Graphics::Views::UIElement *uiParent) : Graphics::Views::View(name, uiParent) {
+bool View::msgKeypress(const Graphics::Views::KeypressMessage &msg) {
+	switch (msg.keycode) {
+	case Common::KEYCODE_F5:
+		g_engine->saveGameDialog();
+		return true;
+	case Common::KEYCODE_F7:
+		g_engine->loadGameDialog();
+		return true;
+	default:
+		return Graphics::Views::View::msgKeypress(msg);
 	}
-	View(const Common::String &name) : Graphics::Views::View(name) {
-	}
-	~View() override {
-	}
-
-	bool msgKeypress(const Graphics::Views::KeypressMessage &msg) override;
-};
+}
 
 } // namespace Shared
 } // namespace Ultima
-
-#endif
