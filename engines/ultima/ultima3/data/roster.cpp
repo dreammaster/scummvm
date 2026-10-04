@@ -19,55 +19,41 @@
  *
  */
 
-#ifndef ULTIMA3_DATA_MAP_H
-#define ULTIMA3_DATA_MAP_H
-
-#include "common/scummsys.h"
-#include "common/serializer.h"
+#include "ultima/ultima3/data/roster.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Data {
 
-constexpr int MAP_SIZE = 64;
-
-/**
- * A 64x64 location map, as used by the overworld, towns and castles. Each
- * cell holds a tile number multiplied by 4
- */
-class Map {
-private:
-	byte _cells[MAP_SIZE * MAP_SIZE] = {};
-
-public:
-	/**
-	 * Loads a map from the start of a .ULT file
-	 */
-	void load(const char *filename);
-
-	void synchronize(Common::Serializer &s);
-
-	/**
-	 * Returns the raw cell value. The coordinates wrap around the map
-	 */
-	byte cell(int x, int y) const {
-		return _cells[(y & (MAP_SIZE - 1)) * MAP_SIZE + (x & (MAP_SIZE - 1))];
-	}
-
-	void setCell(int x, int y, byte value) {
-		_cells[(y & (MAP_SIZE - 1)) * MAP_SIZE + (x & (MAP_SIZE - 1))] = value;
-	}
-
-	/**
-	 * Returns the number of the tile graphic in a cell
-	 */
-	byte tile(int x, int y) const {
-		return cell(x, y) >> 2;
-	}
-};
+void RosterEntry::synchronize(Common::Serializer &s) {
+	s.syncBytes((byte *)_name, sizeof(_name));
+	s.syncAsByte(_marksAndCards);
+	s.syncAsByte(_torches);
+	s.syncAsByte(_partyMember);
+	s.syncAsByte(_status);
+	s.syncAsByte(_strength);
+	s.syncAsByte(_dexterity);
+	s.syncAsByte(_intelligence);
+	s.syncAsByte(_wisdom);
+	s.syncAsByte(_race);
+	s.syncAsByte(_class);
+	s.syncAsByte(_sex);
+	s.syncAsByte(_magicPoints);
+	s.syncAsUint16LE(_hitPoints);
+	s.syncAsUint16LE(_maxHitPoints);
+	s.syncAsUint16LE(_experience);
+	s.syncAsByte(_foodSubCounter);
+	s.syncAsUint16LE(_food);
+	s.syncAsUint16LE(_gold);
+	s.syncAsByte(_gems);
+	s.syncAsByte(_keys);
+	s.syncAsByte(_powder);
+	s.syncAsByte(_armourIndex);
+	s.syncBytes(_armourOwned, sizeof(_armourOwned));
+	s.syncAsByte(_weaponIndex);
+	s.syncBytes(_weaponOwned, sizeof(_weaponOwned));
+}
 
 } // namespace Data
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif
