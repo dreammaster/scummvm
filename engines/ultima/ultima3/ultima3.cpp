@@ -27,6 +27,7 @@
 #include "ultima/ultima3/console.h"
 #include "ultima/ultima3/data/data.h"
 #include "ultima/ultima3/views/views.h"
+#include "ultima/ultima3/gfx/charset.h"
 
 namespace Ultima {
 namespace Ultima3 {
@@ -55,6 +56,7 @@ Common::Error Ultima3Engine::run() {
 	// Initialize 320x200 graphics mode
 	initGraphics(320, 200);
 	Data::setCGAPalette();
+	Gfx::CharSet::load();
 	_pcSpeakerReady = _pcSpeaker->init();
 
 	// Set the engine's debugger console
@@ -97,6 +99,11 @@ void Ultima3Engine::queueSilence(uint32 lengthMs) {
 	_pcSpeaker->playQueue(Audio::PCSpeaker::kWaveFormSilence, 0.0f, lengthMs * 1000);
 }
 
+void Ultima3Engine::playErrorBeep() {
+	// ~371Hz for ~65ms, from the original's raw 48-toggle loop at 4.77MHz
+	queueTone(3216, 65);
+}
+
 bool Ultima3Engine::savegamesExist() const {
 	Common::String slotName = getSaveStateName(1);
 	Common::InSaveFile *saveFile = g_system->getSavefileManager()->openForLoading(slotName);
@@ -104,6 +111,10 @@ bool Ultima3Engine::savegamesExist() const {
 
 	delete saveFile;
 	return result;
+}
+
+Graphics::Font *Ultima3Engine::createFont() const {
+	return new Gfx::CharSet();
 }
 
 } // namespace Ultima3
