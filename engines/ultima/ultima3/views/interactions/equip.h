@@ -19,51 +19,50 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_OVERWORLD_MAP_H
-#define ULTIMA3_VIEWS_OVERWORLD_MAP_H
+#ifndef ULTIMA3_VIEWS_INTERACTIONS_EQUIP_H
+#define ULTIMA3_VIEWS_INTERACTIONS_EQUIP_H
 
-#include "ultima/ultima3/logic/overworld_logic.h"
-#include "ultima/ultima3/views/game.h"
+#include "ultima/ultima3/views/interactions/interaction.h"
+#include "ultima/ultima3/views/menu_input.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
-
-constexpr int VIEWPORT_TILES = 11;
+namespace Interactions {
 
 /**
- * The world map, seen as an 11x11 area of tiles centred on the party.
- * Forests and mountains hide whatever is behind them
+ * Has a party member take up a weapon, or put on a set of armour
  */
-class OverworldMap : public Game {
+class Equip : public Interaction {
 private:
-	OverworldLogic _logic;
+	bool _weapons;
+	PlayerChooser _chooser;
+	bool _choosing = true;
+	MenuChoice _menu;
+	char _keys[20];
+	const char *_words[19];
 
 	/**
-	 * Fills in the tile numbers for the viewport, with the party's transport
-	 * in the middle and hidden tiles blanked out
+	 * Sets up the menu of what can be picked once a party member is chosen
 	 */
-	void buildViewport(byte *tiles) const;
+	void startMenu();
 
-	void doMove(Direction dir, const char *label);
-	void doPass();
-	void doInvalid();
-	void doBoard();
-	void doExitVehicle();
-
-protected:
-	void drawViewport(GfxSurface &s) override;
-	void idleTimeout() override;
-	void endTurn() override;
-	bool handleCommand(const KeypressMessage &msg) override;
+	/**
+	 * Makes the item picked in the menu the one in use, if allowed
+	 */
+	void equip(char letter);
 
 public:
-	OverworldMap() : Game("OverworldMap") {}
-	~OverworldMap() override {}
+	/**
+	 * Constructor
+	 * @param weapons	True for weapons, false for armour
+	 */
+	Equip(bool weapons) : _weapons(weapons) {}
 
-	bool msgFocus(const FocusMessage &msg) override;
+	bool keypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima

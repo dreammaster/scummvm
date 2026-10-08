@@ -19,47 +19,34 @@
  *
  */
 
-#ifndef ULTIMA3_GFX_SCREEN_EFFECTS_H
-#define ULTIMA3_GFX_SCREEN_EFFECTS_H
+#include "ultima/ultima3/views/interactions/exchange.h"
+#include "ultima/ultima3/ultima3.h"
 
 namespace Ultima {
 namespace Ultima3 {
-namespace Gfx {
+namespace Views {
+namespace Interactions {
 
-constexpr int FLASH_FRAMES = 3;
+bool Exchange::keypress(const KeypressMessage &msg) {
+	PlayerChooser::Result result = _chooser.handleKey(msg);
+	if (result == PlayerChooser::PENDING)
+		return false;
+	if (result == PlayerChooser::CANCELLED)
+		return true;
 
-/**
- * Brief colour inversions of part of the game screen, used to show a party
- * member being hurt or the whole view being struck
- */
-struct ScreenEffects {
-	int _slot = -1;
-	bool _viewport = false;
-
-	// A party member's number kept inverted while their details are shown
-	int _highlight = -1;
-	int _frames = 0;
-
-	void flashSlot(int slot) {
-		_slot = slot;
-		_frames = FLASH_FRAMES;
+	if (_first < 0) {
+		_first = _chooser.slot();
+		_G(messages).print("Player: ");
+		return false;
 	}
 
-	void flashViewport() {
-		_viewport = true;
-		_frames = FLASH_FRAMES;
-	}
+	Data::Savegame &save = _G(savegame);
+	SWAP(save._partyEntries[_first], save._partyEntries[_chooser.slot()]);
+	_G(messages).print("Exchanged!\n");
+	return true;
+}
 
-	void tick() {
-		if (_frames > 0 && --_frames == 0) {
-			_slot = -1;
-			_viewport = false;
-		}
-	}
-};
-
-} // namespace Gfx
+} // namespace Interactions
+} // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif

@@ -19,51 +19,28 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_OVERWORLD_MAP_H
-#define ULTIMA3_VIEWS_OVERWORLD_MAP_H
+#ifndef ULTIMA3_VIEWS_INTERACTIONS_LOOK_H
+#define ULTIMA3_VIEWS_INTERACTIONS_LOOK_H
 
-#include "ultima/ultima3/logic/overworld_logic.h"
-#include "ultima/ultima3/views/game.h"
+#include "ultima/ultima3/views/interactions/interaction.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
-
-constexpr int VIEWPORT_TILES = 11;
+namespace Interactions {
 
 /**
- * The world map, seen as an 11x11 area of tiles centred on the party.
- * Forests and mountains hide whatever is behind them
+ * Names what lies on the map next to the party in a chosen direction
  */
-class OverworldMap : public Game {
+class Look : public Interaction {
 private:
-	OverworldLogic _logic;
-
-	/**
-	 * Fills in the tile numbers for the viewport, with the party's transport
-	 * in the middle and hidden tiles blanked out
-	 */
-	void buildViewport(byte *tiles) const;
-
-	void doMove(Direction dir, const char *label);
-	void doPass();
-	void doInvalid();
-	void doBoard();
-	void doExitVehicle();
-
-protected:
-	void drawViewport(GfxSurface &s) override;
-	void idleTimeout() override;
-	void endTurn() override;
-	bool handleCommand(const KeypressMessage &msg) override;
+	DirectionChooser _chooser;
 
 public:
-	OverworldMap() : Game("OverworldMap") {}
-	~OverworldMap() override {}
-
-	bool msgFocus(const FocusMessage &msg) override;
+	bool keypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima

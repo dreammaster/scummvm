@@ -19,51 +19,43 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_OVERWORLD_MAP_H
-#define ULTIMA3_VIEWS_OVERWORLD_MAP_H
+#ifndef ULTIMA3_VIEWS_INTERACTIONS_ZTATS_H
+#define ULTIMA3_VIEWS_INTERACTIONS_ZTATS_H
 
-#include "ultima/ultima3/logic/overworld_logic.h"
-#include "ultima/ultima3/views/game.h"
+#include "common/array.h"
+#include "ultima/ultima3/views/interactions/interaction.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
-
-constexpr int VIEWPORT_TILES = 11;
+namespace Interactions {
 
 /**
- * The world map, seen as an 11x11 area of tiles centred on the party.
- * Forests and mountains hide whatever is behind them
+ * Shows a party member's attributes and belongings in the message window a
+ * few lines at a time, moving on at each key press
  */
-class OverworldMap : public Game {
+class Ztats : public Interaction {
 private:
-	OverworldLogic _logic;
+	PlayerChooser _chooser;
+	bool _showing = false;
+	Common::Array<Common::String> _pages;
+	Common::String _tail;
+	uint _page = 0;
 
 	/**
-	 * Fills in the tile numbers for the viewport, with the party's transport
-	 * in the middle and hidden tiles blanked out
+	 * Works out the text to be shown for a party member
 	 */
-	void buildViewport(byte *tiles) const;
+	void buildPages(const Data::RosterEntry &e);
 
-	void doMove(Direction dir, const char *label);
-	void doPass();
-	void doInvalid();
-	void doBoard();
-	void doExitVehicle();
-
-protected:
-	void drawViewport(GfxSurface &s) override;
-	void idleTimeout() override;
-	void endTurn() override;
-	bool handleCommand(const KeypressMessage &msg) override;
+	void finish();
 
 public:
-	OverworldMap() : Game("OverworldMap") {}
-	~OverworldMap() override {}
+	~Ztats() override;
 
-	bool msgFocus(const FocusMessage &msg) override;
+	bool keypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Interactions
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
