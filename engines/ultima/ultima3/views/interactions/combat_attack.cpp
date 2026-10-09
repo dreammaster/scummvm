@@ -19,55 +19,26 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_INTERACTIONS_ZTATS_H
-#define ULTIMA3_VIEWS_INTERACTIONS_ZTATS_H
-
-#include "common/array.h"
-#include "ultima/ultima3/views/interactions/interaction.h"
+#include "ultima/ultima3/views/interactions/combat_attack.h"
+#include "ultima/ultima3/ultima3.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 namespace Interactions {
 
-/**
- * Shows a party member's attributes and belongings in the message window a
- * few lines at a time, moving on at each key press
- */
-class Ztats : public Interaction {
-private:
-	PlayerChooser _chooser;
-	bool _showing = false;
-	Common::Array<Common::String> _pages;
-	Common::String _tail;
-	uint _page = 0;
+bool CombatAttack::keypress(const KeypressMessage &msg) {
+	DirectionChooser::Result result = _chooser.handleKey(msg);
+	if (result == DirectionChooser::PENDING)
+		return false;
 
-	/**
-	 * Works out the text to be shown for a party member
-	 */
-	void buildPages(const Data::RosterEntry &e);
+	if (result == DirectionChooser::CHOSEN)
+		_G(combat).playerAttack(_slot, _chooser.direction());
 
-	void finish();
-
-	/**
-	 * Starts showing a party member's details
-	 */
-	void begin(int slot);
-
-public:
-	/**
-	 * Constructor
-	 * @param slot		The party member, or -1 to ask who
-	 */
-	Ztats(int slot = -1);
-	~Ztats() override;
-
-	bool keypress(const KeypressMessage &msg) override;
-};
+	return true;
+}
 
 } // namespace Interactions
 } // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif

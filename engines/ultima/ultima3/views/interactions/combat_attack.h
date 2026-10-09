@@ -19,10 +19,9 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_INTERACTIONS_ZTATS_H
-#define ULTIMA3_VIEWS_INTERACTIONS_ZTATS_H
+#ifndef ULTIMA3_VIEWS_INTERACTIONS_COMBAT_ATTACK_H
+#define ULTIMA3_VIEWS_INTERACTIONS_COMBAT_ATTACK_H
 
-#include "common/array.h"
 #include "ultima/ultima3/views/interactions/interaction.h"
 
 namespace Ultima {
@@ -31,36 +30,15 @@ namespace Views {
 namespace Interactions {
 
 /**
- * Shows a party member's attributes and belongings in the message window a
- * few lines at a time, moving on at each key press
+ * Asks which way a party member in a fight is to attack
  */
-class Ztats : public Interaction {
+class CombatAttack : public Interaction {
 private:
-	PlayerChooser _chooser;
-	bool _showing = false;
-	Common::Array<Common::String> _pages;
-	Common::String _tail;
-	uint _page = 0;
-
-	/**
-	 * Works out the text to be shown for a party member
-	 */
-	void buildPages(const Data::RosterEntry &e);
-
-	void finish();
-
-	/**
-	 * Starts showing a party member's details
-	 */
-	void begin(int slot);
+	DirectionChooser _chooser;
+	int _slot;
 
 public:
-	/**
-	 * Constructor
-	 * @param slot		The party member, or -1 to ask who
-	 */
-	Ztats(int slot = -1);
-	~Ztats() override;
+	CombatAttack(int slot) : _slot(slot) {}
 
 	bool keypress(const KeypressMessage &msg) override;
 };

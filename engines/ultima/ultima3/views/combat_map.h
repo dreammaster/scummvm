@@ -19,72 +19,71 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_LOCATION_MAP_H
-#define ULTIMA3_VIEWS_LOCATION_MAP_H
+#ifndef ULTIMA3_VIEWS_COMBAT_MAP_H
+#define ULTIMA3_VIEWS_COMBAT_MAP_H
 
-#include "ultima/ultima3/logic/creature_logic.h"
-#include "ultima/ultima3/logic/location_logic.h"
 #include "ultima/ultima3/views/game.h"
 
 namespace Ultima {
 namespace Ultima3 {
 namespace Views {
 
-constexpr int VIEWPORT_TILES = 11;
-
 /**
- * The world map, seen as an 11x11 area of tiles centred on the party.
- * Forests and mountains hide whatever is behind them
+ * A fight on a small arena. The party members each take a turn in order,
+ * followed by the monsters, until one side is beaten
  */
-class LocationMap : public Game {
+class CombatMap : public Game {
 private:
-	LocationLogic _logic;
-	CreatureLogic _creatures;
+	// What happens once the events from a command have been played
+	enum Next {
+		NOTHING,
+		NEXT_PLAYER,
+		NEXT_ROUND
+	};
 
-	// Set while a step is being taken, as opposed to some other command
-	bool _moved = false;
+	bool _started = false;
+	Next _next = NOTHING;
 
-	// Set when a fight has just begun, and when one has finished and the
-	// turn it interrupted needs completing
-	bool _fightStarted = false;
-	bool _fightOver = false;
-
-	/**
-	 * Starts a fight with a creature
-	 */
-	void startFight(int creature);
+	// A tile shown over the arena for a frame
+	bool _overlay = false;
+	int _overlayX = 0, _overlayY = 0, _overlayTile = 0;
 
 	/**
-	 * Fills in the tile numbers for the viewport, with the party's transport
-	 * in the middle and hidden tiles blanked out
+	 * Starts a round, in which each party member and then the monsters act
 	 */
-	void buildViewport(byte *tiles) const;
+	void beginRound();
 
-	void doMove(Direction dir, const char *label);
-	void doPass();
-	void doInvalid();
-	void doBoard();
-	void doEnter();
+	/**
+	 * Starts the turn of the party member whose turn it is, passing over
+	 * any who can't act
+	 */
+	void beginTurn();
+
+	/**
+	 * Moves on from a turn that has taken place
+	 */
+	void advanceTurn();
+
+	void monstersTurn();
+	void victory();
+	void doMove(int dx, int dy, const char *label);
+	void doNegateTime();
 	void doAttack();
-	void doExitVehicle();
 
 protected:
 	void drawViewport(GfxSurface &s) override;
 	void idleTimeout() override;
 	void endTurn() override;
 	void processFrame() override;
+	bool isWaiting() const override;
 	bool handleCommand(const KeypressMessage &msg) override;
 
 public:
-	LocationMap() : Game("LocationMap") {}
-	~LocationMap() override {}
+	CombatMap() : Game("CombatMap") {}
+	~CombatMap() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
-
-	/**
-	 * Has the party attack whatever is in a direction
-	 */
-	void attackDirection(Direction dir);
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views
