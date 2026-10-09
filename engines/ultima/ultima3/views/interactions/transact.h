@@ -19,11 +19,11 @@
  *
  */
 
-#ifndef ULTIMA3_VIEWS_INTERACTIONS_EQUIP_H
-#define ULTIMA3_VIEWS_INTERACTIONS_EQUIP_H
+#ifndef ULTIMA3_VIEWS_INTERACTIONS_TRANSACT_H
+#define ULTIMA3_VIEWS_INTERACTIONS_TRANSACT_H
 
+#include "common/ptr.h"
 #include "ultima/ultima3/views/interactions/interaction.h"
-#include "ultima/ultima3/views/interactions/log_input.h"
 
 namespace Ultima {
 namespace Ultima3 {
@@ -31,35 +31,41 @@ namespace Views {
 namespace Interactions {
 
 /**
- * Has a party member take up a weapon, or put on a set of armour
+ * Has a party member speak to someone next to them, or deal with the shop
+ * whose counter they're facing
  */
-class Equip : public Interaction {
+class Transact : public Interaction {
 private:
-	bool _weapons;
-	PlayerChooser _chooser;
-	bool _choosing = true;
-	int _slot = -1;
-	LogMenu _menu;
-	char _keys[20];
-	const char *_words[19];
+	enum Stage {
+		CHOOSE_PLAYER,
+		CHOOSE_DIRECTION,
+		IN_SHOP
+	};
+
+	Stage _stage = CHOOSE_PLAYER;
+	PlayerChooser _players;
+	DirectionChooser _directions;
+	Common::ScopedPtr<Interaction> _shop;
 
 	/**
-	 * Sets up the menu of what can be picked once a party member is chosen
+	 * Says what someone in the town has to say
 	 */
-	void startMenu();
+	void talkTo(int creature);
 
 	/**
-	 * Makes the item picked in the menu the one in use, if allowed
+	 * Lord British lets those who have earned it grow stronger
 	 */
-	void equip(char letter);
+	void lordBritish();
+
+	/**
+	 * Starts dealing with the shop whose counter is in a direction
+	 * @returns		False if there isn't one
+	 */
+	bool startShop(int dx, int dy);
 
 public:
-	/**
-	 * Constructor
-	 * @param weapons	True for weapons, false for armour
-	 * @param slot		The party member, or -1 to ask who
-	 */
-	Equip(bool weapons, int slot = -1);
+	Transact() {}
+	~Transact() override;
 
 	bool keypress(const KeypressMessage &msg) override;
 };
