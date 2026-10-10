@@ -19,51 +19,29 @@
  *
  */
 
-#ifndef ULTIMA3_LOGIC_CHEST_LOGIC_H
-#define ULTIMA3_LOGIC_CHEST_LOGIC_H
-
-#include "ultima/ultima3/logic/logic.h"
+#include "common/file.h"
+#include "ultima/ultima3/data/dungeon.h"
 
 namespace Ultima {
 namespace Ultima3 {
+namespace Data {
 
-/**
- * Opening chests, which may be trapped, and what's found inside them
- */
-class ChestLogic : public Logic {
-private:
-	/**
-	 * Returns a number from 0 up to but not including a limit
-	 */
-	static int rollBelow(int limit);
+void Dungeon::load(const char *filename) {
+	Common::File f;
+	if (!f.open(filename))
+		error("Could not load %s", filename);
 
-public:
-	/**
-	 * Hurts every member of the party who can still fight, more so the
-	 * deeper in a dungeon they are
-	 */
-	void damageAll(int level);
+	Common::Serializer s(&f, nullptr);
+	synchronize(s);
+	if (f.err() || f.eos())
+		error("Could not load %s", filename);
+}
 
-	/**
-	 * Rolls to see whether a party member avoids a trap, which the
-	 * agile classes are better at
-	 * @returns		True if they got clear of it
-	 */
-	bool evadesTrap(int slot);
+void Dungeon::synchronize(Common::Serializer &s) {
+	s.syncBytes(_tiles, sizeof(_tiles));
+	s.syncBytes(_signs, sizeof(_signs));
+}
 
-	/**
-	 * Gives a party member the contents of a chest
-	 */
-	void loot(int slot);
-
-	/**
-	 * Opens a chest that a party member has found, possibly setting off a
-	 * trap on the way
-	 */
-	void open(int slot);
-};
-
+} // namespace Data
 } // namespace Ultima3
 } // namespace Ultima
-
-#endif

@@ -19,50 +19,52 @@
  *
  */
 
-#ifndef ULTIMA3_LOGIC_CHEST_LOGIC_H
-#define ULTIMA3_LOGIC_CHEST_LOGIC_H
+#ifndef ULTIMA3_VIEWS_INTERACTIONS_DUNGEON_SPECIAL_H
+#define ULTIMA3_VIEWS_INTERACTIONS_DUNGEON_SPECIAL_H
 
-#include "ultima/ultima3/logic/logic.h"
+#include "ultima/ultima3/views/interactions/interaction.h"
 
 namespace Ultima {
 namespace Ultima3 {
+namespace Views {
+namespace Interactions {
 
 /**
- * Opening chests, which may be trapped, and what's found inside them
+ * What happens when the party step onto one of the special squares of a
+ * dungeon: a vision, a fountain, a wind, a trap, a hot rod or gremlins
  */
-class ChestLogic : public Logic {
+class DungeonSpecial : public Interaction {
 private:
+	byte _kind;
+	bool _finished = false;
+	bool _waiting = false;
+	PlayerChooser _chooser;
+
 	/**
-	 * Returns a number from 0 up to but not including a limit
+	 * Shows one of the pictures that take the place of the dungeon view
 	 */
-	static int rollBelow(int limit);
+	void showScene(const char *filename);
+	void hideScene();
+
+	void askWhoDrinks();
+	void drink(int slot);
+	void touchRod(int slot);
+	void trap();
+	void gremlins();
 
 public:
-	/**
-	 * Hurts every member of the party who can still fight, more so the
-	 * deeper in a dungeon they are
-	 */
-	void damageAll(int level);
+	DungeonSpecial(byte kind);
+	~DungeonSpecial() override;
 
-	/**
-	 * Rolls to see whether a party member avoids a trap, which the
-	 * agile classes are better at
-	 * @returns		True if they got clear of it
-	 */
-	bool evadesTrap(int slot);
+	bool isFinished() const override {
+		return _finished;
+	}
 
-	/**
-	 * Gives a party member the contents of a chest
-	 */
-	void loot(int slot);
-
-	/**
-	 * Opens a chest that a party member has found, possibly setting off a
-	 * trap on the way
-	 */
-	void open(int slot);
+	bool keypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Interactions
+} // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
 

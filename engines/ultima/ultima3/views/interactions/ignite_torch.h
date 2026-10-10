@@ -19,50 +19,29 @@
  *
  */
 
-#ifndef ULTIMA3_LOGIC_CHEST_LOGIC_H
-#define ULTIMA3_LOGIC_CHEST_LOGIC_H
+#ifndef ULTIMA3_VIEWS_INTERACTIONS_IGNITE_TORCH_H
+#define ULTIMA3_VIEWS_INTERACTIONS_IGNITE_TORCH_H
 
-#include "ultima/ultima3/logic/logic.h"
+#include "ultima/ultima3/views/interactions/interaction.h"
 
 namespace Ultima {
 namespace Ultima3 {
+namespace Views {
+namespace Interactions {
 
 /**
- * Opening chests, which may be trapped, and what's found inside them
+ * Has a party member light a torch to see by in a dungeon
  */
-class ChestLogic : public Logic {
+class IgniteTorch : public Interaction {
 private:
-	/**
-	 * Returns a number from 0 up to but not including a limit
-	 */
-	static int rollBelow(int limit);
+	PlayerChooser _chooser;
 
 public:
-	/**
-	 * Hurts every member of the party who can still fight, more so the
-	 * deeper in a dungeon they are
-	 */
-	void damageAll(int level);
-
-	/**
-	 * Rolls to see whether a party member avoids a trap, which the
-	 * agile classes are better at
-	 * @returns		True if they got clear of it
-	 */
-	bool evadesTrap(int slot);
-
-	/**
-	 * Gives a party member the contents of a chest
-	 */
-	void loot(int slot);
-
-	/**
-	 * Opens a chest that a party member has found, possibly setting off a
-	 * trap on the way
-	 */
-	void open(int slot);
+	bool keypress(const KeypressMessage &msg) override;
 };
 
+} // namespace Interactions
+} // namespace Views
 } // namespace Ultima3
 } // namespace Ultima
 

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef ULTIMA3_LOGIC_CHEST_LOGIC_H
-#define ULTIMA3_LOGIC_CHEST_LOGIC_H
+#ifndef ULTIMA3_LOGIC_DUNGEON_LOGIC_H
+#define ULTIMA3_LOGIC_DUNGEON_LOGIC_H
 
 #include "ultima/ultima3/logic/logic.h"
 
@@ -28,39 +28,56 @@ namespace Ultima {
 namespace Ultima3 {
 
 /**
- * Opening chests, which may be trapped, and what's found inside them
+ * Rules for moving the party around a dungeon
  */
-class ChestLogic : public Logic {
-private:
-	/**
-	 * Returns a number from 0 up to but not including a limit
-	 */
-	static int rollBelow(int limit);
-
+class DungeonLogic : public Logic {
 public:
-	/**
-	 * Hurts every member of the party who can still fight, more so the
-	 * deeper in a dungeon they are
-	 */
-	void damageAll(int level);
+	enum Ladder {
+		LADDER_NONE,
+		LADDER_TAKEN,
+		LADDER_OUT
+	};
 
 	/**
-	 * Rolls to see whether a party member avoids a trap, which the
-	 * agile classes are better at
-	 * @returns		True if they got clear of it
+	 * Returns the square the party is on
 	 */
-	bool evadesTrap(int slot);
+	byte tile() const;
 
 	/**
-	 * Gives a party member the contents of a chest
+	 * Moves the party a step forward or backward, if they can
+	 * @returns		True if they moved
 	 */
-	void loot(int slot);
+	bool moveForward();
+	bool moveBackward();
 
 	/**
-	 * Opens a chest that a party member has found, possibly setting off a
-	 * trap on the way
+	 * Turns the party a quarter turn, if they can
+	 * @returns		True if they turned
 	 */
-	void open(int slot);
+	bool turn(bool right);
+
+	/**
+	 * Climbs up a ladder. If this was from the first level it takes the party
+	 * out of the dungeon
+	 */
+	Ladder climb();
+
+	/**
+	 * Goes down a ladder, if there's one
+	 * @returns		True if they did
+	 */
+	bool descend();
+
+	/**
+	 * Sometimes monsters are met on an empty square
+	 * @returns		The tile number of the monsters, or -1
+	 */
+	int rollEncounter();
+
+	/**
+	 * Moves the party to a random empty square on the level
+	 */
+	void teleportRandomly();
 };
 
 } // namespace Ultima3

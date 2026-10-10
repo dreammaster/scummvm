@@ -19,9 +19,8 @@
  *
  */
 
-#include "ultima/ultima3/views/interactions/get_chest.h"
-#include "ultima/ultima3/logic/chest_logic.h"
-#include "ultima/ultima3/logic/dungeon_logic.h"
+#include "ultima/ultima3/views/interactions/ignite_torch.h"
+#include "ultima/ultima3/data/data.h"
 #include "ultima/ultima3/ultima3.h"
 
 namespace Ultima {
@@ -29,49 +28,24 @@ namespace Ultima3 {
 namespace Views {
 namespace Interactions {
 
-constexpr byte FIRST_CHEST_CELL = 0x24;
-constexpr byte LAST_CHEST_CELL = 0x27;
-constexpr byte CELL_FLOOR = 0x20;
+constexpr byte TORCH_LIGHT = 0xFF;
 
-bool GetChest::keypress(const KeypressMessage &msg) {
+bool IgniteTorch::keypress(const KeypressMessage &msg) {
 	PlayerChooser::Result result = _chooser.handleKey(msg);
 	if (result == PlayerChooser::PENDING)
 		return false;
 	if (result == PlayerChooser::CANCELLED)
 		return true;
 
-	const int slot = _chooser.slot();
-	Data::Savegame &save = _G(savegame);
-
-	if (!save.partyMember(slot).isAlive()) {
-		_G(messages).print("Incapacitated!\n");
-		g_engine->playSoundEffect(0xFF);
+	Data::RosterEntry &e = _G(savegame).partyMember(_chooser.slot());
+	if (e._torches == 0) {
+		_G(messages).print("None Left!\n");
+		g_engine->playSoundEffect(0xFE);
 		return true;
 	}
 
-	if (save._location == Data::LOCATION_DUNGEON) {
-		if (DungeonLogic().tile() != Data::DTILE_CHEST) {
-			_G(messages).print("Not Here!\n");
-			g_engine->playSoundEffect(0xFF);
-			return true;
-		}
-
-		_G(dungeon).setTile(save._dungeonLevel, save._posX, save._posY, 0);
-	} else {
-		byte cell = _G(map).cell(save._posX, save._posY);
-		if (cell < FIRST_CHEST_CELL || cell > LAST_CHEST_CELL) {
-			_G(messages).print("Not Here!\n");
-			g_engine->playSoundEffect(0xFF);
-			return true;
-		}
-
-		// The chest goes, leaving the ground it was on
-		byte ground = (cell & 3) << 2;
-		_G(map).setCell(save._posX, save._posY, ground ? ground : CELL_FLOOR);
-	}
-
-	ChestLogic chest;
-	chest.open(slot);
+	e._torches = Data::toBcd(Data::fromBcd(e._torches) - 1);
+	_G(savegame)._lightTurns = TORCH_LIGHT;
 	return true;
 }
 
