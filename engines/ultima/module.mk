@@ -46,6 +46,7 @@ MODULE_OBJS += \
 	ultima1/events.o \
 	ultima1/messages.o \
 	ultima1/metaengine.o \
+	ultima1/sound_effects.o \
 	ultima1/core/strings.o \
 	ultima1/data/data.o \
 	ultima1/data/entity.o \
