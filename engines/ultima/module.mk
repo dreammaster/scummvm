@@ -5,8 +5,8 @@ MODULE_OBJS := \
 	shared/conf/xml_node.o \
 	shared/conf/xml_tree.o \
 	shared/engine/data_archive.o \
-	shared/engine/graphics_options.o \
-	shared/engine/view.o
+	shared/engine/events.o \
+	shared/engine/graphics_options.o
 
 ifdef ENABLE_AKALABETH
 MODULE_OBJS += \
