@@ -396,6 +396,14 @@ MODULE_OBJS += \
 	ultima6/script/se/player.o \
 	ultima6/script/se/se_scripts.o \
 	ultima6/script/se/usecode.o \
+	ultima6/script/u6/actor.o \
+	ultima6/script/u6/combat.o \
+	ultima6/script/u6/ending.o \
+	ultima6/script/u6/init.o \
+	ultima6/script/u6/magic.o \
+	ultima6/script/u6/tables.o \
+	ultima6/script/u6/u6_scripts.o \
+	ultima6/script/u6/worktype.o \
 	ultima6/sound/adlib_sfx_manager.o \
 	ultima6/sound/custom_sfx_manager.o \
 	ultima6/sound/mididrv_m_adlib.o \

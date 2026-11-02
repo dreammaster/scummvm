@@ -321,11 +321,7 @@ void Magic::display_ingredients(uint8 index) {
 }
 
 void Magic::cast_spell_directly(uint8 spell_num) {
-	Common::String lua = "run_magic_script(\"";
-	lua += spell[spell_num]->invocation;
-	lua += "\")";
-
-	magic_script = Game::get_game()->get_script()->new_thread_from_string(lua.c_str());
+	magic_script = Game::get_game()->get_script()->call_magic_cast(spell[spell_num]->invocation);
 
 	if (magic_script)
 		process_script_return(magic_script->start());

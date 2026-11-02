@@ -43,33 +43,6 @@ static const uint16 OBJLIST_OFFSET_DREAM_STAGE = 0x1d53;
 
 static const uint16 DREAM_MODE_BIT = 0x10;
 
-uint16 Target::x() const {
-	return _actor ? _actor->get_x() : _obj->x;
-}
-
-uint16 Target::y() const {
-	return _actor ? _actor->get_y() : _obj->y;
-}
-
-uint8 Target::z() const {
-	return _actor ? _actor->get_z() : _obj->z;
-}
-
-uint16 Target::objN() const {
-	return _actor ? _actor->get_obj_n() : _obj->obj_n;
-}
-
-uint16 Target::frameN() const {
-	return _actor ? _actor->get_frame_n() : _obj->frame_n;
-}
-
-Common::String Target::name() const {
-	if (_actor)
-		return _actor->get_name();
-
-	return Game::get_game()->get_obj_manager()->get_obj_name(_obj->obj_n, _obj->frame_n);
-}
-
 MDScripts::MDScripts(Configuration *config) : GameScripts(config) {
 	initLang();
 }

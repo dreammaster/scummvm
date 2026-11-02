@@ -22,6 +22,7 @@
 #include "ultima/ultima6/core/game.h"
 #include "ultima/ultima6/core/effect.h"
 #include "ultima/ultima6/core/obj.h"
+#include "ultima/ultima6/core/obj_manager.h"
 #include "ultima/ultima6/core/party.h"
 #include "ultima/ultima6/actors/actor_manager.h"
 #include "ultima/ultima6/gui/widgets/map_window.h"
@@ -44,6 +45,33 @@ static const uint8 COMBAT_RANGE_TABLE[64] = {
 	6, 6, 6, 7, 7, 8, 8, 8,
 	7, 7, 7, 7, 8, 8, 8, 8
 };
+
+uint16 Target::x() const {
+	return _actor ? _actor->get_x() : _obj->x;
+}
+
+uint16 Target::y() const {
+	return _actor ? _actor->get_y() : _obj->y;
+}
+
+uint8 Target::z() const {
+	return _actor ? _actor->get_z() : _obj->z;
+}
+
+uint16 Target::objN() const {
+	return _actor ? _actor->get_obj_n() : _obj->obj_n;
+}
+
+uint16 Target::frameN() const {
+	return _actor ? _actor->get_frame_n() : _obj->frame_n;
+}
+
+Common::String Target::name() const {
+	if (_actor)
+		return _actor->get_name();
+
+	return Game::get_game()->get_obj_manager()->get_obj_name(_obj->obj_n, _obj->frame_n);
+}
 
 GameScripts::GameScripts(Configuration *config) : _config(config) {
 }

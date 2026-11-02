@@ -48,6 +48,7 @@
 #include "ultima/ultima6/script/script_cutscene.h"
 #include "ultima/ultima6/script/md/md_scripts.h"
 #include "ultima/ultima6/script/se/se_scripts.h"
+#include "ultima/ultima6/script/u6/u6_scripts.h"
 #include "ultima/ultima6/core/magic.h"
 #include "ultima/ultima6/files/tmx_map.h"
 #include "ultima/ultima6/files/u6_lib_n.h"
@@ -527,6 +528,8 @@ Script::Script(Configuration *cfg, GUI *gui, SoundManager *sm, nuvie_game_t type
 		_scripts = new Scripts::SE::SEScripts(cfg);
 	else if (type == NUVIE_GAME_MD)
 		_scripts = new Scripts::MD::MDScripts(cfg);
+	else if (type == NUVIE_GAME_U6)
+		_scripts = new Scripts::U6::U6Scripts(cfg);
 
 	script_obj_list = iAVLAllocTree(get_iAVLKey);
 
@@ -1356,6 +1359,17 @@ bool Script::call_handle_alt_code(uint16 altcode) {
 		return false;
 
 	return true;
+}
+
+ScriptThread *Script::call_magic_cast(const char *invocation) {
+	if (_scripts)
+		return _scripts->magicCastThread(invocation);
+
+	Common::String lua = "run_magic_script(\"";
+	lua += invocation;
+	lua += "\")";
+
+	return new_thread_from_string(lua.c_str());
 }
 
 bool Script::call_magic_get_spell_list(Spell **spell_list) {

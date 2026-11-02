@@ -65,6 +65,11 @@ protected:
 
 	CSImage *newImage(uint16 w, uint16 h, int fill = -1);
 	CSImage *copyImage(const CSImage *image);
+	CSImage *newStarField(uint16 w, uint16 h);
+	/** Makes one colour of an image see-through */
+	static void setTransparency(CSImage *image, uint8 colour);
+	/** Prints wrapped text onto an image, returning where it ended */
+	void printText(CSImage *image, const char *text, uint16 startX, uint16 width, uint16 x, uint16 y, uint8 colour);
 	bool loadImages(const char *filename, ImageTable &images);
 	CSImage *loadImage(const char *filename, int idx);
 

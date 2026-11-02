@@ -43,6 +43,36 @@ class Spell;
 
 namespace Scripts {
 
+/** An actor or an object, as scripts often don't care which they are dealing with */
+struct Target {
+	Actor *_actor = nullptr;
+	Obj *_obj = nullptr;
+
+	Target() {}
+	Target(Actor *actor) : _actor(actor) {}
+	Target(Obj *obj) : _obj(obj) {}
+
+	bool isNull() const {
+		return !_actor && !_obj;
+	}
+	bool isActor() const {
+		return _actor != nullptr;
+	}
+	bool operator==(const Target &other) const {
+		return _actor == other._actor && _obj == other._obj;
+	}
+	bool operator!=(const Target &other) const {
+		return !(*this == other);
+	}
+
+	uint16 x() const;
+	uint16 y() const;
+	uint8 z() const;
+	uint16 objN() const;
+	uint16 frameN() const;
+	Common::String name() const;
+};
+
 /**
  * Per-game script logic. Each virtual is the C++ equivalent of a Lua global
  * the engine used to call by name. The defaults match what the engine saw
@@ -81,9 +111,11 @@ protected:
 	/** Effects and engine actions that scripts commonly use */
 	static void hitAnim(int x, int y);
 	static void projectileAnim(uint16 tileNum, int startX, int startY, int targetX, int targetY,
-		int speed, bool trail, int initialTileRotation);
+		int speed, bool trail, int initialTileRotation, int rotationAmount = 0, int srcTileYOffset = 0);
 	static void projectileAnimMulti(uint16 tileNum, int startX, int startY, const Common::Array<MapCoord> &targets,
 		int speed, bool trail, int initialTileRotation, Common::Array<MapEntity> &hitEntities);
+	/** Runs an explosion and returns the actors and objects it hit */
+	static void explosionStart(uint16 tileNum, int x, int y, Common::Array<MapEntity> &hitEntities);
 	static void quakeStart(int magnitude, int duration);
 	static void fadeOutEffect();
 	static void fadeInEffect();
@@ -91,6 +123,8 @@ protected:
 	static void displayTextInScrollGump(const Common::String &text);
 	static bool loadTextFromLzc(const char *filename, int idx, Common::String &text);
 	static bool mapCanReachPoint(int x, int y, int x1, int y1, uint8 level);
+	/** Traces a line for a missile. Gives where it hit and the tile before that, or the target if it didn't */
+	static void mapLineHitCheck(int x, int y, int x1, int y1, uint8 level, int &hitX, int &hitY, int &preHitX, int &preHitY);
 	static float objectWeight(Obj *obj);
 	static void actorTalk(Actor *actor);
 
@@ -270,6 +304,11 @@ public:
 	}
 	virtual bool magicGetSpellList(Spell **spellList) {
 		return false;
+	}
+
+	/** Creates the script that casts the spell with an invocation, or nullptr if there isn't one */
+	virtual ScriptThread *magicCastThread(const char *invocation) {
+		return nullptr;
 	}
 
 	virtual bool moonstoneSetLoc(uint8 phase, MapCoord location) {

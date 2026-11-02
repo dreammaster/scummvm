@@ -93,6 +93,34 @@ CSImage *CutsceneScript::newImage(uint16 w, uint16 h, int fill) {
 	return image;
 }
 
+CSImage *CutsceneScript::newStarField(uint16 w, uint16 h) {
+	U6Shape *shape = new U6Shape();
+	if (!shape->init(w, h)) {
+		delete shape;
+		return nullptr;
+	}
+
+	CSImage *image = new CSStarFieldImage(shape);
+	_images.push_back(image);
+	return image;
+}
+
+void CutsceneScript::setTransparency(CSImage *image, uint8 colour) {
+	unsigned char *data = image->shp->get_data();
+	uint16 w, h;
+	image->shp->get_size(&w, &h);
+
+	for (int i = 0; i < w * h; ++i) {
+		if (data[i] == colour)
+			data[i] = 0xff;
+	}
+}
+
+void CutsceneScript::printText(CSImage *image, const char *text, uint16 startX, uint16 width, uint16 x, uint16 y,
+		uint8 colour) {
+	_cutscene->print_text(image, text, &x, &y, startX, width, colour);
+}
+
 CSImage *CutsceneScript::copyImage(const CSImage *image) {
 	uint16 w, h;
 	image->shp->get_size(&w, &h);

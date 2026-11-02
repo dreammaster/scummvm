@@ -29,36 +29,6 @@ namespace Ultima6 {
 namespace Scripts {
 namespace MD {
 
-/** An actor or an object, as scripts often don't care which they are dealing with */
-struct Target {
-	Actor *_actor = nullptr;
-	Obj *_obj = nullptr;
-
-	Target() {}
-	Target(Actor *actor) : _actor(actor) {}
-	Target(Obj *obj) : _obj(obj) {}
-
-	bool isNull() const {
-		return !_actor && !_obj;
-	}
-	bool isActor() const {
-		return _actor != nullptr;
-	}
-	bool operator==(const Target &other) const {
-		return _actor == other._actor && _obj == other._obj;
-	}
-	bool operator!=(const Target &other) const {
-		return !(*this == other);
-	}
-
-	uint16 x() const;
-	uint16 y() const;
-	uint8 z() const;
-	uint16 objN() const;
-	uint16 frameN() const;
-	Common::String name() const;
-};
-
 class MDScripts : public GameScripts {
 public:
 	enum Worktype {

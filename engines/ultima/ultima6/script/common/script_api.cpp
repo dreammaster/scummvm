@@ -43,9 +43,9 @@ void GameScripts::hitAnim(int x, int y) {
 }
 
 void GameScripts::projectileAnim(uint16 tileNum, int startX, int startY, int targetX, int targetY,
-		int speed, bool trail, int initialTileRotation) {
+		int speed, bool trail, int initialTileRotation, int rotationAmount, int srcTileYOffset) {
 	ProjectileEffect *projectile = new ProjectileEffect(tileNum, MapCoord(startX, startY),
-		MapCoord(targetX, targetY), speed, trail, initialTileRotation, 0, 0);
+		MapCoord(targetX, targetY), speed, trail, initialTileRotation, rotationAmount, srcTileYOffset);
 	AsyncEffect *effect = new AsyncEffect(projectile);
 	effect->run();
 }
@@ -66,6 +66,30 @@ void GameScripts::findObjs(int level, int objN, Common::Array<Obj *> &objs) {
 	for (Obj *obj = objManager->find_obj(level, objN, 0, OBJ_NOMATCH_QUALITY); obj;
 			obj = objManager->find_next_obj(level, obj, OBJ_NOMATCH_FRAME_N, OBJ_NOMATCH_QUALITY))
 		objs.push_back(obj);
+}
+
+void GameScripts::mapLineHitCheck(int x, int y, int x1, int y1, uint8 level, int &hitX, int &hitY,
+		int &preHitX, int &preHitY) {
+	Map *map = Game::get_game()->get_game_map();
+	LineTestResult result;
+
+	if (map->lineTest(x, y, x1, y1, level, LT_HitMissileBoundary, result, 0, nullptr, true)) {
+		hitX = result.hit_x;
+		hitY = result.hit_y;
+		preHitX = result.pre_hit_x;
+		preHitY = result.pre_hit_y;
+	} else {
+		hitX = preHitX = x1;
+		hitY = preHitY = y1;
+	}
+}
+
+void GameScripts::explosionStart(uint16 tileNum, int x, int y, Common::Array<MapEntity> &hitEntities) {
+	ExpEffect *explosion = new ExpEffect(tileNum, MapCoord(x, y));
+	AsyncEffect *effect = new AsyncEffect(explosion);
+	effect->run();
+
+	hitEntities = *explosion->get_hit_entities();
 }
 
 void GameScripts::quakeStart(int magnitude, int duration) {

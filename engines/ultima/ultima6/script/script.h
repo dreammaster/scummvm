@@ -180,6 +180,7 @@ public:
 	bool call_handle_alt_code(uint16 altcode);
 
 	bool call_magic_get_spell_list(Spell **spell_list);
+	ScriptThread *call_magic_cast(const char *invocation);
 	bool call_actor_use_effect(Obj *effect_obj, Actor *actor);
 	bool call_function(const char *func_name, int num_args, int num_return, bool print_stacktrace = true) const;
 	ScriptThread *call_function_in_thread(const char *function_name);
