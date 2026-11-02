@@ -3492,7 +3492,7 @@ bool Events::newAction(EventMode new_mode) {
 			return false;
 		}
 		if (game->get_game_type() != NUVIE_GAME_U6) {
-			scriptThread = game->get_script()->call_function_in_thread("player_attack");
+			scriptThread = game->get_script()->call_player_attack_thread();
 			mode = SCRIPT_MODE;
 			scriptThread->start();
 			switch (scriptThread->get_state()) {

@@ -27,6 +27,7 @@
 #include "ultima/ultima6/core/map.h"
 #include "ultima/ultima6/actors/actor.h"
 #include "ultima/ultima6/misc/u6_misc.h"
+#include "ultima/ultima6/script/common/continuation.h"
 #include "ultima/ultima6/script/common/lang.h"
 #include "ultima/ultima6/usecode/usecode.h"
 
@@ -114,6 +115,11 @@ public:
 	}
 	virtual bool playerAttack() {
 		return false;
+	}
+
+	/** The player's attack command, which can ask for a target or direction */
+	virtual ScriptThread *playerAttackThread() {
+		return new FinishedThread();
 	}
 
 	virtual bool actorUpdateAll() {

@@ -419,7 +419,7 @@ static bool get_tbl_field_string(lua_State *L, const char *index, char *field, u
 	return true;
 }
 
-uint8 ScriptThread::resume_with_location(const MapCoord &loc) {
+uint8 LuaScriptThread::resume_with_location(const MapCoord &loc) {
 	lua_newtable(L);
 	lua_pushstring(L, "x");
 	lua_pushinteger(L, loc.x);
@@ -436,19 +436,19 @@ uint8 ScriptThread::resume_with_location(const MapCoord &loc) {
 	return resume(1);
 }
 
-uint8 ScriptThread::resume_with_direction(NuvieDir dir) {
+uint8 LuaScriptThread::resume_with_direction(NuvieDir dir) {
 	lua_pushinteger(L, dir);
 
 	return resume(1);
 }
 
-uint8 ScriptThread::resume_with_spell_num(uint8 spell_num) {
+uint8 LuaScriptThread::resume_with_spell_num(uint8 spell_num) {
 	lua_pushinteger(L, spell_num);
 
 	return resume(1);
 }
 
-uint8 ScriptThread::resume_with_obj(Obj *obj) {
+uint8 LuaScriptThread::resume_with_obj(Obj *obj) {
 	if (obj) {
 		nscript_new_obj_var(L, obj);
 		return resume(1);
@@ -457,11 +457,11 @@ uint8 ScriptThread::resume_with_obj(Obj *obj) {
 	return resume(0);
 }
 
-uint8 ScriptThread::resume_with_nil() {
+uint8 LuaScriptThread::resume_with_nil() {
 	return resume(0);
 }
 
-uint8 ScriptThread::resume(int narg) {
+uint8 LuaScriptThread::resume(int narg) {
 	const char *s;
 	int ret = lua_resume(L, /*nullptr,*/ narg);
 
@@ -889,6 +889,9 @@ Script::~Script() {
 }
 
 bool Script::init() {
+	if (_scripts)
+		return true;
+
 	Common::String tmp;
 	Common::Path dir, path;
 	config->value("config/datadir", tmp, "");
@@ -1301,7 +1304,7 @@ ScriptThread *Script::call_use_obj(Obj *obj, Actor *actor) {
 
 	//FIXME wrap stacktrace dumping logic here as per call_function method.
 
-	t = new ScriptThread(s, 2);
+	t = new LuaScriptThread(s, 2);
 	//if(nscript_call_function(L, "use_obj", 2, 0, true) == false)
 	//  return false;
 
@@ -1492,7 +1495,7 @@ ScriptThread *Script::call_function_in_thread(const char *function_name) {
 
 	//FIXME wrap stacktrace dumping logic here as per call_function method.
 
-	t = new ScriptThread(s, 0);
+	t = new LuaScriptThread(s, 0);
 
 	return t;
 }
@@ -1676,6 +1679,13 @@ uint8 Script::call_get_portrait_number(Actor *actor) {
 	return (uint8)lua_tointeger(L, -1);
 }
 
+ScriptThread *Script::call_player_attack_thread() {
+	if (_scripts)
+		return _scripts->playerAttackThread();
+
+	return call_function_in_thread("player_attack");
+}
+
 bool Script::call_player_attack() {
 	if (_scripts)
 		return _scripts->playerAttack();
@@ -1714,7 +1724,7 @@ ScriptThread *Script::new_thread(const char *scriptfile) {
 	lua_getglobal(s, "run_script");
 	lua_pushstring(s, scriptfile);
 
-	t = new ScriptThread(s, 1);
+	t = new LuaScriptThread(s, 1);
 
 	return t;
 }
@@ -1728,7 +1738,7 @@ ScriptThread *Script::new_thread_from_string(const char *scriptStr) {
 	if (luaL_loadbuffer(s, scriptStr, strlen(scriptStr), "nuvie") != 0)
 		return nullptr;
 
-	t = new ScriptThread(s, 0);
+	t = new LuaScriptThread(s, 0);
 
 	return t;
 }

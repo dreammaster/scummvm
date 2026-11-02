@@ -59,7 +59,30 @@ class GameScripts;
 
 #define NUVIE_SCRIPT_CB_ADV_GAME_TIME  1
 
+/**
+ * A script that may stop to wait for input or for game time to pass.
+ * The state reported after each step says what it is waiting for.
+ */
 class ScriptThread {
+public:
+	virtual ~ScriptThread() {}
+
+	virtual uint32 get_data() = 0;
+	virtual uint8 get_state() = 0;
+	virtual uint8 start() = 0;
+	virtual uint8 resume_with_location(const MapCoord &loc) = 0;
+	virtual uint8 resume_with_direction(NuvieDir dir) = 0;
+	virtual uint8 resume_with_spell_num(uint8 spell_num) = 0;
+	virtual uint8 resume_with_obj(Obj *obj) = 0;
+	virtual uint8 resume_with_nil() = 0;
+	virtual bool finished() = 0;
+
+	bool is_running() {
+		return !finished();
+	}
+};
+
+class LuaScriptThread : public ScriptThread {
 	lua_State *L;
 	int start_nargs;
 	uint32 data;
@@ -67,36 +90,32 @@ class ScriptThread {
 
 public:
 
-	ScriptThread(lua_State *l, int nargs) {
+	LuaScriptThread(lua_State *l, int nargs) {
 		L = l;
 		start_nargs = nargs;
 		data = 0;
 		state = NUVIE_SCRIPT_NOT_STARTED;
 	}
-	~ScriptThread() {  }
-	uint32 get_data() {
+	~LuaScriptThread() override {  }
+	uint32 get_data() override {
 		return data;
 	}
-	uint8 start() {
+	uint8 start() override {
 		return resume(start_nargs);
 	}
-	uint8 resume_with_location(const MapCoord &loc);
-	uint8 resume_with_direction(NuvieDir dir);
-	uint8 resume_with_spell_num(uint8 spell_num);
-	uint8 resume_with_obj(Obj *obj);
-	uint8 resume_with_nil();
+	uint8 resume_with_location(const MapCoord &loc) override;
+	uint8 resume_with_direction(NuvieDir dir) override;
+	uint8 resume_with_spell_num(uint8 spell_num) override;
+	uint8 resume_with_obj(Obj *obj) override;
+	uint8 resume_with_nil() override;
 	uint8 resume(int narg = 0);
-	bool finished() {
+	bool finished() override {
 		return lua_status(L) != LUA_YIELD ? true : false;
 	}
 	int get_error() {
 		return lua_status(L);
 	}
-
-	bool is_running() {
-		return !finished();
-	}
-	uint8 get_state() {
+	uint8 get_state() override {
 		return state;
 	}
 };
@@ -185,6 +204,7 @@ public:
 	bool call_is_container_obj(uint16 obj_n);
 	uint8 call_get_portrait_number(Actor *actor);
 	bool call_player_attack();
+	ScriptThread *call_player_attack_thread();
 
 	uint16 call_get_tile_to_object_mapping(uint16 tile_n);
 	bool call_is_tile_object(uint16 obj_n);
