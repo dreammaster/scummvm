@@ -26,11 +26,6 @@ namespace Ultima6 {
 namespace Scripts {
 namespace U6 {
 
-bool U6Scripts::playIntro() {
-	// Still run by the Lua script
-	return false;
-}
-
 } // End of namespace U6
 } // End of namespace Scripts
 } // End of namespace Ultima6

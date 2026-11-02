@@ -121,6 +121,11 @@ void CutsceneScript::printText(CSImage *image, const char *text, uint16 startX, 
 	_cutscene->print_text(image, text, &x, &y, startX, width, colour);
 }
 
+void CutsceneScript::printWrapped(CSImage *image, const char *text, uint16 startX, uint16 width, uint16 &x, uint16 &y,
+		uint8 colour) {
+	_cutscene->print_text(image, text, &x, &y, startX, width, colour);
+}
+
 CSImage *CutsceneScript::copyImage(const CSImage *image) {
 	uint16 w, h;
 	image->shp->get_size(&w, &h);

@@ -400,6 +400,10 @@ MODULE_OBJS += \
 	ultima6/script/u6/combat.o \
 	ultima6/script/u6/ending.o \
 	ultima6/script/u6/init.o \
+	ultima6/script/u6/intro_create.o \
+	ultima6/script/u6/intro_menu.o \
+	ultima6/script/u6/intro_opening.o \
+	ultima6/script/u6/intro_story.o \
 	ultima6/script/u6/magic.o \
 	ultima6/script/u6/tables.o \
 	ultima6/script/u6/u6_scripts.o \

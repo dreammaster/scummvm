@@ -70,6 +70,8 @@ protected:
 	static void setTransparency(CSImage *image, uint8 colour);
 	/** Prints wrapped text onto an image, returning where it ended */
 	void printText(CSImage *image, const char *text, uint16 startX, uint16 width, uint16 x, uint16 y, uint8 colour);
+	/** Prints wrapped text from a position, updating the position to where the text ended */
+	void printWrapped(CSImage *image, const char *text, uint16 startX, uint16 width, uint16 &x, uint16 &y, uint8 colour);
 	bool loadImages(const char *filename, ImageTable &images);
 	CSImage *loadImage(const char *filename, int idx);
 

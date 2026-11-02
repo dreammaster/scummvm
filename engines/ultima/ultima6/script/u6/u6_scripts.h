@@ -340,11 +340,6 @@ public:
 	bool advanceTime(uint16 minutes) override;
 	bool setGShowStealing(bool stealing) override;
 
-	/** The intro and ending are still Lua scripts, so the Lua scripts need loading */
-	bool needsLua() const override {
-		return true;
-	}
-
 	bool playIntro() override;
 	bool playEnding() override;
 };
