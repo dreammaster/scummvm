@@ -40,6 +40,10 @@ class Actor;
 class NuvieIO;
 class SoundManager;
 
+namespace Scripts {
+class GameScripts;
+} // End of namespace Scripts
+
 #define NUVIE_SCRIPT_NOT_STARTED     255
 #define NUVIE_SCRIPT_ERROR             0
 #define NUVIE_SCRIPT_FINISHED          1
@@ -104,6 +108,9 @@ class Script {
 	nuvie_game_t gametype; // what game is being played?
 	SoundManager *soundManager;
 	lua_State *L;
+
+	// Games whose scripts have been converted to C++ handle those calls here instead of in Lua
+	Scripts::GameScripts *_scripts;
 
 public:
 

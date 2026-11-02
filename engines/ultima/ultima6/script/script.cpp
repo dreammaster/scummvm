@@ -46,6 +46,7 @@
 #include "ultima/ultima6/script/script.h"
 #include "ultima/ultima6/script/script_actor.h"
 #include "ultima/ultima6/script/script_cutscene.h"
+#include "ultima/ultima6/script/se/se_scripts.h"
 #include "ultima/ultima6/core/magic.h"
 #include "ultima/ultima6/files/tmx_map.h"
 #include "ultima/ultima6/files/u6_lib_n.h"
@@ -519,6 +520,10 @@ Script::Script(Configuration *cfg, GUI *gui, SoundManager *sm, nuvie_game_t type
 	gametype = type;
 	script = this;
 	soundManager = sm;
+	_scripts = nullptr;
+
+	if (type == NUVIE_GAME_SE)
+		_scripts = new Scripts::SE::SEScripts(cfg);
 
 	script_obj_list = iAVLAllocTree(get_iAVLKey);
 
@@ -877,6 +882,8 @@ Script::Script(Configuration *cfg, GUI *gui, SoundManager *sm, nuvie_game_t type
 }
 
 Script::~Script() {
+	delete _scripts;
+
 	if (L)
 		lua_close(L);
 }
@@ -953,6 +960,9 @@ bool Script::play_cutscene(const char *script_file) {
 }
 
 MovementStatus Script::call_player_before_move_action(sint16 *rel_x, sint16 *rel_y) {
+	if (_scripts)
+		return _scripts->playerBeforeMoveAction(rel_x, rel_y);
+
 	lua_getglobal(L, "player_before_move_action");
 	lua_pushinteger(L, *rel_x);
 	lua_pushinteger(L, *rel_y);
@@ -981,6 +991,9 @@ MovementStatus Script::call_player_before_move_action(sint16 *rel_x, sint16 *rel
 
 
 bool Script::call_player_post_move_action(bool didMove) {
+	if (_scripts)
+		return _scripts->playerPostMoveAction(didMove);
+
 	lua_getglobal(L, "player_post_move_action");
 	lua_pushboolean(L, didMove);
 
@@ -988,18 +1001,27 @@ bool Script::call_player_post_move_action(bool didMove) {
 }
 
 bool Script::call_player_pass() {
+	if (_scripts)
+		return _scripts->playerPass();
+
 	lua_getglobal(L, "player_pass");
 
 	return call_function("player_pass", 0, 0);
 }
 
 bool Script::call_actor_update_all() {
+	if (_scripts)
+		return _scripts->actorUpdateAll();
+
 	lua_getglobal(L, "actor_update_all");
 
 	return call_function("actor_update_all", 0, 0);
 }
 
 bool Script::call_actor_init(Actor *actor, ActorAlignment alignment) {
+	if (_scripts)
+		return _scripts->actorInit(actor, alignment);
+
 	lua_getglobal(L, "actor_init");
 	nscript_new_actor_var(L, actor->get_actor_num());
 	lua_pushinteger(L, alignment);
@@ -1008,6 +1030,9 @@ bool Script::call_actor_init(Actor *actor, ActorAlignment alignment) {
 }
 
 bool Script::call_actor_attack(Actor *actor, MapCoord location, Obj *weapon, Actor *foe) {
+	if (_scripts)
+		return _scripts->actorAttack(actor, location, weapon, foe);
+
 	lua_getglobal(L, "actor_attack");
 	nscript_new_actor_var(L, actor->get_actor_num());
 	//nscript_new_actor_var(L, foe->get_actor_num());
@@ -1033,10 +1058,16 @@ bool Script::call_actor_attack(Actor *actor, MapCoord location, Obj *weapon, Act
 }
 
 bool Script::call_load_game(NuvieIO *objlist) {
+	if (_scripts)
+		return _scripts->loadGame(objlist);
+
 	return call_loadsave_game("load_game", objlist);
 }
 
 bool Script::call_save_game(NuvieIO *objlist) {
+	if (_scripts)
+		return _scripts->saveGame(objlist);
+
 	return call_loadsave_game("save_game", objlist);
 }
 
@@ -1051,6 +1082,8 @@ bool Script::call_loadsave_game(const char *function, NuvieIO *objlist) {
 }
 
 bool Script::call_actor_map_dmg(Actor *actor, MapCoord location) {
+	if (_scripts)
+		return _scripts->actorMapDmg(actor, location);
 
 	lua_getglobal(L, "actor_map_dmg");
 	nscript_new_actor_var(L, actor->get_actor_num());
@@ -1063,6 +1096,8 @@ bool Script::call_actor_map_dmg(Actor *actor, MapCoord location) {
 }
 
 bool Script::call_actor_tile_dmg(Actor *actor, uint16 tile_num) {
+	if (_scripts)
+		return _scripts->actorTileDmg(actor, tile_num);
 
 	lua_getglobal(L, "actor_tile_dmg");
 	nscript_new_actor_var(L, actor->get_actor_num());
@@ -1073,6 +1108,9 @@ bool Script::call_actor_tile_dmg(Actor *actor, uint16 tile_num) {
 }
 
 bool Script::call_actor_hit(Actor *actor, uint8 dmg, bool display_hit_msg) {
+	if (_scripts)
+		return _scripts->actorHit(actor, dmg, display_hit_msg);
+
 	lua_getglobal(L, "actor_hit");
 	nscript_new_actor_var(L, actor->get_actor_num());
 	lua_pushnumber(L, (lua_Number)dmg);
@@ -1091,6 +1129,9 @@ bool Script::call_actor_hit(Actor *actor, uint8 dmg, bool display_hit_msg) {
 }
 
 bool Script::call_look_obj(Obj *obj) {
+	if (_scripts)
+		return _scripts->lookObj(obj);
+
 	lua_getglobal(L, "look_obj");
 
 	nscript_obj_new(L, obj);
@@ -1102,6 +1143,9 @@ bool Script::call_look_obj(Obj *obj) {
 }
 
 int Script::call_obj_get_readiable_location(Obj *obj) {
+	if (_scripts)
+		return _scripts->objGetReadiableLocation(obj);
+
 	lua_getglobal(L, "obj_get_readiable_location");
 
 	nscript_obj_new(L, obj);
@@ -1113,6 +1157,9 @@ int Script::call_obj_get_readiable_location(Obj *obj) {
 }
 
 uint8 Script::actor_get_max_magic_points(const Actor *actor) {
+	if (_scripts)
+		return _scripts->actorGetMaxMagicPoints(actor);
+
 	lua_getglobal(L, "actor_get_max_magic_points");
 	nscript_new_actor_var(L, actor->get_actor_num());
 
@@ -1122,6 +1169,9 @@ uint8 Script::actor_get_max_magic_points(const Actor *actor) {
 }
 
 bool Script::call_actor_get_obj(Actor *actor, Obj *obj, Obj *container) {
+	if (_scripts)
+		return _scripts->actorGetObj(actor, obj, container);
+
 	int num_args = 2;
 	lua_getglobal(L, "actor_get_obj");
 	nscript_new_actor_var(L, actor->get_actor_num());
@@ -1138,6 +1188,9 @@ bool Script::call_actor_get_obj(Actor *actor, Obj *obj, Obj *container) {
 }
 
 bool Script::call_actor_subtract_movement_points(Actor *actor, uint8 points) {
+	if (_scripts)
+		return _scripts->actorSubtractMovementPoints(actor, points);
+
 	lua_getglobal(L, "subtract_movement_pts");
 	nscript_new_actor_var(L, actor->get_actor_num());
 	lua_pushnumber(L, (lua_Number)points);
@@ -1149,6 +1202,9 @@ bool Script::call_actor_subtract_movement_points(Actor *actor, uint8 points) {
 }
 
 bool Script::call_actor_resurrect(Actor *actor) {
+	if (_scripts)
+		return _scripts->actorResurrect(actor);
+
 	lua_getglobal(L, "actor_resurrect");
 	nscript_new_actor_var(L, actor->get_actor_num());
 
@@ -1159,6 +1215,9 @@ bool Script::call_actor_resurrect(Actor *actor) {
 }
 
 uint8 Script::call_actor_str_adj(Actor *actor) {
+	if (_scripts)
+		return _scripts->actorStrAdj(actor);
+
 	lua_getglobal(L, "actor_str_adj");
 	nscript_new_actor_var(L, actor->get_actor_num());
 
@@ -1168,6 +1227,9 @@ uint8 Script::call_actor_str_adj(Actor *actor) {
 }
 
 uint8 Script::call_actor_dex_adj(Actor *actor) {
+	if (_scripts)
+		return _scripts->actorDexAdj(actor);
+
 	lua_getglobal(L, "actor_dex_adj");
 	nscript_new_actor_var(L, actor->get_actor_num());
 
@@ -1177,6 +1239,9 @@ uint8 Script::call_actor_dex_adj(Actor *actor) {
 }
 
 uint8 Script::call_actor_int_adj(Actor *actor) {
+	if (_scripts)
+		return _scripts->actorIntAdj(actor);
+
 	lua_getglobal(L, "actor_int_adj");
 	nscript_new_actor_var(L, actor->get_actor_num());
 
@@ -1186,6 +1251,9 @@ uint8 Script::call_actor_int_adj(Actor *actor) {
 }
 
 bool Script::call_use_keg(Obj *obj) {
+	if (_scripts)
+		return _scripts->useKeg(obj);
+
 	lua_getglobal(L, "use_keg");
 
 	nscript_obj_new(L, obj);
@@ -1197,6 +1265,9 @@ bool Script::call_use_keg(Obj *obj) {
 }
 
 bool Script::call_has_usecode(Obj *obj, UseCodeEvent usecode_type) {
+	if (_scripts)
+		return _scripts->hasUsecode(obj, usecode_type);
+
 	lua_getglobal(L, "has_usecode");
 
 	nscript_obj_new(L, obj);
@@ -1209,6 +1280,9 @@ bool Script::call_has_usecode(Obj *obj, UseCodeEvent usecode_type) {
 }
 
 ScriptThread *Script::call_use_obj(Obj *obj, Actor *actor) {
+	if (_scripts)
+		return _scripts->useObj(obj, actor);
+
 	ScriptThread *t = nullptr;
 	lua_State *s;
 
@@ -1229,6 +1303,9 @@ ScriptThread *Script::call_use_obj(Obj *obj, Actor *actor) {
 }
 
 bool Script::call_ready_obj(Obj *obj, Actor *actor) {
+	if (_scripts)
+		return _scripts->readyObj(obj, actor);
+
 	lua_getglobal(L, "ready_obj");
 
 	nscript_obj_new(L, obj);
@@ -1241,6 +1318,9 @@ bool Script::call_ready_obj(Obj *obj, Actor *actor) {
 }
 
 bool Script::call_move_obj(Obj *obj, sint16 rel_x, sint16 rel_y) {
+	if (_scripts)
+		return _scripts->moveObj(obj, rel_x, rel_y);
+
 	lua_getglobal(L, "move_obj");
 
 	nscript_obj_new(L, obj);
@@ -1264,6 +1344,9 @@ bool Script::call_handle_alt_code(uint16 altcode) {
 }
 
 bool Script::call_magic_get_spell_list(Spell **spell_list) {
+	if (_scripts)
+		return _scripts->magicGetSpellList(spell_list);
+
 	lua_getglobal(L, "magic_get_spell_list");
 
 	if (call_function("magic_get_spell_list", 0, 1) == false)
@@ -1301,6 +1384,9 @@ bool Script::call_magic_get_spell_list(Spell **spell_list) {
 }
 
 bool Script::call_actor_use_effect(Obj *effect_obj, Actor *actor) {
+	if (_scripts)
+		return _scripts->actorUseEffect(effect_obj, actor);
+
 	lua_getglobal(L, "actor_use_effect");
 	nscript_new_actor_var(L, actor->get_actor_num());
 	nscript_obj_new(L, effect_obj);
@@ -1309,6 +1395,9 @@ bool Script::call_actor_use_effect(Obj *effect_obj, Actor *actor) {
 }
 
 bool Script::call_can_get_obj_override(Obj *obj) const {
+	if (_scripts)
+		return _scripts->canGetObjOverride(obj);
+
 	lua_getglobal(L, "can_get_obj_override");
 	nscript_obj_new(L, obj);
 
@@ -1319,6 +1408,9 @@ bool Script::call_can_get_obj_override(Obj *obj) const {
 }
 
 bool Script::call_out_of_ammo(Actor *attacker, Obj *weapon, bool print_message) {
+	if (_scripts)
+		return _scripts->outOfAmmo(attacker, weapon, print_message);
+
 	lua_getglobal(L, "out_of_ammo");
 	nscript_new_actor_var(L, attacker->get_actor_num());
 	if (weapon == nullptr)
@@ -1334,6 +1426,9 @@ bool Script::call_out_of_ammo(Actor *attacker, Obj *weapon, bool print_message) 
 }
 
 bool Script::call_is_avatar_dead() {
+	if (_scripts)
+		return _scripts->isAvatarDead();
+
 	lua_getglobal(L, "is_avatar_dead");
 	if (call_function("is_avatar_dead", 0, 1) == false)
 		return false;
@@ -1341,6 +1436,9 @@ bool Script::call_is_avatar_dead() {
 }
 
 bool Script::call_is_ranged_select(UseCodeType operation) {
+	if (_scripts)
+		return _scripts->isRangedSelect(operation);
+
 	lua_getglobal(L, "is_ranged_select");
 	lua_pushstring(L, useCodeTypeToString(operation));
 
@@ -1408,6 +1506,9 @@ bool Script::run_lua_file(const char *filename) {
 }
 
 bool Script::call_moonstone_set_loc(uint8 phase, MapCoord location) {
+	if (_scripts)
+		return _scripts->moonstoneSetLoc(phase, location);
+
 	lua_getglobal(L, "moonstone_set_loc");
 
 	lua_pushnumber(L, (lua_Number)phase);
@@ -1419,6 +1520,9 @@ bool Script::call_moonstone_set_loc(uint8 phase, MapCoord location) {
 }
 
 MapCoord Script::call_moonstone_get_loc(uint8 phase) {
+	if (_scripts)
+		return _scripts->moonstoneGetLoc(phase);
+
 	MapCoord loc(0, 0, 0);
 
 	lua_getglobal(L, "moonstone_get_loc");
@@ -1436,6 +1540,9 @@ MapCoord Script::call_moonstone_get_loc(uint8 phase) {
 }
 
 bool Script::call_update_moongates(bool visible) {
+	if (_scripts)
+		return _scripts->updateMoongates(visible);
+
 	lua_getglobal(L, "update_moongates");
 
 	lua_pushboolean(L, visible);
@@ -1444,6 +1551,9 @@ bool Script::call_update_moongates(bool visible) {
 }
 
 bool Script::call_advance_time(uint16 minutes) {
+	if (_scripts)
+		return _scripts->advanceTime(minutes);
+
 	lua_getglobal(L, "advance_time");
 
 	lua_pushnumber(L, (lua_Number)minutes);
@@ -1452,6 +1562,9 @@ bool Script::call_advance_time(uint16 minutes) {
 }
 
 bool Script::call_set_g_show_stealing(bool stealing) {
+	if (_scripts)
+		return _scripts->setGShowStealing(stealing);
+
 	lua_getglobal(L, "set_g_show_stealing");
 	lua_pushboolean(L, stealing);
 
@@ -1461,6 +1574,9 @@ bool Script::call_set_g_show_stealing(bool stealing) {
 }
 
 uint8 Script::call_get_combat_range(uint16 absx, uint16 absy) {
+	if (_scripts)
+		return _scripts->getCombatRange(absx, absy);
+
 	lua_getglobal(L, "get_combat_range");
 	lua_pushnumber(L, (lua_Number)absx);
 	lua_pushnumber(L, (lua_Number)absy);
@@ -1470,6 +1586,9 @@ uint8 Script::call_get_combat_range(uint16 absx, uint16 absy) {
 }
 
 uint8 Script::call_get_weapon_range(uint16 obj_n) {
+	if (_scripts)
+		return _scripts->getWeaponRange(obj_n);
+
 	lua_getglobal(L, "get_weapon_range");
 	lua_pushnumber(L, (lua_Number)obj_n);
 	if (call_function("get_weapon_range", 1, 1) == false)
@@ -1486,6 +1605,9 @@ uint8 Script::call_play_midgame_sequence(uint16 seq_num) {
 }
 
 bool Script::call_talk_script(uint8 script_number) {
+	if (_scripts)
+		return _scripts->talkScript(script_number);
+
 	lua_getglobal(L, "talk_script");
 	lua_pushnumber(L, (lua_Number)script_number);
 	if (call_function("talk_script", 1, 0) == false)
@@ -1494,6 +1616,9 @@ bool Script::call_talk_script(uint8 script_number) {
 }
 
 bool Script::call_talk_to_obj(Obj *obj) {
+	if (_scripts)
+		return _scripts->talkToObj(obj);
+
 	lua_getglobal(L, "talk_to_obj");
 
 	nscript_obj_new(L, obj);
@@ -1505,6 +1630,9 @@ bool Script::call_talk_to_obj(Obj *obj) {
 }
 
 bool Script::call_talk_to_actor(Actor *actor) {
+	if (_scripts)
+		return _scripts->talkToActor(actor);
+
 	lua_getglobal(L, "talk_to_actor");
 
 	nscript_new_actor_var(L, actor->get_actor_num());
@@ -1516,6 +1644,9 @@ bool Script::call_talk_to_actor(Actor *actor) {
 }
 
 bool Script::call_is_container_obj(uint16 obj_n) {
+	if (_scripts)
+		return _scripts->isContainerObj(obj_n);
+
 	lua_getglobal(L, "is_container_obj");
 	lua_pushnumber(L, (lua_Number)obj_n);
 	call_function("is_container_object", 1, 1);
@@ -1523,6 +1654,9 @@ bool Script::call_is_container_obj(uint16 obj_n) {
 }
 
 uint8 Script::call_get_portrait_number(Actor *actor) {
+	if (_scripts)
+		return _scripts->getPortraitNumber(actor);
+
 	lua_getglobal(L, "get_portrait_number");
 	nscript_new_actor_var(L, actor->get_actor_num());
 	if (call_function("get_portrait_number", 1, 1) == false)
@@ -1531,12 +1665,18 @@ uint8 Script::call_get_portrait_number(Actor *actor) {
 }
 
 bool Script::call_player_attack() {
+	if (_scripts)
+		return _scripts->playerAttack();
+
 	lua_getglobal(L, "player_attack");
 
 	return call_function("player_attack", 0, 0);
 }
 
 uint16 Script::call_get_tile_to_object_mapping(uint16 tile_n) {
+	if (_scripts)
+		return _scripts->getTileToObjectMapping(tile_n);
+
 	lua_getglobal(L, "get_tile_to_object_mapping");
 	lua_pushnumber(L, (lua_Number)tile_n);
 	call_function("get_tile_to_object_mapping", 1, 1);
@@ -1545,6 +1685,9 @@ uint16 Script::call_get_tile_to_object_mapping(uint16 tile_n) {
 }
 
 bool Script::call_is_tile_object(uint16 obj_n) {
+	if (_scripts)
+		return _scripts->isTileObject(obj_n);
+
 	lua_getglobal(L, "is_tile_object");
 	lua_pushnumber(L, (lua_Number)obj_n);
 	call_function("is_tile_object", 1, 1);
