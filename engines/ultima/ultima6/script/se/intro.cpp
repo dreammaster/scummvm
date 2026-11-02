@@ -126,14 +126,6 @@ enum {
 
 static const int MAX_NAME_LENGTH = 13;
 
-static char keyToChar(int key) {
-	if (key == ' ' || key == '\'' || (key >= ',' && key <= '.') || (key >= '0' && key <= '9') ||
-			(key >= 'A' && key <= 'Z') || (key >= 'a' && key <= 'z'))
-		return (char)key;
-
-	return 0;
-}
-
 class Intro : public CutsceneScript {
 private:
 	// Main menu sprites: the four entries, then their highlights, then their focus markers

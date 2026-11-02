@@ -90,6 +90,15 @@ protected:
 	bool pollForKeyOrButton(int cycles = -1);
 	bool pollForEsc(int cycles = -1);
 
+	/** Returns any input, setting the exit flag if it was escape or the engine is quitting */
+	int pollForInput();
+
+	static void drawLine(CSImage *image, int startX, int startY, int endX, int endY, uint8 color);
+	static void setMousePointer(uint8 pointer);
+
+	/** The character a key types into a name, or 0 if it isn't allowed in one */
+	static char keyToChar(int key);
+
 	void fadeIn(int speed = 3);
 	void fadeOut(int speed = 3);
 

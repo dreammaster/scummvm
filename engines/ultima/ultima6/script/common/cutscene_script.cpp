@@ -248,6 +248,36 @@ bool CutsceneScript::pollForEsc(int cycles) {
 	return false;
 }
 
+int CutsceneScript::pollForInput() {
+	int input = inputPoll();
+
+	if (input == Common::KEYCODE_ESCAPE)
+		_shouldExit = true;
+
+	if (engineShouldQuit())
+		_shouldExit = true;
+
+	return input;
+}
+
+char CutsceneScript::keyToChar(int key) {
+	if (key == ' ' || key == '\'' || (key >= ',' && key <= '.') || (key >= '0' && key <= '9') ||
+			(key >= 'A' && key <= 'Z') || (key >= 'a' && key <= 'z'))
+		return (char)key;
+
+	return 0;
+}
+
+void CutsceneScript::drawLine(CSImage *image, int startX, int startY, int endX, int endY, uint8 color) {
+	image->shp->draw_line(startX, startY, endX, endY, color);
+}
+
+void CutsceneScript::setMousePointer(uint8 pointer) {
+	Cursor *cursor = Game::get_game()->get_cursor();
+	if (cursor)
+		cursor->set_pointer(pointer);
+}
+
 void CutsceneScript::fadeIn(int speed) {
 	for (int i = 0; i <= 0xff; i += speed) {
 		_cutscene->set_screen_opacity(i);

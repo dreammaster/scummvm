@@ -376,6 +376,8 @@ MODULE_OBJS += \
 	ultima6/script/md/combat.o \
 	ultima6/script/md/dreamworld.o \
 	ultima6/script/md/ending.o \
+	ultima6/script/md/intro.o \
+	ultima6/script/md/intro_menu.o \
 	ultima6/script/md/lang.o \
 	ultima6/script/md/look.o \
 	ultima6/script/md/md_scripts.o \

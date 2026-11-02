@@ -446,9 +446,7 @@ public:
 	bool talkToObj(Obj *obj) override;
 	bool createObjectNeedsQuan(uint16 objN) override;
 
-	bool needsLua() const override {
-		return true; // The intro is still a Lua script
-	}
+	bool playIntro() override;
 	bool playEnding() override;
 
 	bool hasUsecode(Obj *obj, UseCodeEvent usecodeType) override;
