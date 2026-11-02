@@ -41,7 +41,7 @@
 #include "backends/keymapper/keymapper.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define MESG_ANIM_HIT_WORLD  ANIM_CB_HIT_WORLD
 #define MESG_ANIM_HIT        ANIM_CB_HIT
@@ -1868,5 +1868,5 @@ uint16 AsyncEffect::callback(uint16 msg, CallBack *caller, void *data) {
 	return 0;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

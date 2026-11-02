@@ -26,7 +26,7 @@
 #include "ultima/ultima6/keybinding/keys_enum.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 void MetaEngine::listSaves(SaveStateList &saveList) {
 	// Check whether there's an entry for the original save slot
@@ -267,5 +267,5 @@ Common::KeymapArray MetaEngine::initKeymaps(const Common::String &gameId) {
 	return keymapArray;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -25,7 +25,7 @@
 #include "ultima/ultima6/views/view.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class TileManager;
@@ -106,7 +106,7 @@ protected:
 	GUI_status callback(uint16 msg, GUI_CallBack *caller, void *data) override;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

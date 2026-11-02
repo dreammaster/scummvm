@@ -23,7 +23,7 @@
 #define NUVIE_CORE_LOOKUP_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 
@@ -51,7 +51,7 @@ public:
 protected:
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

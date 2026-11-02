@@ -26,7 +26,7 @@
 #include "ultima/ultima6/misc/actor_list.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class SEActor: public WOUActor {
 public:
@@ -41,7 +41,7 @@ public:
 	}
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

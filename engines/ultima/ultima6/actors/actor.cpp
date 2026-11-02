@@ -40,7 +40,7 @@
 #include "ultima/ultima6/actors/u6_actor.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 extern const uint8 walk_frame_tbl[4] = {0, 1, 2, 1};
 
@@ -1963,5 +1963,5 @@ bool Actor::doesOccupyLocation(uint16 lx, uint16 ly, uint8 lz, bool incDoubleTil
 	return false;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

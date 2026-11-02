@@ -25,7 +25,7 @@
 #include "ultima/ultima6/sound/adplug/adplug_player.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class OriginFXAdLibDriver;
 
@@ -114,7 +114,7 @@ public:
 	void interrupt_vector();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif // ULTIMA_MID_H

@@ -29,7 +29,7 @@
 #include "ultima/ultima6/gui/widgets/fps_counter.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 FpsCounter::FpsCounter(Game *g) : GUI_Widget(nullptr) {
 	game = g;
@@ -63,5 +63,5 @@ void FpsCounter::Display(bool full_redraw) {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -36,7 +36,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const char combat_mode_tbl[][8] = {"COMMAND", " FRONT", "  REAR", " FLANK", "BERSERK", "RETREAT", "ASSAULT"};
 static const char combat_mode_tbl_se[][6] = {"CMND", "RANGE", "FLEE", "CLOSE"};
@@ -696,5 +696,5 @@ void InventoryView::simulate_CB_callback() {
 	callback(BUTTON_CB, combat_button, Game::get_game()->get_view_manager());
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

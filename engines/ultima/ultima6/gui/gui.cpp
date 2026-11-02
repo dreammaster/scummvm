@@ -31,7 +31,7 @@
 #include "backends/keymapper/keymapper.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 const int GUI::mouseclick_delay = 300; /* SB-X */
 
@@ -410,5 +410,5 @@ Common::Path GUI::get_data_dir() const {
 	return Common::Path(datadir);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

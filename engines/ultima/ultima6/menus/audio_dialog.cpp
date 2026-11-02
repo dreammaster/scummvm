@@ -39,7 +39,7 @@
 #include "ultima/ultima6/nuvie.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int AD_WIDTH = 292;
 static const int AD_HEIGHT = 166;
@@ -282,5 +282,5 @@ GUI_status AudioDialog::callback(uint16 msg, GUI_CallBack *caller, void *data) {
 	return GUI_PASS;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

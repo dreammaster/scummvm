@@ -26,7 +26,7 @@
 #include "ultima/ultima6/files/u6_shape.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GameClock;
 class Configuration;
@@ -51,7 +51,7 @@ private:
 	void display_surface();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

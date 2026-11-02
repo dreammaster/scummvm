@@ -30,7 +30,7 @@ class Path;
 }
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class CPlayer {
 public:
@@ -93,7 +93,7 @@ protected:
 	static const unsigned char op_table[9];     // the 9 operators as expected by the OPL2
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -26,7 +26,7 @@
 #include "ultima/ultima6/actors/actor.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define MOVE_COST_USE 5
 
@@ -167,7 +167,7 @@ protected:
 	bool attack_select_weapon_at_location(sint8 location, bool add_newline = false, bool use_attack_text = true);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

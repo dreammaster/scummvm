@@ -27,7 +27,7 @@
 #include "ultima/ultima6/views/container_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class TileManager;
@@ -61,7 +61,7 @@ private:
 	void cursor_down();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

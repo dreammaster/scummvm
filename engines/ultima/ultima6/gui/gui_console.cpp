@@ -27,7 +27,7 @@
 #include "ultima/ultima6/gui/gui_console.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_Console::GUI_Console(uint16 x, uint16 y, uint16 w, uint16 h)
 	: GUI_Widget(nullptr, x, y, w, h) {
@@ -105,5 +105,5 @@ GUI_status GUI_Console::MouseMotion(int x, int y, uint8 state) {
 	return GUI_YUM;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

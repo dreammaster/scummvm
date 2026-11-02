@@ -26,7 +26,7 @@
 #include "ultima/ultima6/gui/gui_drag_area.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // Drag Messages.
 #define GUI_DRAG_OBJ 0
@@ -59,7 +59,7 @@ public:
 	void draw(int x, int y);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

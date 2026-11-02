@@ -28,7 +28,7 @@
 #include "ultima/ultima6/core/game_clock.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GameClock::GameClock(nuvie_game_t type) : game_type(type), day_of_week(0) {
 	date_string[10] = '\0';
@@ -352,5 +352,5 @@ void GameClock::update_timers(uint8 amount) {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

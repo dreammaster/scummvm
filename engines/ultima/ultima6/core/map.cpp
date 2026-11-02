@@ -34,7 +34,7 @@
 #include "ultima/ultima6/misc/u6_misc.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Map::Map(const Configuration *cfg) : config(cfg), tile_manager(nullptr),
 		obj_manager(nullptr), actor_manager(nullptr), surface(nullptr),
@@ -819,5 +819,5 @@ bool Map::lineTest(int start_x, int start_y, int end_x, int end_y, uint8 level,
 	return  false;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

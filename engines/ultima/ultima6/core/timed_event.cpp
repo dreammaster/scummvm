@@ -43,7 +43,7 @@
 #include "ultima/ultima6/core/timed_event.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define MESG_TIMED CB_TIMED
 
@@ -840,5 +840,5 @@ void TimedRest::sleep() {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

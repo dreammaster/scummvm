@@ -30,7 +30,7 @@
 #include "ultima/ultima6/files/nuvie_io_file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class ActorManager;
@@ -83,7 +83,7 @@ public:
 	bool save(const Common::String &filename, const Common::String &save_description, bool isAutosave);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

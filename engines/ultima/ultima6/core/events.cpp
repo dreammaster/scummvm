@@ -58,7 +58,7 @@
 #include "backends/keymapper/keymapper.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Events *Events::g_events;
 
@@ -3856,5 +3856,5 @@ bool shouldQuit() {
 	return g_engine->shouldQuit();
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

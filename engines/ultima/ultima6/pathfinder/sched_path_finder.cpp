@@ -26,7 +26,7 @@
 #include "ultima/ultima6/pathfinder/sched_path_finder.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* NOTE: Path_type must always be valid. */
 SchedPathFinder::SchedPathFinder(Actor *a, MapCoord g, Path *path_type)
@@ -98,5 +98,5 @@ bool SchedPathFinder::check_loc(const MapCoord &locPos) {
 	return actor->check_move(locPos.x, locPos.y, locPos.z, ACTOR_IGNORE_OTHERS);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

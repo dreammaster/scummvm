@@ -33,7 +33,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 extern GUI_status inventoryViewButtonCallback(void *data);
 extern GUI_status partyViewButtonCallback(void *data);
@@ -342,5 +342,5 @@ void ActorView::select_button() {
 		View::callback(BUTTON_CB, right_button, view_manager);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

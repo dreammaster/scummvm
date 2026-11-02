@@ -26,7 +26,7 @@
 #include "common/array.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 namespace U6Audio {
 
 class RandomCollectionAudioStream : public Audio::AudioStream {
@@ -45,7 +45,7 @@ public:
 RandomCollectionAudioStream *makeRandomCollectionAudioStream(int rate, bool stereo, Common::Array<Audio::RewindableAudioStream *>streams, DisposeAfterUse::Flag disposeAfterUse);
 
 } // End of namespace U6Audio
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

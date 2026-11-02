@@ -28,7 +28,7 @@
 #include "ultima/ultima6/gui/gui_scroller.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_Scroller::GUI_Scroller(int x, int y, int w, int h, uint8 r, uint8 g, uint8 b, uint16 r_height)
 	: GUI_Widget(nullptr, x, y, w, h), R(r), G(g), B(b), bg_color(0),
@@ -218,5 +218,5 @@ GUI_status GUI_Scroller::callback(uint16 msg, GUI_CallBack *caller, void *data) 
 	return GUI_YUM;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

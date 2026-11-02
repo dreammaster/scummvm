@@ -25,7 +25,7 @@
 #include "common/scummsys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define HAS_YM3812  1
 #define HAS_YM3526  0
@@ -102,7 +102,7 @@ void YM3526SetUpdateHandler(int which, OPL_UPDATEHANDLER UpdateHandler, int para
 
 #endif
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #if BUILD_Y8950
@@ -110,7 +110,7 @@ void YM3526SetUpdateHandler(int which, OPL_UPDATEHANDLER UpdateHandler, int para
 #include "ymdeltat.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* Y8950 port handlers */
 void Y8950SetPortHandler(int which, OPL_PORTHANDLER_W PortHandler_w, OPL_PORTHANDLER_R PortHandler_r, int param);
@@ -129,7 +129,7 @@ void Y8950SetTimerHandler(int which, OPL_TIMERHANDLER TimerHandler, int channelO
 void Y8950SetIRQHandler(int which, OPL_IRQHANDLER IRQHandler, int param);
 void Y8950SetUpdateHandler(int which, OPL_UPDATEHANDLER UpdateHandler, int param);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

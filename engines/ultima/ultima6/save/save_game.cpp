@@ -52,7 +52,7 @@
 #include "gui/browser.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define OBJLIST_FILENAME "savegame/objlist"
 #define OBJBLK_FILENAME  "savegame/objblkxx"
@@ -583,5 +583,5 @@ void SaveGame::update_objlist_for_new_game_md() {
 	objlist.write1(b2);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

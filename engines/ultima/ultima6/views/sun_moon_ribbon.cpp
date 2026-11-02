@@ -29,7 +29,7 @@
 #include "ultima/ultima6/gui/gui.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int SUNMOON_RIBBON_END_WIDTH = 5;
 static const int SUNMOON_RIBBON_WIDTH = 48;
@@ -224,5 +224,5 @@ GUI_status SunMoonRibbon::MouseDown(int x, int y, Events::MouseButton button) {
 	return GUI_PASS;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

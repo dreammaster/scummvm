@@ -24,7 +24,7 @@
 #include "ultima/ultima6/gui/gui_load_image.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* the check marks bitmap */
 Graphics::ManagedSurface *checkmarks = nullptr;
@@ -333,5 +333,5 @@ Graphics::ManagedSurface *GUI_Button::CreateTextButtonImage(int style, const cha
 	return img;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -25,7 +25,7 @@
 #include "common/file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /*
  *  Open a file for input,
@@ -54,5 +54,5 @@ bool fileExists(const Common::Path &fname) {
 	return Common::File::exists(fname);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

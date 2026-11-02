@@ -30,7 +30,7 @@
 #include "audio/mixer.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define TOWNS_SFX_SOUNDS1_SIZE 12
 
@@ -56,7 +56,7 @@ private:
 	void playSoundSample(uint8 sample_num, Audio::SoundHandle *looping_handle, uint8 volume);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

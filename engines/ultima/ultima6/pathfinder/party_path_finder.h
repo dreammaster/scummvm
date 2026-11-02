@@ -26,7 +26,7 @@
 #include "ultima/ultima6/core/map.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* PartyPathFinder moves the entire party at once.
  * FIXME: Move to target if one square away and unblocked. Shamino isn't in the
@@ -95,7 +95,7 @@ protected:
 	}
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

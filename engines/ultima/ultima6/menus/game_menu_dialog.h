@@ -26,7 +26,7 @@
 #include "ultima/ultima6/core/nuvie_defs.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define GAMEMENUDIALOG_CB_DELETE 3
 
@@ -52,7 +52,7 @@ public:
 	GUI_status callback(uint16 msg, GUI_CallBack *caller, void *data) override;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

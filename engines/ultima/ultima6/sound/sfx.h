@@ -23,7 +23,7 @@
 #define NUVIE_SOUND_SFX_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 typedef uint16 SfxIdType;
 
@@ -74,7 +74,7 @@ typedef uint16 SfxIdType;
 
 #define NUVIE_SFX_EARTH_QUAKE 39
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

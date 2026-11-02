@@ -26,7 +26,7 @@
 #include "ultima/ultima6/files/tmx_map.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 TMXMap::TMXMap(TileManager *tm, Map *m, ObjManager *om) : tile_manager(tm),
 		map(m), obj_manager(om), mapdata(nullptr) {
@@ -245,5 +245,5 @@ Common::String TMXMap::boolToString(bool value) {
 	return value ? Common::String("true") : Common::String("false");
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -34,7 +34,7 @@
 #include "ultima/ultima6/core/converse_speech.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //#define CONVERSE_DEBUG
 
@@ -1550,5 +1550,5 @@ const char *ConverseInterpret::op_str(converse_value op) {
 	return "U6OP_UNKNOWN";
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

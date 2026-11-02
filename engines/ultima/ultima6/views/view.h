@@ -25,7 +25,7 @@
 #include "ultima/ultima6/gui/widgets/gui_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_status viewLeftButtonCallback(void *data);
 GUI_status viewRightButtonCallback(void *data);
@@ -79,7 +79,7 @@ protected:
 	GUI_Button *loadButton(const Common::Path &dir, Common::String name, uint16 x, uint16 y);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

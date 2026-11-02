@@ -25,7 +25,7 @@
 #include "audio/midiparser.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 MidiParser_M::MidiParser_M(int8 source) : MidiParser(source) {
 	// M uses a fixed timer frequency of 60 Hz, or 16.667 ms per tick.
@@ -261,5 +261,5 @@ void MidiParser_M::allNotesOff() {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

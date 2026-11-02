@@ -26,13 +26,13 @@
 #define NUVIE_CONF_MISC_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 extern bool string_i_compare(const Common::String &s1, const Common::String &s2);
 
 extern Common::String readLine(Common::ReadStream *stream);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

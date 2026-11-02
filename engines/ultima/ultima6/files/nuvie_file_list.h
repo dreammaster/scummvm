@@ -26,7 +26,7 @@
 #include "common/fs.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 
 #define NUVIE_SORT_TIME_DESC 0x1
@@ -73,7 +73,7 @@ public:
 };
 
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

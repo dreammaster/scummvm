@@ -31,7 +31,7 @@
 #include "ultima/ultima6/conf/configuration.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class SoundManager;
 class Font;
@@ -227,7 +227,7 @@ private:
 
 ScriptCutscene *get_cutscene();
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

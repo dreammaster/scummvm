@@ -25,7 +25,7 @@
 #include "ultima/ultima6/sound/adplug/opl.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class CSilentopl : public Copl {
 public:
@@ -33,7 +33,7 @@ public:
 	void init() override { };
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif // ULTIMA_SILENT_OPL_H

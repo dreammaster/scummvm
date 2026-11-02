@@ -23,7 +23,7 @@
 #include "ultima/ultima6/pathfinder/combat_path_finder.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 CombatPathFinder::CombatPathFinder(Actor *a)
 	: ActorPathFinder(a, a->get_location()), target_mode(PATHFINDER_NONE),
@@ -91,5 +91,5 @@ bool CombatPathFinder::get_next_move(MapCoord &step) {
 	return false;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

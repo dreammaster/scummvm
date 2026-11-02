@@ -28,7 +28,7 @@
 #include "common/file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Configuration::Configuration() : _configChanged(false) {
 	// Set up keys that will be stored locally, since we don't want them being
@@ -437,5 +437,5 @@ void Configuration::setEnhancedDefaults(GameId gameType) {
 	_settings["input/interface"] = "fullscreen";
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

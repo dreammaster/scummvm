@@ -25,7 +25,7 @@
 #include "ultima/ultima6/fonts/font.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class Screen;
@@ -55,7 +55,7 @@ public:
 	uint16 getStringWidth(const char *str, uint16 string_len) override;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

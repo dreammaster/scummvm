@@ -26,7 +26,7 @@
 #include "ultima/ultima6/files/u6_lib_n.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class Actor;
@@ -51,7 +51,7 @@ private:
 	uint8 get_background_shape_num(uint8 actor_num) const;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

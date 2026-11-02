@@ -26,7 +26,7 @@
 #include "ultima/ultima6/pathfinder/u6_astar_path.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* Return the cost of moving one step from `c1' to `c2'.
  * Blocking objects are checked for, and doors may be passable
@@ -62,5 +62,5 @@ uint32 U6AStarPath::path_cost_est(const MapCoord &s, const MapCoord &g) {
 	return Path::path_cost_est(s, g);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

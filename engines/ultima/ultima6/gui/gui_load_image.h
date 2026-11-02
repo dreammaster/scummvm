@@ -25,7 +25,7 @@
 #include "graphics/managed_surface.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /************************************************************************/
 /* C functions for C image loading support:
@@ -47,7 +47,7 @@ extern Graphics::ManagedSurface *GUI_FontGump(void);
 
 extern const uint8 *GUI_FontGumpWData(void);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

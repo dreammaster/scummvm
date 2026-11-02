@@ -22,7 +22,7 @@
 #include "mididrv_m_mt32.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 const uint8 MidiDriver_M_MT32::MIDI_NOTE_MAP[] = {
 	0x00, 0x0C, 0x0E, 0x10, 0x11, 0x13, 0x15, 0x17,
@@ -201,5 +201,5 @@ void MidiDriver_M_MT32::onTimer() {
 	MidiDriver_MT32GM::onTimer();
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

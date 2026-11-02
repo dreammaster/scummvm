@@ -29,7 +29,7 @@
 #include "ultima/ultima6/views/draggable_view.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 DraggableView::DraggableView(const Configuration *cfg) : View(cfg),
 		drag(false), button_x(0), button_y(0), bg_image(nullptr),
@@ -141,5 +141,5 @@ void DraggableView::MoveRelative(int dx, int dy) {
 	return;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

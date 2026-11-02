@@ -26,7 +26,7 @@
 #include "common/stack.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* Control and value opcodes for op() & evop() (U6) */
 #define U6OP_GT         0x81
@@ -330,7 +330,7 @@ public:
 	MDTalkInterpret(Converse *owner) : WOUConverseInterpret(owner) { }
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

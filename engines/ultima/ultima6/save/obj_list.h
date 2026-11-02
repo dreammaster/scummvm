@@ -23,7 +23,7 @@
 #define NUVIE_SAVE_OBJ_LIST_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define OBJLIST_OFFSET_PARTY_NAMES     0xf00
 #define OBJLIST_OFFSET_PARTY_ROSTER    0xfe0
@@ -79,7 +79,7 @@ namespace Nuvie {
 
 #define OBJLIST_OFFSET_SE_COMMAND_BAR  0x1d6c
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

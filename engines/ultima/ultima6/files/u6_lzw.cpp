@@ -35,7 +35,7 @@
 #include "ultima/ultima6/misc/u6_misc.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 U6Lzw::U6Lzw() : dict(new U6LzwDict), stack(new U6LzwStack), errstr("unknown error") {
 }
@@ -450,5 +450,5 @@ int U6LzwDict::get_codeword(int codeword) const {
 	return dict[codeword].codeword;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

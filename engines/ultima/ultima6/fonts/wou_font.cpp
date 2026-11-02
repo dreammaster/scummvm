@@ -28,7 +28,7 @@
 #include "ultima/ultima6/core/game.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 WOUFont::WOUFont() : font_data(nullptr), char_buf(nullptr), height(0),
 		pixel_char(0) {
@@ -167,5 +167,5 @@ uint8 WOUFont::drawCharToShape(U6Shape *shp, uint8 char_num, uint16 x, uint16 y,
 	return width;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

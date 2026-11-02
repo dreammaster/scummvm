@@ -25,7 +25,7 @@
 #include "ultima/ultima6/views/view.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class TileManager;
@@ -81,7 +81,7 @@ protected:
 	Actor *get_actor(int x, int y);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

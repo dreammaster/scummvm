@@ -27,7 +27,7 @@
 #include "audio/audiostream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class OriginFXAdLibDriver;
 class Configuration;
@@ -86,7 +86,7 @@ protected:
 	uint32 total_samples_played;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

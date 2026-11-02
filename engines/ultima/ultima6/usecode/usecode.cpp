@@ -30,7 +30,7 @@
 #include "ultima/ultima6/core/events.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 UseCode::UseCode(Game *g, const Configuration *cfg) : game(g), config(cfg),
 		obj_manager(nullptr), map(nullptr), player(nullptr), scroll(nullptr),
@@ -310,5 +310,5 @@ const char *useCodeTypeToString(UseCodeType type) {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

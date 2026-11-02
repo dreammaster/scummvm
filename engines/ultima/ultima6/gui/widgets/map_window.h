@@ -28,7 +28,7 @@
 #include "ultima/ultima6/core/map.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class TileManager;
@@ -374,7 +374,7 @@ private:
 	bool can_display_obj(uint16 x, uint16 y, Obj *obj);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

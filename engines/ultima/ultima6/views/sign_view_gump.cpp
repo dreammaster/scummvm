@@ -28,7 +28,7 @@
 #include "ultima/ultima6/views/sign_view_gump.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int SIGN_BG_W = 246;
 static const int SIGN_BG_H = 101;
@@ -127,5 +127,5 @@ GUI_status SignViewGump::callback(uint16 msg, GUI_CallBack *caller, void *data) 
 	return GUI_YUM;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -27,7 +27,7 @@
 #include "ultima/ultima6/gui/widgets/msg_scroll.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_DragManager::GUI_DragManager(Screen *s): screen(s), message(0),
 		data(nullptr), drag_source(nullptr), is_out_of_range(false) {
@@ -80,5 +80,5 @@ GUI_DragArea *GUI_DragManager::get_source() {
 	return drag_source;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

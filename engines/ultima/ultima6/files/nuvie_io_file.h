@@ -29,7 +29,7 @@
 #include "common/savefile.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class NuvieIOFile : public NuvieIO {
 public:
@@ -103,7 +103,7 @@ public:
 	uint32 write(NuvieIO *src) override;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

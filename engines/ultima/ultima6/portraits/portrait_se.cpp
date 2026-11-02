@@ -34,7 +34,7 @@
 #include "ultima/ultima6/misc/u6_misc.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 bool PortraitSE::init() {
 	Common::Path filename;
@@ -195,5 +195,5 @@ unsigned char *PortraitSE::get_portrait_data(Actor *actor) {
 	return bg_data;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -26,7 +26,7 @@
 #include "ultima/ultima6/core/obj_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class U6LList;
@@ -209,7 +209,7 @@ protected:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

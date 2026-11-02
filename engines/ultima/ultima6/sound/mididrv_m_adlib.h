@@ -25,7 +25,7 @@
 #include "audio/adlib_ms.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /**
  * M driver for AdLib (OPL2).
@@ -97,7 +97,7 @@ protected:
 	uint8 _fadeCurrentDelays[9];
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

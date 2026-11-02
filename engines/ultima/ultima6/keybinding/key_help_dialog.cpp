@@ -27,7 +27,7 @@
 #include "gui/widgets/richtext.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 KeyHelpDialog::KeyHelpDialog(const Common::U32String &helpTxt)
 	: GUI::Dialog("HelpDialog") {
@@ -42,5 +42,5 @@ void KeyHelpDialog::handleCommand(GUI::CommandSender *sender, uint32 cmd, uint32
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

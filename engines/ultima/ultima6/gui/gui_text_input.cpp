@@ -26,7 +26,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_TextInput:: GUI_TextInput(int x, int y, uint8 r, uint8 g, uint8 b, const char *str,
 							  GUI_Font *gui_font, uint16 width, uint16 height, GUI_CallBack *callback)
@@ -310,5 +310,5 @@ void GUI_TextInput::display_cursor() {
 	return;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

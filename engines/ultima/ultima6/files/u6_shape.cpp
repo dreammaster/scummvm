@@ -28,7 +28,7 @@
 #include "common/endian.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /*
  * Structure of shape file:
@@ -404,5 +404,5 @@ void U6Shape::fill(uint8 color) {
 	memset(raw, color, width * height);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

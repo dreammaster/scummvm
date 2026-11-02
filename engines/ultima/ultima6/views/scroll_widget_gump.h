@@ -29,7 +29,7 @@
 #include "common/str.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 
 class Configuration;
@@ -110,7 +110,7 @@ private:
 	void update_arrows();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

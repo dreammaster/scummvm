@@ -29,7 +29,7 @@
 #include "ultima/ultima6/core/anim_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //class Actor;
 class EffectManager;
@@ -697,7 +697,7 @@ public:
 	uint16 callback(uint16 msg, CallBack *caller, void *data) override;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

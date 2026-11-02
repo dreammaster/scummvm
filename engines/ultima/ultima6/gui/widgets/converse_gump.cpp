@@ -36,7 +36,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int CURSOR_COLOR = 248;
 
@@ -753,5 +753,5 @@ void ConverseGump::drawCursor(uint16 x, uint16 y) {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

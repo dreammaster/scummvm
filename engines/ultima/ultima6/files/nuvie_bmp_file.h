@@ -28,7 +28,7 @@
 #include "ultima/ultima6/core/tile_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class NuvieBmpFile {
 private:
@@ -91,7 +91,7 @@ private:
 	void write8BitData(NuvieIOFileWrite *file);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

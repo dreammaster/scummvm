@@ -31,7 +31,7 @@
 
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class U6Lib_n;
 class Configuration;
@@ -74,7 +74,7 @@ public:
 	void fill(uint8 color);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

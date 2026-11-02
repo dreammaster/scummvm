@@ -37,7 +37,7 @@
 #include "ultima/ultima6/views/sun_moon_strip_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 extern GUI_status inventoryViewButtonCallback(void *data);
 extern GUI_status actorViewButtonCallback(void *data);
@@ -384,5 +384,5 @@ void PartyView::display_arrows() {
 }
 // </SB-X>
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

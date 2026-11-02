@@ -25,7 +25,7 @@
 #include "ultima/ultima6/sound/song.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class SongFilename : public Song {
 public:
@@ -38,7 +38,7 @@ public:
 	bool FadeOut(float seconds) override;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -29,7 +29,7 @@
 #include "ultima/ultima6/views/scroll_view_gump.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int SIGN_BG_W = (SCROLLWIDGETGUMP_W + 16);
 static const int SIGN_BG_H = (SCROLLWIDGETGUMP_H + 16);
@@ -117,5 +117,5 @@ GUI_status ScrollViewGump::callback(uint16 msg, GUI_CallBack *caller, void *data
 	return GUI_YUM;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

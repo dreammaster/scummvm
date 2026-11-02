@@ -24,7 +24,7 @@
 #include "ultima/ultima6/gui/gui_area.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_Area:: GUI_Area(int x, int y, int w, int h, uint8 r, uint8 g, uint8 b, int aShape)
 	: GUI_Widget(nullptr, x, y, w, h), R(r), G(g), B(b), color(0), useFrame(0), shape(aShape),
@@ -117,5 +117,5 @@ void GUI_Area::Display(bool full_redraw) {
 	return;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

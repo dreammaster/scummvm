@@ -43,7 +43,7 @@
 #include "ultima/ultima6/core/u6_objects.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Portrait *newPortrait(nuvie_game_t gametype, const Configuration *cfg) {
 	// Correct portrait class for each game
@@ -102,5 +102,5 @@ unsigned char *Portrait::get_wou_portrait_data(U6Lib_n *lib, uint8 num) {
 	return new_portrait;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

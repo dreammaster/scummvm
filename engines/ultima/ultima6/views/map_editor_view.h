@@ -25,7 +25,7 @@
 #include "ultima/ultima6/views/view.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class GUI_Button;
@@ -59,7 +59,7 @@ private:
 	void update_selected_tile_relative(sint32 rel_value);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

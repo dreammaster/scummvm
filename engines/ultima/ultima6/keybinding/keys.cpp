@@ -46,7 +46,7 @@
 #define ENCODE_KEY(key, mod) ((uint32)(key) | ((uint32)(mod) << 24))
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const char *whitespace = "\t\n\v\f\r ";
 
@@ -1038,5 +1038,5 @@ char get_ascii_char_from_keysym(Common::KeyState keysym) {
 	return ascii;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

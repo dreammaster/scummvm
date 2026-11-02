@@ -23,7 +23,7 @@
 #include "ultima/ultima6/gui/gui_text_toggle_button.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_TextToggleButton::GUI_TextToggleButton(void *data, int x, int y, int w, int h,
 		const char *const *texts_, int count_, int selection_,
@@ -79,5 +79,5 @@ int GUI_TextToggleButton::GetSelection() const {
 	return selection;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

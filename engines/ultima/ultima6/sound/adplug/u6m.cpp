@@ -24,7 +24,7 @@
 #include "ultima/ultima6/sound/adplug/u6m.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Cu6mPlayer::~Cu6mPlayer() {
 	if (song_data)
@@ -625,5 +625,5 @@ void Cu6mPlayer::out_adlib_opcell(int channel, bool carrier, unsigned char adlib
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

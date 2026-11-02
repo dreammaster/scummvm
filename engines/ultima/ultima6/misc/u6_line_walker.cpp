@@ -22,7 +22,7 @@
 #include "ultima/ultima6/misc/u6_line_walker.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 U6LineWalker::U6LineWalker(uint32 sx, uint32 sy, uint32 ex, uint32 ey)
 	: start_x(sx), start_y(sy), end_x(ex), end_y(ey), cur_x(sx), cur_y(sy), cur_step(0) {
@@ -91,5 +91,5 @@ bool U6LineWalker::next(uint32 *x, uint32 *y) {
 	return ret;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

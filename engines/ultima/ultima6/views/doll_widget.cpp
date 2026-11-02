@@ -39,7 +39,7 @@
 #include "ultima/ultima6/files/nuvie_bmp_file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const byte gump_blocked_tile_data[] = {
 	170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170, 170,
@@ -553,5 +553,5 @@ GUI_status DollWidget::MouseDelayed(int x, int y, Events::MouseButton button) {
 	return GUI_PASS;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

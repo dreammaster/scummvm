@@ -28,7 +28,7 @@
 #include "ultima/ultima6/core/obj.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //class U6LList;
 class Configuration;
@@ -244,7 +244,7 @@ public:
 	void print_obj(const Obj *obj, bool in_container, uint8 indent = 0);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

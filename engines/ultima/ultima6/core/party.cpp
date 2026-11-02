@@ -41,7 +41,7 @@
 #include "ultima/ultima6/core/events.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Party::Party(const Configuration *cfg) : config(cfg), game(nullptr),
 		actor_manager(nullptr), map(nullptr), pathfinder(nullptr),
@@ -995,5 +995,5 @@ bool Party::has_light_source() {
 	return false;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -40,7 +40,7 @@
 #include "ultima/ultima6/views/sun_moon_strip_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 PortraitView::PortraitView(const Configuration *cfg) : View(cfg),
 		portrait_data(nullptr), portrait(nullptr),	bg_data(nullptr),
@@ -241,5 +241,5 @@ void PortraitView::set_waiting(bool state) {
 	Game::get_game()->get_gui()->lock_input(waiting ? this : nullptr);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

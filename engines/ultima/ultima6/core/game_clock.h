@@ -25,7 +25,7 @@
 #include "ultima/ultima6/core/nuvie_defs.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define GAMECLOCK_TICKS_PER_MINUTE   4
 
@@ -146,7 +146,7 @@ private:
 	void save_MD_timers(NuvieIO *objlist);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

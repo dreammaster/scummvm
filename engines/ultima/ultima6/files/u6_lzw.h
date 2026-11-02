@@ -25,7 +25,7 @@
 #include "common/str.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class NuvieIOFileRead;
 
@@ -105,7 +105,7 @@ protected:
 	void get_string(int codeword);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

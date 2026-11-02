@@ -33,7 +33,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 PortraitViewGump::PortraitViewGump(const Configuration *cfg) : DraggableView(cfg),
 		portrait(nullptr), font(nullptr), gump_button(nullptr), portrait_data(nullptr),
@@ -289,5 +289,5 @@ GUI_status PortraitViewGump::MouseDown(int x, int y, Events::MouseButton button)
 	return DraggableView::MouseDown(x, y, button);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

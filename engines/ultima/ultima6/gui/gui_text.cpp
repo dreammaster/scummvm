@@ -24,7 +24,7 @@
 #include "ultima/ultima6/gui/gui_font.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_Text::GUI_Text(int x, int y, uint8 r, uint8 g, uint8 b, GUI_Font *gui_font, uint16 line_length)
 	: GUI_Widget(nullptr, x, y, 0, 0) {
@@ -72,5 +72,5 @@ void GUI_Text::setText(const char *txt) {
 	area.setHeight(h);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

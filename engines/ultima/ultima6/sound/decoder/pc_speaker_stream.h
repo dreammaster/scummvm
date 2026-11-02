@@ -27,7 +27,7 @@
 #include "audio/audiostream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class PCSpeakerStream : public Audio::RewindableAudioStream {
 public:
@@ -180,7 +180,7 @@ Audio::AudioStream *makePCSpeakerKalLorSfxStream(uint rate);
 Audio::AudioStream *makePCSpeakerHailStoneSfxStream(uint rate);
 Audio::AudioStream *makePCSpeakerEarthQuakeSfxStream(uint rate);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

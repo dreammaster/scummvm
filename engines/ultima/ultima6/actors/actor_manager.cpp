@@ -44,7 +44,7 @@
 #include "ultima/ultima6/views/view_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int ACTOR_TEMP_INIT = 255;
 static const int SCHEDULE_SIZE = 5;
@@ -1214,5 +1214,5 @@ Actor *ActorManager::findActorAtImpl(uint16 x, uint16 y, uint8 z, bool (*predica
 	return nullptr;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

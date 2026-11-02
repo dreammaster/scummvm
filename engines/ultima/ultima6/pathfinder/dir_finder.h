@@ -23,7 +23,7 @@
 #define NUVIE_PATHFINDER_DIR_FINDER_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class MapCoord;
 
@@ -38,7 +38,7 @@ public:
 	static void get_normalized_dir(const MapCoord &from, const MapCoord &to, sint8 &xdir, sint8 &ydir);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

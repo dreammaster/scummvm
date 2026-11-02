@@ -26,7 +26,7 @@
 #include "ultima/ultima6/pathfinder/dir_finder.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Actor;
 
@@ -54,7 +54,7 @@ protected:
 	bool check_dir_and_distance(const MapCoord &loc, const MapCoord &g, MapCoord &rel_step, sint8 rotate);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

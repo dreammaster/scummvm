@@ -30,7 +30,7 @@
 #include "audio/decoders/wave.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class CustomSfxManager : public SfxManager {
 public:
@@ -51,7 +51,7 @@ private:
 	Common::HashMap<uint16, uint16> sfx_map;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

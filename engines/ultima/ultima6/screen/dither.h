@@ -23,7 +23,7 @@
 #define NUVIE_SCREEN_DITHER_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 
@@ -59,7 +59,7 @@ protected:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

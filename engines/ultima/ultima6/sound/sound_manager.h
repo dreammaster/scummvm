@@ -46,7 +46,7 @@
 #include "common/mutex.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define SFX_PLAY_ASYNC true
 #define SFX_PLAY_SYNC false
@@ -189,7 +189,7 @@ public:
 	static bool g_MusicFinished;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

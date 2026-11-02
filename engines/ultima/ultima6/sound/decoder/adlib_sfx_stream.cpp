@@ -24,7 +24,7 @@
 #include "ultima/ultima6/sound/decoder/adlib_sfx_stream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 AdLibSfxStream::AdLibSfxStream(const Configuration *cfg, int rate, uint8 channel, sint8 note, uint8 velocity, uint8 program_number, uint32 d) {
 	interrupt_samples_left = 0;
@@ -85,5 +85,5 @@ int AdLibSfxStream::readBuffer(sint16 *buffer, const int numSamples) {
 	return numSamples;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

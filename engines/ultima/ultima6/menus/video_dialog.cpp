@@ -40,7 +40,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int VD_WIDTH = 311;
 static const int VD_HEIGHT = 171; // add or subtract 13 if you add/remove a row
@@ -311,5 +311,5 @@ GUI_status VideoDialog::callback(uint16 msg, GUI_CallBack *caller, void *data) {
 	return GUI_PASS;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

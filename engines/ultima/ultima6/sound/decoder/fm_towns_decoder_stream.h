@@ -22,7 +22,7 @@
 #include "ultima/ultima6/sound/decoder/random_collection_audio_stream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class U6Lib_n;
 class U6Lzw;
@@ -80,7 +80,7 @@ private:
 	inline sint16 convertSample(uint16 rawSample) const;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

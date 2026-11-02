@@ -27,7 +27,7 @@
 #include "common/fs.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 NuvieFileList::NuvieFileList() : sort_mode(NUVIE_SORT_NAME_ASC) {
 }
@@ -98,5 +98,5 @@ const Common::List<NuvieFileDesc> &NuvieFileList::get_filelist() const {
 	return file_list;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

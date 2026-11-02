@@ -25,14 +25,14 @@
 #include "common/array.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Actor;
 
 typedef Common::Array<Actor *> ActorList;
 typedef Common::Array<Actor *>::iterator ActorIterator;
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -42,7 +42,7 @@
 #include "ultima/ultima6/nuvie.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const Tile placeholder_tile = {
 	0,
@@ -514,5 +514,5 @@ void CommandBar::drag_perform_drop(int x, int y, int message, void *data) {
 		Game::get_game()->get_map_window()->drag_perform_drop(x, y, message, data);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

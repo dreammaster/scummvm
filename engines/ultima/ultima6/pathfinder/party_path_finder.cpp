@@ -29,7 +29,7 @@
 #include "ultima/ultima6/core/u6_objects.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 PartyPathFinder::PartyPathFinder(Party *p) : party(p) {
 	assert(p);
@@ -467,5 +467,5 @@ void PartyPathFinder::end_seek(uint32 p) {
 	get_member(p).actor->delete_pathfinder();
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

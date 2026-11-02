@@ -24,7 +24,7 @@
 #include "ultima/ultima6/pathfinder/astar_path.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 AStarPath::AStarPath() : final_node(0) {
 }
@@ -213,5 +213,5 @@ void AStarPath::delete_nodes() {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

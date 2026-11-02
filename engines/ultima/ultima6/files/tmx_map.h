@@ -26,7 +26,7 @@
 #include "ultima/ultima6/files/nuvie_io_file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Map;
 class ObjManager;
@@ -61,7 +61,7 @@ private:
 	bool canDrawTile(Tile *t, bool forceLower, bool toptile);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

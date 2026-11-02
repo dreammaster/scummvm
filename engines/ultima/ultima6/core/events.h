@@ -28,7 +28,7 @@
 #include "ultima/ultima6/core/obj_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Actor;
 class CallbackTarget;
@@ -475,7 +475,7 @@ public:
 
 extern bool shouldQuit();
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

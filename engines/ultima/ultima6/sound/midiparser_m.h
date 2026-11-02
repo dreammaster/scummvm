@@ -28,7 +28,7 @@
 #include "common/util.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /**
  * A parser for the music format M, used by Times Of Lore, Bad Blood and
@@ -79,7 +79,7 @@ protected:
 	Common::FixedStack<LoopData, 16> *_loopStack;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -28,7 +28,7 @@
 #include "common/str.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 void Tokenise(const Common::String &str, Common::Array<Common::String> &tokens, char delimiter = ' ') {
 	Common::String delimiters(delimiter);
@@ -719,5 +719,5 @@ Common::String encode_xml_entity(const Common::String &s) {
 	return ret;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

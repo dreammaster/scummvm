@@ -26,7 +26,7 @@
 #include "ultima/ultima6/conf/configuration.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Copl;
 class Configuration;
@@ -91,7 +91,7 @@ private:
 	void write_adlib_instrument(sint8 voice, unsigned char *tim_data);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

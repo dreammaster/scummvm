@@ -26,7 +26,7 @@
 #include "ultima/ultima6/files/u6_lib_n.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 U6Lib_n::U6Lib_n() : num_offsets(0), items(nullptr), data(nullptr),
 	del_data(false), filesize(0), game_type(NUVIE_GAME_U6), lib_size(0) {
@@ -471,5 +471,5 @@ void U6Lib_n::write_item(uint32 item_number) {
 	((NuvieIOFileWrite *)data)->writeBuf(items[item_number].data, items[item_number].size);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

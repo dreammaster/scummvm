@@ -26,7 +26,7 @@
 #include "audio/fmopl.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class CEmuopl: public Copl {
 public:
@@ -48,7 +48,7 @@ private:
 	int oplRate;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

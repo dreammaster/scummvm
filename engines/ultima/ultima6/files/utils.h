@@ -26,7 +26,7 @@
 #include "common/stream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 bool openFile(
 	Common::ReadStream *&in,    // Input stream to open.
@@ -35,7 +35,7 @@ bool openFile(
 
 extern bool fileExists(const Common::Path &fname);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

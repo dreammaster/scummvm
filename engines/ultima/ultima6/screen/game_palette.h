@@ -25,7 +25,7 @@
 #include "ultima/ultima6/screen/screen.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 
@@ -53,7 +53,7 @@ protected:
 	bool loadPalette();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

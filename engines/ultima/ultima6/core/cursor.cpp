@@ -31,7 +31,7 @@
 #include "ultima/ultima6/core/cursor.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 
 Cursor::Cursor() : cursor_id(0), cur_x(-1), cur_y(-1), cleanup(nullptr),
@@ -257,5 +257,5 @@ void Cursor::add_update(uint16 x, uint16 y, uint16 w, uint16 h) {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -38,7 +38,7 @@
 #include "common/system.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const uint32 DELUXE_PAINT_MAGIC = 0x4d524f46; // "FORM"
 
@@ -1950,5 +1950,5 @@ void CSStarFieldImage::updateEffect() {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

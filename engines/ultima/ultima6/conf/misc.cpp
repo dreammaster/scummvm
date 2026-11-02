@@ -22,7 +22,7 @@
 #include "ultima/ultima6/conf/misc.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Common::String readLine(Common::ReadStream *stream) {
 	Common::String line;
@@ -33,5 +33,5 @@ Common::String readLine(Common::ReadStream *stream) {
 	return line;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

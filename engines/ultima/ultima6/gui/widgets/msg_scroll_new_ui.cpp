@@ -36,7 +36,7 @@
 #include "ultima/ultima6/core/timed_event.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // MsgScrollNewUI Class
 
@@ -293,5 +293,5 @@ MsgLine *MsgScrollNewUI::add_new_line() {
 	return line;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -36,7 +36,7 @@
 #include "ultima/ultima6/gui/widgets/msg_scroll.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int obj_egg_table[5] = {0,   // NUVIE_GAME_NONE
 									 335, // NUVIE_GAME_U6
@@ -2071,5 +2071,5 @@ bool ObjManager::moveto_container(Obj *obj, Obj *container_obj, bool stack) {
 	return true;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

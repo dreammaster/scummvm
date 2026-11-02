@@ -39,7 +39,7 @@
 #include "ultima/ultima6/gui/widgets/background.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //#define CONVERSE_DEBUG
 
@@ -748,5 +748,5 @@ ConverseGumpType get_converse_gump_type_from_config(const Configuration *config)
 	return CONVERSE_GUMP_DEFAULT;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

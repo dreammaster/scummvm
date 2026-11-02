@@ -28,7 +28,7 @@
 #include "ultima/ultima6/gui/widgets/command_bar.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class NuvieIO;
 class Events;
@@ -60,7 +60,7 @@ private:
 	const char *get_command_name(sint8 command_num) const;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

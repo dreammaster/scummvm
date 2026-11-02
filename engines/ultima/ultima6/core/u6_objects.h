@@ -23,7 +23,7 @@
 #define NUVIE_CORE_U6_OBJECTS_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //object numbers
 #define OBJ_U6_NOTHING               0
@@ -500,7 +500,7 @@ namespace Nuvie {
 #define OBJ_MD_CHIP_OF_RADIUM        449
 #define OBJ_MD_DREAM_TELEPORTER      461
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -26,7 +26,7 @@
 #include "graphics/managed_surface.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class GUI_Button;
@@ -55,7 +55,7 @@ protected:
 	void force_full_redraw_if_needed();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

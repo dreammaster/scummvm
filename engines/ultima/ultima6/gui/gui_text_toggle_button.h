@@ -25,7 +25,7 @@
 #include "ultima/ultima6/gui/gui_button.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // A button that cycles through a set of captions when clicked
 
@@ -56,7 +56,7 @@ protected:
 	ButtonTextAlign alignment;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -25,7 +25,7 @@
 #include "ultima/ultima6/files/u6_bmp.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 U6Bmp::U6Bmp(): U6Shape(), data(nullptr) {
 }
@@ -61,5 +61,5 @@ bool U6Bmp::load(const Common::Path &filename) {
 	return true;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

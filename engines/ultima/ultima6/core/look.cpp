@@ -28,7 +28,7 @@
 #include "ultima/ultima6/core/look.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Look::Look(const Configuration *cfg)
 	: look_data(nullptr), desc_buf(nullptr), config(cfg), max_len(0) {
@@ -175,5 +175,5 @@ void Look::print() {
 	return;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

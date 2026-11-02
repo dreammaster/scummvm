@@ -23,7 +23,7 @@
 #define NUVIE_VIEWS_VIEW_MANAGER_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class GUI;
@@ -167,7 +167,7 @@ protected:
 	void move_gump_to_top(DraggableView *gump);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

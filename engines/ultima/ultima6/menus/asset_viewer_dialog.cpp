@@ -43,7 +43,7 @@
 #include "common/keyboard.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int AVD_WIDTH = 320;
 static const int AVD_HEIGHT = 200;
@@ -283,5 +283,5 @@ GUI_status AssetViewerDialog::callback(uint16 msg, GUI_CallBack *caller, void *d
 	return GUI_YUM;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

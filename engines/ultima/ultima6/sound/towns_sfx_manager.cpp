@@ -30,7 +30,7 @@
 #include "ultima/ultima6/sound/towns_sfx_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 typedef struct { // sfx lookup
 	uint16 sfx_id;
@@ -149,5 +149,5 @@ void TownsSfxManager::playSoundSample(uint8 sample_num, Audio::SoundHandle *loop
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

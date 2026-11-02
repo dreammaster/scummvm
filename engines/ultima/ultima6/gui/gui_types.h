@@ -27,7 +27,7 @@
 #include "ultima/ultima6/misc/sdl_compat.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GUI_image {
 
@@ -68,7 +68,7 @@ public:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

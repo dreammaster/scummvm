@@ -29,7 +29,7 @@
 #include "ultima/ultima6/nuvie.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 SongAdPlug::SongAdPlug(Audio::Mixer *m, CEmuopl *o) {
 	mixer = m;
@@ -75,5 +75,5 @@ bool SongAdPlug::SetVolume(uint8 volume) {
 	return true;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

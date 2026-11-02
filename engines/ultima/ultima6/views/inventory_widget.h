@@ -27,7 +27,7 @@
 #include "ultima/ultima6/views/inventory_message.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class TileManager;
@@ -122,7 +122,7 @@ public:
 	Obj *get_obj_at_location(int x, int y);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

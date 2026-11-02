@@ -22,7 +22,7 @@
 #include "ultima/ultima6/actors/se_actor.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 SEActor::SEActor(Map *m, ObjManager *om, GameClock *c): WOUActor(m, om, c) {
 }
@@ -41,5 +41,5 @@ bool SEActor::will_not_talk() const {
 	return false;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

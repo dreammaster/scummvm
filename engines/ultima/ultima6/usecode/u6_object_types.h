@@ -23,7 +23,7 @@
 #define ULTIMA_U6_OBJECT_TYPES_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class U6UseCode;
 
@@ -192,7 +192,7 @@ const U6ObjectType U6ObjectTypes[] = {
 	{ nullptr,                          OBJ_U6_NOTHING, 0, 0, 0, OBJTYPE_NONE } // end indicator
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif // ULTIMA_U6_OBJECT_TYPES_H

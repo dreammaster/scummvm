@@ -26,7 +26,7 @@
 #include "ultima/ultima6/core/nuvie_defs.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GUI_CallBack {
 
@@ -45,7 +45,7 @@ public:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

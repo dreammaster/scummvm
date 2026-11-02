@@ -26,7 +26,7 @@
 #include "audio/mixer.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 namespace U6Audio {
 
 #pragma mark -
@@ -130,5 +130,5 @@ RandomCollectionAudioStream *makeRandomCollectionAudioStream(int rate, bool ster
 }
 
 } // End of namespace U6Audio
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -27,7 +27,7 @@
 #include "engines/engine.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 NuvieIOFileRead::~NuvieIOFileRead() {
 	close();
@@ -260,5 +260,5 @@ uint32 NuvieIOFileWrite::write(NuvieIO *src) {
 	return 0;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

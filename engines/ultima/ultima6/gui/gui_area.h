@@ -28,7 +28,7 @@
 #include "ultima/ultima6/screen/screen.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define AREA_ROUND 1
 #define AREA_ANGULAR 2
@@ -67,7 +67,7 @@ protected:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

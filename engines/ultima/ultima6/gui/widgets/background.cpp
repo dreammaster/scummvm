@@ -31,7 +31,7 @@
 #include "ultima/ultima6/gui/gui.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Background::Background(const Configuration *cfg) : GUI_Widget(nullptr), config(cfg),
 		bg_w(0), bg_h(0), border_width(0), background(nullptr), right_bg_x_off(0),
@@ -158,5 +158,5 @@ void Background::drag_perform_drop(int x, int y, int message, void *data) {
 		Game::get_game()->get_map_window()->drag_perform_drop(x, y, message, data);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -29,7 +29,7 @@
 #include "ultima/ultima6/core/u6_objects.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define U6_LORD_BRITISH_ACTOR_NUM 5 /*change to U6_NPC_LORD_BRITISH?*/
 #define U6_SHERRY_ACTOR_NUM       9
@@ -222,7 +222,7 @@ protected:
 	inline bool lock_pick_dex_check();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

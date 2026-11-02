@@ -25,7 +25,7 @@
 #include "ultima/ultima6/gui/widgets/gui_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GUI_Font;
 
@@ -47,7 +47,7 @@ public:
 	void setText(const char *txt);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

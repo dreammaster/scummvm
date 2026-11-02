@@ -26,7 +26,7 @@
 #include "ultima/ultima6/views/sun_moon_strip_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 SunMoonStripWidget::SunMoonStripWidget(Player *p, TileManager *tm)
 	: GUI_Widget(nullptr, 0, 0, 0, 0), player(p), tile_manager(tm) {
@@ -151,5 +151,5 @@ void SunMoonStripWidget::display_moons(uint8 day, uint8 hour, uint8 minute) {
 		display_sun_moon(tileB, posB - 5);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

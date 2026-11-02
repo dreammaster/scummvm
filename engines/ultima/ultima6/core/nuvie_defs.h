@@ -26,7 +26,7 @@
 #include "ultima/ultima6/misc/sdl_compat.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 typedef int8 sint8;
 typedef int16 sint16;
@@ -133,7 +133,7 @@ extern void u6debug(bool no_header, const DebugLevelType level, const char *form
 #define NUVIE_RAND_MAX 0x7fffffff // POSIX: 2^(31)-1
 #define NUVIE_RAND() getRandom(NUVIE_RAND_MAX)
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

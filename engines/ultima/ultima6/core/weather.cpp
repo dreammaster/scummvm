@@ -36,7 +36,7 @@
 #include "ultima/ultima6/script/script.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //the longest we will go before having a change in wind direction
 #define WEATHER_MAX_WIND 30
@@ -252,5 +252,5 @@ uint16 Weather::callback(uint16 msg, CallBack *caller, void *data) {
 	return 1;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

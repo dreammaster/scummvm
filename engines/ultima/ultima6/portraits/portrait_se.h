@@ -26,7 +26,7 @@
 #include "ultima/ultima6/files/u6_lib_n.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class Actor;
@@ -49,7 +49,7 @@ private:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

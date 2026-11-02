@@ -42,7 +42,7 @@
 #include "common/events.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define btn_size 17
 #define SELECTED_COLOR 248
@@ -278,5 +278,5 @@ void CommandBarNewUI::display_information()
 }
 */
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

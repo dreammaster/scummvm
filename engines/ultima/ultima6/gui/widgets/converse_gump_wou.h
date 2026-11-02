@@ -28,7 +28,7 @@
 #include "common/str.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class Font;
@@ -103,7 +103,7 @@ private:
 	Graphics::ManagedSurface *bg_image;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

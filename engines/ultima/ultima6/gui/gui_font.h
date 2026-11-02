@@ -25,7 +25,7 @@
 #include "ultima/ultima6/core/nuvie_defs.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 enum GuiFont {
 	GUI_FONT_DEFAULT = 0,
@@ -88,7 +88,7 @@ public:
 	uint16 getCenter(const char *text, uint16 width);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

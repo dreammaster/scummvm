@@ -39,7 +39,7 @@
 #include "ultima/ultima6/views/view_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 ContainerWidget::ContainerWidget(const Configuration *cfg, GUI_CallBack *callback)
 		: GUI_Widget(nullptr, 0, 0, 0, 0), config(cfg), callback_object(callback),
@@ -545,5 +545,5 @@ GUI_status ContainerWidget::MouseDelayed(int x, int y, Events::MouseButton butto
 	return GUI_PASS;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

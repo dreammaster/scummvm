@@ -69,7 +69,7 @@
 #include "graphics/cursorman.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Game *Game::game = nullptr;
 
@@ -689,5 +689,5 @@ uint getRandom(uint maxVal) {
 	return g_engine->getRandomNumber(maxVal);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

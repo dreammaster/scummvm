@@ -23,7 +23,7 @@
 #define NUVIE_VIEWS_INVENTORY_FONT_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int NUVIE_MICRO_FONT_COUNT = 26;
 
@@ -238,7 +238,7 @@ const unsigned char inventory_font[NUVIE_MICRO_FONT_COUNT][15] = {
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -22,7 +22,7 @@
 #include "mididrv_m_adlib.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 const uint16 MidiDriver_M_AdLib::FNUM_VALUES[24] = {
 	0x0, 0x158, 0x182, 0x1B0, 0x1CC, 0x203, 0x241, 0x286, 
@@ -455,5 +455,5 @@ void MidiDriver_M_AdLib::onTimer() {
 	_activeNotesMutex.unlock();
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

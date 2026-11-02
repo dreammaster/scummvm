@@ -25,7 +25,7 @@
 #include "ultima/ultima6/pathfinder/dir_finder.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /** STATIC FUNCTIONS **/
 
@@ -111,5 +111,5 @@ void DirFinder::get_normalized_dir(const MapCoord &from, const MapCoord &to, sin
 	    }*/
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -23,7 +23,7 @@
 #define NUVIE_MISC_U6_LIST_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define U6LLIST_FREE_DATA true
 
@@ -71,7 +71,7 @@ public:
 	U6Link *gotoPos(uint32 pos);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

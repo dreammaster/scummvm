@@ -30,7 +30,7 @@ namespace Shared {
 class XMLTree;
 } // End of namespace Shared
 
-namespace Nuvie {
+namespace Ultima6 {
 
 class ConfigNode;
 
@@ -113,7 +113,7 @@ public:
 	void getSubkeys(KeyTypeList &ktl, const Common::String &basekey);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

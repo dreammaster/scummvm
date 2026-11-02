@@ -37,7 +37,7 @@
 #include "ultima/ultima6/nuvie.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int GMD_WIDTH = 150;
 static const int GMD_HEIGHT = 135;
@@ -189,5 +189,5 @@ GUI_status GameMenuDialog::callback(uint16 msg, GUI_CallBack *caller, void *data
 	return GUI_YUM;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

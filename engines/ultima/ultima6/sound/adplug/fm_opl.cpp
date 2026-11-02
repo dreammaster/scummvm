@@ -23,7 +23,7 @@
 #include "common/scummsys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #ifdef _MSC_VER
 #  define INLINE __inline
@@ -2397,5 +2397,5 @@ void Y8950SetKeyboardHandler(int which,OPL_PORTHANDLER_W KeyboardHandler_w,OPL_P
 
 #endif
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

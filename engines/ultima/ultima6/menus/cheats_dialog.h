@@ -25,7 +25,7 @@
 #include "ultima/ultima6/gui/gui_dialog.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GUI;
 class GUI_CallBack;
@@ -51,7 +51,7 @@ public:
 	GUI_status callback(uint16 msg, GUI_CallBack *caller, void *data) override;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

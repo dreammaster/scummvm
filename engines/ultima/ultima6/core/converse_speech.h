@@ -25,7 +25,7 @@
 #include "audio/mixer.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class U6Lib_n;
@@ -56,7 +56,7 @@ protected:
 	void wav_init_header(NuvieIOBuffer *wav_buffer, uint32 audio_length) const;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

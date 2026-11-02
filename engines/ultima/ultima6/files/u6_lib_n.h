@@ -26,7 +26,7 @@
 #include "common/stream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class NuvieIO;
 
@@ -93,7 +93,7 @@ private:
 	Common::String *conversefile;
 };
 #endif
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 

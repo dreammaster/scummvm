@@ -28,7 +28,7 @@
 #include "ultima/ultima6/gui/gui_font.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GUI_CallBack;
 
@@ -141,7 +141,7 @@ protected:
 	bool is_highlighted;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

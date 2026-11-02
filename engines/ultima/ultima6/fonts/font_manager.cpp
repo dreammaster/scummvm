@@ -33,7 +33,7 @@
 #include "ultima/ultima6/misc/u6_misc.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 FontManager::FontManager(const Configuration *cfg) : config(cfg), num_fonts(0),
 		conv_font(nullptr), conv_garg_font(nullptr), conv_font_data(nullptr),
@@ -194,5 +194,5 @@ Font *FontManager::get_font(uint16 font_number) {
 	return nullptr;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

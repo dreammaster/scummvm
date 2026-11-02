@@ -23,7 +23,7 @@
 #define NUVIE_FONTS_FONT_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define FONT_COLOR_U6_NORMAL    0x48
 #define FONT_COLOR_U6_HIGHLIGHT 0x0c
@@ -89,7 +89,7 @@ protected:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

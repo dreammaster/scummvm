@@ -25,7 +25,7 @@
 #include "ultima/ultima6/gui/gui_text.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GUI_Font;
 
@@ -68,7 +68,7 @@ public:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

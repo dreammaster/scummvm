@@ -48,7 +48,7 @@
 #include "ultima/ultima6/views/md_sky_strip_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 ViewManager::ViewManager(const Configuration *cfg) : config(cfg),
 		current_view(nullptr), gui(nullptr), font(nullptr), tile_manager(nullptr),
@@ -582,5 +582,5 @@ Graphics::ManagedSurface *ViewManager::loadGenericDollImage(bool orig) {
 	return bmp.getSdlSurface32(imagefile);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

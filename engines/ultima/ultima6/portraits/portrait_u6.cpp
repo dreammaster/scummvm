@@ -37,7 +37,7 @@
 #include "ultima/ultima6/core/u6_objects.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //define temporary portraits.
 
@@ -155,5 +155,5 @@ unsigned char *PortraitU6::get_portrait_data(Actor *actor) {
 	return new_portrait;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

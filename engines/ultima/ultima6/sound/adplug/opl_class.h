@@ -25,7 +25,7 @@
 #include "ultima/ultima6/sound/adplug/opl.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define HAS_YM3812  1
 #define HAS_YM3526  0
@@ -247,7 +247,7 @@ private:
 	inline void OPL_CALC_RH(OPL_CH *CH, unsigned int noise);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

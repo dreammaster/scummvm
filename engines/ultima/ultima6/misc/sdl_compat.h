@@ -26,7 +26,7 @@
 #include "graphics/managed_surface.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define SDL_TRUE 1
 
@@ -38,7 +38,7 @@ extern int SDL_BlitSurface(const Graphics::ManagedSurface *src, const Common::Re
 extern int SDL_FillRect(Graphics::ManagedSurface *surf, const Common::Rect *rect, uint color);
 extern Graphics::ManagedSurface *SDL_LoadBMP(const Common::Path &filename);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

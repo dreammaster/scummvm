@@ -52,7 +52,7 @@
 #include "backends/keymapper/keymapper.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 ///
 // @module script
@@ -4685,5 +4685,5 @@ static int nscript_unlock_inventory_view(lua_State *L) {
 	return 0;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

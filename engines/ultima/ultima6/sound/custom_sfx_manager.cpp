@@ -29,7 +29,7 @@
 #include "common/file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 CustomSfxManager::CustomSfxManager(const Configuration *cfg, Audio::Mixer *m) : SfxManager(cfg, m) {
 	Common::Path cfg_filename;
@@ -120,5 +120,5 @@ void CustomSfxManager::playSoundSample(uint16 sample_num, Audio::SoundHandle *lo
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

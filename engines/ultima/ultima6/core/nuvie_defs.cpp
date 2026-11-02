@@ -22,7 +22,7 @@
 #include "ultima/ultima6/core/nuvie_defs.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #ifndef WITHOUT_DEBUG
 
@@ -37,5 +37,5 @@ void u6debug(bool no_header, const DebugLevelType level, const char *format, ...
 
 #endif
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

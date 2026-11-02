@@ -25,7 +25,7 @@
 #include "ultima/ultima6/pathfinder/actor_path_finder.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 ActorPathFinder::ActorPathFinder(Actor *a, MapCoord g)
 	: PathFinder(a->get_location(), g), actor(a) {
@@ -145,5 +145,5 @@ bool ActorPathFinder::update_location() {
 	return true;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

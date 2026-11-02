@@ -25,7 +25,7 @@
 #include "ultima/ultima6/files/nuvie_io_file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define SPKR_OUTPUT_RATE 22050 //11025 //FIXME may need to fiddle with this.
 
@@ -56,7 +56,7 @@ public:
 	void PCSPEAKER_CallBack(sint16 *stream, const uint32 len);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -23,7 +23,7 @@
 #define NUVIE_CORE_BOOK_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class U6Lib_n;
@@ -42,7 +42,7 @@ public:
 	char *get_book_data(uint16 num);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

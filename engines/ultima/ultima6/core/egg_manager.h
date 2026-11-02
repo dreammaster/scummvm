@@ -26,7 +26,7 @@
 #include "ultima/ultima6/core/obj_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 struct Egg {
 	bool seen_egg;
@@ -84,7 +84,7 @@ protected:
 	bool not_spawning_actors;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

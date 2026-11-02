@@ -28,7 +28,7 @@
 #include "ultima/ultima6/screen/screen.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define GUI_DIALOG_MOVABLE true
 
@@ -95,7 +95,7 @@ protected:
 	void send_down_button_msg();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

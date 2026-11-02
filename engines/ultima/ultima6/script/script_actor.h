@@ -25,12 +25,12 @@
 #include "common/lua/lua.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 void nscript_init_actor(lua_State *L);
 bool nscript_new_actor_var(lua_State *L, uint16 actor_num);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

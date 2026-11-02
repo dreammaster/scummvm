@@ -35,7 +35,7 @@
 #include "ultima/ultima6/core/u6_objects.h" //needed for silver serpent exception
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* ALWAYS means the time is unset, is unknown, or day and night are both set */
 typedef enum {
@@ -236,5 +236,5 @@ uint8 EggManager::get_worktype(const Obj *embryo) {
 	return embryo->quality;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

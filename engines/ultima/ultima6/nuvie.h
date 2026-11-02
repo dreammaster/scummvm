@@ -31,7 +31,7 @@
 #include "gui/debugger.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Events;
 class Game;
@@ -155,7 +155,7 @@ public:
 
 extern NuvieEngine *g_engine;
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

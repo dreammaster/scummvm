@@ -26,7 +26,7 @@
 #include "ultima/ultima6/screen/dither.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //dither EGA to CGA
 static const uint8 dither_cga_tbl[0x10] =   {0, 3, 3, 3, 13, 13, 13, 3, 3, 13, 15, 3, 13, 13, 15, 15};
@@ -109,5 +109,5 @@ bool Dither::dither_bitmap(unsigned char *src_buf, uint16 src_w, uint16 src_h, b
 	return true;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -25,7 +25,7 @@
 #include "ultima/ultima6/core/map.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Path;
 
@@ -74,7 +74,7 @@ public:
 	virtual bool get_next_move(MapCoord &step) = 0;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

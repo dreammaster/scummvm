@@ -23,7 +23,7 @@
 #define NUVIE_KEYBINDING_KEYS_ENUM_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // FIXME - I needed to reduce includes. Maybe use C++11 enum class in the future
 enum ActionKeyType {
@@ -56,7 +56,7 @@ enum ActionKeyType {
 	OTHER_KEY
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

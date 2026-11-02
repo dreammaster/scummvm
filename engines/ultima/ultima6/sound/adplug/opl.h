@@ -25,7 +25,7 @@
 #include "common/scummsys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Copl {
 public:
@@ -36,7 +36,7 @@ public:
 	virtual void init(void) = 0;                // reinitialize OPL chip
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

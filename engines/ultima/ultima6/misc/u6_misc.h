@@ -36,7 +36,7 @@
 #include "graphics/managed_surface.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 
@@ -111,7 +111,7 @@ sint8 get_wrapped_rel_dir(sint16 p1, sint16 p2, uint8 level);
 
 Common::String encode_xml_entity(const Common::String &s);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

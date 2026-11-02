@@ -31,7 +31,7 @@ namespace GUI {
 }
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /**
  * Key help dialog - just a rich text and a close button.
@@ -44,7 +44,7 @@ public:
 };
 
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

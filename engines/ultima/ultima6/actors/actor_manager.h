@@ -28,7 +28,7 @@
 #include "ultima/ultima6/actors/actor.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class Map;
@@ -167,7 +167,7 @@ private:
 	Common::Array<Common::String> getCustomTileFilenames(const Common::Path &datadir, const Common::String &filenamePrefix);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

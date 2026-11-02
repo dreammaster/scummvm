@@ -23,7 +23,7 @@
 #include "ultima/ultima6/sound/adplug/fm_opl.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 CEmuopl::CEmuopl(int rate, bool bit16, bool usestereo)
 	: use16bit(bit16), stereo(usestereo), oplRate(rate) {
@@ -72,5 +72,5 @@ void CEmuopl::init() {
 	YM3812ResetChip(0);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

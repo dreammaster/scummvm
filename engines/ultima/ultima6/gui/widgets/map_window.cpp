@@ -47,7 +47,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define TMP_MAP_BORDER 3
 
@@ -2573,5 +2573,5 @@ bool MapWindow::in_dungeon_level() const {
 	return (cur_level != 0 && cur_level != 5);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

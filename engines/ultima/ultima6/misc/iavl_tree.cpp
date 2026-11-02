@@ -23,7 +23,7 @@
 #include "ultima/ultima6/core/nuvie_defs.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static iAVLNode *iAVLCloseSearchNode(iAVLTree const *avltree, iAVLKey key);
 static void iAVLRebalanceNode(iAVLTree *avltree, iAVLNode *avlnode);
@@ -455,5 +455,5 @@ void iAVLFillVacancy(iAVLTree *avltree,
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

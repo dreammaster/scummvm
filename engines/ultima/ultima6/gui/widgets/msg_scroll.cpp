@@ -34,7 +34,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // MsgText Class
 MsgText::MsgText() : font(nullptr), color(0) {
@@ -1127,5 +1127,5 @@ uint8 MsgScroll::get_char_from_input_char() {
 		return (input_char + Common::KEYCODE_a - 1);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

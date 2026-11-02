@@ -31,7 +31,7 @@
 #include "ultima/ultima6/gui/gui_button.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 View::View(const Configuration *cfg) : GUI_Widget(nullptr, 0, 0, 0, 0),
 		config(cfg), new_ui_mode(false), left_button(nullptr), font(nullptr),
@@ -207,5 +207,5 @@ GUI_Button *View::loadButton(const Common::Path &dir, Common::String name, uint1
 	return button;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

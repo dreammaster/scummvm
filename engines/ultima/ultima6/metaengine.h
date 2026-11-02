@@ -26,7 +26,7 @@
 #include "backends/keymapper/keymapper.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 enum {
 	ORIGINAL_SAVE_SLOT = 1
@@ -38,7 +38,7 @@ public:
 	static Common::KeymapArray initKeymaps(const Common::String &gameId);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

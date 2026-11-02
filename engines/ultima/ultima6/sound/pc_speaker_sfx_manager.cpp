@@ -28,7 +28,7 @@
 #include "audio/mixer.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 PCSpeakerSfxManager::PCSpeakerSfxManager(const Configuration *cfg, Audio::Mixer *m) : SfxManager(cfg, m) {
 
@@ -117,5 +117,5 @@ void PCSpeakerSfxManager::playSoundSample(Audio::AudioStream *stream, Audio::Sou
 
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

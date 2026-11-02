@@ -30,7 +30,7 @@
 #include "engines/util.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define sqr(a) ((a)*(a))
 
@@ -1395,5 +1395,5 @@ void Screen::set_non_square_pixels(bool value) {
 	// No implementation
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

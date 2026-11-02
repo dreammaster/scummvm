@@ -23,7 +23,7 @@
 #include "common/scummsys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #ifdef _MSC_VER
 #  define INLINE __inline
@@ -1626,5 +1626,5 @@ void OplClass::YM3812UpdateOne(int which, int16 *buffer, int length) {
 }
 #endif /* BUILD_YM3812 */
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

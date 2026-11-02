@@ -27,7 +27,7 @@
 #include "ultima/ultima6/sound/adplug/mid.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 //#define TESTING
 #ifdef TESTING
@@ -568,5 +568,5 @@ Common::String CmidPlayer::gettype() {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

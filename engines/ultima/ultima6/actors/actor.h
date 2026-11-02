@@ -29,7 +29,7 @@
 #include "ultima/ultima6/core/obj_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define ACTOR_NO_READIABLE_LOCATION -1
 #define ACTOR_HEAD   0
@@ -733,7 +733,7 @@ private:
 
 const char *get_actor_alignment_str(ActorAlignment alignment);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

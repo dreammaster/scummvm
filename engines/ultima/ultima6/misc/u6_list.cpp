@@ -23,7 +23,7 @@
 #include "ultima/ultima6/misc/u6_llist.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 void retainU6Link(U6Link *link) {
 	if (link)
@@ -240,5 +240,5 @@ U6Link *U6LList::gotoPos(uint32 pos) {
 	return link;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

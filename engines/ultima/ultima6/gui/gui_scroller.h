@@ -28,7 +28,7 @@
 #include "ultima/ultima6/screen/screen.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GUI_ScrollBar;
 
@@ -71,7 +71,7 @@ protected:
 	GUI_status callback(uint16 msg, GUI_CallBack *caller, void *data) override;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

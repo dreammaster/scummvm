@@ -24,7 +24,7 @@
 #include "ultima/ultima6/sound/decoder/fm_towns_decoder_stream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 inline sint16 convert_sample(uint16 raw_sample);
 
@@ -97,5 +97,5 @@ inline sint16 FMtownsDecoderStream::convertSample(uint16 rawSample) const {
 	return sample;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

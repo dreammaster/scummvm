@@ -204,7 +204,7 @@ Common::Error UltimaMetaEngine::createInstance(OSystem *syst, Engine **engine, c
 	case Ultima::GAME_ULTIMA6:
 	case Ultima::GAME_MARTIAN_DREAMS:
 	case Ultima::GAME_SAVAGE_EMPIRE:
-		*engine = new Ultima::Nuvie::NuvieEngine(syst, gd);
+		*engine = new Ultima::Ultima6::NuvieEngine(syst, gd);
 		break;
 #endif
 #ifdef ENABLE_ULTIMA8
@@ -231,7 +231,7 @@ SaveStateList UltimaMetaEngine::listSaves(const char *target) const {
 #ifdef ENABLE_ULTIMA6
 	Common::String gameId = getGameId(target);
 	if (gameId == "ultima6" || gameId == "ultima6_enh")
-		Ultima::Nuvie::MetaEngine::listSaves(saveList);
+		Ultima::Ultima6::MetaEngine::listSaves(saveList);
 #endif
 
 	return saveList;
@@ -271,7 +271,7 @@ Common::KeymapArray UltimaMetaEngine::initKeymaps(const char *target) const {
 	if (gameId == "ultima6" || gameId == "ultima6_enh"
 			|| gameId == "martiandreams" || gameId == "martiandreams_enh"
 			|| gameId == "savageempire" || gameId == "savageempire_enh")
-		return Ultima::Nuvie::MetaEngine::initKeymaps(gameId);
+		return Ultima::Ultima6::MetaEngine::initKeymaps(gameId);
 #endif
 #ifdef ENABLE_ULTIMA8
 	if (gameId == "ultima8" || gameId == "remorse" || gameId == "regret")

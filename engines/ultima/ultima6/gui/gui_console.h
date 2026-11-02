@@ -30,7 +30,7 @@
 #include "ultima/ultima6/screen/screen.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class GUI_Console : public GUI_Widget {
 
@@ -58,7 +58,7 @@ public:
 	virtual void AddLine(const Common::String &line);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

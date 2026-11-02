@@ -27,7 +27,7 @@
 #include "common/str.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 
 class Configuration;
@@ -147,7 +147,7 @@ private:
 	unsigned char *get_portrait_data(Actor *a);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

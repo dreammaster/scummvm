@@ -27,7 +27,7 @@
 #include "ultima/ultima6/fonts/bmp_font.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 BMPFont::BMPFont() : char_w(0), char_h(0), font_width_data(nullptr),
 		font_surface(nullptr), rune_mode(false), dual_font_mode(false) {
@@ -129,5 +129,5 @@ uint16 BMPFont::drawChar(Screen *screen, uint8 char_num, uint16 x, uint16 y,
 	return getCharWidth(char_num);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

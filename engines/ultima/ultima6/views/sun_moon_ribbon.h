@@ -25,7 +25,7 @@
 #include "ultima/ultima6/views/sun_moon_strip_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class SunMoonRibbon : public SunMoonStripWidget {
 
@@ -62,7 +62,7 @@ private:
 	void update_hour(uint16 time);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

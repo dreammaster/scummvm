@@ -28,7 +28,7 @@
 #include "audio/audiostream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class U6Lib_n;
 class U6Lzw;
@@ -88,7 +88,7 @@ protected:
 	bool is_midi_track;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

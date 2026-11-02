@@ -26,7 +26,7 @@
 #include "ultima/ultima6/gui/widgets/console.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static Console *g_console = nullptr;
 
@@ -125,5 +125,5 @@ void ConsoleHide() {
 		g_console->Hide();
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

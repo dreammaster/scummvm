@@ -25,7 +25,7 @@
 #include "graphics/pixelformat.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class OpenGL;
 
@@ -156,7 +156,7 @@ RenderSurface *CreateRenderSurface(uint32 width, uint32 height, uint32 bpp, sint
 RenderSurface *CreateRenderSurface(Graphics::ManagedSurface *surf);
 RenderSurface *CreateRenderSurface(OpenGL *ogl);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

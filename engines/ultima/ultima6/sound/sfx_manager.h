@@ -28,7 +28,7 @@
 #include "ultima/ultima6/sound/sfx.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class SfxManager {
 public:
@@ -51,7 +51,7 @@ protected:
 	uint32 sfx_duration; //duration of the last sfx played in milliseconds.
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

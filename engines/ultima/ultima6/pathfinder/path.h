@@ -26,7 +26,7 @@
 #include "ultima/ultima6/pathfinder/path_finder.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class MapCoord;
 
@@ -78,7 +78,7 @@ public:
 	virtual bool remove_first_step();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

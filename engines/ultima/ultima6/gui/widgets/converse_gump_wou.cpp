@@ -42,7 +42,7 @@
 #include "ultima/ultima6/views/md_sky_strip_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define INPUT_FONT_COLOR 1
 
@@ -183,5 +183,5 @@ void ConverseGumpWOU::Display(bool full_redraw) {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

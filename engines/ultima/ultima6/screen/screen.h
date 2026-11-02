@@ -28,7 +28,7 @@
 #include "graphics/screen.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 
@@ -159,7 +159,7 @@ protected:
 	void set_screen_mode();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

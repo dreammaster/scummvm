@@ -42,7 +42,7 @@
 #include "ultima/ultima6/nuvie.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define GAME Game::get_game()
 #define EVENT Game::get_game()->get_event()
@@ -569,5 +569,5 @@ void ActionToggleCheats(int param) {
 void ActionDoNothing(int param) {
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

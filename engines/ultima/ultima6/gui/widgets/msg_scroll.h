@@ -41,7 +41,7 @@
 #define MSGSCROLL_NO_MAP_DISPLAY false
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 
 class Configuration;
@@ -295,7 +295,7 @@ inline int MsgScroll::print(const Common::String &format, TParam... param) {
 	return print_internal(&format, Common::forward<TParam>(param)...);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

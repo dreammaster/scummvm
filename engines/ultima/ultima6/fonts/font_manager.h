@@ -25,7 +25,7 @@
 #include "common/str.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class Font;
@@ -66,7 +66,7 @@ protected:
 	bool initConvFonts(nuvie_game_t game_type);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

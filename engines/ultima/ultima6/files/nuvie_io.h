@@ -25,7 +25,7 @@
 #include "common/stream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 
@@ -137,7 +137,7 @@ public:
 
 extern char *strgets(char *str, int n, Common::ReadStream *stream);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

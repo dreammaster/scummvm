@@ -28,7 +28,7 @@
 #include "ultima/ultima6/views/md_sky_strip_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 MDSkyStripWidget::MDSkyStripWidget(const Configuration *cfg, GameClock *c, Player *p)
 	: GUI_Widget(nullptr, 0, 0, 0, 0), config(cfg), player(p), _clock(c) {
@@ -83,5 +83,5 @@ void MDSkyStripWidget::display_surface() {
 	screen->blit(area.left, area.top, shp_data, 8, area.width(), area.height(), w, false);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

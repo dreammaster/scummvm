@@ -31,7 +31,7 @@
 #include "ultima/ultima6/screen/screen.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 uint32 SDL_GetTicks() {
 	return g_system->getMillis();
@@ -77,5 +77,5 @@ Graphics::ManagedSurface *SDL_LoadBMP(const Common::Path &filename) {
 	return dest;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

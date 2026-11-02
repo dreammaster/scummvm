@@ -26,7 +26,7 @@
 #include "ultima/ultima6/misc/call_back.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define REAGENT_U6_MANDRAKE_ROOT 0x01
 #define REAGENT_U6_NIGHTSHADE    0x02
@@ -161,7 +161,7 @@ private:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

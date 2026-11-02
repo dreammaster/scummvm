@@ -36,7 +36,7 @@
 #include "ultima/ultima6/gui/gui.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define NUM_ORIGINAL_TILES 2048
 
@@ -943,5 +943,5 @@ void TileManager::anim_stop_playing(uint8 anim_index) {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

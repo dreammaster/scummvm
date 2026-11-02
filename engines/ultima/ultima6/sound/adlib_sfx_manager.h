@@ -29,7 +29,7 @@
 #include "audio/audiostream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class AdLibSfxManager : public SfxManager {
 public:
@@ -43,7 +43,7 @@ private:
 	void playSoundSample(Audio::AudioStream *stream, Audio::SoundHandle *looping_handle, uint8 volume);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

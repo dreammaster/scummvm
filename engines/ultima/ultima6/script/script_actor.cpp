@@ -36,7 +36,7 @@
 #include "ultima/ultima6/views/portrait_view.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 ///
 //@module script
@@ -1867,5 +1867,5 @@ static int nscript_actor_get_schedule(lua_State *L) {
 	return 1;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

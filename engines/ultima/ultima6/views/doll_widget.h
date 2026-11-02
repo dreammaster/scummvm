@@ -28,7 +28,7 @@
 #include "ultima/ultima6/views/inventory_message.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class Actor;
@@ -95,7 +95,7 @@ private:
 	void load_md_doll_shp();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

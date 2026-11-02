@@ -27,7 +27,7 @@
 #include "ultima/ultima6/core/u6_objects.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 enum ActorMovetype {
 	MOVETYPE_U6_NONE = 0,
@@ -199,7 +199,7 @@ protected:
 	void inventory_make_all_objs_ok_to_take();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

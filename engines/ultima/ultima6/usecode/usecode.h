@@ -29,7 +29,7 @@
 #include "ultima/ultima6/core/player.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // The game triggers one of these events on an object to activate its UseCode
 // function(s). The return value meaning is different for each event.
@@ -301,7 +301,7 @@ protected:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

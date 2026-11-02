@@ -25,7 +25,7 @@
 #include "ultima/ultima6/core/u6_objects.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Obj::Obj() : obj_n(0), status(0), nuvie_status(0), frame_n(0), qty(0),
 		quality(0), parent(nullptr), container(nullptr), x(0), y(0), z(0) {
@@ -322,5 +322,5 @@ bool Obj::is_ok_to_take() const {
 	return ((status & OBJ_STATUS_OK_TO_TAKE) || Game::get_game()->using_hackmove());
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -35,7 +35,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int CONTAINER_WIDGET_OFFSET = 29;
 #define CHECK_X 0
@@ -395,5 +395,5 @@ GUI_status ContainerViewGump::MouseUp(int x, int y, Events::MouseButton button) 
 	return DraggableView::MouseUp(x, y, button);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

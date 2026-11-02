@@ -25,7 +25,7 @@
 #include "ultima/ultima6/sound/sound.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Song : public Sound {
 public:
@@ -56,7 +56,7 @@ private:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

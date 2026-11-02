@@ -25,7 +25,7 @@
 #include "ultima/ultima6/fonts/u6_font.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 U6Font::U6Font() : font_data(nullptr) {
 }
@@ -76,5 +76,5 @@ uint16 U6Font::drawChar(Screen *screen, uint8 char_num, uint16 x, uint16 y,
 	return 8;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

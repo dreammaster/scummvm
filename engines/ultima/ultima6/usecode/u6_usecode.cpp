@@ -52,7 +52,7 @@
 #include "ultima/ultima6/actors/u6_work_types.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define MESG_ANIM_HIT_WORLD  ANIM_CB_HIT_WORLD
 #define MESG_ANIM_HIT        ANIM_CB_HIT
@@ -3001,5 +3001,5 @@ bool U6UseCode::use_harpsichord(Obj *obj, UseCodeEvent ev) {
 	return play_instrument(obj, ev);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

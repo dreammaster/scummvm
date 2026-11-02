@@ -40,7 +40,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int ID_WIDTH = 280;
 static const int ID_HEIGHT = 166;
@@ -276,5 +276,5 @@ GUI_status InputDialog::callback(uint16 msg, GUI_CallBack *caller, void *data) {
 	return GUI_PASS;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

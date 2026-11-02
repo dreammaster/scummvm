@@ -27,7 +27,7 @@
 #include "ultima/ultima6/sound/decoder/u6_adplug_decoder_stream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class CEmuopl;
 
@@ -60,7 +60,7 @@ private:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

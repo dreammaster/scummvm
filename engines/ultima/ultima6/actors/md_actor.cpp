@@ -25,7 +25,7 @@
 #include "ultima/ultima6/pathfinder/dir_finder.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define MD_DOWNWARD_FACING_FRAME_N 9
 
@@ -146,5 +146,5 @@ bool MDActor::is_passable() const {
 	return Actor::is_passable();
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

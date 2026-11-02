@@ -23,7 +23,7 @@
 #define NUVIE_MISC_IAVL_TREE_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* typedef the keytype */
 // TODO: Clean up object manager so it isn't intermixing pointers and ints
@@ -69,7 +69,7 @@ extern int iAVLDelete(iAVLTree *avltree, iAVLKey key);
 extern void *iAVLFirst(iAVLCursor *avlcursor, iAVLTree const *avltree);
 extern void *iAVLNext(iAVLCursor *avlcursor);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

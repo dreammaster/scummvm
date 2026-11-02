@@ -44,7 +44,7 @@
 #include "ultima/ultima6/core/weather.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 U6Actor::U6Actor(Map *m, ObjManager *om, GameClock *c): Actor(m, om, c),
 		actor_type(nullptr), walk_frame_inc(1), base_actor_type(nullptr),
@@ -1685,5 +1685,5 @@ uint8 U6Actor::get_hp_text_color() const {
 	return hp_text_color;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

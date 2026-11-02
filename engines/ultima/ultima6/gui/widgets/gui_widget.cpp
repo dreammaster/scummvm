@@ -24,7 +24,7 @@
 #include "ultima/ultima6/gui/widgets/gui_widget.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* Widget constructors */
 GUI_Widget::GUI_Widget(void *data) {
@@ -574,5 +574,5 @@ GUI_status GUI_Widget::MouseHeld(int x, int y, Events::MouseButton button) {
 	return GUI_PASS;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

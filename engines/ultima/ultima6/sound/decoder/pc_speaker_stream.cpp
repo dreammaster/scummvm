@@ -22,7 +22,7 @@
 #include "ultima/ultima6/core/game.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 PCSpeakerFreqStream::PCSpeakerFreqStream(uint freq, uint16 d) {
 	frequency = freq;
@@ -423,5 +423,5 @@ Audio::AudioStream *makePCSpeakerEarthQuakeSfxStream(uint /*rate*/) {
 	return stream;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

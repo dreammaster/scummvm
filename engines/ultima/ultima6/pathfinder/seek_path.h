@@ -25,7 +25,7 @@
 #include "ultima/ultima6/pathfinder/path.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* Provides routines for building short paths around obstacles and seeking a
  * target. Much of the work doesn't involve finding a path at all, but instead
@@ -62,7 +62,7 @@ public:
 	                         sint32 &Bxdir, sint32 &Bydir);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

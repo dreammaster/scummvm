@@ -27,7 +27,7 @@
 #include "ultima/ultima6/sound/origin_fx_adib_driver.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 const uint8 adlib_BD_cmd_tbl[] = { 0, 1, 0, 1, 0, 1, 16, 8, 4, 2, 1 };
 
@@ -529,5 +529,5 @@ void OriginFXAdLibDriver::interrupt_vector() {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

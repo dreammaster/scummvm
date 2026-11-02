@@ -42,7 +42,7 @@
 #include "common/compression/unzip.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 NuvieEngine *g_engine;
 
@@ -121,7 +121,7 @@ bool NuvieEngine::initialize() {
 	initConfig();
 
 	// Setup events
-	Events *events = new Ultima::Nuvie::Events(_config);
+	Events *events = new Ultima::Ultima6::Events(_config);
 	_events = events;
 
 	// Setup savegame handler
@@ -450,5 +450,5 @@ bool NuvieEngine::playIntro() {
 	return false;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

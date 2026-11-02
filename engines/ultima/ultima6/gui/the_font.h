@@ -23,7 +23,7 @@
 #define NUVIE_GUI_THE_FONT_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int font_w = 128;
 static const int font_h = 144;
@@ -1902,7 +1902,7 @@ static const uint8 font_gump_data[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

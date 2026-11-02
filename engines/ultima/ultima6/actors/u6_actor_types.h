@@ -25,7 +25,7 @@
 #include "ultima/ultima6/actors/u6_actor.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /*
 base_obj_n
@@ -301,7 +301,7 @@ const CombatType u6combat_objects[] = {
 	{OBJ_U6_NOTHING, {0}, {0} , 0, ATTACK_TYPE_NONE, 0, OBJ_U6_NOTHING, false} // this last element terminates the array.
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

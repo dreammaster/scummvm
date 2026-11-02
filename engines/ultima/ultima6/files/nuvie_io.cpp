@@ -23,7 +23,7 @@
 #include "ultima/ultima6/files/nuvie_io.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 NuvieIO::NuvieIO() : size(0), pos(0) {
 }
@@ -220,5 +220,5 @@ char *strgets(char *str, int n, Common::ReadStream *stream) {
 	return count ? str : nullptr;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

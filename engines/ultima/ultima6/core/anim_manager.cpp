@@ -35,7 +35,7 @@
 #include "ultima/ultima6/core/anim_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 #define MESG_ANIM_HIT_WORLD ANIM_CB_HIT_WORLD
 #define MESG_ANIM_HIT       ANIM_CB_HIT
@@ -1360,5 +1360,5 @@ bool TileFadeAnim::update() {
 	return true;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

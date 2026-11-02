@@ -26,7 +26,7 @@
 #include "ultima/ultima6/gui/gui_dialog.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_Dialog::GUI_Dialog(int x, int y, int w, int h, uint8 r, uint8 g, uint8 b, bool is_moveable)
 	: GUI_Widget(nullptr, x, y, w, h), R(r), G(g), B(b), bg_color(0), drag(false),
@@ -250,5 +250,5 @@ void GUI_Dialog::MoveRelative(int dx, int dy) {
 	return;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

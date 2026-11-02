@@ -29,7 +29,7 @@
 #include "common/hash-str.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 enum joy_axes_pairs {
 	AXES_PAIR1, AXES_PAIR2, AXES_PAIR3, AXES_PAIR4, UNHANDLED_AXES_PAIR
@@ -146,7 +146,7 @@ private:
 	Common::Array<Common::U32String> buildKeyHelp() const;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

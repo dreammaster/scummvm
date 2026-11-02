@@ -30,7 +30,7 @@
 #include "ultima/ultima6/files/nuvie_bmp_file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 SpellViewGump::SpellViewGump(const Configuration *cfg) : SpellView(cfg),
 		gump_button(nullptr), font(nullptr), selected_spell(-1) {
@@ -352,5 +352,5 @@ GUI_status SpellViewGump::MouseUp(int x, int y, Events::MouseButton button) {
 	return ret;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

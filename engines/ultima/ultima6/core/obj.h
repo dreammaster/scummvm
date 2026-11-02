@@ -26,7 +26,7 @@
 #include "ultima/ultima6/misc/u6_llist.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Actor;
 
@@ -187,7 +187,7 @@ protected:
 
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

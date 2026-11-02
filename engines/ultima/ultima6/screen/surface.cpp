@@ -24,7 +24,7 @@
 #include "common/algorithm.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // Colour shifting values
 uint8  RenderSurface::Rloss;
@@ -533,5 +533,5 @@ const unsigned char *RenderSurface::get_pixels() {
 	return ((const unsigned char *)pixels);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

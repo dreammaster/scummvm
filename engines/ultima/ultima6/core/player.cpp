@@ -38,7 +38,7 @@
 #include "ultima/ultima6/core/player.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 static const int PLAYER_BASE_MOVEMENT_COST = 5;
 
@@ -739,5 +739,5 @@ void Player::repairShip() {
 	Game::get_game()->time_changed();
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

@@ -27,7 +27,7 @@
 #include "ultima/ultima6/misc/call_back.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class NuvieIO;
 class Events;
@@ -107,7 +107,7 @@ public:
 	void drag_perform_drop(int x, int y, int message, void *data) override; // needed for !orig_style
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

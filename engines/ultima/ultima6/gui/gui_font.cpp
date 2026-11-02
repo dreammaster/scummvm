@@ -26,7 +26,7 @@
 #include "common/textconsole.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /* use default 8x8 font */
 GUI_Font::GUI_Font(uint8 fontType) : _wData(nullptr) {
@@ -173,5 +173,5 @@ uint16 GUI_Font::getCenter(const char *text, uint16 width) {
 		return 0;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

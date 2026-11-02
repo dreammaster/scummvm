@@ -25,7 +25,7 @@
 #define NUVIE_GUI_GUI_STATUS_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 typedef enum {
 	GUI_QUIT,               /* Close the GUI */
@@ -44,7 +44,7 @@ typedef enum {
 /* GUI idle function -- run when no events pending */
 typedef GUI_status(*GUI_IdleProc)(void);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

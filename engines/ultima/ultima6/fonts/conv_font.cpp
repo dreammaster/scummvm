@@ -25,7 +25,7 @@
 #include "ultima/ultima6/fonts/conv_font.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 ConvFont::ConvFont() : data_offset(0), f_data(nullptr), f_w_data(nullptr) {
 }
@@ -58,5 +58,5 @@ uint16 ConvFont::drawChar(Screen *screen, uint8 char_num, uint16 x, uint16 y,
 	return getCharWidth(char_num);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

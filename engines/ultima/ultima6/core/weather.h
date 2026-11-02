@@ -27,7 +27,7 @@
 #include "ultima/ultima6/core/map.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class NuvieIO;
@@ -88,7 +88,7 @@ protected:
 	bool display_from_wind_dir;
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

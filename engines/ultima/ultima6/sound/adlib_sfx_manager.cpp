@@ -26,7 +26,7 @@
 #include "audio/mixer.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 AdLibSfxManager::AdLibSfxManager(const Configuration *cfg, Audio::Mixer *m) : SfxManager(cfg, m) {
 
@@ -73,5 +73,5 @@ void AdLibSfxManager::playSoundSample(Audio::AudioStream *stream, Audio::SoundHa
 
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

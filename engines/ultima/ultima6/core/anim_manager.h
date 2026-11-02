@@ -30,7 +30,7 @@
 #include "ultima/ultima6/misc/u6_line_walker.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Actor;
 class CallBack;
@@ -483,7 +483,7 @@ protected:
 	void init(uint16 speed);
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

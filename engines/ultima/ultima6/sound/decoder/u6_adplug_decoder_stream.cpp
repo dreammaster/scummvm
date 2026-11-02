@@ -25,7 +25,7 @@
 #include "ultima/ultima6/sound/decoder/u6_adplug_decoder_stream.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 U6AdPlugDecoderStream::U6AdPlugDecoderStream(CEmuopl *o, const Common::Path &filename, uint16 song_num) {
 	is_midi_track = false;
@@ -124,5 +124,5 @@ void U6AdPlugDecoderStream::update_opl(short *data, int len) {
 	}
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

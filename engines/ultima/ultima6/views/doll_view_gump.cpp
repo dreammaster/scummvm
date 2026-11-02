@@ -33,7 +33,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 DollViewGump::DollViewGump(const Configuration *cfg)
     : DraggableView(cfg), gump_button(nullptr), combat_button(nullptr),
@@ -680,5 +680,5 @@ GUI_status DollViewGump::MouseUp(int x, int y, Events::MouseButton button) {
 	return DraggableView::MouseUp(x, y, button);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

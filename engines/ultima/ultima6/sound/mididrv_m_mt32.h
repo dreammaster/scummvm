@@ -25,7 +25,7 @@
 #include "audio/mt32gm.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // An assignment of a MIDI instrument to a MIDI output channel. M data channels
 // using this instrument will be mapped to the specified MIDI channel.
@@ -92,7 +92,7 @@ protected:
 	uint8 _mInstrumentMapping[16];
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -23,7 +23,7 @@
 #define NUVIE_KEYBINDING_KEY_ACTIONS_H
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 void ActionWalkWest(int param);
 void ActionWalkEast(int param);
@@ -107,7 +107,7 @@ void ActionToggleCheats(int param);
 
 void ActionDoNothing(int param);
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

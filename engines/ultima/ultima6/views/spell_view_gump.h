@@ -26,7 +26,7 @@
 #include "ultima/ultima6/files/nuvie_bmp_file.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 class Configuration;
 class TileManager;
@@ -77,7 +77,7 @@ protected:
 	void close_spellbook();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

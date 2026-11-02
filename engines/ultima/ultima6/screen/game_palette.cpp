@@ -30,7 +30,7 @@
 #include "common/util.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GamePalette::GamePalette(Screen *s, const Configuration *cfg) : screen(s), config(cfg), counter(0) {
 	palette = (uint8 *)malloc(768);
@@ -158,5 +158,5 @@ void GamePalette::rotatePalette() {
 
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

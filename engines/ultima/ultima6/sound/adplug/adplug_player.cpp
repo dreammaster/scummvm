@@ -23,7 +23,7 @@
 #include "ultima/ultima6/sound/adplug/silent_opl.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 /***** CPlayer *****/
 
@@ -67,5 +67,5 @@ void CPlayer::seek(unsigned long ms) {
 		pos += 1000 / getrefresh();
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

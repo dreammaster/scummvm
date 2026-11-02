@@ -28,7 +28,7 @@
 #include "ultima/ultima6/core/game.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Font::Font() : num_chars(0), offset(0), default_color(FONT_COLOR_U6_NORMAL),
 		default_highlight_color(FONT_COLOR_U6_HIGHLIGHT) {
@@ -93,5 +93,5 @@ uint16 Font::drawChar(Screen *screen, uint8 char_num, uint16 x, uint16 y) {
 	return drawChar(screen, char_num, x, y, default_color);
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

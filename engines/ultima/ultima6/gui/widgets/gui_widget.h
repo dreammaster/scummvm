@@ -31,7 +31,7 @@
 #include "ultima/ultima6/core/events.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 typedef GUI_status(*GUI_CallbackProc)(void *data);
 
@@ -245,7 +245,7 @@ protected:
 	virtual GUI_status try_mouse_delayed();
 };
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 
 #endif

@@ -26,7 +26,7 @@
 #include "ultima/ultima6/core/effect_manager.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 EffectManager::EffectManager() {
 }
@@ -131,5 +131,5 @@ EffectManager::EffectWatch *EffectManager::find_effect_watch(Effect *effect) {
 	return nullptr;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

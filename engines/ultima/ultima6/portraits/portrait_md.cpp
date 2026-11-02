@@ -35,7 +35,7 @@
 #include "ultima/ultima6/script/script.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 bool PortraitMD::init() {
 	Common::Path filename;
@@ -147,5 +147,5 @@ uint8 PortraitMD::get_background_shape_num(uint8 actor_num) const {
 	return v & 0xf;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

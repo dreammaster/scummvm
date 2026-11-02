@@ -31,7 +31,7 @@
 #include "ultima/ultima6/keybinding/keys.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 GUI_YesNoDialog::GUI_YesNoDialog(GUI *gui, int x, int y, int w, int h, const char *msg,
 		CallBack *yesCallback, CallBack *noCallback)
@@ -95,5 +95,5 @@ GUI_status GUI_YesNoDialog::callback(uint16 msg, GUI_CallBack *caller, void *dat
 	return GUI_PASS;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima

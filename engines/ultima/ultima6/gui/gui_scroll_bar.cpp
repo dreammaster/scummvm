@@ -27,7 +27,7 @@
 #include "ultima/ultima6/gui/gui_scroll_bar.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 // Colours
 
@@ -310,6 +310,6 @@ GUI_status GUI_ScrollBar::callback(uint16 msg, GUI_CallBack *caller, void *data)
 	return GUI_YUM;
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
 

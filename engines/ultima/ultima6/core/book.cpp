@@ -27,7 +27,7 @@
 #include "ultima/ultima6/core/book.h"
 
 namespace Ultima {
-namespace Nuvie {
+namespace Ultima6 {
 
 Book::Book(const Configuration *cfg) : config(cfg), books(new U6Lib_n) {
 }
@@ -54,5 +54,5 @@ char *Book::get_book_data(uint16 num) {
 	return reinterpret_cast<char *>(books->get_item(num));
 }
 
-} // End of namespace Nuvie
+} // End of namespace Ultima6
 } // End of namespace Ultima
