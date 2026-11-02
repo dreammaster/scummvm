@@ -39,8 +39,8 @@
 #include "ultima/ultima4/metaengine.h"
 #endif
 #ifdef ENABLE_ULTIMA6
-#include "ultima/nuvie/metaengine.h"
-#include "ultima/nuvie/nuvie.h"
+#include "ultima/ultima6/metaengine.h"
+#include "ultima/ultima6/nuvie.h"
 #endif
 #ifdef ENABLE_ULTIMA8
 #include "ultima/ultima8/ultima8.h"
