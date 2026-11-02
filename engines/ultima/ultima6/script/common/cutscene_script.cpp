@@ -51,10 +51,6 @@ CutsceneScript::~CutsceneScript() {
 	}
 }
 
-int CutsceneScript::randomRange(int low, int high) {
-	return low + NUVIE_RAND() % (high - low + 1);
-}
-
 CSSprite *CutsceneScript::newSprite(CSImage *image, int x, int y, bool visible) {
 	CSSprite *sprite = new CSSprite();
 	sprite->image = image;
@@ -117,6 +113,14 @@ bool CutsceneScript::loadImages(const char *filename, ImageTable &images) {
 		adoptImages(images[i]);
 
 	return true;
+}
+
+CSImage *CutsceneScript::loadImage(const char *filename, int idx) {
+	CSImage *image = _cutscene->load_image(filename, idx);
+	if (image)
+		_images.push_back(image);
+
+	return image;
 }
 
 void CutsceneScript::adoptImages(const Common::Array<CSImage *> &images) {
@@ -343,6 +347,48 @@ void CutsceneScript::fireworks(const ImageTable &images, CSSprite *logo) {
 		count -= updateFireworks(active, images);
 		pollForEsc(1);
 	}
+}
+
+void CutsceneScript::aboutMartianDreams() {
+	const int LINES = 82;
+
+	_cutscene->hide_sprites();
+	newSprite(loadImage("mars.lzc", 0), 0, 24, true);
+
+	Common::Array<Common::String> text = _cutscene->load_text("scenetxt.lzc", 4);
+	musicPlay("mdd_mus.lzc", 8);
+
+	// Each line has a shadow beneath it
+	CSSprite *lines[LINES * 2];
+	for (int i = 0; i < LINES; ++i) {
+		Common::String line = (uint)i < text.size() ? text[i] : Common::String();
+
+		lines[i * 2] = newSprite(nullptr, 11, 153 + i * 14, true);
+		lines[i * 2]->text_color = 6;
+		lines[i * 2]->text = line;
+
+		lines[i * 2 + 1] = newSprite(nullptr, 12, 152 + i * 14, true);
+		lines[i * 2 + 1]->text_color = 14;
+		lines[i * 2 + 1]->text = line;
+	}
+
+	// Black bars at the top and bottom of the screen hide the text as it scrolls in and out
+	newSprite(newImage(220, 24, 0), 0, 0, true);
+	newSprite(newImage(220, 48, 0), 0, 152, true);
+
+	for (int i = 0; i <= 90 * 14; ++i) {
+		for (int j = 0; j < LINES * 2; ++j)
+			lines[j]->y -= 1;
+
+		pollForKeyOrButton(2);
+		if (_shouldExit) {
+			fadeOut();
+			return;
+		}
+	}
+
+	musicStop();
+	fadeOut();
 }
 
 } // End of namespace Scripts

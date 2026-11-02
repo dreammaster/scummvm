@@ -26,6 +26,7 @@
 #include "common/str.h"
 #include "ultima/ultima6/core/map.h"
 #include "ultima/ultima6/actors/actor.h"
+#include "ultima/ultima6/misc/map_entity.h"
 #include "ultima/ultima6/misc/u6_misc.h"
 #include "ultima/ultima6/script/common/continuation.h"
 #include "ultima/ultima6/script/common/lang.h"
@@ -61,7 +62,8 @@ protected:
 
 	void print(const Common::String &str) const;
 	void printl(const char *code) const;
-	void printfl(const char *code, const Common::String &arg) const;
+	/** Prints the text for a code, which is a printf format, with the arguments filled in */
+	void printfl(const char *code, ...) const;
 
 	/** Blocks for a number of milliseconds while the game keeps updating */
 	void wait(uint32 duration) const;
@@ -75,6 +77,65 @@ protected:
 	void altCodeExportTmxMapFiles();
 	void altCodeExportTileset();
 	void altCodeFindObjsOnMap();
+
+	/** Effects and engine actions that scripts commonly use */
+	static void hitAnim(int x, int y);
+	static void projectileAnim(uint16 tileNum, int startX, int startY, int targetX, int targetY,
+		int speed, bool trail, int initialTileRotation);
+	static void projectileAnimMulti(uint16 tileNum, int startX, int startY, const Common::Array<MapCoord> &targets,
+		int speed, bool trail, int initialTileRotation, Common::Array<MapEntity> &hitEntities);
+	static void quakeStart(int magnitude, int duration);
+	static void fadeOutEffect();
+	static void fadeInEffect();
+	static void displayPrompt(bool newline);
+	static void displayTextInScrollGump(const Common::String &text);
+	static bool loadTextFromLzc(const char *filename, int idx, Common::String &text);
+	static bool mapCanReachPoint(int x, int y, int x1, int y1, uint8 level);
+	static float objectWeight(Obj *obj);
+	static void actorTalk(Actor *actor);
+
+	/** Inventory of an actor in list order, optionally including the contents of containers */
+	static void getInventoryObjs(Actor *actor, bool recursive, Common::Array<Obj *> &objs);
+
+	/** Removes an object from the game and frees it unless it ended up somewhere else */
+	static void removeFromEngine(Obj *obj);
+	static uint16 objOriginalTileNum(const Obj *obj);
+
+	/** Objects at a map location, in list order. Safe to move or remove while iterating the result */
+	static void getObjsAt(int x, int y, int z, Common::Array<Obj *> &objs);
+	static void getObjsInArea(int x, int y, int z, int width, int height, Common::Array<Obj *> &objs);
+	/** Every object of a type on a map level */
+	static void findObjs(int level, int objN, Common::Array<Obj *> &objs);
+	static Obj *mapGetObj(int x, int y, int z, int objN = -1, bool includeMultiTile = false);
+	static Actor *mapGetActor(int x, int y, int z, Actor *excluded = nullptr);
+	static bool mapIsOnScreen(int x, int y, int z);
+	static bool tileGetFlag(uint16 tileNum, uint8 flagSet, uint8 bit);
+	static uint16 objTileNum(const Obj *obj);
+	static const char *tileDescription(uint16 tileNum);
+
+	/** Moves an object that's on the map, or just changes its location if it isn't */
+	static void setObjLocation(Obj *obj, uint16 x, uint16 y, uint8 z);
+
+	static uint16 getWrappedDist(uint16 pt1, uint16 pt2);
+	static int actorRandomiseStat(int baseStat);
+	static bool actorHasBadAlignment(const Actor *actor);
+	static bool actorHasFreeArm(Actor *actor);
+	static bool actorIsHoldingObj(Actor *actor, uint16 objN);
+	static int actorFindMaxWrappedXYDistance(const Actor *actor, uint16 x, uint16 y);
+	uint8 actorGetCombatRange(const Actor *actor, uint16 targetX, uint16 targetY) const;
+	void subtractMapMovementPts(Actor *actor);
+
+	/** Moves one tile in a direction. The flag is passed on to the game's movement logic */
+	virtual bool actorMove(Actor *actor, NuvieDir direction, int flag) {
+		return false;
+	}
+	virtual int actorMoveDiagonal(Actor *actor, NuvieDir xDirection, NuvieDir yDirection) {
+		return 0;
+	}
+
+	/** Returns 0 if the actor couldn't move anywhere, otherwise 1 */
+	int actorMoveTowardsLoc(Actor *actor, int mapX, int mapY);
+	bool tossActor(Actor *actor, int fromX, int fromY, uint8 fromZ, int arg0);
 
 	/** Collects the direct children of a container so they can be moved while iterating */
 	static void getContainerObjs(Obj *container, Common::Array<Obj *> &objs);
@@ -242,7 +303,12 @@ public:
 		return false;
 	}
 
-	/** Intro and ending cutscenes. Return false if the game has none. */
+	/** True while some of the game's scripts still run in Lua, so the Lua scripts need loading */
+	virtual bool needsLua() const {
+		return false;
+	}
+
+	/** Intro and ending cutscenes. Return false if the game has none in C++ yet. */
 	virtual bool playIntro() {
 		return false;
 	}

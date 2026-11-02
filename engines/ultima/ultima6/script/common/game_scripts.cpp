@@ -60,8 +60,11 @@ void GameScripts::printl(const char *code) const {
 	print(_lang.get(code));
 }
 
-void GameScripts::printfl(const char *code, const Common::String &arg) const {
-	print(Common::String::format(_lang.get(code), arg.c_str()));
+void GameScripts::printfl(const char *code, ...) const {
+	va_list args;
+	va_start(args, code);
+	print(Common::String::vformat(_lang.get(code), args));
+	va_end(args);
 }
 
 void GameScripts::wait(uint32 duration) const {

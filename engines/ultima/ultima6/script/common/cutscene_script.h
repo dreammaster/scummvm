@@ -23,6 +23,7 @@
 #define NUVIE_SCRIPT_COMMON_CUTSCENE_SCRIPT_H
 
 #include "common/array.h"
+#include "ultima/ultima6/script/common/script_random.h"
 #include "ultima/ultima6/script/script_cutscene.h"
 
 namespace Ultima {
@@ -57,8 +58,6 @@ protected:
 	CutsceneScript();
 	virtual ~CutsceneScript();
 
-	static int randomRange(int low, int high);
-
 	CSSprite *newSprite(CSImage *image, int x, int y, bool visible);
 	void moveToFront(CSSprite *sprite);
 	static void setOpacity(CSSprite *sprite, int opacity);
@@ -67,6 +66,7 @@ protected:
 	CSImage *newImage(uint16 w, uint16 h, int fill = -1);
 	CSImage *copyImage(const CSImage *image);
 	bool loadImages(const char *filename, ImageTable &images);
+	CSImage *loadImage(const char *filename, int idx);
 
 	/** Takes ownership of images loaded elsewhere */
 	void adoptImages(const Common::Array<CSImage *> &images);
@@ -98,6 +98,9 @@ protected:
 	CSSprite *createPlayerSprite(CSImage *image, int x, int y);
 	CSSprite *createSprite(CSImage *image, int x, int y);
 	void fireworks(const ImageTable &images, CSSprite *logo);
+
+	/** The scrolling Martian Dreams credits */
+	void aboutMartianDreams();
 };
 
 } // End of namespace Scripts

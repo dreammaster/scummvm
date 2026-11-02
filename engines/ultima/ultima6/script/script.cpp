@@ -46,6 +46,7 @@
 #include "ultima/ultima6/script/script.h"
 #include "ultima/ultima6/script/script_actor.h"
 #include "ultima/ultima6/script/script_cutscene.h"
+#include "ultima/ultima6/script/md/md_scripts.h"
 #include "ultima/ultima6/script/se/se_scripts.h"
 #include "ultima/ultima6/core/magic.h"
 #include "ultima/ultima6/files/tmx_map.h"
@@ -524,6 +525,8 @@ Script::Script(Configuration *cfg, GUI *gui, SoundManager *sm, nuvie_game_t type
 
 	if (type == NUVIE_GAME_SE)
 		_scripts = new Scripts::SE::SEScripts(cfg);
+	else if (type == NUVIE_GAME_MD)
+		_scripts = new Scripts::MD::MDScripts(cfg);
 
 	script_obj_list = iAVLAllocTree(get_iAVLKey);
 
@@ -889,7 +892,7 @@ Script::~Script() {
 }
 
 bool Script::init() {
-	if (_scripts)
+	if (_scripts && !_scripts->needsLua())
 		return true;
 
 	Common::String tmp;
@@ -957,13 +960,13 @@ bool Script::play_cutscene(const char *script_file) {
 	// (e.g. for character name entry or skipping the intro)
 
 	g_system->getEventManager()->getKeymapper()->setEnabled(false);
-	bool retVal;
+	bool handled = false;
 	if (_scripts && !strcmp(script_file, "/intro.lua"))
-		retVal = _scripts->playIntro();
+		handled = _scripts->playIntro();
 	else if (_scripts && !strcmp(script_file, "/ending.lua"))
-		retVal = _scripts->playEnding();
-	else
-		retVal = run_lua_file(script_file_path.c_str());
+		handled = _scripts->playEnding();
+
+	bool retVal = handled || run_lua_file(script_file_path.c_str());
 	g_system->getEventManager()->getKeymapper()->setEnabled(true);
 	return retVal;
 }

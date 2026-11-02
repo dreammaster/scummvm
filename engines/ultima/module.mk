@@ -366,10 +366,26 @@ MODULE_OBJS += \
 	ultima6/script/script.o \
 	ultima6/script/script_actor.o \
 	ultima6/script/script_cutscene.o \
+	ultima6/script/common/actor.o \
 	ultima6/script/common/common.o \
 	ultima6/script/common/cutscene_script.o \
 	ultima6/script/common/game_scripts.o \
 	ultima6/script/common/lang.o \
+	ultima6/script/common/script_api.o \
+	ultima6/script/md/actor.o \
+	ultima6/script/md/combat.o \
+	ultima6/script/md/dreamworld.o \
+	ultima6/script/md/ending.o \
+	ultima6/script/md/lang.o \
+	ultima6/script/md/look.o \
+	ultima6/script/md/md_scripts.o \
+	ultima6/script/md/player.o \
+	ultima6/script/md/tables.o \
+	ultima6/script/md/talk.o \
+	ultima6/script/md/usecode.o \
+	ultima6/script/md/usecode_items.o \
+	ultima6/script/md/usecode_world.o \
+	ultima6/script/md/worktype.o \
 	ultima6/script/se/actor.o \
 	ultima6/script/se/ending.o \
 	ultima6/script/se/intro.o \
