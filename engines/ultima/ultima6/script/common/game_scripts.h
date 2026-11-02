@@ -65,6 +65,16 @@ protected:
 	/** Blocks for a number of milliseconds while the game keeps updating */
 	void wait(uint32 duration) const;
 
+	Common::String inputSelect(const char *allowedChars, bool canEscape) const;
+	int inputSelectInteger(bool canEscape) const;
+	bool inputShouldProceed() const;
+
+	void altCodeSetActorTalkFlag();
+	void altCodeCreateObject();
+	void altCodeExportTmxMapFiles();
+	void altCodeExportTileset();
+	void altCodeFindObjsOnMap();
+
 	/** Collects the direct children of a container so they can be moved while iterating */
 	static void getContainerObjs(Obj *container, Common::Array<Obj *> &objs);
 
@@ -220,6 +230,23 @@ public:
 	virtual bool talkToActor(Actor *actor) {
 		return false;
 	}
+
+	/** Whether the alt code create object command asks for a quantity of this object */
+	virtual bool createObjectNeedsQuan(uint16 objN) {
+		return false;
+	}
+
+	/** Intro and ending cutscenes. Return false if the game has none. */
+	virtual bool playIntro() {
+		return false;
+	}
+	virtual bool playEnding() {
+		return false;
+	}
+
+	/** Debug commands, run by number */
+	bool handleAltCode(uint16 altCode);
+	uint8 playMidgameSequence(uint16 seqNum);
 
 	virtual bool isContainerObj(uint16 objN) {
 		return false;

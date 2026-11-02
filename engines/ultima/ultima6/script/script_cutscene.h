@@ -80,6 +80,16 @@ public:
 	void updateEffect() override;
 };
 
+enum {
+	INPUT_NONE = -1,
+	INPUT_MOUSE_CLICK = 0,
+	INPUT_MOUSE_MOTION = 1,
+	INPUT_KEY_RIGHT = 79 | (1 << 30),
+	INPUT_KEY_LEFT = 80 | (1 << 30),
+	INPUT_KEY_DOWN = 81 | (1 << 30),
+	INPUT_KEY_UP = 82 | (1 << 30)
+};
+
 struct CSSprite {
 	sint16 x;
 	sint16 y;
@@ -172,6 +182,9 @@ public:
 
 	void set_update_interval(uint16 interval);
 	void update();
+
+	/** Returns a key code, an INPUT_ value, or INPUT_NONE if there's no input waiting */
+	int input_poll(bool poll_mouse_motion = false);
 
 	void wait();
 	void Display(bool full_redraw) override;

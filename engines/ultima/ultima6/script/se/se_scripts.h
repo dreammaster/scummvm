@@ -109,6 +109,9 @@ public:
 	bool advanceTime(uint16 minutes) override;
 	bool talkToObj(Obj *obj) override;
 
+	bool playIntro() override;
+	bool playEnding() override;
+
 	bool isContainerObj(uint16 objN) override;
 	uint16 getTileToObjectMapping(uint16 tileN) override;
 	bool isTileObject(uint16 objN) override;

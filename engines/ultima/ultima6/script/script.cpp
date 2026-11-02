@@ -954,7 +954,13 @@ bool Script::play_cutscene(const char *script_file) {
 	// (e.g. for character name entry or skipping the intro)
 
 	g_system->getEventManager()->getKeymapper()->setEnabled(false);
-	bool retVal = run_lua_file(script_file_path.c_str());
+	bool retVal;
+	if (_scripts && !strcmp(script_file, "/intro.lua"))
+		retVal = _scripts->playIntro();
+	else if (_scripts && !strcmp(script_file, "/ending.lua"))
+		retVal = _scripts->playEnding();
+	else
+		retVal = run_lua_file(script_file_path.c_str());
 	g_system->getEventManager()->getKeymapper()->setEnabled(true);
 	return retVal;
 }
@@ -1334,6 +1340,9 @@ bool Script::call_move_obj(Obj *obj, sint16 rel_x, sint16 rel_y) {
 }
 
 bool Script::call_handle_alt_code(uint16 altcode) {
+	if (_scripts)
+		return _scripts->handleAltCode(altcode);
+
 	lua_getglobal(L, "handle_alt_code");
 	lua_pushnumber(L, (lua_Number)altcode);
 
@@ -1597,6 +1606,9 @@ uint8 Script::call_get_weapon_range(uint16 obj_n) {
 }
 
 uint8 Script::call_play_midgame_sequence(uint16 seq_num) {
+	if (_scripts)
+		return _scripts->playMidgameSequence(seq_num);
+
 	lua_getglobal(L, "play_midgame_sequence");
 	lua_pushnumber(L, (lua_Number)seq_num);
 	if (call_function("play_midgame_sequence", 1, 1) == false)

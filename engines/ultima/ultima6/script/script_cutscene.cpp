@@ -42,11 +42,6 @@ namespace Ultima6 {
 
 static const uint32 DELUXE_PAINT_MAGIC = 0x4d524f46; // "FORM"
 
-static const int INPUT_KEY_RIGHT = 79 | (1<<30);
-static const int INPUT_KEY_LEFT  = 80 | (1<<30);
-static const int INPUT_KEY_DOWN  = 81 | (1<<30);
-static const int INPUT_KEY_UP    = 82 | (1<<30);
-
 static ScriptCutscene *cutScene = nullptr;
 ScriptCutscene *get_cutscene() {
 	return cutScene;
@@ -1008,12 +1003,18 @@ static int nscript_get_mouse_y(lua_State *L) {
 }
 
 static int nscript_input_poll(lua_State *L) {
+	bool poll_mouse_motion = lua_isnil(L, 1) ? false : lua_toboolean(L, 1);
+
+	int input = cutScene->input_poll(poll_mouse_motion);
+	if (input == INPUT_NONE)
+		return 0;
+
+	lua_pushinteger(L, input);
+	return 1;
+}
+
+int ScriptCutscene::input_poll(bool poll_mouse_motion) {
 	Common::Event event;
-	bool poll_mouse_motion;
-	if (lua_isnil(L, 1))
-		poll_mouse_motion = false;
-	else
-		poll_mouse_motion = lua_toboolean(L, 1);
 
 	while (Events::get()->pollEvent(event)) {
 		//FIXME do something here.
@@ -1042,17 +1043,13 @@ static int nscript_input_poll(lua_State *L) {
 				ActionType a = keybinder->get_ActionType(key);
 				switch (keybinder->GetActionKeyType(a)) {
 				case WEST_KEY:
-					lua_pushinteger(L, INPUT_KEY_LEFT);
-					return 1;
+					return INPUT_KEY_LEFT;
 				case EAST_KEY:
-					lua_pushinteger(L, INPUT_KEY_RIGHT);
-					return 1;
+					return INPUT_KEY_RIGHT;
 				case SOUTH_KEY:
-					lua_pushinteger(L, INPUT_KEY_DOWN);
-					return 1;
+					return INPUT_KEY_DOWN;
 				case NORTH_KEY:
-					lua_pushinteger(L, INPUT_KEY_UP);
-					return 1;
+					return INPUT_KEY_UP;
 				case CANCEL_ACTION_KEY:
 					key.keycode = Common::KEYCODE_ESCAPE;
 					break;
@@ -1064,25 +1061,21 @@ static int nscript_input_poll(lua_State *L) {
 					break;
 				}
 			}
-			lua_pushinteger(L, key.keycode);
-			return 1;
+			return key.keycode;
 		}
 		if (event.type == Common::EVENT_QUIT) {
-			lua_pushinteger(L, 'Q');
-			return 1;
+			return 'Q';
 		}
 
 		if (event.type == Common::EVENT_LBUTTONDOWN || event.type == Common::EVENT_RBUTTONDOWN) {
-			lua_pushinteger(L, 0);
-			return 1;
+			return 0;
 		}
 		if (poll_mouse_motion && event.type == Common::EVENT_MOUSEMOVE) {
-			lua_pushinteger(L, 1);
 			return 1;
 		}
 	}
 
-	return 0;
+	return INPUT_NONE;
 }
 
 static int nscript_config_set(lua_State *L) {
