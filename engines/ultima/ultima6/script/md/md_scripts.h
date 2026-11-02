@@ -95,7 +95,7 @@ private:
 
 	void initLang();
 
-	// init.lua
+	// init
 	void updateWatchTile();
 	static bool isBlood(uint16 objN);
 	static bool isObjAttackable(const Obj *obj);
@@ -110,7 +110,7 @@ private:
 	void playDoorSfx();
 	int inputSelectObjQty(Obj *obj);
 
-	// actor.lua
+	// actor
 	/**
 	 * Per object number: strength, dexterity, intelligence, hit points, alignment,
 	 * an unknown value, damage, then the flag bytes read by isActorStatBitSet()
@@ -167,7 +167,7 @@ private:
 	void actorRadiationCheck(Actor *actor, Obj *obj);
 	Target findRockwormActor(const Target &target);
 
-	// combat.lua
+	// combat
 	int getWeaponDamage(const Target &weapon);
 	bool attackDexSavingThrow(Actor *attacker, const Target &defender, const Target &weapon);
 	void attackWithFreezeray(Actor *actor, Actor *target, int damage);
@@ -176,7 +176,7 @@ private:
 	void spreadWeaponDamage(Actor *actor, uint16 targetX, uint16 targetY, Obj *weapon);
 	void fireRangeBasedWeapon(Actor *attacker, uint16 targetX, uint16 targetY, const Target &weapon);
 
-	// worktype.lua
+	// worktype
 	Actor *selectTargetActor(Actor *srcActor);
 	void worktype15YourMother(Actor *actor);
 	void worktypeStompAround(Actor *actor);
@@ -191,7 +191,7 @@ private:
 	void stokerBlocked(Actor *stoker);
 	void performWorktype(Actor *actor);
 
-	// player.lua
+	// player
 	void updateObjectsAroundParty();
 	bool canMoveDrill(Obj *drill, int relX, int relY);
 	Target weaponSelect();
@@ -199,7 +199,7 @@ private:
 	void selectAttackTarget(const MapCoord &targetLoc);
 	void playerAttackWithWeapon(const Target &weapon, const MapCoord &targetLoc);
 
-	// look.lua
+	// look
 	void lookPocketwatch(Obj *obj);
 	void lookCannon(Obj *obj);
 	void lookBarrow(Obj *obj);
@@ -223,7 +223,7 @@ private:
 	void lookObelisk(Obj *obj);
 	bool lookUsecode(Obj *obj);
 
-	// talk.lua
+	// talk
 	void openGatesAtOlympusMons();
 	void openDreamMachineDoor();
 	void talkScriptFixPanels();
@@ -233,7 +233,7 @@ private:
 	void talkDreamMachine();
 	void playEndSequence();
 
-	// usecode.lua
+	// usecode
 	class UseObjThread;
 
 	typedef void (MDScripts::*UseFunc)(Obj *obj, Actor *actor);
@@ -364,7 +364,7 @@ private:
 	void useShovelToUnloadContainer(Obj *obj, const Target &target, Obj *toObj, Actor *actor);
 	void useShovelOnOreToContainer(Obj *obj, const Target &target, Obj *toObj, Actor *actor);
 
-	// dreamworld.lua
+	// dreamworld
 	void finishDreamQuest(Actor *actor);
 	void wakeFromDream();
 	void actorUseDreamMachine(Actor *actor, int dreamQuality);

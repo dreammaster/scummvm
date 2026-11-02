@@ -1,4 +1,4 @@
-// Generated from the Lua intro script
+// Generated from the original intro script
 
 static const uint8 GYPSY_A_LOOKUP[28] = {
 	0, 0, 0, 0, 0, 0, 0, 1,

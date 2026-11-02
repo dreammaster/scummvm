@@ -1794,7 +1794,7 @@ void Events::alt_code(int c) {
 		active_alt_code = 0;
 		break;
 
-	default: // attempt to handle the altcode with lua script.
+	default: // attempt to handle the altcode with the game scripts.
 		Game::get_game()->get_script()->call_handle_alt_code(c);
 		scroll->display_prompt();
 		break;

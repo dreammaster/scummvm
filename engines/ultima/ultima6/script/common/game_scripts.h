@@ -74,10 +74,9 @@ struct Target {
 };
 
 /**
- * Per-game script logic. Each virtual is the C++ equivalent of a Lua global
- * the engine used to call by name. The defaults match what the engine saw
- * when that global didn't exist for a game, so a game only overrides what
- * its Lua scripts actually defined.
+ * Per-game script logic. Each virtual is an entry point the engine calls.
+ * The defaults are what a game gets if it doesn't do anything special for
+ * that entry point, so a game only overrides what it needs to.
  */
 class GameScripts {
 protected:
@@ -342,12 +341,7 @@ public:
 		return false;
 	}
 
-	/** True while some of the game's scripts still run in Lua, so the Lua scripts need loading */
-	virtual bool needsLua() const {
-		return false;
-	}
-
-	/** Intro and ending cutscenes. Return false if the game has none in C++ yet. */
+	/** Intro and ending cutscenes */
 	virtual bool playIntro() {
 		return false;
 	}

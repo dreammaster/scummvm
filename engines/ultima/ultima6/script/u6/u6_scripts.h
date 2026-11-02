@@ -99,7 +99,7 @@ public:
 		TIMER_ECLIPSE = 15
 	};
 
-	/** Stat table row. The flags are the Lua table entries from "can talk" onwards, read with statFlag() */
+	/** Stat table row. The flags are the entries from "can talk" onwards, read with statFlag() */
 	struct ActorStats {
 		uint16 _objN;
 		uint8 _str, _dex, _int, _hp, _dmg;
@@ -120,7 +120,7 @@ public:
 		uint8 _spin;
 	};
 
-	/** Flag numbers in the same numbering the original Lua tables used */
+	/** Flag numbers in the numbering the original stats tables used */
 	enum StatFlag {
 		FLAG_CAN_TALK = 7,
 		FLAG_DROPS_BLOOD = 8,
@@ -183,7 +183,7 @@ private:
 	static bool statFlag(uint16 objN, int flag);
 	static const ProjectileInfo *getProjectileInfo(uint16 objN);
 
-	// init.lua
+	// init
 	void playSfx(uint16 sfxId, bool async = false) const;
 	static bool alignmentIsEvil(int align);
 	static int actorFindMaxXYDistance(const Actor *actor, int x, int y);
@@ -215,7 +215,7 @@ private:
 	void explodeSurroundingObjects(int x, int y, int z);
 	void setArmageddon(bool value);
 
-	// actor.lua
+	// actor
 	static int getWeaponDmg(uint16 objN);
 	int actorGetAc(Actor *actor);
 	Obj *actorSelectObjFromList(Actor *actor, const uint16 *objNums, uint count);
@@ -291,7 +291,7 @@ private:
 	void performWorktype(Actor *actor);
 	void subtractMovementPts(Actor *actor, int pts);
 
-	// usecode.lua
+	// usecode
 	void useSilverHorn(Actor *actor);
 
 protected:

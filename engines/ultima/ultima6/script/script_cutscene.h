@@ -22,8 +22,6 @@
 #ifndef NUVIE_SCRIPT_SCRIPT_CUTSCENE_H
 #define NUVIE_SCRIPT_SCRIPT_CUTSCENE_H
 
-#include "common/lua/lua.h"
-
 #include "ultima/ultima6/gui/gui.h"
 #include "ultima/ultima6/gui/widgets/gui_widget.h"
 #include "ultima/ultima6/files/u6_shape.h"
@@ -132,7 +130,7 @@ struct TransferSaveData {
 	int level;
 };
 
-void nscript_init_cutscene(lua_State *L, Configuration *cfg, GUI *gui, SoundManager *sm);
+void init_cutscene(Configuration *cfg, GUI *gui, SoundManager *sm);
 
 class ScriptCutscene : public GUI_Widget {
 private:

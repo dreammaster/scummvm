@@ -132,8 +132,8 @@ public:
 		return 0x48;
 	}
 	bool isFlying() const override {
-		// FIXME: Get flying flag from lua actor_tbl
-		// in devtools/create_ultima/files/ultima6/scripts/u6/actor.lua
+		// FIXME: Get flying flag from the actor stats table
+		// in script/u6/tables.cpp
 		const uint16 flyingObjs[] = {
 				OBJ_U6_INSECTS, OBJ_U6_GIANT_BAT, OBJ_U6_GAZER, OBJ_U6_BIRD,
 				OBJ_U6_WINGED_GARGOYLE, OBJ_U6_DAEMON, OBJ_U6_DRAKE,

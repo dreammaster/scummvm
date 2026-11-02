@@ -22,8 +22,6 @@
 #ifndef NUVIE_SCRIPT_SCRIPT_H
 #define NUVIE_SCRIPT_SCRIPT_H
 
-#include "common/lua/lua.h"
-
 #include "common/str.h"
 #include "ultima/ultima6/gui/gui.h"
 #include "ultima/ultima6/misc/u6_misc.h"
@@ -82,61 +80,20 @@ public:
 	}
 };
 
-class LuaScriptThread : public ScriptThread {
-	lua_State *L;
-	int start_nargs;
-	uint32 data;
-	uint8 state;
-
-public:
-
-	LuaScriptThread(lua_State *l, int nargs) {
-		L = l;
-		start_nargs = nargs;
-		data = 0;
-		state = NUVIE_SCRIPT_NOT_STARTED;
-	}
-	~LuaScriptThread() override {  }
-	uint32 get_data() override {
-		return data;
-	}
-	uint8 start() override {
-		return resume(start_nargs);
-	}
-	uint8 resume_with_location(const MapCoord &loc) override;
-	uint8 resume_with_direction(NuvieDir dir) override;
-	uint8 resume_with_spell_num(uint8 spell_num) override;
-	uint8 resume_with_obj(Obj *obj) override;
-	uint8 resume_with_nil() override;
-	uint8 resume(int narg = 0);
-	bool finished() override {
-		return lua_status(L) != LUA_YIELD ? true : false;
-	}
-	int get_error() {
-		return lua_status(L);
-	}
-	uint8 get_state() override {
-		return state;
-	}
-};
-
 #define SCRIPT_DISPLAY_HIT_MSG true
 class Script {
 	static Script *script;
 	Configuration *config;
 	nuvie_game_t gametype; // what game is being played?
 	SoundManager *soundManager;
-	lua_State *L;
 
-	// Games whose scripts have been converted to C++ handle those calls here instead of in Lua
+	// The scripts for the game being played
 	Scripts::GameScripts *_scripts;
 
 public:
 
 	Script(Configuration *cfg, GUI *gui, SoundManager *sm, nuvie_game_t type);
 	~Script();
-
-	bool init();
 
 	/* Return instance of self */
 	static Script *get_script() {
@@ -149,11 +106,11 @@ public:
 		return soundManager;
 	}
 
-	bool run_script(const char *script);
 	bool call_load_game(NuvieIO *objlist);
 	bool call_save_game(NuvieIO *objlist);
 
-	bool play_cutscene(const char *script_file);
+	bool play_intro();
+	bool play_ending();
 	MovementStatus call_player_before_move_action(sint16 *rel_x, sint16 *rel_y);
 	bool call_player_post_move_action(bool didMove);
 	bool call_player_pass();
@@ -182,9 +139,6 @@ public:
 	bool call_magic_get_spell_list(Spell **spell_list);
 	ScriptThread *call_magic_cast(const char *invocation);
 	bool call_actor_use_effect(Obj *effect_obj, Actor *actor);
-	bool call_function(const char *func_name, int num_args, int num_return, bool print_stacktrace = true) const;
-	ScriptThread *call_function_in_thread(const char *function_name);
-	bool run_lua_file(const char *filename);
 	bool call_moonstone_set_loc(uint8 phase, MapCoord location); //this is a hack until we have 'use' moonstone in script.
 	bool call_advance_time(uint16 minutes);
 	bool call_can_get_obj_override(Obj *obj) const;
@@ -210,12 +164,8 @@ public:
 	uint16 call_get_tile_to_object_mapping(uint16 tile_n);
 	bool call_is_tile_object(uint16 obj_n);
 
-	ScriptThread *new_thread(const char *scriptfile);
-	ScriptThread *new_thread_from_string(const char *script);
-
-protected:
-	bool call_loadsave_game(const char *function, NuvieIO *objlist);
-	void seed_random();
+private:
+	bool play_cutscene(bool intro);
 };
 
 } // End of namespace Ultima6

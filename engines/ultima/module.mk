@@ -364,7 +364,6 @@ MODULE_OBJS += \
 	ultima6/screen/screen.o \
 	ultima6/screen/surface.o \
 	ultima6/script/script.o \
-	ultima6/script/script_actor.o \
 	ultima6/script/script_cutscene.o \
 	ultima6/script/common/actor.o \
 	ultima6/script/common/common.o \

@@ -1618,7 +1618,7 @@ bool ObjManager::temp_obj_list_remove(Obj *obj) {
 }
 
 void ObjManager::remove_temp_obj(Obj *tmp_obj) {
-	//FIXME MD has special temp object flag override logic. This should be implemented in lua script.
+	//FIXME MD has special temp object flag override logic. This should be implemented in the scripts.
 	if (game_type != NUVIE_GAME_MD || (tmp_obj->obj_n != OBJ_MD_DREAM_TELEPORTER && tmp_obj->frame_n != 0)) {
 		DEBUG(0,
 		      LEVEL_DEBUGGING,

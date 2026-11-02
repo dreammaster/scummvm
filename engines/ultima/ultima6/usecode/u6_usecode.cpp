@@ -833,7 +833,7 @@ bool U6UseCode::use_vortex_cube(Obj *obj, UseCodeEvent ev) {
 					if (game->get_view_manager()->get_current_view())
 						game->get_view_manager()->get_current_view()->Hide();
 
-					game->get_script()->play_cutscene("/ending.lua");
+					game->get_script()->play_ending();
 					game->quit();
 
 					return true;
@@ -2861,7 +2861,7 @@ void U6UseCode::light_torch(Obj *obj) {
 		owner->add_light(TORCH_LIGHT_LEVEL);
 	}
 
-	obj->qty = 0xc8; //torch duration. updated in lua advance_time()
+	obj->qty = 0xc8; //torch duration. updated in the scripts advance_time
 	if (!owner || owner->is_in_party() || owner == player->get_actor())
 		scroll->display_string("\nTorch is lit.\n");
 	game->get_map_window()->updateBlacking();

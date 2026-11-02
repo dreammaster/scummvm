@@ -146,7 +146,7 @@ bool MDScripts::talkScript(uint8 scriptNumber) {
 
 void MDScripts::playEndSequence() {
 	get_cutscene()->moveToFront();
-	Script::get_script()->play_cutscene("/ending.lua");
+	Script::get_script()->play_ending();
 	Game::get_game()->quit();
 }
 

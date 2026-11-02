@@ -166,11 +166,9 @@ bool NuvieEngine::initialize() {
 	_game = new Game(_config, events, _screen, gui, gameType, _soundManager);
 
 	_script = new Script(_config, gui, _soundManager, gameType);
-	if (_script->init() == false)
-		return false;
 
 	if (playEnding) {
-		_script->play_cutscene("/ending.lua");
+		_script->play_ending();
 		return false;
 	}
 
@@ -438,7 +436,7 @@ bool NuvieEngine::playIntro() {
 		return true;
 
 
-	if (_script->play_cutscene("/intro.lua")) {
+	if (_script->play_intro()) {
 		bool should_quit = false;
 		_config->value("config/quit", should_quit, false);
 		if (!should_quit) {

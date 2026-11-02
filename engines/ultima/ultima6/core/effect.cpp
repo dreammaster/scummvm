@@ -175,7 +175,7 @@ uint16 CannonballEffect::callback(uint16 msg, CallBack *caller, void *msg_data) 
 
 	if (stop_effect) {
 		if (hit_actor) {
-			anim->pause(); //pause to avoid recursive problems when animations are called from actor_hit() lua script.
+			anim->pause(); //pause to avoid recursive problems when animations are called from actor_hit() script.
 			Game::get_game()->get_script()->call_actor_hit(hit_actor, 32, true);
 		}
 		if (msg != MESG_ANIM_DONE) // this msg means anim stopped itself
@@ -672,7 +672,7 @@ void DropEffect::hit_target() {
 	throw_obj->y = stop_at.y;
 	throw_obj->z = stop_at.z;
 
-	//FIXME drop logic should probably be in lua script.
+	//FIXME drop logic should probably be in the scripts.
 	if (drop_from_actor && obj_manager->is_breakable(throw_obj) && start_at.distance(stop_at) > 1) {
 		nuvie_game_t game_type = game->get_game_type();
 		if (game_type == NUVIE_GAME_U6 && throw_obj->obj_n == OBJ_U6_DRAGON_EGG) {
