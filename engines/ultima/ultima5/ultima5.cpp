@@ -20,9 +20,13 @@
  */
 
 #include "common/system.h"
+#include "common/translation.h"
 #include "engines/util.h"
+#include "gui/error.h"
 #include "ultima/ultima5/ultima5.h"
 #include "ultima/ultima5/console.h"
+#include "ultima/ultima5/data/data.h"
+#include "ultima/ultima5/gfx/charset.h"
 #include "ultima/ultima5/metaengine.h"
 #include "ultima/ultima5/views/views.h"
 
@@ -52,6 +56,12 @@ Common::Error Ultima5Engine::run() {
 
 	// Initialize 320x200 graphics mode
 	initGraphics(320, 200);
+	Data::setPalette();
+
+	if (!_tileset.load()) {
+		GUIErrorMessage(_("Could not load the game graphics"));
+		return Common::kNoError;
+	}
 
 	// Set the engine's debugger console
 	setDebugger(new Console());
@@ -79,6 +89,10 @@ bool Ultima5Engine::canLoadGameStateCurrently(Common::U32String *) {
 Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
 	// TODO: Savegame data
 	return Common::kNoError;
+}
+
+Graphics::Font *Ultima5Engine::createFont() const {
+	return new Gfx::CharSet();
 }
 
 } // namespace Ultima5

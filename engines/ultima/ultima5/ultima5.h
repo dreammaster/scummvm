@@ -29,6 +29,7 @@
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/engine/events.h"
+#include "ultima/ultima5/gfx/tileset.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -49,6 +50,9 @@ protected:
 	 * Goes back to the title screen
 	 */
 	void returnToMainMenu() override;
+
+public:
+	Gfx::Tileset _tileset;
 
 public:
 	Ultima5Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);
@@ -85,6 +89,11 @@ public:
 		Common::Serializer s(stream, nullptr);
 		return syncGame(s);
 	}
+
+	/**
+	 * Returns a font object that GfxSurface instances can use
+	 */
+	Graphics::Font *createFont() const override;
 };
 
 extern Ultima5Engine *g_engine;

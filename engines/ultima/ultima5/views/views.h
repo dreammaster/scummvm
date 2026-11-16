@@ -23,6 +23,7 @@
 #define ULTIMA5_VIEWS_H
 
 #include "ultima/shared/engine/events.h"
+#include "ultima/ultima5/views/asset_viewer.h"
 #include "ultima/ultima5/views/title.h"
 
 namespace Ultima {
@@ -30,6 +31,7 @@ namespace Ultima5 {
 namespace Views {
 
 struct Views {
+	AssetViewer _assetViewer;
 	Title _title;
 };
 

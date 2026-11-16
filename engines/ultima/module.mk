@@ -323,6 +323,12 @@ MODULE_OBJS += \
 	ultima5/ultima5.o \
 	ultima5/console.o \
 	ultima5/metaengine.o \
+	ultima5/data/data.o \
+	ultima5/gfx/charset.o \
+	ultima5/gfx/image_file.o \
+	ultima5/gfx/lzw.o \
+	ultima5/gfx/tileset.o \
+	ultima5/views/asset_viewer.o \
 	ultima5/views/title.o
 endif
 

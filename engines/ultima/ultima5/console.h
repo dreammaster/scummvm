@@ -28,6 +28,10 @@ namespace Ultima {
 namespace Ultima5 {
 
 class Console : public GUI::Debugger {
+private:
+	bool cmdTiles(int argc, const char **argv);
+	bool cmdImage(int argc, const char **argv);
+
 public:
 	Console();
 	~Console() override;

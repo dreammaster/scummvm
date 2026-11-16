@@ -21,14 +21,42 @@
 
 #include "ultima/ultima5/console.h"
 #include "ultima/ultima5/ultima5.h"
+#include "ultima/ultima5/views/asset_viewer.h"
 
 namespace Ultima {
 namespace Ultima5 {
 
 Console::Console() : GUI::Debugger() {
+	registerCmd("tiles", WRAP_METHOD(Console, cmdTiles));
+	registerCmd("image", WRAP_METHOD(Console, cmdImage));
 }
 
 Console::~Console() {
+}
+
+static Views::AssetViewer *assetViewer() {
+	return dynamic_cast<Views::AssetViewer *>(g_engine->findView("AssetViewer"));
+}
+
+bool Console::cmdTiles(int, const char **) {
+	assetViewer()->showTiles();
+	g_engine->replaceView("AssetViewer", true);
+	return false;
+}
+
+bool Console::cmdImage(int argc, const char **argv) {
+	if (argc < 2) {
+		debugPrintf("image <file> [index]  - Browses the images of a .16 file, such as ULTIMA.16\n");
+		return true;
+	}
+
+	if (!assetViewer()->showImages(argv[1], argc > 2 ? atoi(argv[2]) : 0)) {
+		debugPrintf("Could not load %s\n", argv[1]);
+		return true;
+	}
+
+	g_engine->replaceView("AssetViewer", true);
+	return false;
 }
 
 } // namespace Ultima5
