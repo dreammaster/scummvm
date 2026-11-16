@@ -51,6 +51,11 @@
 #include "ultima/ultima4/ultima4.h"
 #include "ultima/ultima4/metaengine.h"
 #endif
+#ifdef ENABLE_ULTIMA5
+#include "ultima/ultima5/ultima5.h"
+#include "ultima/ultima5/metaengine.h"
+#undef _G
+#endif
 #ifdef ENABLE_ULTIMA6
 #include "ultima/nuvie/metaengine.h"
 #include "ultima/nuvie/nuvie.h"
@@ -378,6 +383,11 @@ Common::Error UltimaMetaEngine::createInstance(OSystem *syst, Engine **engine, c
 		*engine = new Ultima::Ultima4::Ultima4Engine(syst, gd);
 		break;
 #endif
+#ifdef ENABLE_ULTIMA5
+	case Ultima::GAME_ULTIMA5:
+		*engine = new Ultima::Ultima5::Ultima5Engine(syst, gd);
+		break;
+#endif
 #ifdef ENABLE_ULTIMA6
 	case Ultima::GAME_ULTIMA6:
 	case Ultima::GAME_MARTIAN_DREAMS:
@@ -433,7 +443,7 @@ SaveStateDescriptor UltimaMetaEngine::querySaveMetaInfos(const char *target, int
 }
 
 Common::KeymapArray UltimaMetaEngine::initKeymaps(const char *target) const {
-#if defined(ENABLE_AKALABETH) || defined(ENABLE_ULTIMA1) || defined(ENABLE_ULTIMA2) || defined(ENABLE_ULTIMA4) || defined(ENABLE_ULTIMA6) || defined(ENABLE_ULTIMA8)
+#if defined(ENABLE_AKALABETH) || defined(ENABLE_ULTIMA1) || defined(ENABLE_ULTIMA2) || defined(ENABLE_ULTIMA3) || defined(ENABLE_ULTIMA4) || defined(ENABLE_ULTIMA5) || defined(ENABLE_ULTIMA6) || defined(ENABLE_ULTIMA8)
 	const Common::String gameId = getGameId(target);
 #endif
 
@@ -456,6 +466,10 @@ Common::KeymapArray UltimaMetaEngine::initKeymaps(const char *target) const {
 #ifdef ENABLE_ULTIMA4
 	if (gameId == "ultima4" || gameId == "ultima4_enh")
 		return Ultima::Ultima4::MetaEngine::initKeymaps();
+#endif
+#ifdef ENABLE_ULTIMA5
+	if (gameId == "ultima5")
+		return Ultima::Ultima5::MetaEngine::initKeymaps();
 #endif
 #ifdef ENABLE_ULTIMA6
 	if (gameId == "ultima6" || gameId == "ultima6_enh"

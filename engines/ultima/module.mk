@@ -318,6 +318,14 @@ MODULE_OBJS += \
 	ultima4/ultima4.o
 endif
 
+ifdef ENABLE_ULTIMA5
+MODULE_OBJS += \
+	ultima5/ultima5.o \
+	ultima5/console.o \
+	ultima5/metaengine.o \
+	ultima5/views/title.o
+endif
+
 ifdef ENABLE_ULTIMA6
 MODULE_OBJS += \
 	nuvie/metaengine.o \
