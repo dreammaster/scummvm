@@ -28,10 +28,26 @@ namespace Ultima {
 namespace Ultima5 {
 namespace Data {
 
+// The graphics the game can be shown with, which use different picture files
+enum RenderMode {
+	RENDER_CGA = 0, RENDER_EGA = 1,
+	RENDER_MODE_COUNT = 2
+};
+
+// Descriptions of the modes for the launcher's graphics mode drop-down, in
+// the same order. Marked for translation, but not translated
+extern const char *const RENDER_MODE_LABELS[RENDER_MODE_COUNT];
+
 /**
- * Sets the screen palette to the 16 EGA colors
+ * Returns the extension of the picture and tile files used by a mode
  */
-extern void setPalette();
+extern const char *pictureExtension(RenderMode mode);
+
+/**
+ * Sets the screen palette for a mode. CGA is cyan, magenta and white on black,
+ * and the colors above 3 repeat them, as the original masks colors to 2 bits
+ */
+extern void setPalette(RenderMode mode);
 
 } // namespace Data
 } // namespace Ultima5

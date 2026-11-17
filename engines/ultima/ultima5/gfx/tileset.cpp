@@ -27,15 +27,20 @@ namespace Ultima {
 namespace Ultima5 {
 namespace Gfx {
 
-constexpr int TILE_BYTES = TILE_SIZE * TILE_SIZE / 2;
+bool Tileset::load(Data::RenderMode mode) {
+	const bool cga = mode == Data::RENDER_CGA;
+	const int pixelCount = TILE_COUNT * TILE_SIZE * TILE_SIZE;
+	const Common::String name = Common::String("TILES") + Data::pictureExtension(mode);
 
-bool Tileset::load() {
+	// Pixels are packed from the top bits of each byte down, 4 or 2 to a byte
 	Common::Array<byte> data;
-	if (!loadLzwFile("TILES.16", data) || data.size() < TILE_COUNT * TILE_BYTES)
+	if (!loadLzwFile(name.c_str(), data) || data.size() < (uint)(cga ? pixelCount / 4 : pixelCount / 2))
 		return false;
 
-	for (int i = 0; i < TILE_COUNT * TILE_SIZE * TILE_SIZE; ++i)
-		_pixels[i] = (i & 1) ? (data[i >> 1] & 0x0F) : (data[i >> 1] >> 4);
+	for (int i = 0; i < pixelCount; ++i) {
+		_pixels[i] = cga ? (data[i >> 2] >> (6 - (i & 3) * 2)) & 3 :
+			(i & 1) ? (data[i >> 1] & 0x0F) : (data[i >> 1] >> 4);
+	}
 
 	return true;
 }

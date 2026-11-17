@@ -20,6 +20,7 @@
  */
 
 #include "common/system.h"
+#include "common/translation.h"
 #include "graphics/paletteman.h"
 #include "ultima/ultima5/data/data.h"
 
@@ -34,8 +35,29 @@ static const byte EGA_PALETTE[16 * 3] = {
 	0xff, 0x55, 0x55, 0xff, 0x55, 0xff, 0xff, 0xff, 0x55, 0xff, 0xff, 0xff
 };
 
-void setPalette() {
-	g_system->getPaletteManager()->setPalette(EGA_PALETTE, 0, 16);
+static const byte CGA_PALETTE[4 * 3] = {
+	0x00, 0x00, 0x00, 0x00, 0xaa, 0xaa, 0xaa, 0x00, 0xaa, 0xaa, 0xaa, 0xaa
+};
+
+const char *const RENDER_MODE_LABELS[RENDER_MODE_COUNT] = {
+	_s("Original (CGA)"), _s("EGA (16 colors)")
+};
+
+const char *pictureExtension(RenderMode mode) {
+	return mode == RENDER_CGA ? ".4" : ".16";
+}
+
+void setPalette(RenderMode mode) {
+	if (mode == RENDER_EGA) {
+		g_system->getPaletteManager()->setPalette(EGA_PALETTE, 0, 16);
+		return;
+	}
+
+	byte palette[16 * 3];
+	for (int i = 0; i < 16; ++i)
+		memcpy(&palette[i * 3], &CGA_PALETTE[(i & 3) * 3], 3);
+
+	g_system->getPaletteManager()->setPalette(palette, 0, 16);
 }
 
 } // namespace Data

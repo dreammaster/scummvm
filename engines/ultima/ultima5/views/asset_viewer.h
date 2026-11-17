@@ -57,7 +57,7 @@ public:
 	void showTiles();
 
 	/**
-	 * Shows the images of a file
+	 * Shows the images of a file, given without its extension
 	 * @returns		False if the file couldn't be loaded
 	 */
 	bool showImages(const Common::String &name, int index = 0);

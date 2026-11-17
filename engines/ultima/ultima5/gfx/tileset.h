@@ -23,6 +23,7 @@
 #define ULTIMA5_GFX_TILESET_H
 
 #include "graphics/managed_surface.h"
+#include "ultima/ultima5/data/data.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -32,7 +33,7 @@ constexpr int TILE_SIZE = 16;
 constexpr int TILE_COUNT = 512;
 
 /**
- * The 16x16 tiles of TILES.16, kept a byte per pixel
+ * The 16x16 tiles of TILES.16 or TILES.4, kept a byte per pixel
  */
 class Tileset {
 private:
@@ -43,7 +44,7 @@ public:
 	 * Loads the tiles
 	 * @returns		False if they couldn't be loaded
 	 */
-	bool load();
+	bool load(Data::RenderMode mode);
 
 	/**
 	 * Draws a tile, clipped to the surface

@@ -24,6 +24,7 @@
 
 #include "common/array.h"
 #include "graphics/managed_surface.h"
+#include "ultima/ultima5/data/data.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -35,14 +36,16 @@ enum ImageFlags {
 };
 
 /**
- * A .16 graphics file: a count, then an offset for each image and its mask.
- * Images are 4 bits per pixel with each row padded to a multiple of 4 bytes.
- * A mask is one bit per pixel, with set bits being transparent
+ * A .16 (EGA) or .4 (CGA) graphics file: a count, then an offset for each image
+ * and its mask. EGA images are 4 bits per pixel with each row padded to a
+ * multiple of 4 bytes, and CGA ones 2 bits per pixel with no padding. A mask is
+ * one bit per pixel, with set bits being transparent
  */
 class ImageFile {
 private:
 	Common::Array<byte> _data;
 	uint _count = 0;
+	bool _cga = false;
 
 	const byte *imagePtr(uint idx) const;
 	const byte *maskPtr(uint idx) const;
@@ -50,9 +53,10 @@ private:
 public:
 	/**
 	 * Loads an image file
+	 * @param baseName	The name without its extension, such as ULTIMA
 	 * @returns		False if it couldn't be loaded
 	 */
-	bool load(const char *name);
+	bool load(const char *baseName, Data::RenderMode mode);
 
 	uint size() const {
 		return _count;

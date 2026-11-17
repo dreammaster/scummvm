@@ -23,6 +23,7 @@
 #include "common/translation.h"
 #include "engines/util.h"
 #include "gui/error.h"
+#include "ultima/shared/engine/graphics_options.h"
 #include "ultima/ultima5/ultima5.h"
 #include "ultima/ultima5/console.h"
 #include "ultima/ultima5/data/data.h"
@@ -35,9 +36,16 @@ namespace Ultima5 {
 
 Ultima5Engine *g_engine;
 
+// The renderer stored in the configuration, falling back to EGA if it is missing or stale
+static Data::RenderMode configuredRenderMode() {
+	const int mode = Shared::configuredGraphicsMode(Data::RENDER_EGA);
+	return (mode >= 0 && mode < Data::RENDER_MODE_COUNT) ? (Data::RenderMode)mode : Data::RENDER_EGA;
+}
+
 Ultima5Engine::Ultima5Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc) :
 		Engine(syst), Shared::Events("ultima5"), _gameDescription(gameDesc) {
 	g_engine = this;
+	_renderMode = configuredRenderMode();
 }
 
 Ultima5Engine::~Ultima5Engine() {
@@ -56,9 +64,9 @@ Common::Error Ultima5Engine::run() {
 
 	// Initialize 320x200 graphics mode
 	initGraphics(320, 200);
-	Data::setPalette();
+	Data::setPalette(_renderMode);
 
-	if (!_tileset.load()) {
+	if (!_tileset.load(_renderMode)) {
 		GUIErrorMessage(_("Could not load the game graphics"));
 		return Common::kNoError;
 	}
@@ -76,6 +84,21 @@ Common::Error Ultima5Engine::run() {
 
 void Ultima5Engine::returnToMainMenu() {
 	replaceView("Title", true);
+}
+
+void Ultima5Engine::applyGameSettings() {
+	const Data::RenderMode mode = configuredRenderMode();
+	if (mode == _renderMode)
+		return;
+
+	if (!_tileset.load(mode))
+		return;
+
+	_renderMode = mode;
+	Data::setPalette(_renderMode);
+
+	if (focusedView())
+		focusedView()->redraw();
 }
 
 bool Ultima5Engine::canSaveGameStateCurrently(Common::U32String *) {

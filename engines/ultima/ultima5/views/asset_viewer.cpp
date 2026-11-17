@@ -43,7 +43,7 @@ void AssetViewer::showTiles() {
 }
 
 bool AssetViewer::showImages(const Common::String &name, int index) {
-	if (!_image.load(name.c_str()) || _image.size() == 0)
+	if (!_image.load(name.c_str(), _G(renderMode)) || _image.size() == 0)
 		return false;
 
 	_mode = MODE_IMAGE;

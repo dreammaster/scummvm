@@ -51,8 +51,16 @@ protected:
 	 */
 	void returnToMainMenu() override;
 
+	/**
+	 * Applies a change to the graphics mode from the game options dialog
+	 */
+	void applyGameSettings() override;
+
 public:
 	Gfx::Tileset _tileset;
+
+	// Which of the renderers is in use
+	Data::RenderMode _renderMode = Data::RENDER_EGA;
 
 public:
 	Ultima5Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);

@@ -46,11 +46,17 @@ bool Console::cmdTiles(int, const char **) {
 
 bool Console::cmdImage(int argc, const char **argv) {
 	if (argc < 2) {
-		debugPrintf("image <file> [index]  - Browses the images of a .16 file, such as ULTIMA.16\n");
+		debugPrintf("image <file> [index]  - Browses the images of a picture file, such as ULTIMA\n");
 		return true;
 	}
 
-	if (!assetViewer()->showImages(argv[1], argc > 2 ? atoi(argv[2]) : 0)) {
+	// Drop any extension, which comes from the graphics mode
+	Common::String name(argv[1]);
+	const size_t dot = name.findLastOf('.');
+	if (dot != Common::String::npos)
+		name.erase(dot);
+
+	if (!assetViewer()->showImages(name, argc > 2 ? atoi(argv[2]) : 0)) {
 		debugPrintf("Could not load %s\n", argv[1]);
 		return true;
 	}

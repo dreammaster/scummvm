@@ -27,9 +27,12 @@ namespace Ultima {
 namespace Ultima5 {
 namespace Gfx {
 
-bool ImageFile::load(const char *name) {
+bool ImageFile::load(const char *baseName, Data::RenderMode mode) {
 	_count = 0;
-	if (!loadLzwFile(name, _data) || _data.size() < 2)
+	_cga = mode == Data::RENDER_CGA;
+
+	const Common::String name = Common::String(baseName) + Data::pictureExtension(mode);
+	if (!loadLzwFile(name.c_str(), _data) || _data.size() < 2)
 		return false;
 
 	const uint count = READ_LE_UINT16(&_data[0]);
@@ -64,7 +67,7 @@ void ImageFile::draw(Graphics::ManagedSurface &dst, uint idx, int x, int y, int 
 	const byte *mask = maskPtr(idx);
 	const int width = READ_LE_UINT16(image);
 	const int height = READ_LE_UINT16(image + 2);
-	const int stride = ((width + 7) / 8) * 4;
+	const int stride = _cga ? (width + 3) / 4 : ((width + 7) / 8) * 4;
 	const int maskStride = mask ? (READ_LE_UINT16(mask) + 7) / 8 : 0;
 	const bool vflip = (flags & IMAGE_VFLIP) != 0;
 	const bool hflip = (flags & IMAGE_HFLIP) != 0;
@@ -86,8 +89,13 @@ void ImageFile::draw(Graphics::ManagedSurface &dst, uint idx, int x, int y, int 
 			if (dstX < 0 || dstX >= dst.w)
 				continue;
 
-			const byte b = row[xx >> 1];
-			*(byte *)dst.getBasePtr(dstX, dstY) = (xx & 1) ? (b & 0x0F) : (b >> 4);
+			byte pixel;
+			if (_cga)
+				pixel = (row[xx >> 2] >> (6 - (xx & 3) * 2)) & 3;
+			else
+				pixel = (xx & 1) ? (row[xx >> 1] & 0x0F) : (row[xx >> 1] >> 4);
+
+			*(byte *)dst.getBasePtr(dstX, dstY) = pixel;
 		}
 	}
 }

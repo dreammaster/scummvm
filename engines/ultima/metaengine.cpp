@@ -336,6 +336,13 @@ GUI::OptionsContainerWidget *UltimaMetaEngine::buildEngineOptionsWidget(GUI::Gui
 			enhanced ? Ultima::Ultima2::Data::RENDER_EGA : Ultima::Ultima2::Data::RENDER_CGA);
 	}
 #endif
+#ifdef ENABLE_ULTIMA5
+	if (getGameId(target) == "ultima5") {
+		return new Ultima::Shared::GraphicsOptionsWidget(boss, name, target,
+			Ultima::Ultima5::Data::RENDER_MODE_LABELS, Ultima::Ultima5::Data::RENDER_MODE_COUNT,
+			ExtraGuiOptions(), false, Ultima::Ultima5::Data::RENDER_EGA);
+	}
+#endif
 #ifdef ENABLE_ULTIMA3
 	if (getGameId(target) == "ultima3" || getGameId(target) == "ultima3_enh") {
 		// The enhanced version starts off with all the options on, and the best graphics
