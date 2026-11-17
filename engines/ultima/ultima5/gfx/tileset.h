@@ -33,7 +33,7 @@ constexpr int TILE_SIZE = 16;
 constexpr int TILE_COUNT = 512;
 
 /**
- * The 16x16 tiles of TILES.16 or TILES.4, kept a byte per pixel
+ * The 16x16 tiles of tiles.16 or tiles.4, kept a byte per pixel
  */
 class Tileset {
 private:

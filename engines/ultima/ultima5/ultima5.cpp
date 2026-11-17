@@ -34,6 +34,8 @@
 namespace Ultima {
 namespace Ultima5 {
 
+constexpr int SAVEGAME_VERSION = 1;
+
 Ultima5Engine *g_engine;
 
 // The renderer stored in the configuration, falling back to EGA if it is missing or stale
@@ -110,7 +112,8 @@ bool Ultima5Engine::canLoadGameStateCurrently(Common::U32String *) {
 }
 
 Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
-	// TODO: Savegame data
+	s.syncVersion(SAVEGAME_VERSION);
+	_savegame.synchronize(s);
 	return Common::kNoError;
 }
 

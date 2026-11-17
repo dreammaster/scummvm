@@ -40,9 +40,9 @@ private:
 
 public:
 	/**
-	 * Loads a charset, such as IBM.CH for text or RUNES.CH
+	 * Loads a charset, such as ibm.ch for text or runes.ch
 	 */
-	CharSet(const char *filename = "IBM.CH");
+	CharSet(const char *filename = "ibm.ch");
 
 	int getFontHeight() const override {
 		return 8;

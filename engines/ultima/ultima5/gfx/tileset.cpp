@@ -30,7 +30,7 @@ namespace Gfx {
 bool Tileset::load(Data::RenderMode mode) {
 	const bool cga = mode == Data::RENDER_CGA;
 	const int pixelCount = TILE_COUNT * TILE_SIZE * TILE_SIZE;
-	const Common::String name = Common::String("TILES") + Data::pictureExtension(mode);
+	const Common::String name = Common::String("tiles") + Data::pictureExtension(mode);
 
 	// Pixels are packed from the top bits of each byte down, 4 or 2 to a byte
 	Common::Array<byte> data;

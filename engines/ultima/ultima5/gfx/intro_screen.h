@@ -42,12 +42,25 @@ private:
 	Common::ScopedPtr<CharSet> _font;
 	ImageFile _logo;
 
-	void drawCell(Graphics::ManagedSurface &dst, int col, int row, byte ch, byte fg, byte bg) const;
-	void print(Graphics::ManagedSurface &dst, int col, int row, const char *text, byte fg, byte bg) const;
 	void drawCaps(Graphics::ManagedSurface &dst, int x, int y, bool left) const;
 
 public:
 	static constexpr int WD_FRAME_COUNT = 4;
+
+	/**
+	 * Draws a character in one of the 8x8 cells of the screen, on a background
+	 */
+	void drawCell(Graphics::ManagedSurface &dst, int col, int row, byte ch, byte fg, byte bg) const;
+
+	/**
+	 * Draws text from a cell onwards
+	 */
+	void print(Graphics::ManagedSurface &dst, int col, int row, const char *text, byte fg, byte bg) const;
+
+	/**
+	 * Draws the animated text cursor in a cell
+	 */
+	void drawCursor(Graphics::ManagedSurface &dst, int col, int row, int cursorFrame) const;
 
 	/**
 	 * Loads the graphics, once the render mode is known
@@ -81,9 +94,16 @@ public:
 	void drawPrompt(Graphics::ManagedSurface &dst, int cursorFrame) const;
 
 	/**
-	 * Draws the message shown when there's no saved game to continue
+	 * Draws the title screen with the inside of the menu frame emptied, as the
+	 * background for entering a name
 	 */
-	void drawNoGame(Graphics::ManagedSurface &dst) const;
+	void drawEmptyMenu(Graphics::ManagedSurface &dst, int wdFrame) const;
+
+	/**
+	 * Draws up to three lines of text in the menu frame, in place of the menu
+	 */
+	void drawMessage(Graphics::ManagedSurface &dst, const char *line1, const char *line2 = nullptr,
+		const char *line3 = nullptr) const;
 };
 
 } // namespace Gfx

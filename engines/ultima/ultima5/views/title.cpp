@@ -43,7 +43,7 @@ bool Title::msgFocus(const FocusMessage &msg) {
 
 	_selected = 0;
 	_animFrame = 0;
-	_noGame = false;
+	_showNotice = false;
 
 	delayFrames(FRAMES_PER_STEP);
 	return Shared::View::msgFocus(msg);
@@ -53,8 +53,12 @@ void Title::draw() {
 	auto s = getSurface();
 	_screen.drawTitle(s, _animFrame);
 
-	if (_noGame) {
-		_screen.drawNoGame(s);
+	if (_showNotice) {
+		if (_G(savegame).hasActiveGame())
+			_screen.drawMessage(s, "Journey Onward is not yet playable.");
+		else
+			_screen.drawMessage(s, "No active game.", "Please create a character or transfer",
+				"one from Ultima IV.");
 	} else {
 		_screen.drawMenu(s, _selected);
 		_screen.drawPrompt(s, _animFrame);
@@ -78,9 +82,11 @@ void Title::choose(int index, bool activate) {
 void Title::activate(int index) {
 	switch (index) {
 	case CHOICE_JOURNEY:
-		// There's no saved game to continue yet
-		_noGame = true;
+		_showNotice = true;
 		redraw();
+		break;
+	case CHOICE_CREATE:
+		addView("CreateCharacter");
 		break;
 	case CHOICE_INTRODUCTION:
 		addView("Introduction");
@@ -97,8 +103,8 @@ bool Title::msgKeypress(const KeypressMessage &msg) {
 	if (isModifierKey(msg.keycode))
 		return false;
 
-	if (_noGame) {
-		_noGame = false;
+	if (_showNotice) {
+		_showNotice = false;
 		redraw();
 		return true;
 	}

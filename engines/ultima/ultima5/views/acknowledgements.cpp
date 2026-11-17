@@ -42,7 +42,7 @@ constexpr int SLIDE_FRAMES = 3;
 constexpr int MENU_ITEM_ACKNOWLEDGEMENTS = 4;
 
 bool Acknowledgements::msgFocus(const FocusMessage &msg) {
-	if (!_intro.load() || !_scroll.load("STARTSC", _G(renderMode)) || _scroll.size() < 3)
+	if (!_intro.load() || !_scroll.load("startsc", _G(renderMode)) || _scroll.size() < 3)
 		error("Could not load the credits");
 
 	_screen.create(320, 200);

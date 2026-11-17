@@ -29,6 +29,7 @@
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/engine/events.h"
+#include "ultima/ultima5/data/savegame.h"
 #include "ultima/ultima5/gfx/tileset.h"
 
 namespace Ultima {
@@ -57,6 +58,7 @@ protected:
 	void applyGameSettings() override;
 
 public:
+	Data::Savegame _savegame;
 	Gfx::Tileset _tileset;
 
 	// Which of the renderers is in use

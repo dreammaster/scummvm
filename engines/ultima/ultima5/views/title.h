@@ -39,7 +39,7 @@ private:
 	Gfx::IntroScreen _screen;
 	int _selected = 0;
 	int _animFrame = 0;
-	bool _noGame = false;
+	bool _showNotice = false;
 
 	/**
 	 * Moves the highlight to a choice, and carries it out if it's one that's

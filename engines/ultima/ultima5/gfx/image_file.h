@@ -53,7 +53,7 @@ private:
 public:
 	/**
 	 * Loads an image file
-	 * @param baseName	The name without its extension, such as ULTIMA
+	 * @param baseName	The name without its extension, such as ultima
 	 * @returns		False if it couldn't be loaded
 	 */
 	bool load(const char *baseName, Data::RenderMode mode);

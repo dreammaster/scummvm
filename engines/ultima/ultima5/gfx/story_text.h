@@ -39,10 +39,11 @@ struct StoryLayout {
 	int _right[2] = { 320, 320 };
 	int _splitTop = 200;
 	int _splitBottom = 200;
+	int _spaceWidth = 5;
 };
 
 /**
- * Draws justified, word wrapped text in the proportional font of PROPORT.PCS.
+ * Draws justified, word wrapped text in the proportional font of proport.pcs.
  * An underscore in a word marks where it can be hyphenated, and a brace
  * is an indent
  */

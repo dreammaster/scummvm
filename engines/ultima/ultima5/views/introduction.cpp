@@ -31,7 +31,7 @@ namespace Views {
 constexpr int SCENE_COUNT = 21;
 constexpr int MAX_TEXT_LENGTH = 2000;
 
-// How a scene is laid out. Kind 1 has a banner from TEXT.16 behind it, 2 has the
+// How a scene is laid out. Kind 1 has a banner from text.16 behind it, 2 has the
 // door that is revealed beside the text, 3 has the door and fixed text, and 4 and
 // above have a second picture below the first
 enum SceneKind { KIND_PLAIN = 0, KIND_BANNER = 1, KIND_DOOR = 2, KIND_DOOR_OPENING = 3 };
@@ -48,7 +48,7 @@ static const uint16 RIGHT_EDGES[SCENE_COUNT][2] = {
 	{ 0x140, 0x140 }, { 0x0AA, 0x140 }, { 0x140, 0x140 }, { 0x140, 0x0AA }, { 0x140, 0x140 }, { 0x140, 0x0AA }, { 0x140, 0x140 }
 };
 
-// Where the story text of each scene is in STORY.DAT
+// Where the story text of each scene is in story.dat
 static const uint16 TEXT_OFFSETS[SCENE_COUNT] = {
 	0x0000, 0x0111, 0x03CB, 0x0590, 0x0803, 0x0AC4, 0x0000, 0x0D6D,
 	0x0E23, 0x0FB6, 0x1173, 0x132A, 0x14BE, 0x162E, 0x192B, 0x1B9A,
@@ -100,12 +100,12 @@ bool Introduction::msgFocus(const FocusMessage &msg) {
 		_page.create(320, 200);
 
 	Common::File f;
-	if (_story.empty() && f.open("STORY.DAT")) {
+	if (_story.empty() && f.open("story.dat")) {
 		_story.resize(f.size());
 		f.read(&_story[0], _story.size());
 	}
 
-	if (!_text.load() || _story.empty() || !_banners.load("TEXT", _G(renderMode)))
+	if (!_text.load() || _story.empty() || !_banners.load("text", _G(renderMode)))
 		error("Could not load the introduction");
 
 	_pictureFile = -1;
@@ -127,7 +127,7 @@ Common::String Introduction::sceneText(int scene) const {
 
 void Introduction::buildScene(int scene) {
 	if (STORY_FILES[scene] != _pictureFile) {
-		const Common::String name = Common::String::format("STORY%d", STORY_FILES[scene] + 1);
+		const Common::String name = Common::String::format("story%d", STORY_FILES[scene] + 1);
 		if (!_pictures.load(name.c_str(), _G(renderMode)))
 			error("Could not load %s", name.c_str());
 

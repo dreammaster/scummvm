@@ -25,7 +25,6 @@ namespace Ultima {
 namespace Ultima5 {
 namespace Gfx {
 
-constexpr int SPACE_WIDTH = 5;
 constexpr int INDENT_WIDTH = 0x0F;
 constexpr int HYPHEN_WIDTH = 3;
 constexpr int HYPHEN_GLYPH = 0x0D;
@@ -55,7 +54,7 @@ static int glyphWidth(byte ch) {
 }
 
 bool StoryText::load() {
-	return _glyphs.load("PROPORT.PCS");
+	return _glyphs.load("proport.pcs");
 }
 
 void StoryText::draw(Graphics::ManagedSurface &dst, const Common::String &text, int &x, int &y,
@@ -79,7 +78,7 @@ void StoryText::draw(Graphics::ManagedSurface &dst, const Common::String &text, 
 		while (at(scan) != 0 && used < lineWidth && at(scan) != '\n') {
 			const byte c = at(scan);
 			if (c <= 0x20) {
-				used += SPACE_WIDTH;
+				used += layout._spaceWidth;
 				++spaces;
 			} else if (c == '{') {
 				used += INDENT_WIDTH;
@@ -100,7 +99,7 @@ void StoryText::draw(Graphics::ManagedSurface &dst, const Common::String &text, 
 				break;
 
 			if (at(scan) == ' ') {
-				used -= SPACE_WIDTH;
+				used -= layout._spaceWidth;
 				--spaces;
 				break;
 			}
@@ -120,7 +119,7 @@ void StoryText::draw(Graphics::ManagedSurface &dst, const Common::String &text, 
 		for (int i = pos; i < end; ++i) {
 			const byte c = at(i);
 			if (c <= 0x20) {
-				x += SPACE_WIDTH;
+				x += layout._spaceWidth;
 				if (spaces != 0 && at(end) != 0 && at(end) != '\n') {
 					x += slack / spaces;
 					slack -= slack / spaces;

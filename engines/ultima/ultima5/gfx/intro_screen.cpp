@@ -60,7 +60,7 @@ bool IntroScreen::load() {
 	if (!_font)
 		_font.reset(new CharSet());
 
-	return _logo.load("ULTIMA", _G(renderMode)) && _logo.size() > WD_FRAME_COUNT;
+	return _logo.load("ultima", _G(renderMode)) && _logo.size() > WD_FRAME_COUNT;
 }
 
 void IntroScreen::drawCell(Graphics::ManagedSurface &dst, int col, int row, byte ch, byte fg, byte bg) const {
@@ -128,14 +128,29 @@ void IntroScreen::drawPrompt(Graphics::ManagedSurface &dst, int cursorFrame) con
 	drawCaps(dst, 15 * 8, MENU_TOP_ROW * 8, true);
 	print(dst, 16, MENU_TOP_ROW, "Select: ", WHITE, BLACK);
 	drawCaps(dst, 24 * 8, MENU_TOP_ROW * 8, false);
-	drawCell(dst, 23, MENU_TOP_ROW, GLYPH_CURSOR + (cursorFrame & 3), WHITE, BLACK);
+	drawCursor(dst, 23, MENU_TOP_ROW, cursorFrame);
 }
 
-void IntroScreen::drawNoGame(Graphics::ManagedSurface &dst) const {
+void IntroScreen::drawCursor(Graphics::ManagedSurface &dst, int col, int row, int cursorFrame) const {
+	drawCell(dst, col, row, GLYPH_CURSOR + (cursorFrame & 3), WHITE, BLACK);
+}
+
+void IntroScreen::drawEmptyMenu(Graphics::ManagedSurface &dst, int wdFrame) const {
+	drawTitle(dst, wdFrame);
 	dst.fillRect(Common::Rect(8, 128, 312, 192), BLACK);
-	print(dst, 2, 18, "No active game.", WHITE, BLACK);
-	print(dst, 2, 19, "Please create a character or transfer", WHITE, BLACK);
-	print(dst, 2, 20, "one from Ultima IV.", WHITE, BLACK);
+	dst.fillRect(Common::Rect(0x78, 0x78, 0xC9, 0x7F), BLUE);
+	dst.drawLine(0x78, 0x7F, 0xC8, 0x7F, WHITE);
+}
+
+void IntroScreen::drawMessage(Graphics::ManagedSurface &dst, const char *line1, const char *line2,
+		const char *line3) const {
+	dst.fillRect(Common::Rect(8, 128, 312, 192), BLACK);
+
+	const char *const lines[] = { line1, line2, line3 };
+	for (int i = 0; i < 3; ++i) {
+		if (lines[i])
+			print(dst, 2, 18 + i, lines[i], WHITE, BLACK);
+	}
 }
 
 void IntroScreen::drawTitle(Graphics::ManagedSurface &dst, int wdFrame) const {

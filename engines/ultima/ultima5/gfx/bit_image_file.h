@@ -30,7 +30,7 @@ namespace Ultima5 {
 namespace Gfx {
 
 /**
- * A compressed resource of one bit per pixel images, such as PROPORT.PCS:
+ * A compressed resource of one bit per pixel images, such as proport.pcs:
  * a count, an offset for each image, and for each a width and height
  * followed by rows padded to whole bytes, with the leftmost pixel in the top bit
  */
