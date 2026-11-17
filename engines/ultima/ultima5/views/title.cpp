@@ -54,11 +54,8 @@ void Title::draw() {
 	_screen.drawTitle(s, _animFrame);
 
 	if (_showNotice) {
-		if (_G(savegame).hasActiveGame())
-			_screen.drawMessage(s, "Journey Onward is not yet playable.");
-		else
-			_screen.drawMessage(s, "No active game.", "Please create a character or transfer",
-				"one from Ultima IV.");
+		_screen.drawMessage(s, "No active game.", "Please create a character or transfer",
+			"one from Ultima IV.");
 	} else {
 		_screen.drawMenu(s, _selected);
 		_screen.drawPrompt(s, _animFrame);
@@ -82,8 +79,12 @@ void Title::choose(int index, bool activate) {
 void Title::activate(int index) {
 	switch (index) {
 	case CHOICE_JOURNEY:
-		_showNotice = true;
-		redraw();
+		if (_G(savegame).hasActiveGame()) {
+			replaceView("Game", true);
+		} else {
+			_showNotice = true;
+			redraw();
+		}
 		break;
 	case CHOICE_CREATE:
 		addView("CreateCharacter");

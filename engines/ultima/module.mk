@@ -327,15 +327,19 @@ MODULE_OBJS += \
 	ultima5/data/savegame.o \
 	ultima5/gfx/bit_image_file.o \
 	ultima5/gfx/charset.o \
+	ultima5/gfx/game_frame.o \
 	ultima5/gfx/image_file.o \
 	ultima5/gfx/intro_screen.o \
 	ultima5/gfx/lzw.o \
+	ultima5/gfx/message_log.o \
 	ultima5/gfx/story_text.o \
+	ultima5/gfx/text_screen.o \
 	ultima5/gfx/tileset.o \
 	ultima5/logic/creation_logic.o \
 	ultima5/views/acknowledgements.o \
 	ultima5/views/asset_viewer.o \
 	ultima5/views/create_character.o \
+	ultima5/views/game.o \
 	ultima5/views/introduction.o \
 	ultima5/views/title.o
 endif

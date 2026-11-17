@@ -22,10 +22,9 @@
 #ifndef ULTIMA5_GFX_INTRO_SCREEN_H
 #define ULTIMA5_GFX_INTRO_SCREEN_H
 
-#include "common/ptr.h"
 #include "graphics/managed_surface.h"
-#include "ultima/ultima5/gfx/charset.h"
 #include "ultima/ultima5/gfx/image_file.h"
+#include "ultima/ultima5/gfx/text_screen.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -37,30 +36,12 @@ constexpr int MENU_ITEM_COUNT = 6;
  * Draws the parts of the title screen: the logo, the shimmering subtitle,
  * the blue bordered menu at the bottom and its text
  */
-class IntroScreen {
+class IntroScreen : public TextScreen {
 private:
-	Common::ScopedPtr<CharSet> _font;
 	ImageFile _logo;
-
-	void drawCaps(Graphics::ManagedSurface &dst, int x, int y, bool left) const;
 
 public:
 	static constexpr int WD_FRAME_COUNT = 4;
-
-	/**
-	 * Draws a character in one of the 8x8 cells of the screen, on a background
-	 */
-	void drawCell(Graphics::ManagedSurface &dst, int col, int row, byte ch, byte fg, byte bg) const;
-
-	/**
-	 * Draws text from a cell onwards
-	 */
-	void print(Graphics::ManagedSurface &dst, int col, int row, const char *text, byte fg, byte bg) const;
-
-	/**
-	 * Draws the animated text cursor in a cell
-	 */
-	void drawCursor(Graphics::ManagedSurface &dst, int col, int row, int cursorFrame) const;
 
 	/**
 	 * Loads the graphics, once the render mode is known

@@ -26,6 +26,7 @@
 #include "ultima/ultima5/views/acknowledgements.h"
 #include "ultima/ultima5/views/asset_viewer.h"
 #include "ultima/ultima5/views/create_character.h"
+#include "ultima/ultima5/views/game.h"
 #include "ultima/ultima5/views/introduction.h"
 #include "ultima/ultima5/views/title.h"
 
@@ -37,6 +38,7 @@ struct Views {
 	Acknowledgements _acknowledgements;
 	AssetViewer _assetViewer;
 	CreateCharacter _createCharacter;
+	Game _game;
 	Introduction _introduction;
 	Title _title;
 };

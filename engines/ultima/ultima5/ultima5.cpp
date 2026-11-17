@@ -104,16 +104,22 @@ void Ultima5Engine::applyGameSettings() {
 }
 
 bool Ultima5Engine::canSaveGameStateCurrently(Common::U32String *) {
-	return false;
+	return dynamic_cast<Views::Game *>(focusedView()) != nullptr;
 }
 
 bool Ultima5Engine::canLoadGameStateCurrently(Common::U32String *) {
-	return false;
+	return true;
 }
 
 Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
 	s.syncVersion(SAVEGAME_VERSION);
 	_savegame.synchronize(s);
+
+	if (s.isLoading()) {
+		_messages.clear();
+		replaceView(_savegame.hasActiveGame() ? "Game" : "Title", true);
+	}
+
 	return Common::kNoError;
 }
 

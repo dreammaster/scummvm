@@ -36,6 +36,18 @@ constexpr int SAVEGAME_SIZE = 0x1060;
 constexpr byte GENDER_MALE = 0x0B;
 constexpr byte GENDER_FEMALE = 0x0C;
 
+constexpr char STATUS_GOOD = 'G';
+constexpr char STATUS_POISONED = 'P';
+constexpr char STATUS_DEAD = 'D';
+constexpr char STATUS_SLEEP = 'S';
+constexpr char STATUS_CHARMED = 'C';
+
+// Set as the active character when there isn't one
+constexpr byte NO_ACTIVE_CHARACTER = 0xFF;
+
+// Maps above ground have levels from 0, and the levels below are negative
+constexpr byte MAP_LEVEL_UNDERGROUND = 0x80;
+
 /**
  * A character of the party, or one available to join it
  */

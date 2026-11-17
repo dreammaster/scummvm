@@ -44,9 +44,6 @@ constexpr byte GLYPH_CORNER_TOP_RIGHT = 0x7C;
 constexpr byte GLYPH_CORNER_BOTTOM_LEFT = 0x7D;
 constexpr byte GLYPH_CORNER_BOTTOM_RIGHT = 0x7E;
 constexpr byte GLYPH_EDGE = 0x7F;
-constexpr byte GLYPH_CAP_RIGHT = 1;
-constexpr byte GLYPH_CAP_LEFT = 2;
-constexpr byte GLYPH_CURSOR = 5;
 
 static const char *const MENU_ITEMS[MENU_ITEM_COUNT] = {
 	"Journey Onward", "Create New Character", "Transfer from Ultima IV",
@@ -57,33 +54,8 @@ static const byte MENU_ITEM_COLUMNS[MENU_ITEM_COUNT] = { 12, 9, 8, 9, 11, 10 };
 static const char *const COPYRIGHT = "Copyright 1988 Lord British";
 
 bool IntroScreen::load() {
-	if (!_font)
-		_font.reset(new CharSet());
-
+	loadFont();
 	return _logo.load("ultima", _G(renderMode)) && _logo.size() > WD_FRAME_COUNT;
-}
-
-void IntroScreen::drawCell(Graphics::ManagedSurface &dst, int col, int row, byte ch, byte fg, byte bg) const {
-	dst.fillRect(Common::Rect(col * 8, row * 8, col * 8 + 8, row * 8 + 8), bg);
-	_font->drawChar(dst.surfacePtr(), ch, col * 8, row * 8, fg);
-}
-
-void IntroScreen::print(Graphics::ManagedSurface &dst, int col, int row, const char *text, byte fg, byte bg) const {
-	for (; *text; ++text, ++col)
-		drawCell(dst, col, row, *text, fg, bg);
-}
-
-void IntroScreen::drawCaps(Graphics::ManagedSurface &dst, int x, int y, bool left) const {
-	dst.fillRect(Common::Rect(x, y, x + 8, y + 8), BLACK);
-	_font->drawChar(dst.surfacePtr(), left ? GLYPH_CAP_LEFT : GLYPH_CAP_RIGHT, x, y, BLUE);
-
-	if (left) {
-		dst.drawLine(x, y, x + 5, y + 3, WHITE);
-		dst.drawLine(x + 5, y + 4, x, y + 7, WHITE);
-	} else {
-		dst.drawLine(x + 7, y, x + 2, y + 3, WHITE);
-		dst.drawLine(x + 2, y + 4, x + 7, y + 7, WHITE);
-	}
 }
 
 void IntroScreen::drawSubtitle(Graphics::ManagedSurface &dst, int wdFrame) const {
@@ -129,10 +101,6 @@ void IntroScreen::drawPrompt(Graphics::ManagedSurface &dst, int cursorFrame) con
 	print(dst, 16, MENU_TOP_ROW, "Select: ", WHITE, BLACK);
 	drawCaps(dst, 24 * 8, MENU_TOP_ROW * 8, false);
 	drawCursor(dst, 23, MENU_TOP_ROW, cursorFrame);
-}
-
-void IntroScreen::drawCursor(Graphics::ManagedSurface &dst, int col, int row, int cursorFrame) const {
-	drawCell(dst, col, row, GLYPH_CURSOR + (cursorFrame & 3), WHITE, BLACK);
 }
 
 void IntroScreen::drawEmptyMenu(Graphics::ManagedSurface &dst, int wdFrame) const {
