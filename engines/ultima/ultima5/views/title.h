@@ -23,6 +23,7 @@
 #define ULTIMA5_VIEWS_TITLE_H
 
 #include "ultima/shared/engine/view.h"
+#include "ultima/ultima5/gfx/intro_screen.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -31,14 +32,31 @@ namespace Views {
 using namespace Graphics::Views;
 
 /**
- * Placeholder title screen
+ * The title screen, with the logo, the shimmering subtitle and the main menu
  */
 class Title : public Shared::View {
+private:
+	Gfx::IntroScreen _screen;
+	int _selected = 0;
+	int _animFrame = 0;
+	bool _noGame = false;
+
+	/**
+	 * Moves the highlight to a choice, and carries it out if it's one that's
+	 * chosen directly by its letter
+	 */
+	void choose(int index, bool activate);
+
+	void activate(int index);
+
 public:
 	Title() : Shared::View("Title") {}
 	~Title() override {}
 
+	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
+	void timeout() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views

@@ -20,14 +20,116 @@
  */
 
 #include "ultima/ultima5/views/title.h"
+#include "ultima/ultima5/views/keys.h"
+#include "ultima/ultima5/ultima5.h"
 
 namespace Ultima {
 namespace Ultima5 {
 namespace Views {
 
+constexpr int FRAMES_PER_STEP = 3;
+
+enum MenuChoice {
+	CHOICE_JOURNEY, CHOICE_CREATE, CHOICE_TRANSFER, CHOICE_INTRODUCTION,
+	CHOICE_ACKNOWLEDGEMENTS, CHOICE_VIEW
+};
+
+// The letter that picks each choice
+static const char MENU_LETTERS[] = "JCTUAR";
+
+bool Title::msgFocus(const FocusMessage &msg) {
+	if (!_screen.load())
+		error("Could not load the title graphics");
+
+	_selected = 0;
+	_animFrame = 0;
+	_noGame = false;
+
+	delayFrames(FRAMES_PER_STEP);
+	return Shared::View::msgFocus(msg);
+}
+
 void Title::draw() {
 	auto s = getSurface();
-	s.clear();
+	_screen.drawTitle(s, _animFrame);
+
+	if (_noGame) {
+		_screen.drawNoGame(s);
+	} else {
+		_screen.drawMenu(s, _selected);
+		_screen.drawPrompt(s, _animFrame);
+	}
+}
+
+void Title::timeout() {
+	_animFrame = (_animFrame + 1) & 3;
+	redraw();
+	delayFrames(FRAMES_PER_STEP);
+}
+
+void Title::choose(int index, bool activate) {
+	_selected = index;
+	redraw();
+
+	if (activate)
+		this->activate(index);
+}
+
+void Title::activate(int index) {
+	switch (index) {
+	case CHOICE_JOURNEY:
+		// There's no saved game to continue yet
+		_noGame = true;
+		redraw();
+		break;
+	case CHOICE_INTRODUCTION:
+		addView("Introduction");
+		break;
+	case CHOICE_ACKNOWLEDGEMENTS:
+		addView("Acknowledgements");
+		break;
+	default:
+		break;
+	}
+}
+
+bool Title::msgKeypress(const KeypressMessage &msg) {
+	if (isModifierKey(msg.keycode))
+		return false;
+
+	if (_noGame) {
+		_noGame = false;
+		redraw();
+		return true;
+	}
+
+	switch (msg.keycode) {
+	case Common::KEYCODE_LEFT:
+	case Common::KEYCODE_UP:
+		choose((_selected + Gfx::MENU_ITEM_COUNT - 1) % Gfx::MENU_ITEM_COUNT, false);
+		return true;
+	case Common::KEYCODE_RIGHT:
+	case Common::KEYCODE_DOWN:
+		choose((_selected + 1) % Gfx::MENU_ITEM_COUNT, false);
+		return true;
+	case Common::KEYCODE_RETURN:
+	case Common::KEYCODE_KP_ENTER:
+	case Common::KEYCODE_SPACE:
+		activate(_selected);
+		return true;
+	default:
+		break;
+	}
+
+	const char letter = toupper(msg.ascii);
+	for (int i = 0; MENU_LETTERS[i]; ++i) {
+		if (letter == MENU_LETTERS[i]) {
+			choose(i, true);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 } // namespace Views
