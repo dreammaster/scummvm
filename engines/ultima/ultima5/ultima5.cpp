@@ -117,10 +117,16 @@ Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
 
 	if (s.isLoading()) {
 		_messages.clear();
+		_world.unload();
 		replaceView(_savegame.hasActiveGame() ? "Game" : "Title", true);
 	}
 
 	return Common::kNoError;
+}
+
+bool Ultima5Engine::loadWorld() {
+	const bool underworld = _savegame._mapLevel >= Data::MAP_LEVEL_UNDERGROUND;
+	return _world.isLoaded(underworld) || _world.load(underworld, _savegame);
 }
 
 Graphics::Font *Ultima5Engine::createFont() const {

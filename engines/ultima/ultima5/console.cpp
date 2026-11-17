@@ -21,6 +21,7 @@
 
 #include "ultima/ultima5/console.h"
 #include "ultima/ultima5/ultima5.h"
+#include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/views/asset_viewer.h"
 
 namespace Ultima {
@@ -29,6 +30,7 @@ namespace Ultima5 {
 Console::Console() : GUI::Debugger() {
 	registerCmd("tiles", WRAP_METHOD(Console, cmdTiles));
 	registerCmd("image", WRAP_METHOD(Console, cmdImage));
+	registerCmd("teleport", WRAP_METHOD(Console, cmdTeleport));
 }
 
 Console::~Console() {
@@ -62,6 +64,35 @@ bool Console::cmdImage(int argc, const char **argv) {
 	}
 
 	g_engine->replaceView("AssetViewer", true);
+	return false;
+}
+
+bool Console::cmdTeleport(int argc, const char **argv) {
+	Data::Savegame &sg = _G(savegame);
+
+	if (!sg.hasActiveGame()) {
+		debugPrintf("Create a character first\n");
+		return true;
+	}
+
+	if (argc < 3) {
+		debugPrintf("teleport <x> <y> [under]  - Moves the party to Britannia, or the underworld\n");
+		return true;
+	}
+
+	sg._mapId = 0;
+	sg._mapX = atoi(argv[1]);
+	sg._mapY = atoi(argv[2]);
+	sg._mapLevel = (argc > 3) ? Data::MAP_LEVEL_UNDERGROUND : 0;
+	if (sg._partyTile == 0)
+		sg._partyTile = TILE_AVATAR;
+
+	if (!g_engine->loadWorld()) {
+		debugPrintf("Could not load the map\n");
+		return true;
+	}
+
+	g_engine->replaceView("Game", true);
 	return false;
 }
 

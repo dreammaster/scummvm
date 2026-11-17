@@ -31,6 +31,7 @@ class Console : public GUI::Debugger {
 private:
 	bool cmdTiles(int argc, const char **argv);
 	bool cmdImage(int argc, const char **argv);
+	bool cmdTeleport(int argc, const char **argv);
 
 public:
 	Console();

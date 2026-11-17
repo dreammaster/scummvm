@@ -72,6 +72,23 @@ struct Character {
 	void synchronize(Common::Serializer &s);
 };
 
+constexpr int ACTOR_COUNT = 32;
+constexpr int ACTOR_SIZE = 8;
+
+/**
+ * An object on the map, such as the party, a monster or a ship
+ */
+struct ActorRecord {
+	byte _tile = 0;
+	byte _animTile = 0;
+	byte _x = 0;
+	byte _y = 0;
+	byte _z = 0;
+	byte _hull = 0;
+	byte _unk6 = 0;
+	byte _unk7 = 0;
+};
+
 /**
  * The state of the game, kept in the same layout as the original saved.gam
  * and init.gam files
@@ -219,6 +236,13 @@ struct Savegame {
 	bool hasActiveGame() const {
 		return _party[0]._name[0] != '\0';
 	}
+
+	/**
+	 * Returns one of the objects on the map. The first is the party
+	 */
+	ActorRecord getActor(int idx) const;
+
+	void setActor(int idx, const ActorRecord &actor);
 };
 
 } // namespace Data

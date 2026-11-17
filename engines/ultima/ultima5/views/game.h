@@ -24,6 +24,7 @@
 
 #include "ultima/shared/engine/view.h"
 #include "ultima/ultima5/gfx/game_frame.h"
+#include "ultima/ultima5/gfx/world_view.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -37,6 +38,7 @@ using namespace Graphics::Views;
 class Game : public Shared::View {
 private:
 	Gfx::GameFrame _frame;
+	Gfx::WorldView _worldView;
 	int _cursorFrame = 0;
 
 public:
@@ -46,6 +48,7 @@ public:
 	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
 	void timeout() override;
+	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
 } // namespace Views

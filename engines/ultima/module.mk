@@ -325,6 +325,7 @@ MODULE_OBJS += \
 	ultima5/metaengine.o \
 	ultima5/data/data.o \
 	ultima5/data/savegame.o \
+	ultima5/data/world_map.o \
 	ultima5/gfx/bit_image_file.o \
 	ultima5/gfx/charset.o \
 	ultima5/gfx/game_frame.o \
@@ -335,7 +336,10 @@ MODULE_OBJS += \
 	ultima5/gfx/story_text.o \
 	ultima5/gfx/text_screen.o \
 	ultima5/gfx/tileset.o \
+	ultima5/gfx/world_view.o \
 	ultima5/logic/creation_logic.o \
+	ultima5/logic/time_logic.o \
+	ultima5/logic/world_logic.o \
 	ultima5/views/acknowledgements.o \
 	ultima5/views/asset_viewer.o \
 	ultima5/views/create_character.o \

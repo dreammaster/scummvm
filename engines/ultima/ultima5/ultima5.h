@@ -30,6 +30,7 @@
 #include "ultima/detection.h"
 #include "ultima/shared/engine/events.h"
 #include "ultima/ultima5/data/savegame.h"
+#include "ultima/ultima5/data/world_map.h"
 #include "ultima/ultima5/gfx/message_log.h"
 #include "ultima/ultima5/gfx/tileset.h"
 
@@ -60,6 +61,7 @@ protected:
 
 public:
 	Data::Savegame _savegame;
+	Data::WorldMap _world;
 	Gfx::MessageLog _messages;
 	Gfx::Tileset _tileset;
 
@@ -101,6 +103,12 @@ public:
 		Common::Serializer s(stream, nullptr);
 		return syncGame(s);
 	}
+
+	/**
+	 * Makes sure the map of the level the party is on is loaded
+	 * @returns		False if it can not be loaded
+	 */
+	bool loadWorld();
 
 	/**
 	 * Returns a font object that GfxSurface instances can use

@@ -175,6 +175,36 @@ void Savegame::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_unk105F);
 }
 
+ActorRecord Savegame::getActor(int idx) const {
+	assert(idx >= 0 && idx < ACTOR_COUNT);
+	const byte *p = &_objects[idx * ACTOR_SIZE];
+
+	ActorRecord actor;
+	actor._tile = p[0];
+	actor._animTile = p[1];
+	actor._x = p[2];
+	actor._y = p[3];
+	actor._z = p[4];
+	actor._hull = p[5];
+	actor._unk6 = p[6];
+	actor._unk7 = p[7];
+	return actor;
+}
+
+void Savegame::setActor(int idx, const ActorRecord &actor) {
+	assert(idx >= 0 && idx < ACTOR_COUNT);
+	byte *p = &_objects[idx * ACTOR_SIZE];
+
+	p[0] = actor._tile;
+	p[1] = actor._animTile;
+	p[2] = actor._x;
+	p[3] = actor._y;
+	p[4] = actor._z;
+	p[5] = actor._hull;
+	p[6] = actor._unk6;
+	p[7] = actor._unk7;
+}
+
 bool Savegame::load(const char *filename) {
 	Common::File f;
 	if (!f.open(filename) || f.size() != SAVEGAME_SIZE)
