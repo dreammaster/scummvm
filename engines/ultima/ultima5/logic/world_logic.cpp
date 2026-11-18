@@ -27,7 +27,6 @@
 namespace Ultima {
 namespace Ultima5 {
 
-constexpr int MINUTES_PER_STEP = 2;
 constexpr int MINUTES_PER_SLOW_STEP = 2;
 constexpr int MINUTES_PER_VERY_SLOW_STEP = 4;
 
@@ -220,13 +219,11 @@ bool WorldLogic::walk(Direction direction) {
 		TimeLogic::advance(sg, MINUTES_PER_VERY_SLOW_STEP);
 	}
 
-	TimeLogic::advance(sg, MINUTES_PER_STEP);
 	return true;
 }
 
 void WorldLogic::pass() {
 	_log.print("Pass\n");
-	TimeLogic::advance(_G(savegame), MINUTES_PER_STEP);
 }
 
 } // namespace Ultima5

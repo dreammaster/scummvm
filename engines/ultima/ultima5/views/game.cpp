@@ -21,7 +21,11 @@
 
 #include "ultima/ultima5/views/game.h"
 #include "ultima/ultima5/views/keys.h"
+#include "ultima/ultima5/logic/party_logic.h"
+#include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
+#include "ultima/ultima5/views/interactions/look.h"
+#include "ultima/ultima5/views/interactions/new_order.h"
 #include "ultima/ultima5/ultima5.h"
 
 namespace Ultima {
@@ -30,6 +34,9 @@ namespace Views {
 
 // The id of the map of Britannia and the underworld
 constexpr byte OUTDOOR_MAP = 0;
+
+// How long a command takes
+constexpr int MINUTES_PER_TURN = 2;
 
 // Maps from the first dungeon up are not out in the open, and neither is a certain one
 constexpr byte FIRST_DUNGEON_MAP = 0x21;
@@ -106,6 +113,9 @@ void Game::draw() {
 	drawParty();
 	drawStatus();
 	drawWind();
+
+	if (_interaction)
+		_interaction->draw(*this);
 }
 
 void Game::drawFrame() {
@@ -310,33 +320,86 @@ void Game::drawWorld() {
 	}
 }
 
-bool Game::msgKeypress(const KeypressMessage &msg) {
-	if (isModifierKey(msg.keycode) || _G(savegame)._mapId != OUTDOOR_MAP)
-		return false;
+void Game::startInteraction(Interactions::Interaction *interaction) {
+	_interaction.reset(interaction);
+	redraw();
+}
 
-	WorldLogic logic(_messages);
+void Game::endTurn() {
+	TimeLogic::advance(_G(savegame), MINUTES_PER_TURN);
+	redraw();
+}
+
+bool Game::handleCommand(const KeypressMessage &msg) {
+	const bool outdoors = _G(savegame)._mapId == OUTDOOR_MAP;
+	WorldLogic world(_messages);
+	PartyLogic party(_messages);
+
 	switch (msg.keycode) {
 	case Common::KEYCODE_UP:
-		logic.walk(DIR_NORTH);
-		break;
 	case Common::KEYCODE_RIGHT:
-		logic.walk(DIR_EAST);
-		break;
 	case Common::KEYCODE_DOWN:
-		logic.walk(DIR_SOUTH);
-		break;
 	case Common::KEYCODE_LEFT:
-		logic.walk(DIR_WEST);
-		break;
+		if (!outdoors)
+			return false;
+
+		if (world.walk(msg.keycode == Common::KEYCODE_UP ? DIR_NORTH :
+				msg.keycode == Common::KEYCODE_RIGHT ? DIR_EAST :
+				msg.keycode == Common::KEYCODE_DOWN ? DIR_SOUTH : DIR_WEST))
+			endTurn();
+		else
+			redraw();
+		return true;
+
 	case Common::KEYCODE_SPACE:
-		logic.pass();
+		world.pass();
+		endTurn();
+		return true;
+
+	default:
 		break;
+	}
+
+	switch (toupper(msg.ascii)) {
+	case 'I':
+		party.igniteTorch();
+		endTurn();
+		return true;
+
+	case 'L':
+		if (!outdoors)
+			return false;
+
+		_messages.print("Look-");
+		startInteraction(new Interactions::Look(_messages));
+		return true;
+
+	case 'N':
+		_messages.print("New Order");
+		startInteraction(new Interactions::NewOrder(_messages));
+		return true;
+
 	default:
 		return false;
 	}
+}
 
-	redraw();
-	return true;
+bool Game::msgKeypress(const KeypressMessage &msg) {
+	if (isModifierKey(msg.keycode))
+		return false;
+
+	if (_interaction) {
+		if (_interaction->keypress(msg)) {
+			_interaction.reset();
+			endTurn();
+		} else {
+			redraw();
+		}
+
+		return true;
+	}
+
+	return handleCommand(msg);
 }
 
 } // namespace Views

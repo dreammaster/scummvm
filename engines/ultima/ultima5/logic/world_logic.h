@@ -66,7 +66,7 @@ public:
 	bool walk(Direction direction);
 
 	/**
-	 * The party waits a while
+	 * The party waits a while. Time only passes once the turn is ended
 	 */
 	void pass();
 };

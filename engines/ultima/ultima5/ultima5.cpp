@@ -69,8 +69,8 @@ Common::Error Ultima5Engine::run() {
 	_charset.reset(new Gfx::CharSet());
 	Data::setPalette(_renderMode);
 
-	if (!_tileset.load(_renderMode)) {
-		GUIErrorMessage(_("Could not load the game graphics"));
+	if (!_tileset.load(_renderMode) || !_lookNames.load()) {
+		GUIErrorMessage(_("Could not load the game data"));
 		return Common::kNoError;
 	}
 

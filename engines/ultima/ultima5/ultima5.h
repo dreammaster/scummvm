@@ -30,6 +30,7 @@
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/engine/events.h"
+#include "ultima/ultima5/data/look_names.h"
 #include "ultima/ultima5/data/savegame.h"
 #include "ultima/ultima5/gfx/charset.h"
 #include "ultima/ultima5/data/world_map.h"
@@ -62,6 +63,7 @@ protected:
 
 public:
 	Common::ScopedPtr<Gfx::CharSet> _charset;
+	Data::LookNames _lookNames;
 	Data::Savegame _savegame;
 	Data::WorldMap _world;
 	Gfx::Tileset _tileset;

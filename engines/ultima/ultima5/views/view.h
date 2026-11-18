@@ -41,7 +41,7 @@ constexpr byte COLOR_WHITE = 15;
  * adds drawing the things that go in them
  */
 class View : public Shared::View {
-protected:
+public:
 	/**
 	 * Draws a character in one of the cells of the screen, on a background
 	 */
@@ -63,7 +63,6 @@ protected:
 	 */
 	void drawCaps(int x, int y, bool left);
 
-public:
 	View(const Common::String &name) : Shared::View(name) {}
 	~View() override {}
 };

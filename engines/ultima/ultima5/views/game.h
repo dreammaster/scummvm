@@ -22,7 +22,9 @@
 #ifndef ULTIMA5_VIEWS_GAME_H
 #define ULTIMA5_VIEWS_GAME_H
 
+#include "common/ptr.h"
 #include "ultima/ultima5/gfx/tileset.h"
+#include "ultima/ultima5/views/interactions/interaction.h"
 #include "ultima/ultima5/views/message_log.h"
 #include "ultima/ultima5/views/view.h"
 
@@ -39,6 +41,23 @@ constexpr int VIEW_TILES = 11;
 class Game : public View {
 private:
 	MessageLog _messages;
+	Common::ScopedPtr<Interactions::Interaction> _interaction;
+
+	/**
+	 * Starts a command that needs more input than the key that began it
+	 */
+	void startInteraction(Interactions::Interaction *interaction);
+
+	/**
+	 * Lets time go by after a command
+	 */
+	void endTurn();
+
+	/**
+	 * Carries out the command of a key
+	 * @returns		True if the key was a command
+	 */
+	bool handleCommand(const KeypressMessage &msg);
 
 	/**
 	 * Clears the screen and draws the blue frame and the outlines of the windows
