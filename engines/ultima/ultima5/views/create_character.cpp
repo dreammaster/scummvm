@@ -28,7 +28,6 @@ namespace Ultima {
 namespace Ultima5 {
 namespace Views {
 
-constexpr byte WHITE = 15;
 constexpr int MAX_NAME_LENGTH = 8;
 constexpr int MAX_TEXT_LENGTH = 2000;
 constexpr int FRAMES_PER_STEP = 3;
@@ -57,17 +56,16 @@ bool CreateCharacter::msgFocus(const FocusMessage &msg) {
 		f.read(&_questions[0], _questions.size());
 	}
 
-	if (!_intro.load() || !_images.load("create", _G(renderMode)) || !_text.load() || _questions.empty() ||
+	if (!loadTitleGraphics() || !_images.load("create", _G(renderMode)) || !_text.load() || _questions.empty() ||
 			!_newGame.load("init.gam"))
 		error("Could not load the character creation");
 
-	_page.create(320, 200);
 	_name.clear();
 	_cursorFrame = 0;
-	showNamePrompt();
+	_phase = PHASE_NAME;
 
 	delayFrames(FRAMES_PER_STEP);
-	return Shared::View::msgFocus(msg);
+	return TitleBase::msgFocus(msg);
 }
 
 Common::String CreateCharacter::questionText(uint offset) const {
@@ -79,51 +77,53 @@ Common::String CreateCharacter::questionText(uint offset) const {
 	return result;
 }
 
-void CreateCharacter::showNamePrompt() {
-	_phase = PHASE_NAME;
-	_intro.drawEmptyMenu(_page, 0);
-	_intro.print(_page, 3, 17, "By what name shalt thou be known?", WHITE, 0);
-	_intro.print(_page, 14, NAME_ROW, ":", WHITE, 0);
+void CreateCharacter::drawNameScreen() {
+	drawEmptyMenu(0);
+	print(3, 17, "By what name shalt thou be known?", COLOR_WHITE, COLOR_BLACK);
+	print(14, NAME_ROW, ":", COLOR_WHITE, COLOR_BLACK);
+	print(NAME_COLUMN, NAME_ROW, _name, COLOR_WHITE, COLOR_BLACK);
+
+	if (_phase == PHASE_NAME)
+		drawCursor(NAME_COLUMN + _name.size(), NAME_ROW, _cursorFrame);
+	else
+		print(8, 21, "Art thou Male or Female? ", COLOR_WHITE, COLOR_BLACK);
 }
 
-void CreateCharacter::showGenderPrompt() {
-	_phase = PHASE_GENDER;
-	_intro.print(_page, NAME_COLUMN, NAME_ROW, _name.c_str(), WHITE, 0);
-	_intro.print(_page, 8, 21, "Art thou Male or Female? ", WHITE, 0);
-}
-
-void CreateCharacter::showIntro() {
-	_phase = PHASE_INTRO;
-	_page.clear();
-	_images.draw(_page, PICTURE_TENT, 0, 0x60);
+void CreateCharacter::drawIntroScreen() {
+	auto s = getSurface();
+	s.clear();
+	_images.draw(s, PICTURE_TENT, 0, 0x60);
 
 	Gfx::StoryLayout layout;
 	layout._left[1] = 0xAF;
 	layout._splitTop = 0x59;
 
 	int x = 0, y = 9;
-	_text.draw(_page, questionText(INTRO_TEXT_OFFSET), x, y, layout);
+	_text.draw(s, questionText(INTRO_TEXT_OFFSET), x, y, layout);
 }
 
 void CreateCharacter::showQuestion() {
 	_phase = PHASE_QUESTION;
 	_question = _logic.nextQuestion();
+}
 
-	_page.clear();
-	_images.draw(_page, PICTURE_CARD_BACK, 0x10, 0);
-	_images.draw(_page, PICTURE_CARD_BACK, 200, 0);
-	_images.draw(_page, PICTURE_FIRST_CARD + _question._left, CARD_X[_question._left], CARD_Y[_question._left]);
-	_images.draw(_page, PICTURE_FIRST_CARD + _question._right, CARD_X[_question._right] + RIGHT_CARD_OFFSET,
+void CreateCharacter::drawQuestionScreen() {
+	auto s = getSurface();
+	s.clear();
+	_images.draw(s, PICTURE_CARD_BACK, 0x10, 0);
+	_images.draw(s, PICTURE_CARD_BACK, 200, 0);
+	_images.draw(s, PICTURE_FIRST_CARD + _question._left, CARD_X[_question._left], CARD_Y[_question._left]);
+	_images.draw(s, PICTURE_FIRST_CARD + _question._right, CARD_X[_question._right] + RIGHT_CARD_OFFSET,
 		CARD_Y[_question._right]);
 
 	int x = 0, y = 0x98;
-	_text.draw(_page, questionText(_question._textOffset), x, y, Gfx::StoryLayout());
+	_text.draw(s, questionText(_question._textOffset), x, y, Gfx::StoryLayout());
 }
 
-void CreateCharacter::showResult() {
-	_phase = PHASE_RESULT;
-	_page.clear();
-	_images.draw(_page, PICTURE_RESULT, 0xA8, 100);
+void CreateCharacter::drawResultScreen() {
+	auto s = getSurface();
+	s.clear();
+	_images.draw(s, PICTURE_RESULT, 0xA8, 100);
 
 	Gfx::StoryLayout layout;
 	layout._right[1] = 0xA6;
@@ -131,7 +131,7 @@ void CreateCharacter::showResult() {
 	layout._spaceWidth = 4;
 
 	int x = 0, y = 0;
-	_text.draw(_page, questionText(RESULT_TEXT_OFFSET), x, y, layout);
+	_text.draw(s, questionText(RESULT_TEXT_OFFSET), x, y, layout);
 }
 
 void CreateCharacter::finish() {
@@ -144,18 +144,28 @@ void CreateCharacter::finish() {
 }
 
 void CreateCharacter::draw() {
-	auto s = getSurface();
-	s.blitFrom(_page);
-
-	if (_phase == PHASE_NAME) {
-		_intro.print(s, NAME_COLUMN, NAME_ROW, _name.c_str(), WHITE, 0);
-		_intro.drawCursor(s, NAME_COLUMN + _name.size(), NAME_ROW, _cursorFrame);
+	switch (_phase) {
+	case PHASE_NAME:
+	case PHASE_GENDER:
+		drawNameScreen();
+		break;
+	case PHASE_INTRO:
+		drawIntroScreen();
+		break;
+	case PHASE_QUESTION:
+		drawQuestionScreen();
+		break;
+	case PHASE_RESULT:
+		drawResultScreen();
+		break;
 	}
 }
 
 void CreateCharacter::timeout() {
 	_cursorFrame = (_cursorFrame + 1) & 3;
-	redraw();
+	if (_phase == PHASE_NAME)
+		redraw();
+
 	delayFrames(FRAMES_PER_STEP);
 }
 
@@ -169,7 +179,7 @@ bool CreateCharacter::nameKeypress(const KeypressMessage &msg) {
 			return true;
 		}
 
-		showGenderPrompt();
+		_phase = PHASE_GENDER;
 		break;
 
 	case Common::KEYCODE_BACKSPACE:
@@ -202,7 +212,7 @@ bool CreateCharacter::genderKeypress(const KeypressMessage &msg) {
 	_newGame._party[0]._gender = (letter == 'M') ? Data::GENDER_MALE : Data::GENDER_FEMALE;
 	_logic.start(_newGame._party[0]);
 
-	showIntro();
+	_phase = PHASE_INTRO;
 	redraw();
 	return true;
 }
@@ -215,7 +225,7 @@ bool CreateCharacter::questionKeypress(const KeypressMessage &msg) {
 	_logic.answer(_question, letter == 'A');
 
 	if (_logic.isFinished())
-		showResult();
+		_phase = PHASE_RESULT;
 	else
 		showQuestion();
 

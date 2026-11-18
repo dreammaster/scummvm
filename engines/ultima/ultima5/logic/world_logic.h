@@ -24,6 +24,7 @@
 
 #include "common/scummsys.h"
 #include "ultima/ultima5/data/savegame.h"
+#include "ultima/ultima5/views/message_log.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -39,7 +40,12 @@ constexpr byte TILE_AVATAR = 0x1C;
  * The rules for moving around Britannia and the underworld
  */
 class WorldLogic {
+private:
+	Views::MessageLog &_log;
+
 public:
+	WorldLogic(Views::MessageLog &log) : _log(log) {}
+
 	/**
 	 * Returns true if something of a kind can go onto a kind of terrain
 	 * @param actorTile		The tile of what's moving

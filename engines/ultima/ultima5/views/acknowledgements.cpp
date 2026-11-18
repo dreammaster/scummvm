@@ -42,29 +42,30 @@ constexpr int SLIDE_FRAMES = 3;
 constexpr int MENU_ITEM_ACKNOWLEDGEMENTS = 4;
 
 bool Acknowledgements::msgFocus(const FocusMessage &msg) {
-	if (!_intro.load() || !_scroll.load("startsc", _G(renderMode)) || _scroll.size() < 3)
+	if (!loadTitleGraphics() || !_scroll.load("startsc", _G(renderMode)) || _scroll.size() < 3)
 		error("Could not load the credits");
 
-	_screen.create(320, 200);
-	_credits.create(320, 200);
-	_menu.create(320, 200);
+	// The three screens are drawn in turn and each kept to be restored from
+	auto s = getSurface();
+	drawTitle(0);
+	drawMenu(MENU_ITEM_ACKNOWLEDGEMENTS);
+	drawPrompt(0);
+	_screen.copyFrom(s);
 
-	_intro.drawTitle(_screen, 0);
-	_intro.drawMenu(_screen, MENU_ITEM_ACKNOWLEDGEMENTS);
-	_intro.drawPrompt(_screen, 0);
+	s.clear();
+	_scroll.draw(s, SCROLL_CREDITS, 0x10, TOP);
+	_credits.copyFrom(s);
 
-	_credits.clear();
-	_scroll.draw(_credits, SCROLL_CREDITS, 0x10, TOP);
-
-	_menu.clear();
-	_intro.drawSubtitle(_menu, 0);
-	_intro.drawMenuFrame(_menu);
-	_intro.drawMenu(_menu, MENU_ITEM_ACKNOWLEDGEMENTS);
+	s.clear();
+	drawSubtitle(0);
+	drawMenuFrame();
+	drawMenu(MENU_ITEM_ACKNOWLEDGEMENTS);
+	_menu.copyFrom(s);
 
 	_phase = PHASE_RISE;
 	_pos = BOTTOM;
 	delayFrames(1);
-	return Shared::View::msgFocus(msg);
+	return TitleBase::msgFocus(msg);
 }
 
 void Acknowledgements::drawScrollEdges(int leftX, int rightX, int y) {

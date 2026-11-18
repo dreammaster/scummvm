@@ -25,13 +25,14 @@
 #include "common/scummsys.h"
 #include "common/system.h"
 #include "common/error.h"
+#include "common/ptr.h"
 #include "common/serializer.h"
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/engine/events.h"
 #include "ultima/ultima5/data/savegame.h"
+#include "ultima/ultima5/gfx/charset.h"
 #include "ultima/ultima5/data/world_map.h"
-#include "ultima/ultima5/gfx/message_log.h"
 #include "ultima/ultima5/gfx/tileset.h"
 
 namespace Ultima {
@@ -60,9 +61,9 @@ protected:
 	void applyGameSettings() override;
 
 public:
+	Common::ScopedPtr<Gfx::CharSet> _charset;
 	Data::Savegame _savegame;
 	Data::WorldMap _world;
-	Gfx::MessageLog _messages;
 	Gfx::Tileset _tileset;
 
 	// Which of the renderers is in use

@@ -21,11 +21,11 @@
 
 #include "common/file.h"
 #include "common/endian.h"
-#include "ultima/ultima5/gfx/lzw.h"
+#include "ultima/ultima5/data/lzw.h"
 
 namespace Ultima {
 namespace Ultima5 {
-namespace Gfx {
+namespace Data {
 
 constexpr int LZW_CLEAR = 256;
 constexpr int LZW_EOI = 257;
@@ -130,6 +130,6 @@ bool loadLzwFile(const char *name, Common::Array<byte> &dest) {
 	return decompressLzw(&data[0], data.size(), dest);
 }
 
-} // namespace Gfx
+} // namespace Data
 } // namespace Ultima5
 } // namespace Ultima

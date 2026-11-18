@@ -96,9 +96,6 @@ static const byte KINDS[SCENE_COUNT] = {
 constexpr int SECOND_PICTURE_OFFSET = 0x37;
 
 bool Introduction::msgFocus(const FocusMessage &msg) {
-	if (_page.empty())
-		_page.create(320, 200);
-
 	Common::File f;
 	if (_story.empty() && f.open("story.dat")) {
 		_story.resize(f.size());
@@ -110,9 +107,8 @@ bool Introduction::msgFocus(const FocusMessage &msg) {
 
 	_pictureFile = -1;
 	_scene = 0;
-	buildScene(_scene);
 
-	return Shared::View::msgFocus(msg);
+	return View::msgFocus(msg);
 }
 
 Common::String Introduction::sceneText(int scene) const {
@@ -125,7 +121,7 @@ Common::String Introduction::sceneText(int scene) const {
 	return result;
 }
 
-void Introduction::buildScene(int scene) {
+void Introduction::drawScene(int scene) {
 	if (STORY_FILES[scene] != _pictureFile) {
 		const Common::String name = Common::String::format("story%d", STORY_FILES[scene] + 1);
 		if (!_pictures.load(name.c_str(), _G(renderMode)))
@@ -134,29 +130,30 @@ void Introduction::buildScene(int scene) {
 		_pictureFile = STORY_FILES[scene];
 	}
 
-	_page.clear();
+	auto s = getSurface();
+	s.clear();
 	const int kind = KINDS[scene];
 
 	if (kind == KIND_BANNER) {
 		switch (scene) {
 		case 0:
-			_banners.draw(_page, 0, 0xE0, 0x1E);
-			_banners.draw(_page, 1, 0xA8, 0x3A);
+			_banners.draw(s, 0, 0xE0, 0x1E);
+			_banners.draw(s, 1, 0xA8, 0x3A);
 			break;
 		case 7:
-			_banners.draw(_page, 0, 0xE8, 0x1A);
-			_banners.draw(_page, 2, 200, 0x36);
+			_banners.draw(s, 0, 0xE8, 0x1A);
+			_banners.draw(s, 2, 200, 0x36);
 			break;
 		default:
-			_banners.draw(_page, 0, 0xB8, 0);
-			_banners.draw(_page, 3, 0xF8, 0);
+			_banners.draw(s, 0, 0xB8, 0);
+			_banners.draw(s, 3, 0xF8, 0);
 			break;
 		}
 	}
 
-	_pictures.draw(_page, PICTURES[scene], PICTURE_X[scene], PICTURE_Y[scene]);
+	_pictures.draw(s, PICTURES[scene], PICTURE_X[scene], PICTURE_Y[scene]);
 	if (kind >= 4)
-		_pictures.draw(_page, kind * 2 - 5, PICTURE_X[scene], PICTURE_Y[scene] + SECOND_PICTURE_OFFSET);
+		_pictures.draw(s, kind * 2 - 5, PICTURE_X[scene], PICTURE_Y[scene] + SECOND_PICTURE_OFFSET);
 
 	Gfx::StoryLayout layout;
 	layout._left[0] = LEFT_EDGES[scene][0];
@@ -170,23 +167,22 @@ void Introduction::buildScene(int scene) {
 	int y = START_Y[scene];
 
 	if (kind == KIND_DOOR_OPENING) {
-		_pictures.draw(_page, 3, 0x60, 0x27);
-		_text.draw(_page, "Instantly, a shimmering blue door springs up!", x, y, layout);
+		_pictures.draw(s, 3, 0x60, 0x27);
+		_text.draw(s, "Instantly, a shimmering blue door springs up!", x, y, layout);
 
 		x = START_X[scene];
 		y = 0xB4;
-		_text.draw(_page, "With heart beating rapidly, you step into it.", x, y, layout);
+		_text.draw(s, "With heart beating rapidly, you step into it.", x, y, layout);
 	} else {
-		_text.draw(_page, sceneText(scene), x, y, layout);
+		_text.draw(s, sceneText(scene), x, y, layout);
 	}
 
 	if (kind == KIND_DOOR)
-		_pictures.draw(_page, 2, 0x28, 0x56);
+		_pictures.draw(s, 2, 0x28, 0x56);
 }
 
 void Introduction::draw() {
-	auto s = getSurface();
-	s.blitFrom(_page);
+	drawScene(_scene);
 }
 
 bool Introduction::msgKeypress(const KeypressMessage &msg) {
@@ -194,7 +190,6 @@ bool Introduction::msgKeypress(const KeypressMessage &msg) {
 		return false;
 
 	if (++_scene < SCENE_COUNT) {
-		buildScene(_scene);
 		redraw();
 	} else {
 		close();

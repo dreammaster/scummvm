@@ -23,9 +23,8 @@
 #define ULTIMA5_VIEWS_ACKNOWLEDGEMENTS_H
 
 #include "graphics/managed_surface.h"
-#include "ultima/shared/engine/view.h"
 #include "ultima/ultima5/gfx/image_file.h"
-#include "ultima/ultima5/gfx/intro_screen.h"
+#include "ultima/ultima5/views/title_base.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -37,11 +36,10 @@ using namespace Graphics::Views;
  * The credits. A rolled up scroll rise over the title screen and unfurls
  * to show them, then close again on a key press to show the menu once more
  */
-class Acknowledgements : public Shared::View {
+class Acknowledgements : public TitleBase {
 private:
 	enum Phase { PHASE_RISE, PHASE_OPEN, PHASE_WAIT, PHASE_CLOSE, PHASE_DROP };
 
-	Gfx::IntroScreen _intro;
 	Gfx::ImageFile _scroll;
 
 	// What's on the screen, what the scroll reveals when it unfurls,
@@ -66,7 +64,7 @@ private:
 	void step();
 
 public:
-	Acknowledgements() : Shared::View("Acknowledgements") {}
+	Acknowledgements() : TitleBase("Acknowledgements") {}
 	~Acknowledgements() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;

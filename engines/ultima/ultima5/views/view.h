@@ -19,60 +19,56 @@
  *
  */
 
-#ifndef ULTIMA5_GFX_TEXT_SCREEN_H
-#define ULTIMA5_GFX_TEXT_SCREEN_H
+#ifndef ULTIMA5_VIEWS_VIEW_H
+#define ULTIMA5_VIEWS_VIEW_H
 
-#include "common/ptr.h"
-#include "graphics/managed_surface.h"
-#include "ultima/ultima5/gfx/charset.h"
+#include "common/str.h"
+#include "ultima/shared/engine/view.h"
 
 namespace Ultima {
 namespace Ultima5 {
-namespace Gfx {
+namespace Views {
 
-constexpr byte TEXT_BLACK = 0;
-constexpr byte TEXT_BLUE = 1;
-constexpr byte TEXT_WHITE = 15;
+using namespace Graphics::Views;
+
+constexpr byte COLOR_BLACK = 0;
+constexpr byte COLOR_BLUE = 1;
+constexpr byte COLOR_WHITE = 15;
 
 /**
- * Base for the classes that draw whole screens of the game, which are laid out
- * in 8x8 cells of text mixed with graphics
+ * Base class for the views of the game. The screen is laid out in cells of 8x8
+ * pixels, holding text or the pieces of the blue borders, and this
+ * adds drawing the things that go in them
  */
-class TextScreen {
-private:
-	Common::ScopedPtr<CharSet> _font;
-
+class View : public Shared::View {
 protected:
 	/**
-	 * Loads the font, if it hasn't been already
+	 * Draws a character in one of the cells of the screen, on a background
 	 */
-	void loadFont();
-
-public:
-	virtual ~TextScreen() {}
-
-	/**
-	 * Draws a character in one of the 8x8 cells of the screen, on a background
-	 */
-	void drawCell(Graphics::ManagedSurface &dst, int col, int row, byte ch, byte fg, byte bg) const;
+	void drawCell(int col, int row, byte ch, byte fg, byte bg);
 
 	/**
 	 * Draws text from a cell onwards
 	 */
-	void print(Graphics::ManagedSurface &dst, int col, int row, const char *text, byte fg, byte bg) const;
+	void print(int col, int row, const Common::String &text, byte fg, byte bg);
 
 	/**
 	 * Draws the animated text cursor in a cell
 	 */
-	void drawCursor(Graphics::ManagedSurface &dst, int col, int row, int cursorFrame) const;
+	void drawCursor(int col, int row, int cursorFrame);
 
 	/**
-	 * Draws the cap that starts or ends a label set in a border, in a cell
+	 * Draws the cap that starts or ends a label set in a border, in the cell
+	 * at a position given in pixels
 	 */
-	void drawCaps(Graphics::ManagedSurface &dst, int x, int y, bool left) const;
+	void drawCaps(int x, int y, bool left);
+
+public:
+	View(const Common::String &name) : Shared::View(name) {}
+	~View() override {}
 };
 
-} // namespace Gfx
+} // namespace Views
 } // namespace Ultima5
 } // namespace Ultima
 

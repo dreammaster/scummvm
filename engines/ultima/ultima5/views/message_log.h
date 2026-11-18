@@ -19,39 +19,55 @@
  *
  */
 
-#ifndef ULTIMA5_GFX_WORLD_VIEW_H
-#define ULTIMA5_GFX_WORLD_VIEW_H
+#ifndef ULTIMA5_VIEWS_MESSAGE_LOG_H
+#define ULTIMA5_VIEWS_MESSAGE_LOG_H
 
-#include "graphics/managed_surface.h"
-#include "ultima/ultima5/data/savegame.h"
-#include "ultima/ultima5/data/world_map.h"
-#include "ultima/ultima5/gfx/tileset.h"
+#include "common/str.h"
+#include "ultima/shared/engine/events.h"
 
 namespace Ultima {
 namespace Ultima5 {
-namespace Gfx {
+namespace Views {
 
-constexpr int VIEW_TILES = 11;
-constexpr int VIEW_X = 8;
-constexpr int VIEW_Y = 8;
+constexpr int LOG_COLUMNS = 16;
+constexpr int LOG_ROWS = 13;
 
 /**
- * Draws the part of Britannia or the underworld around the party, with the
- * party and the other objects on it, in the window at the left of the screen
+ * The scrolling text window at the bottom right of the screen, where the game
+ * reports what's happening. It's an element of the game view, drawn within
+ * the bounds it's given
  */
-class WorldView {
+class MessageLog : public Shared::UIElement {
 private:
-	/**
-	 * Works out which objects are seen in each tile of the window
-	 */
-	static void placeObjects(const Data::Savegame &savegame, byte objects[VIEW_TILES][VIEW_TILES], byte ground[VIEW_TILES][VIEW_TILES]);
+	char _cells[LOG_ROWS][LOG_COLUMNS];
+	int _x = 0;
+	int _y = 0;
+	int _cursorFrame = 0;
+
+	void scroll();
+
+protected:
+	void timeout() override;
 
 public:
-	void draw(Graphics::ManagedSurface &dst, const Tileset &tileset, const Data::WorldMap &world,
-		const Data::Savegame &savegame) const;
+	MessageLog(Graphics::Views::UIElement *parent);
+	~MessageLog() override {}
+
+	/**
+	 * Empties the window
+	 */
+	void clear();
+
+	/**
+	 * Prints text at the cursor, wrapping at the edge of the window
+	 * and scrolling it when it gets to the bottom. A newline starts a new line
+	 */
+	void print(const Common::String &text);
+
+	void draw() override;
 };
 
-} // namespace Gfx
+} // namespace Views
 } // namespace Ultima5
 } // namespace Ultima
 

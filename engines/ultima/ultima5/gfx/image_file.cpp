@@ -21,7 +21,7 @@
 
 #include "common/endian.h"
 #include "ultima/ultima5/gfx/image_file.h"
-#include "ultima/ultima5/gfx/lzw.h"
+#include "ultima/ultima5/data/lzw.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -32,7 +32,7 @@ bool ImageFile::load(const char *baseName, Data::RenderMode mode) {
 	_cga = mode == Data::RENDER_CGA;
 
 	const Common::String name = Common::String(baseName) + Data::pictureExtension(mode);
-	if (!loadLzwFile(name.c_str(), _data) || _data.size() < 2)
+	if (!Data::loadLzwFile(name.c_str(), _data) || _data.size() < 2)
 		return false;
 
 	const uint count = READ_LE_UINT16(&_data[0]);

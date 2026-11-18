@@ -324,19 +324,14 @@ MODULE_OBJS += \
 	ultima5/console.o \
 	ultima5/metaengine.o \
 	ultima5/data/data.o \
+	ultima5/data/lzw.o \
 	ultima5/data/savegame.o \
 	ultima5/data/world_map.o \
 	ultima5/gfx/bit_image_file.o \
 	ultima5/gfx/charset.o \
-	ultima5/gfx/game_frame.o \
 	ultima5/gfx/image_file.o \
-	ultima5/gfx/intro_screen.o \
-	ultima5/gfx/lzw.o \
-	ultima5/gfx/message_log.o \
 	ultima5/gfx/story_text.o \
-	ultima5/gfx/text_screen.o \
 	ultima5/gfx/tileset.o \
-	ultima5/gfx/world_view.o \
 	ultima5/logic/creation_logic.o \
 	ultima5/logic/time_logic.o \
 	ultima5/logic/world_logic.o \
@@ -345,7 +340,10 @@ MODULE_OBJS += \
 	ultima5/views/create_character.o \
 	ultima5/views/game.o \
 	ultima5/views/introduction.o \
-	ultima5/views/title.o
+	ultima5/views/message_log.o \
+	ultima5/views/title.o \
+	ultima5/views/title_base.o \
+	ultima5/views/view.o
 endif
 
 ifdef ENABLE_ULTIMA6

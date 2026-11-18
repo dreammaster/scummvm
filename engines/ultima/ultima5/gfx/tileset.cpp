@@ -21,7 +21,7 @@
 
 #include "common/array.h"
 #include "ultima/ultima5/gfx/tileset.h"
-#include "ultima/ultima5/gfx/lzw.h"
+#include "ultima/ultima5/data/lzw.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -34,7 +34,7 @@ bool Tileset::load(Data::RenderMode mode) {
 
 	// Pixels are packed from the top bits of each byte down, 4 or 2 to a byte
 	Common::Array<byte> data;
-	if (!loadLzwFile(name.c_str(), data) || data.size() < (uint)(cga ? pixelCount / 4 : pixelCount / 2))
+	if (!Data::loadLzwFile(name.c_str(), data) || data.size() < (uint)(cga ? pixelCount / 4 : pixelCount / 2))
 		return false;
 
 	for (int i = 0; i < pixelCount; ++i) {

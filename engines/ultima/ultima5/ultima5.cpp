@@ -66,6 +66,7 @@ Common::Error Ultima5Engine::run() {
 
 	// Initialize 320x200 graphics mode
 	initGraphics(320, 200);
+	_charset.reset(new Gfx::CharSet());
 	Data::setPalette(_renderMode);
 
 	if (!_tileset.load(_renderMode)) {
@@ -116,7 +117,9 @@ Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
 	_savegame.synchronize(s);
 
 	if (s.isLoading()) {
-		_messages.clear();
+		Views::MessageLog *log = dynamic_cast<Views::MessageLog *>(findView("MessageLog"));
+		if (log)
+			log->clear();
 		_world.unload();
 		replaceView(_savegame.hasActiveGame() ? "Game" : "Title", true);
 	}
@@ -130,7 +133,8 @@ bool Ultima5Engine::loadWorld() {
 }
 
 Graphics::Font *Ultima5Engine::createFont() const {
-	return new Gfx::CharSet();
+	// A copy, as every surface made for a view asks for one
+	return new Gfx::CharSet(*_charset);
 }
 
 } // namespace Ultima5

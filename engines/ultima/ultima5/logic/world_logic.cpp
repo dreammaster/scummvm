@@ -168,8 +168,7 @@ bool WorldLogic::walk(Direction direction) {
 	static const int8 DY[] = { -1, 0, 1, 0 };
 
 	Data::Savegame &sg = _G(savegame);
-	Gfx::MessageLog &log = _G(messages);
-	log.print(NAMES[direction]);
+	_log.print(NAMES[direction]);
 
 	const byte x = sg._mapX + DX[direction];
 	const byte y = sg._mapY + DY[direction];
@@ -191,7 +190,7 @@ bool WorldLogic::walk(Direction direction) {
 	}
 
 	if (!free || !isWalkable(party, _G(world).getTile(x, y))) {
-		log.print("Blocked!\n");
+		_log.print("Blocked!\n");
 		return false;
 	}
 
@@ -214,10 +213,10 @@ bool WorldLogic::walk(Direction direction) {
 	}
 
 	if (slowness == 1) {
-		log.print("Slow progress!\n");
+		_log.print("Slow progress!\n");
 		TimeLogic::advance(sg, MINUTES_PER_SLOW_STEP);
 	} else if (slowness == 2) {
-		log.print("Very slow!\n");
+		_log.print("Very slow!\n");
 		TimeLogic::advance(sg, MINUTES_PER_VERY_SLOW_STEP);
 	}
 
@@ -226,7 +225,7 @@ bool WorldLogic::walk(Direction direction) {
 }
 
 void WorldLogic::pass() {
-	_G(messages).print("Pass\n");
+	_log.print("Pass\n");
 	TimeLogic::advance(_G(savegame), MINUTES_PER_STEP);
 }
 

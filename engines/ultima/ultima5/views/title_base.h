@@ -19,75 +19,78 @@
  *
  */
 
-#ifndef ULTIMA5_GFX_INTRO_SCREEN_H
-#define ULTIMA5_GFX_INTRO_SCREEN_H
+#ifndef ULTIMA5_VIEWS_TITLE_BASE_H
+#define ULTIMA5_VIEWS_TITLE_BASE_H
 
-#include "graphics/managed_surface.h"
 #include "ultima/ultima5/gfx/image_file.h"
-#include "ultima/ultima5/gfx/text_screen.h"
+#include "ultima/ultima5/views/view.h"
 
 namespace Ultima {
 namespace Ultima5 {
-namespace Gfx {
+namespace Views {
 
 constexpr int MENU_ITEM_COUNT = 6;
 
 /**
- * Draws the parts of the title screen: the logo, the shimmering subtitle,
- * the blue bordered menu at the bottom and its text
+ * Base for the views that are shown over the title screen: the logo, the
+ * shimmering subtitle and the blue bordered menu at the bottom
  */
-class IntroScreen : public TextScreen {
+class TitleBase : public View {
 private:
-	ImageFile _logo;
+	Gfx::ImageFile _logo;
 
-public:
-	static constexpr int WD_FRAME_COUNT = 4;
+protected:
+	static constexpr int SUBTITLE_FRAME_COUNT = 4;
+
+	TitleBase(const Common::String &name) : View(name) {}
 
 	/**
 	 * Loads the graphics, once the render mode is known
 	 */
-	bool load();
+	bool loadTitleGraphics();
 
 	/**
 	 * Draws the black screen with the logo, a frame of the subtitle,
 	 * the menu border and the copyright line
 	 */
-	void drawTitle(Graphics::ManagedSurface &dst, int wdFrame) const;
+	void drawTitle(int subtitleFrame);
 
 	/**
 	 * Draws the subtitle on its own
 	 */
-	void drawSubtitle(Graphics::ManagedSurface &dst, int wdFrame) const;
+	void drawSubtitle(int subtitleFrame);
 
 	/**
 	 * Draws the menu border and its white inner outline
 	 */
-	void drawMenuFrame(Graphics::ManagedSurface &dst) const;
+	void drawMenuFrame();
 
 	/**
 	 * Draws the menu choices, with one highlighted
 	 */
-	void drawMenu(Graphics::ManagedSurface &dst, int selected) const;
+	void drawMenu(int selected);
 
 	/**
 	 * Draws the "Select:" prompt on the top border, with its animated cursor
 	 */
-	void drawPrompt(Graphics::ManagedSurface &dst, int cursorFrame) const;
+	void drawPrompt(int cursorFrame);
 
 	/**
 	 * Draws the title screen with the inside of the menu frame emptied, as the
 	 * background for entering a name
 	 */
-	void drawEmptyMenu(Graphics::ManagedSurface &dst, int wdFrame) const;
+	void drawEmptyMenu(int subtitleFrame);
 
 	/**
 	 * Draws up to three lines of text in the menu frame, in place of the menu
 	 */
-	void drawMessage(Graphics::ManagedSurface &dst, const char *line1, const char *line2 = nullptr,
-		const char *line3 = nullptr) const;
+	void drawMessage(const char *line1, const char *line2 = nullptr, const char *line3 = nullptr);
+
+public:
+	~TitleBase() override {}
 };
 
-} // namespace Gfx
+} // namespace Views
 } // namespace Ultima5
 } // namespace Ultima
 

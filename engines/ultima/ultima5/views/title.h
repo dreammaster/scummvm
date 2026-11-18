@@ -22,8 +22,7 @@
 #ifndef ULTIMA5_VIEWS_TITLE_H
 #define ULTIMA5_VIEWS_TITLE_H
 
-#include "ultima/shared/engine/view.h"
-#include "ultima/ultima5/gfx/intro_screen.h"
+#include "ultima/ultima5/views/title_base.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -34,9 +33,8 @@ using namespace Graphics::Views;
 /**
  * The title screen, with the logo, the shimmering subtitle and the main menu
  */
-class Title : public Shared::View {
+class Title : public TitleBase {
 private:
-	Gfx::IntroScreen _screen;
 	int _selected = 0;
 	int _animFrame = 0;
 	bool _showNotice = false;
@@ -50,7 +48,7 @@ private:
 	void activate(int index);
 
 public:
-	Title() : Shared::View("Title") {}
+	Title() : TitleBase("Title") {}
 	~Title() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;

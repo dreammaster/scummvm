@@ -24,13 +24,11 @@
 
 #include "common/array.h"
 #include "common/str.h"
-#include "graphics/managed_surface.h"
-#include "ultima/shared/engine/view.h"
 #include "ultima/ultima5/data/savegame.h"
 #include "ultima/ultima5/gfx/image_file.h"
-#include "ultima/ultima5/gfx/intro_screen.h"
 #include "ultima/ultima5/gfx/story_text.h"
 #include "ultima/ultima5/logic/creation_logic.h"
+#include "ultima/ultima5/views/title_base.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -42,15 +40,13 @@ using namespace Graphics::Views;
  * Creates the Avatar. The player gives a name and a gender, and then the gypsy
  * asks a series of questions, whose answers decide the attributes
  */
-class CreateCharacter : public Shared::View {
+class CreateCharacter : public TitleBase {
 private:
 	enum Phase { PHASE_NAME, PHASE_GENDER, PHASE_INTRO, PHASE_QUESTION, PHASE_RESULT };
 
-	Gfx::IntroScreen _intro;
 	Gfx::ImageFile _images;
 	Gfx::StoryText _text;
 	Common::Array<byte> _questions;
-	Graphics::ManagedSurface _page;
 
 	Data::Savegame _newGame;
 	CreationLogic _logic;
@@ -64,11 +60,12 @@ private:
 	 */
 	Common::String questionText(uint offset) const;
 
-	void showNamePrompt();
-	void showGenderPrompt();
-	void showIntro();
+	void drawNameScreen();
+	void drawIntroScreen();
+	void drawQuestionScreen();
+	void drawResultScreen();
+
 	void showQuestion();
-	void showResult();
 
 	/**
 	 * Adds the new character to the game
@@ -80,7 +77,7 @@ private:
 	bool questionKeypress(const KeypressMessage &msg);
 
 public:
-	CreateCharacter() : Shared::View("CreateCharacter") {}
+	CreateCharacter() : TitleBase("CreateCharacter") {}
 	~CreateCharacter() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;

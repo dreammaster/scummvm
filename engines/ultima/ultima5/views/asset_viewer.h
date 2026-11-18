@@ -23,8 +23,8 @@
 #define ULTIMA5_VIEWS_ASSET_VIEWER_H
 
 #include "common/str.h"
-#include "ultima/shared/engine/view.h"
 #include "ultima/ultima5/gfx/image_file.h"
+#include "ultima/ultima5/views/view.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -36,7 +36,7 @@ using namespace Graphics::Views;
  * Debugging view for browsing the tiles and the images of the .16 files.
  * Left and right change page or image, and Escape returns to the title
  */
-class AssetViewer : public Shared::View {
+class AssetViewer : public View {
 private:
 	enum Mode { MODE_TILES, MODE_IMAGE };
 
@@ -48,7 +48,7 @@ private:
 	int pageCount() const;
 
 public:
-	AssetViewer() : Shared::View("AssetViewer") {}
+	AssetViewer() : View("AssetViewer") {}
 	~AssetViewer() override {}
 
 	/**

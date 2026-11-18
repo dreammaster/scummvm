@@ -19,18 +19,26 @@
  *
  */
 
-#include "ultima/ultima5/gfx/message_log.h"
+#include "ultima/ultima5/views/message_log.h"
+#include "ultima/ultima5/views/view.h"
 
 namespace Ultima {
 namespace Ultima5 {
-namespace Gfx {
+namespace Views {
 
-constexpr int LOG_FIRST_COLUMN = 24;
-constexpr int LOG_FIRST_ROW = 11;
+constexpr int FRAMES_PER_CURSOR_STEP = 3;
+constexpr byte GLYPH_CURSOR = 5;
+constexpr int CURSOR_FRAME_COUNT = 4;
+
+MessageLog::MessageLog(Graphics::Views::UIElement *parent) : Shared::UIElement("MessageLog", parent) {
+	clear();
+	delayFrames(FRAMES_PER_CURSOR_STEP);
+}
 
 void MessageLog::clear() {
 	memset(_cells, ' ', sizeof(_cells));
 	_x = _y = 0;
+	redraw();
 }
 
 void MessageLog::scroll() {
@@ -55,19 +63,26 @@ void MessageLog::print(const Common::String &text) {
 		if (_y == LOG_ROWS)
 			scroll();
 	}
+
+	redraw();
 }
 
-void MessageLog::draw(const TextScreen &screen, Graphics::ManagedSurface &dst, bool showCursor,
-		int cursorFrame) const {
-	for (int y = 0; y < LOG_ROWS; ++y) {
-		for (int x = 0; x < LOG_COLUMNS; ++x)
-			screen.drawCell(dst, LOG_FIRST_COLUMN + x, LOG_FIRST_ROW + y, _cells[y][x], TEXT_WHITE, TEXT_BLACK);
-	}
+void MessageLog::draw() {
+	auto s = getSurface();
+	s.setColor(COLOR_WHITE, COLOR_BLACK);
 
-	if (showCursor)
-		screen.drawCursor(dst, LOG_FIRST_COLUMN + _x, LOG_FIRST_ROW + _y, cursorFrame);
+	for (int y = 0; y < LOG_ROWS; ++y)
+		s.writeString(Common::Point(0, y), Common::String(_cells[y], LOG_COLUMNS));
+
+	s.writeChar(Common::Point(_x, _y), GLYPH_CURSOR + _cursorFrame);
 }
 
-} // namespace Gfx
+void MessageLog::timeout() {
+	_cursorFrame = (_cursorFrame + 1) % CURSOR_FRAME_COUNT;
+	redraw();
+	delayFrames(FRAMES_PER_CURSOR_STEP);
+}
+
+} // namespace Views
 } // namespace Ultima5
 } // namespace Ultima

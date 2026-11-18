@@ -23,10 +23,9 @@
 #define ULTIMA5_VIEWS_INTRODUCTION_H
 
 #include "common/array.h"
-#include "graphics/managed_surface.h"
-#include "ultima/shared/engine/view.h"
 #include "ultima/ultima5/gfx/image_file.h"
 #include "ultima/ultima5/gfx/story_text.h"
+#include "ultima/ultima5/views/view.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -38,20 +37,19 @@ using namespace Graphics::Views;
  * The introduction, a series of illustrated scenes of the story of how the
  * Avatar comes to Britannia, each shown on a key press
  */
-class Introduction : public Shared::View {
+class Introduction : public View {
 private:
 	Gfx::ImageFile _banners;
 	Gfx::ImageFile _pictures;
 	int _pictureFile = -1;
 	Gfx::StoryText _text;
 	Common::Array<byte> _story;
-	Graphics::ManagedSurface _page;
 	int _scene = 0;
 
 	/**
-	 * Draws a scene onto the page
+	 * Draws a scene
 	 */
-	void buildScene(int scene);
+	void drawScene(int scene);
 
 	/**
 	 * Returns the story text of a scene
@@ -59,7 +57,7 @@ private:
 	Common::String sceneText(int scene) const;
 
 public:
-	Introduction() : Shared::View("Introduction") {}
+	Introduction() : View("Introduction") {}
 	~Introduction() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;

@@ -38,7 +38,7 @@ enum MenuChoice {
 static const char MENU_LETTERS[] = "JCTUAR";
 
 bool Title::msgFocus(const FocusMessage &msg) {
-	if (!_screen.load())
+	if (!loadTitleGraphics())
 		error("Could not load the title graphics");
 
 	_selected = 0;
@@ -46,19 +46,17 @@ bool Title::msgFocus(const FocusMessage &msg) {
 	_showNotice = false;
 
 	delayFrames(FRAMES_PER_STEP);
-	return Shared::View::msgFocus(msg);
+	return TitleBase::msgFocus(msg);
 }
 
 void Title::draw() {
-	auto s = getSurface();
-	_screen.drawTitle(s, _animFrame);
+	drawTitle(_animFrame);
 
 	if (_showNotice) {
-		_screen.drawMessage(s, "No active game.", "Please create a character or transfer",
-			"one from Ultima IV.");
+		drawMessage("No active game.", "Please create a character or transfer", "one from Ultima IV.");
 	} else {
-		_screen.drawMenu(s, _selected);
-		_screen.drawPrompt(s, _animFrame);
+		drawMenu(_selected);
+		drawPrompt(_animFrame);
 	}
 }
 
@@ -113,11 +111,11 @@ bool Title::msgKeypress(const KeypressMessage &msg) {
 	switch (msg.keycode) {
 	case Common::KEYCODE_LEFT:
 	case Common::KEYCODE_UP:
-		choose((_selected + Gfx::MENU_ITEM_COUNT - 1) % Gfx::MENU_ITEM_COUNT, false);
+		choose((_selected + MENU_ITEM_COUNT - 1) % MENU_ITEM_COUNT, false);
 		return true;
 	case Common::KEYCODE_RIGHT:
 	case Common::KEYCODE_DOWN:
-		choose((_selected + 1) % Gfx::MENU_ITEM_COUNT, false);
+		choose((_selected + 1) % MENU_ITEM_COUNT, false);
 		return true;
 	case Common::KEYCODE_RETURN:
 	case Common::KEYCODE_KP_ENTER:

@@ -19,15 +19,15 @@
  *
  */
 
-#ifndef ULTIMA5_GFX_LZW_H
-#define ULTIMA5_GFX_LZW_H
+#ifndef ULTIMA5_DATA_LZW_H
+#define ULTIMA5_DATA_LZW_H
 
 #include "common/array.h"
 #include "common/scummsys.h"
 
 namespace Ultima {
 namespace Ultima5 {
-namespace Gfx {
+namespace Data {
 
 /**
  * Decompresses a resource: a 32-bit little endian size followed by LZW codes
@@ -42,7 +42,7 @@ extern bool decompressLzw(const byte *src, size_t srcSize, Common::Array<byte> &
  */
 extern bool loadLzwFile(const char *name, Common::Array<byte> &dest);
 
-} // namespace Gfx
+} // namespace Data
 } // namespace Ultima5
 } // namespace Ultima
 

@@ -62,12 +62,12 @@ void AssetViewer::draw() {
 		for (int i = 0; i < TILES_PER_PAGE && first + i < Gfx::TILE_COUNT; ++i)
 			_G(tileset).drawTile(s, (i % TILE_COLUMNS) * Gfx::TILE_SIZE, (i / TILE_COLUMNS) * Gfx::TILE_SIZE, first + i);
 
-		s.writeString(Common::Point(0, 192), Common::String::format("Tiles %d-%d", first,
+		s.writeString(Common::Point(0, 24), Common::String::format("Tiles %d-%d", first,
 			MIN(first + TILES_PER_PAGE, Gfx::TILE_COUNT) - 1));
 	} else {
 		_image.draw(s, _index, 0, 0);
 
-		s.writeString(Common::Point(0, 192), Common::String::format("%s %d/%d (%dx%d)", _imageName.c_str(),
+		s.writeString(Common::Point(0, 24), Common::String::format("%s %d/%d (%dx%d)", _imageName.c_str(),
 			_index, _image.size() - 1, _image.getWidth(_index), _image.getHeight(_index)));
 	}
 }

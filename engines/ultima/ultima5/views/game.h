@@ -22,32 +22,61 @@
 #ifndef ULTIMA5_VIEWS_GAME_H
 #define ULTIMA5_VIEWS_GAME_H
 
-#include "ultima/shared/engine/view.h"
-#include "ultima/ultima5/gfx/game_frame.h"
-#include "ultima/ultima5/gfx/world_view.h"
+#include "ultima/ultima5/gfx/tileset.h"
+#include "ultima/ultima5/views/message_log.h"
+#include "ultima/ultima5/views/view.h"
 
 namespace Ultima {
 namespace Ultima5 {
 namespace Views {
 
-using namespace Graphics::Views;
+constexpr int VIEW_TILES = 11;
 
 /**
- * The main game screen: the party, the status and the messages around the map
+ * The main game screen: the map, with the party, the status and the messages
+ * around it
  */
-class Game : public Shared::View {
+class Game : public View {
 private:
-	Gfx::GameFrame _frame;
-	Gfx::WorldView _worldView;
-	int _cursorFrame = 0;
+	MessageLog _messages;
+
+	/**
+	 * Clears the screen and draws the blue frame and the outlines of the windows
+	 */
+	void drawFrame();
+
+	/**
+	 * Draws the names, hit points and condition of the first members of the party
+	 */
+	void drawParty();
+
+	/**
+	 * Draws the food, gold, date and the label between them
+	 */
+	void drawStatus();
+
+	/**
+	 * Draws the wind in the bottom border, or clears it below ground
+	 */
+	void drawWind();
+
+	/**
+	 * Draws the part of Britannia or the underworld around the party, with the
+	 * party and the other objects on it
+	 */
+	void drawWorld();
+
+	/**
+	 * Works out which objects are seen in each tile of the window
+	 */
+	void placeObjects(byte objects[VIEW_TILES][VIEW_TILES], byte ground[VIEW_TILES][VIEW_TILES]);
 
 public:
-	Game() : Shared::View("Game") {}
+	Game();
 	~Game() override {}
 
 	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
-	void timeout() override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
