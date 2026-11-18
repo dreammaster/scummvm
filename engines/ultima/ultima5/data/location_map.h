@@ -31,9 +31,6 @@ namespace Data {
 constexpr int LOCATION_SIZE = 32;
 constexpr int LOCATION_BRIDGE_MAX = 32;
 
-// What the map shows beyond its edges, and for what can't be seen
-constexpr byte TILE_DARKNESS = 0xFF;
-
 /**
  * One level of the map of a town, castle, keep or dwelling, which is 32x32 tiles
  */
@@ -72,11 +69,11 @@ public:
 	}
 
 	/**
-	 * Returns a tile, or darkness for anywhere outside the map
+	 * Returns a tile. Anywhere outside the map has the tile of its last corner
 	 */
 	byte getTile(int x, int y) const {
-		return (x < 0 || y < 0 || x >= LOCATION_SIZE || y >= LOCATION_SIZE) ? TILE_DARKNESS :
-			_tiles[y * LOCATION_SIZE + x];
+		return (x < 0 || y < 0 || x >= LOCATION_SIZE || y >= LOCATION_SIZE) ?
+			_tiles[LOCATION_SIZE * LOCATION_SIZE - 1] : _tiles[y * LOCATION_SIZE + x];
 	}
 
 	void setTile(int x, int y, byte tile) {

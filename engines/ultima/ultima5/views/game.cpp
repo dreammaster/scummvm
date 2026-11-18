@@ -98,6 +98,14 @@ constexpr byte ACTOR_REMAINS = 0xE8;
 constexpr byte ACTOR_MUSICIAN = 0x5C;
 constexpr byte ACTOR_MUSICIAN_FRAME_OFFSET = 8;
 
+// Gives the tiles of the map the party is on to work out what it can see
+class MapTileSource : public TileSource {
+public:
+	byte tileAt(int x, int y) const override {
+		return g_engine->getMapTile(x, y);
+	}
+};
+
 Game::Game() : View("Game"), _messages(this) {
 	_messages.setBounds(Common::Rect(LOG_LEFT, LOG_TOP, 320, LOG_BOTTOM));
 }
@@ -303,10 +311,9 @@ void Game::drawMap() {
 	byte objects[VIEW_TILES][VIEW_TILES] = {};
 	byte ground[VIEW_TILES][VIEW_TILES];
 
-	for (int y = 0; y < VIEW_TILES; ++y) {
-		for (int x = 0; x < VIEW_TILES; ++x)
-			ground[y][x] = g_engine->getMapTile(sg._mapX - PARTY_TILE_X + x, sg._mapY - PARTY_TILE_Y + y);
-	}
+	// Only what the party can see of the map is shown
+	MapTileSource source;
+	g_engine->_visibility.computeView(source, sg._chunkX, sg._chunkY, sg._mapX, sg._mapY, sg._light, ground);
 
 	placeObjects(objects, ground);
 

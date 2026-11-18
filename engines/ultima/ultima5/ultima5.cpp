@@ -28,6 +28,7 @@
 #include "ultima/ultima5/console.h"
 #include "ultima/ultima5/data/data.h"
 #include "ultima/ultima5/logic/location_logic.h"
+#include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/gfx/charset.h"
 #include "ultima/ultima5/metaengine.h"
 #include "ultima/ultima5/views/views.h"
@@ -132,7 +133,15 @@ Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
 
 bool Ultima5Engine::loadWorld() {
 	const bool underworld = _savegame._mapLevel >= Data::MAP_LEVEL_UNDERGROUND;
-	return _world.isLoaded(underworld) || _world.load(underworld, _savegame);
+	if (_world.isLoaded(underworld))
+		return true;
+
+	if (!_world.load(underworld, _savegame))
+		return false;
+
+	_visibility.invalidate();
+	TimeLogic::advance(_savegame, 0);
+	return true;
 }
 
 bool Ultima5Engine::loadMap() {

@@ -36,6 +36,7 @@
 #include "ultima/ultima5/gfx/charset.h"
 #include "ultima/ultima5/data/world_map.h"
 #include "ultima/ultima5/gfx/tileset.h"
+#include "ultima/ultima5/logic/visibility_logic.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -67,6 +68,7 @@ public:
 	Data::LocationMap _location;
 	Data::LookNames _lookNames;
 	Data::Savegame _savegame;
+	VisibilityLogic _visibility;
 	Data::WorldMap _world;
 	Gfx::Tileset _tileset;
 

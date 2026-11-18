@@ -66,6 +66,12 @@ public:
 	static void syncPartyObject(Data::Savegame &savegame);
 
 	/**
+	 * Works out which 32x32 tiles of the map are the ones to work over, which
+	 * are around the party, when it comes to the map
+	 */
+	static void centerWindow(Data::Savegame &savegame);
+
+	/**
 	 * Moves the party a step, or reports why it can't
 	 * @returns		True if the party moved
 	 */

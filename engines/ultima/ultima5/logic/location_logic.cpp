@@ -22,6 +22,7 @@
 #include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/logic/game_random.h"
 #include "ultima/ultima5/logic/npc_logic.h"
+#include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/data/location_tables.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -95,7 +96,7 @@ static void changeGround(Data::LocationMap &map, const Data::Savegame &sg) {
 }
 
 bool LocationLogic::load() {
-	const Data::Savegame &sg = _G(savegame);
+	Data::Savegame &sg = _G(savegame);
 	if (_G(location).isLoaded(sg._mapId, sg._mapLevel))
 		return true;
 
@@ -106,6 +107,8 @@ bool LocationLogic::load() {
 		updateForHour();
 
 	changeGround(_G(location), sg);
+	_G(visibility).invalidate();
+	TimeLogic::advance(sg, 0);
 	return true;
 }
 
@@ -126,6 +129,8 @@ void LocationLogic::updateForHour() {
 			map.setTile(map.getBridgeX(i), map.getBridgeY(i),
 				sg._hour == FIRST_DAY_HOUR ? map.getBridgeTile(i) : TILE_BRIDGE_RAISED);
 	}
+
+	_G(visibility).invalidate();
 }
 
 bool LocationLogic::arrive() {
@@ -140,7 +145,11 @@ bool LocationLogic::arrive() {
 		}
 	}
 
+	// Locations are drawn from their top left
+	sg._chunkX = sg._chunkY = 0;
+
 	_G(location).unload();
+	_G(visibility).invalidate();
 	return NpcLogic::arrive(sg);
 }
 
@@ -281,6 +290,8 @@ void LocationLogic::leave() {
 	sg._mapY = Data::LOCATION_ENTRANCE_Y[sg._mapId - 1];
 	sg._mapId = 0;
 	sg.restoreWorldObjects(sg._mapLevel != 0);
+	WorldLogic::centerWindow(sg);
+	_G(visibility).invalidate();
 }
 
 } // namespace Ultima5

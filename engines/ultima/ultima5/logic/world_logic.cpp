@@ -63,6 +63,10 @@ static const byte BOAT_RIVER_DIRECTIONS[16] = {
 };
 static const byte BOAT_CHANNEL_DIRECTIONS[4] = { 0x06, 0x03, 0x09, 0x0C };
 
+constexpr int WINDOW_SIZE = 32;
+constexpr int WINDOW_MARGIN = 5;
+constexpr int CHUNK_SIZE = 16;
+
 constexpr byte TILE_FIRST_RIVER = 0x34;
 constexpr byte TILE_FIRST_SHORE = 0x60;
 constexpr byte TILE_LAVA = 0x8F;
@@ -141,6 +145,16 @@ bool WorldLogic::isWalkable(byte actorTile, byte terrain) {
 	}
 }
 
+void WorldLogic::centerWindow(Data::Savegame &sg) {
+	sg._chunkX = sg._mapX & 0xF0;
+	if ((sg._mapX & 0x0F) < CHUNK_SIZE / 2)
+		sg._chunkX = (sg._chunkX - CHUNK_SIZE) & 0xF0;
+
+	sg._chunkY = sg._mapY & 0xF0;
+	if ((sg._mapY & 0x0F) < CHUNK_SIZE / 2)
+		sg._chunkY = (sg._chunkY - CHUNK_SIZE) & 0xF0;
+}
+
 void WorldLogic::syncPartyObject(Data::Savegame &sg) {
 	Data::ActorRecord party = sg.getActor(0);
 	party._x = sg._mapX;
@@ -194,6 +208,16 @@ bool WorldLogic::walk(Direction direction) {
 
 	sg._mapX = x;
 	sg._mapY = y;
+
+	// The 32x32 tiles that are worked over move on when the party gets near their edge
+	const int windowX = (x - sg._chunkX) & 0x1F;
+	const int windowY = (y - sg._chunkY) & 0x1F;
+	if (windowX < WINDOW_MARGIN || windowX > WINDOW_SIZE - 1 - WINDOW_MARGIN || windowY < WINDOW_MARGIN ||
+			windowY > WINDOW_SIZE - 1 - WINDOW_MARGIN) {
+		sg._chunkX = (DX[direction] * CHUNK_SIZE + sg._chunkX) & 0xF0;
+		sg._chunkY = (DY[direction] * CHUNK_SIZE + sg._chunkY) & 0xF0;
+		_G(visibility).invalidate();
+	}
 
 	// Rough ground slows the party down
 	const byte ground = _G(world).getTile(x, y);

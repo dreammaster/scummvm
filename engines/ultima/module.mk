@@ -340,6 +340,7 @@ MODULE_OBJS += \
 	ultima5/logic/npc_logic.o \
 	ultima5/logic/party_logic.o \
 	ultima5/logic/time_logic.o \
+	ultima5/logic/visibility_logic.o \
 	ultima5/logic/world_logic.o \
 	ultima5/views/acknowledgements.o \
 	ultima5/views/asset_viewer.o \

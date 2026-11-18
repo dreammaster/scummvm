@@ -24,6 +24,7 @@
 
 #include "common/ptr.h"
 #include "ultima/ultima5/gfx/tileset.h"
+#include "ultima/ultima5/logic/visibility_logic.h"
 #include "ultima/ultima5/views/interactions/interaction.h"
 #include "ultima/ultima5/views/message_log.h"
 #include "ultima/ultima5/views/view.h"
@@ -31,8 +32,6 @@
 namespace Ultima {
 namespace Ultima5 {
 namespace Views {
-
-constexpr int VIEW_TILES = 11;
 
 /**
  * The main game screen: the map, with the party, the status and the messages

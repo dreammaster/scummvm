@@ -89,6 +89,9 @@ bool Console::cmdTeleport(int argc, const char **argv) {
 	if (sg._partyTile == 0)
 		sg._partyTile = TILE_AVATAR;
 
+	WorldLogic::centerWindow(sg);
+	g_engine->_visibility.invalidate();
+
 	if (!g_engine->loadWorld()) {
 		debugPrintf("Could not load the map\n");
 		return true;
