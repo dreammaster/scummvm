@@ -21,6 +21,7 @@
 
 #include "common/endian.h"
 #include "common/file.h"
+#include "common/util.h"
 #include "ultima/ultima5/logic/npc_logic.h"
 #include "ultima/ultima5/data/location_tables.h"
 
@@ -36,6 +37,8 @@ constexpr byte OBJECT_SLEEPING = 0x1E;
 constexpr byte OBJECT_STAYS_FLAG = 0xFF;
 constexpr byte NPC_KIND_CHEST = 1;
 constexpr uint16 NO_TALK = 0xFFFF;
+constexpr byte OBJECT_CROWN = 0xB5;
+constexpr int VIEW_LAST = 10;
 
 static const char *const NPC_FILES[] = { "towne.npc", "dwelling.npc", "castle.npc", "keep.npc" };
 
@@ -120,10 +123,36 @@ void NpcLogic::initialize(Data::Savegame &sg) {
 	}
 }
 
-int NpcLogic::findFreeObject(const Data::Savegame &sg) {
+// Looks through the objects for one in a range of tiles, if need be that is also
+// out of view of the party
+static int findObject(const Data::Savegame &sg, int first, int last, bool outOfView) {
 	for (int i = 1; i <= LAST_PERSON_OBJECT; ++i) {
-		if (sg.getActor(i)._tile == 0)
-			return i;
+		const Data::ActorRecord actor = sg.getActor(i);
+
+		if (actor._tile >= first && actor._tile <= last && actor._tile != OBJECT_CROWN) {
+			if (!outOfView)
+				return i;
+
+			if ((byte)(actor._x - sg._mapX + 5) > VIEW_LAST || (byte)(actor._y - sg._mapY + 5) > VIEW_LAST)
+				return i;
+		}
+	}
+
+	return 0;
+}
+
+int NpcLogic::findFreeObject(const Data::Savegame &sg) {
+	// A spare object if there is one, otherwise the first thing out of sight
+	// that can be done without
+	static const int RANGES[][3] = {
+		{ 0, 0, 0 }, { 1, 0xF, 1 }, { 0x80, 0xFF, 1 }, { 0x10, 0x11, 1 }, { 0x30, 0x7F, 1 },
+		{ 1, 0xF, 0 }, { 0x80, 0xFF, 0 }, { 0x10, 0x11, 0 }, { 0x30, 0x7F, 0 }, { 0, 0xFF, 0 }
+	};
+
+	for (int i = 0; i < ARRAYSIZE(RANGES); ++i) {
+		const int object = findObject(sg, RANGES[i][0], RANGES[i][1], RANGES[i][2] != 0);
+		if (object != 0)
+			return object;
 	}
 
 	return 0;

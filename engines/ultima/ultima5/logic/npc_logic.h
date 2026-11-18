@@ -34,11 +34,6 @@ namespace Ultima5 {
 class NpcLogic {
 private:
 	/**
-	 * Puts a person at a place, on the map if that's the level the party is on
-	 */
-	static void placeNpc(Data::Savegame &savegame, int npc, int x, int y, int z);
-
-	/**
 	 * Finds a spare object for a person, or returns zero if there isn't one
 	 */
 	static int findFreeObject(const Data::Savegame &savegame);
@@ -55,6 +50,11 @@ private:
 	static void initialize(Data::Savegame &savegame);
 
 public:
+	/**
+	 * Puts a person at a place, on the map if that's the level the party is on
+	 */
+	static void placeNpc(Data::Savegame &savegame, int npc, int x, int y, int z);
+
 	/**
 	 * Returns which of a person's three schedules is the one for an hour
 	 */

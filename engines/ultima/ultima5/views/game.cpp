@@ -22,6 +22,7 @@
 #include "ultima/ultima5/views/game.h"
 #include "ultima/ultima5/views/keys.h"
 #include "ultima/ultima5/logic/location_logic.h"
+#include "ultima/ultima5/logic/npc_movement.h"
 #include "ultima/ultima5/logic/party_logic.h"
 #include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
@@ -343,6 +344,8 @@ void Game::endTurn() {
 		// The drawbridges and the windows change as it gets dark and light
 		if (sg._hour != hour && (sg._hour == FIRST_NIGHT_HOUR || sg._hour == FIRST_DAY_HOUR))
 			LocationLogic::updateForHour();
+
+		NpcMovement(sg, _G(location), _G(gameRandom)).turn();
 	}
 
 	redraw();

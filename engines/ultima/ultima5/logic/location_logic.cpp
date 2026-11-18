@@ -145,6 +145,8 @@ bool LocationLogic::arrive() {
 		}
 	}
 
+	_G(gameRandom).seed(g_engine->getRandomNumber(0xFFFF));
+
 	// Locations are drawn from their top left
 	sg._chunkX = sg._chunkY = 0;
 
