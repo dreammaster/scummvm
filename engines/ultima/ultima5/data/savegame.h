@@ -89,6 +89,40 @@ struct ActorRecord {
 	byte _unk7 = 0;
 };
 
+constexpr int NPC_COUNT = 32;
+constexpr byte NPC_KIND_BOX = 0x0E;
+constexpr byte NPC_KIND_FIRST_PERSON = 0x40;
+constexpr int NPC_SCHEDULE_SIZE = 16;
+constexpr int NPC_STATE_SIZE = 16;
+constexpr int NPC_SCHEDULE_SLOTS = 3;
+constexpr int NPC_TIME_SLOTS = 4;
+
+/**
+ * Where a person of a location is at different times of the day, and what
+ * they're doing there
+ */
+struct NpcSchedule {
+	byte _type[NPC_SCHEDULE_SLOTS] = {};
+	byte _x[NPC_SCHEDULE_SLOTS] = {};
+	byte _y[NPC_SCHEDULE_SLOTS] = {};
+	byte _z[NPC_SCHEDULE_SLOTS] = {};
+	byte _time[NPC_TIME_SLOTS] = {};
+};
+
+/**
+ * What the game keeps track of for a person of a location
+ */
+struct NpcState {
+	uint16 _present = 0;
+	int16 _x = 0;
+	int16 _y = 0;
+	uint16 _z = 0;
+	uint16 _tile = 0;
+	uint16 _dialog = 0;
+	uint16 _object = 0;
+	uint16 _slot = 0;
+};
+
 /**
  * The state of the game, kept in the same layout as the original saved.gam
  * and init.gam files
@@ -205,11 +239,11 @@ struct Savegame {
 	byte _objects[0x100] = {}; // The 32 objects on the map
 	uint16 _unk07B4 = 0;
 	uint16 _unk07B6 = 0;
-	byte _unk07B8[0x200] = {};
-	byte _unk09B8[0x200] = {};
-	byte _unk0BB8[0x400] = {};
-	byte _unk0FB8[0x40] = {};
-	byte _unk0FF8[0x20] = {};
+	byte _npcSchedules[0x200] = {};
+	byte _npcStates[0x200] = {};
+	byte _npcMovement[0x400] = {};
+	byte _npcTalk[0x40] = {};
+	byte _npcTypes[0x20] = {};
 	byte _unk1018 = 0;
 	byte _unk1019 = 0;
 	uint16 _unk101A = 0;
@@ -276,6 +310,17 @@ struct Savegame {
 	ActorRecord getActor(int idx) const;
 
 	void setActor(int idx, const ActorRecord &actor);
+
+	NpcSchedule getSchedule(int npc) const;
+	void setSchedule(int npc, const NpcSchedule &schedule);
+	NpcState getNpcState(int npc) const;
+	void setNpcState(int npc, const NpcState &state);
+
+	/**
+	 * Returns true if a person of the location the party is in has been killed
+	 * for good
+	 */
+	bool isNpcKilled(int npc) const;
 };
 
 } // namespace Data

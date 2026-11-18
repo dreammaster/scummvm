@@ -21,6 +21,7 @@
 
 #include "ultima/ultima5/console.h"
 #include "ultima/ultima5/ultima5.h"
+#include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/views/asset_viewer.h"
 
@@ -126,6 +127,8 @@ bool Console::cmdLocation(int argc, const char **argv) {
 	sg._mapY = 30;
 	if (sg._partyTile == 0)
 		sg._partyTile = TILE_AVATAR;
+
+	LocationLogic::arrive();
 
 	if (!g_engine->loadMap()) {
 		debugPrintf("Could not load the map\n");

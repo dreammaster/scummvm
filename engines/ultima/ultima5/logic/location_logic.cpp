@@ -21,6 +21,7 @@
 
 #include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/logic/game_random.h"
+#include "ultima/ultima5/logic/npc_logic.h"
 #include "ultima/ultima5/data/location_tables.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -72,6 +73,7 @@ constexpr byte ACTOR_DEAD = 0x1F;
 // on the day the shadowlords come
 constexpr byte NO_CHANGES_FLAG = 0xFF;
 constexpr int CHANGE_ODDS = 7;
+constexpr int SHADOWLORD_PLACES = 3;
 
 static void changeGround(Data::LocationMap &map, const Data::Savegame &sg) {
 	if (sg._unk03B2 == NO_CHANGES_FLAG)
@@ -124,6 +126,22 @@ void LocationLogic::updateForHour() {
 			map.setTile(map.getBridgeX(i), map.getBridgeY(i),
 				sg._hour == FIRST_DAY_HOUR ? map.getBridgeTile(i) : TILE_BRIDGE_RAISED);
 	}
+}
+
+bool LocationLogic::arrive() {
+	Data::Savegame &sg = _G(savegame);
+
+	// The shadowlords are in three of the locations each day, and spoil the ground there
+	sg._unk03B2 = NO_CHANGES_FLAG;
+	for (int i = 0; i < SHADOWLORD_PLACES; ++i) {
+		if (sg._unk0322[i] == sg._mapId) {
+			sg._unk03B2 = i;
+			break;
+		}
+	}
+
+	_G(location).unload();
+	return NpcLogic::arrive(sg);
 }
 
 bool LocationLogic::enter() {
@@ -184,6 +202,7 @@ bool LocationLogic::goIn(const char *kind) {
 	sg._mapLevel = 0;
 	sg._mapX = ENTRANCE_X;
 	sg._mapY = ENTRANCE_Y;
+	arrive();
 	return false;
 }
 
@@ -234,9 +253,11 @@ LocationLogic::WalkResult LocationLogic::walk(Direction direction) {
 		if (facing == direction) {
 			++sg._mapLevel;
 			_log.print("Up!\n");
+			NpcLogic::place(sg);
 		} else if (facing == (direction ^ 2)) {
 			--sg._mapLevel;
 			_log.print("Down!\n");
+			NpcLogic::place(sg);
 		}
 	}
 

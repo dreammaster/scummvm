@@ -337,6 +337,7 @@ MODULE_OBJS += \
 	ultima5/gfx/tileset.o \
 	ultima5/logic/creation_logic.o \
 	ultima5/logic/location_logic.o \
+	ultima5/logic/npc_logic.o \
 	ultima5/logic/party_logic.o \
 	ultima5/logic/time_logic.o \
 	ultima5/logic/world_logic.o \

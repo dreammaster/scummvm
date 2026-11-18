@@ -64,6 +64,13 @@ public:
 	static void updateForHour();
 
 	/**
+	 * Sets up a location the party has just come to, with the people who are
+	 * in it at this time of day
+	 * @returns		False if its people couldn't be loaded
+	 */
+	static bool arrive();
+
+	/**
 	 * Goes into the town, castle, keep or dwelling the party is on the entrance to
 	 * @returns		True if time passes
 	 */

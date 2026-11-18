@@ -19,6 +19,7 @@
  *
  */
 
+#include "common/endian.h"
 #include "common/file.h"
 #include "ultima/ultima5/data/savegame.h"
 
@@ -160,11 +161,11 @@ void Savegame::synchronize(Common::Serializer &s) {
 	s.syncBytes(_objects, 256);
 	s.syncAsUint16LE(_unk07B4);
 	s.syncAsUint16LE(_unk07B6);
-	s.syncBytes(_unk07B8, 512);
-	s.syncBytes(_unk09B8, 512);
-	s.syncBytes(_unk0BB8, 1024);
-	s.syncBytes(_unk0FB8, 64);
-	s.syncBytes(_unk0FF8, 32);
+	s.syncBytes(_npcSchedules, 512);
+	s.syncBytes(_npcStates, 512);
+	s.syncBytes(_npcMovement, 1024);
+	s.syncBytes(_npcTalk, 64);
+	s.syncBytes(_npcTypes, 32);
 	s.syncAsByte(_unk1018);
 	s.syncAsByte(_unk1019);
 	s.syncAsUint16LE(_unk101A);
@@ -203,6 +204,69 @@ void Savegame::setActor(int idx, const ActorRecord &actor) {
 	p[5] = actor._hull;
 	p[6] = actor._unk6;
 	p[7] = actor._unk7;
+}
+
+NpcSchedule Savegame::getSchedule(int npc) const {
+	assert(npc >= 0 && npc < NPC_COUNT);
+	const byte *p = &_npcSchedules[npc * NPC_SCHEDULE_SIZE];
+
+	NpcSchedule schedule;
+	memcpy(schedule._type, p, NPC_SCHEDULE_SLOTS);
+	memcpy(schedule._x, p + 3, NPC_SCHEDULE_SLOTS);
+	memcpy(schedule._y, p + 6, NPC_SCHEDULE_SLOTS);
+	memcpy(schedule._z, p + 9, NPC_SCHEDULE_SLOTS);
+	memcpy(schedule._time, p + 12, NPC_TIME_SLOTS);
+	return schedule;
+}
+
+void Savegame::setSchedule(int npc, const NpcSchedule &schedule) {
+	assert(npc >= 0 && npc < NPC_COUNT);
+	byte *p = &_npcSchedules[npc * NPC_SCHEDULE_SIZE];
+
+	memcpy(p, schedule._type, NPC_SCHEDULE_SLOTS);
+	memcpy(p + 3, schedule._x, NPC_SCHEDULE_SLOTS);
+	memcpy(p + 6, schedule._y, NPC_SCHEDULE_SLOTS);
+	memcpy(p + 9, schedule._z, NPC_SCHEDULE_SLOTS);
+	memcpy(p + 12, schedule._time, NPC_TIME_SLOTS);
+}
+
+NpcState Savegame::getNpcState(int npc) const {
+	assert(npc >= 0 && npc < NPC_COUNT);
+	const byte *p = &_npcStates[npc * NPC_STATE_SIZE];
+
+	NpcState state;
+	state._present = READ_LE_UINT16(p);
+	state._x = READ_LE_INT16(p + 2);
+	state._y = READ_LE_INT16(p + 4);
+	state._z = READ_LE_UINT16(p + 6);
+	state._tile = READ_LE_UINT16(p + 8);
+	state._dialog = READ_LE_UINT16(p + 10);
+	state._object = READ_LE_UINT16(p + 12);
+	state._slot = READ_LE_UINT16(p + 14);
+	return state;
+}
+
+void Savegame::setNpcState(int npc, const NpcState &state) {
+	assert(npc >= 0 && npc < NPC_COUNT);
+	byte *p = &_npcStates[npc * NPC_STATE_SIZE];
+
+	WRITE_LE_UINT16(p, state._present);
+	WRITE_LE_INT16(p + 2, state._x);
+	WRITE_LE_INT16(p + 4, state._y);
+	WRITE_LE_UINT16(p + 6, state._z);
+	WRITE_LE_UINT16(p + 8, state._tile);
+	WRITE_LE_UINT16(p + 10, state._dialog);
+	WRITE_LE_UINT16(p + 12, state._object);
+	WRITE_LE_UINT16(p + 14, state._slot);
+}
+
+bool Savegame::isNpcKilled(int npc) const {
+	// Only some kinds of people stay dead: those that are chests, and the wizards upwards
+	const byte type = _npcTypes[npc];
+	if (type != NPC_KIND_BOX && type < NPC_KIND_FIRST_PERSON)
+		return false;
+
+	return (READ_LE_UINT32(&_npcKilled[(_mapId - 1) * 4]) & (1U << npc)) != 0;
 }
 
 void Savegame::synchronizeWorldObjects(Common::Serializer &s) {
