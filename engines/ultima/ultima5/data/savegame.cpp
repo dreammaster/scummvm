@@ -205,6 +205,19 @@ void Savegame::setActor(int idx, const ActorRecord &actor) {
 	p[7] = actor._unk7;
 }
 
+void Savegame::synchronizeWorldObjects(Common::Serializer &s) {
+	s.syncBytes(_worldObjects[0], sizeof(_worldObjects[0]));
+	s.syncBytes(_worldObjects[1], sizeof(_worldObjects[1]));
+}
+
+bool Savegame::loadWorldObjects(const char *filename) {
+	Common::File f;
+	memset(_worldObjects, 0, sizeof(_worldObjects));
+
+	return f.open(filename) && f.size() == sizeof(_worldObjects[1]) &&
+		f.read(_worldObjects[1], sizeof(_worldObjects[1])) == sizeof(_worldObjects[1]);
+}
+
 bool Savegame::load(const char *filename) {
 	Common::File f;
 	if (!f.open(filename) || f.size() != SAVEGAME_SIZE)

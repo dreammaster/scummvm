@@ -30,6 +30,7 @@
 #include "engines/engine.h"
 #include "ultima/detection.h"
 #include "ultima/shared/engine/events.h"
+#include "ultima/ultima5/data/location_map.h"
 #include "ultima/ultima5/data/look_names.h"
 #include "ultima/ultima5/data/savegame.h"
 #include "ultima/ultima5/gfx/charset.h"
@@ -63,6 +64,7 @@ protected:
 
 public:
 	Common::ScopedPtr<Gfx::CharSet> _charset;
+	Data::LocationMap _location;
 	Data::LookNames _lookNames;
 	Data::Savegame _savegame;
 	Data::WorldMap _world;
@@ -112,6 +114,18 @@ public:
 	 * @returns		False if it can not be loaded
 	 */
 	bool loadWorld();
+
+	/**
+	 * Makes sure the map the party is on is loaded, whether it's Britannia, the
+	 * underworld or a level of a town or other location
+	 * @returns		False if it can not be loaded
+	 */
+	bool loadMap();
+
+	/**
+	 * Returns a tile of the map the party is on
+	 */
+	byte getMapTile(int x, int y) const;
 
 	/**
 	 * Returns a font object that GfxSurface instances can use

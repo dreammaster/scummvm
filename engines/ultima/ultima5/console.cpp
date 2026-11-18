@@ -31,6 +31,7 @@ Console::Console() : GUI::Debugger() {
 	registerCmd("tiles", WRAP_METHOD(Console, cmdTiles));
 	registerCmd("image", WRAP_METHOD(Console, cmdImage));
 	registerCmd("teleport", WRAP_METHOD(Console, cmdTeleport));
+	registerCmd("location", WRAP_METHOD(Console, cmdLocation));
 }
 
 Console::~Console() {
@@ -88,6 +89,45 @@ bool Console::cmdTeleport(int argc, const char **argv) {
 		sg._partyTile = TILE_AVATAR;
 
 	if (!g_engine->loadWorld()) {
+		debugPrintf("Could not load the map\n");
+		return true;
+	}
+
+	g_engine->replaceView("Game", true);
+	return false;
+}
+
+bool Console::cmdLocation(int argc, const char **argv) {
+	Data::Savegame &sg = _G(savegame);
+
+	if (!sg.hasActiveGame()) {
+		debugPrintf("Create a character first\n");
+		return true;
+	}
+
+	if (argc < 2) {
+		debugPrintf("location <id> [level]  - Moves the party into a town, castle, keep or dwelling (1-32)\n");
+		return true;
+	}
+
+	const int id = atoi(argv[1]);
+	if (id < 1 || id > 32) {
+		debugPrintf("The id must be from 1 to 32\n");
+		return true;
+	}
+
+	if (sg._mapId == 0)
+		sg.storeWorldObjects(sg._mapLevel != 0);
+
+	sg.clearObjects();
+	sg._mapId = id;
+	sg._mapLevel = (argc > 2) ? atoi(argv[2]) : 0;
+	sg._mapX = 15;
+	sg._mapY = 30;
+	if (sg._partyTile == 0)
+		sg._partyTile = TILE_AVATAR;
+
+	if (!g_engine->loadMap()) {
 		debugPrintf("Could not load the map\n");
 		return true;
 	}

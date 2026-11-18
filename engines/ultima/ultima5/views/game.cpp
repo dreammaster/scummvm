@@ -21,9 +21,11 @@
 
 #include "ultima/ultima5/views/game.h"
 #include "ultima/ultima5/views/keys.h"
+#include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/logic/party_logic.h"
 #include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
+#include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
 #include "ultima/ultima5/ultima5.h"
@@ -37,6 +39,9 @@ constexpr byte OUTDOOR_MAP = 0;
 
 // How long a command takes
 constexpr int MINUTES_PER_TURN = 2;
+constexpr int MINUTES_PER_LOCATION_TURN = 1;
+constexpr int FIRST_NIGHT_HOUR = 20;
+constexpr int FIRST_DAY_HOUR = 5;
 
 // Maps from the first dungeon up are not out in the open, and neither is a certain one
 constexpr byte FIRST_DUNGEON_MAP = 0x21;
@@ -97,18 +102,12 @@ Game::Game() : View("Game"), _messages(this) {
 	_messages.setBounds(Common::Rect(LOG_LEFT, LOG_TOP, 320, LOG_BOTTOM));
 }
 
-bool Game::msgFocus(const FocusMessage &msg) {
-	if (_G(savegame)._mapId == OUTDOOR_MAP && !g_engine->loadWorld())
+void Game::draw() {
+	if (!g_engine->loadMap())
 		error("Could not load the map");
 
-	return View::msgFocus(msg);
-}
-
-void Game::draw() {
 	drawFrame();
-
-	if (_G(savegame)._mapId == OUTDOOR_MAP)
-		drawWorld();
+	drawMap();
 
 	drawParty();
 	drawStatus();
@@ -297,7 +296,7 @@ void Game::placeObjects(byte objects[VIEW_TILES][VIEW_TILES], byte ground[VIEW_T
 	}
 }
 
-void Game::drawWorld() {
+void Game::drawMap() {
 	Data::Savegame &sg = _G(savegame);
 	WorldLogic::syncPartyObject(sg);
 
@@ -306,7 +305,7 @@ void Game::drawWorld() {
 
 	for (int y = 0; y < VIEW_TILES; ++y) {
 		for (int x = 0; x < VIEW_TILES; ++x)
-			ground[y][x] = _G(world).getTile(sg._mapX - PARTY_TILE_X + x, sg._mapY - PARTY_TILE_Y + y);
+			ground[y][x] = g_engine->getMapTile(sg._mapX - PARTY_TILE_X + x, sg._mapY - PARTY_TILE_Y + y);
 	}
 
 	placeObjects(objects, ground);
@@ -326,8 +325,45 @@ void Game::startInteraction(Interactions::Interaction *interaction) {
 }
 
 void Game::endTurn() {
-	TimeLogic::advance(_G(savegame), MINUTES_PER_TURN);
+	Data::Savegame &sg = _G(savegame);
+
+	if (sg._mapId == OUTDOOR_MAP) {
+		TimeLogic::advance(sg, MINUTES_PER_TURN);
+	} else {
+		const byte hour = sg._hour;
+		TimeLogic::advance(sg, MINUTES_PER_LOCATION_TURN);
+
+		// The drawbridges and the windows change as it gets dark and light
+		if (sg._hour != hour && (sg._hour == FIRST_NIGHT_HOUR || sg._hour == FIRST_DAY_HOUR))
+			LocationLogic::updateForHour();
+	}
+
 	redraw();
+}
+
+bool Game::walk(Direction direction) {
+	if (_G(savegame)._mapId == OUTDOOR_MAP) {
+		if (WorldLogic(_messages).walk(direction))
+			endTurn();
+		else
+			redraw();
+
+		return true;
+	}
+
+	switch (LocationLogic(_messages).walk(direction)) {
+	case LocationLogic::WALK_MOVED:
+		endTurn();
+		break;
+	case LocationLogic::WALK_AT_EDGE:
+		startInteraction(new Interactions::LeaveLocation(_messages));
+		break;
+	default:
+		redraw();
+		break;
+	}
+
+	return true;
 }
 
 bool Game::handleCommand(const KeypressMessage &msg) {
@@ -340,16 +376,9 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 	case Common::KEYCODE_RIGHT:
 	case Common::KEYCODE_DOWN:
 	case Common::KEYCODE_LEFT:
-		if (!outdoors)
-			return false;
-
-		if (world.walk(msg.keycode == Common::KEYCODE_UP ? DIR_NORTH :
-				msg.keycode == Common::KEYCODE_RIGHT ? DIR_EAST :
-				msg.keycode == Common::KEYCODE_DOWN ? DIR_SOUTH : DIR_WEST))
-			endTurn();
-		else
-			redraw();
-		return true;
+		return walk(msg.keycode == Common::KEYCODE_UP ? DIR_NORTH :
+			msg.keycode == Common::KEYCODE_RIGHT ? DIR_EAST :
+			msg.keycode == Common::KEYCODE_DOWN ? DIR_SOUTH : DIR_WEST);
 
 	case Common::KEYCODE_SPACE:
 		world.pass();
@@ -361,15 +390,23 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 	}
 
 	switch (toupper(msg.ascii)) {
+	case 'E':
+		if (!outdoors)
+			return false;
+
+		_messages.print("Enter ");
+		if (LocationLogic(_messages).enter())
+			endTurn();
+		else
+			redraw();
+		return true;
+
 	case 'I':
 		party.igniteTorch();
 		endTurn();
 		return true;
 
 	case 'L':
-		if (!outdoors)
-			return false;
-
 		_messages.print("Look-");
 		startInteraction(new Interactions::Look(_messages));
 		return true;

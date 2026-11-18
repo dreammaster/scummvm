@@ -54,6 +54,12 @@ public:
 	static bool isWalkable(byte actorTile, byte terrainTile);
 
 	/**
+	 * Returns the tile of the object at a place on the level the party is on,
+	 * other than the party itself, or zero if there isn't one
+	 */
+	static byte objectTileAt(const Data::Savegame &savegame, int x, int y);
+
+	/**
 	 * Makes sure that the first object, which is the party, is where
 	 * the party is
 	 */

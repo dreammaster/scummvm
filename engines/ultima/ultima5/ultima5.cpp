@@ -27,6 +27,7 @@
 #include "ultima/ultima5/ultima5.h"
 #include "ultima/ultima5/console.h"
 #include "ultima/ultima5/data/data.h"
+#include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/gfx/charset.h"
 #include "ultima/ultima5/metaengine.h"
 #include "ultima/ultima5/views/views.h"
@@ -115,12 +116,14 @@ bool Ultima5Engine::canLoadGameStateCurrently(Common::U32String *) {
 Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
 	s.syncVersion(SAVEGAME_VERSION);
 	_savegame.synchronize(s);
+	_savegame.synchronizeWorldObjects(s);
 
 	if (s.isLoading()) {
 		Views::MessageLog *log = dynamic_cast<Views::MessageLog *>(findView("MessageLog"));
 		if (log)
 			log->clear();
 		_world.unload();
+		_location.unload();
 		replaceView(_savegame.hasActiveGame() ? "Game" : "Title", true);
 	}
 
@@ -130,6 +133,14 @@ Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
 bool Ultima5Engine::loadWorld() {
 	const bool underworld = _savegame._mapLevel >= Data::MAP_LEVEL_UNDERGROUND;
 	return _world.isLoaded(underworld) || _world.load(underworld, _savegame);
+}
+
+bool Ultima5Engine::loadMap() {
+	return _savegame._mapId == 0 ? loadWorld() : LocationLogic::load();
+}
+
+byte Ultima5Engine::getMapTile(int x, int y) const {
+	return _savegame._mapId == 0 ? _world.getTile(x, y) : _location.getTile(x, y);
 }
 
 Graphics::Font *Ultima5Engine::createFont() const {

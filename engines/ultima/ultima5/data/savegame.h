@@ -237,6 +237,39 @@ struct Savegame {
 		return _party[0]._name[0] != '\0';
 	}
 
+	// The objects of Britannia and of the underworld, kept while the party is
+	// somewhere else. They're stored with the savegame, but after the layout of the game
+	byte _worldObjects[2][ACTOR_COUNT * ACTOR_SIZE] = {};
+
+	/**
+	 * Reads or writes the objects of the two worlds
+	 */
+	void synchronizeWorldObjects(Common::Serializer &s);
+
+	/**
+	 * Loads the objects of a new game from a file in the game folder, such as init.ool
+	 * @returns		False if it couldn't be loaded
+	 */
+	bool loadWorldObjects(const char *filename);
+
+	/**
+	 * Puts the objects the party is among away, for it to come back to
+	 */
+	void storeWorldObjects(bool underworld) {
+		memcpy(_worldObjects[underworld], _objects, sizeof(_objects));
+	}
+
+	/**
+	 * Brings back the objects of a world, or none at all
+	 */
+	void restoreWorldObjects(bool underworld) {
+		memcpy(_objects, _worldObjects[underworld], sizeof(_objects));
+	}
+
+	void clearObjects() {
+		memset(_objects, 0, sizeof(_objects));
+	}
+
 	/**
 	 * Returns one of the objects on the map. The first is the party
 	 */

@@ -54,6 +54,11 @@ private:
 	void endTurn();
 
 	/**
+	 * Moves the party in the map it's in
+	 */
+	bool walk(Direction direction);
+
+	/**
 	 * Carries out the command of a key
 	 * @returns		True if the key was a command
 	 */
@@ -80,10 +85,10 @@ private:
 	void drawWind();
 
 	/**
-	 * Draws the part of Britannia or the underworld around the party, with the
-	 * party and the other objects on it
+	 * Draws the part of the map around the party, with the party and the other
+	 * objects on it
 	 */
-	void drawWorld();
+	void drawMap();
 
 	/**
 	 * Works out which objects are seen in each tile of the window
@@ -94,7 +99,6 @@ public:
 	Game();
 	~Game() override {}
 
-	bool msgFocus(const FocusMessage &msg) override;
 	void draw() override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 };

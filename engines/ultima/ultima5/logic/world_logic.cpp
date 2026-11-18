@@ -150,8 +150,7 @@ void WorldLogic::syncPartyObject(Data::Savegame &sg) {
 	sg.setActor(0, party);
 }
 
-// Returns the tile of the object at a place, other than the party, or zero
-static byte findObjectTile(const Data::Savegame &sg, int x, int y) {
+byte WorldLogic::objectTileAt(const Data::Savegame &sg, int x, int y) {
 	for (int i = 1; i < Data::ACTOR_COUNT; ++i) {
 		const Data::ActorRecord actor = sg.getActor(i);
 		if (actor._x == x && actor._y == y && actor._z == sg._mapLevel)
@@ -175,7 +174,7 @@ bool WorldLogic::walk(Direction direction) {
 
 	// Other things in the way, unless they're something to get on
 	bool free = true;
-	const byte other = findObjectTile(sg, x, y);
+	const byte other = objectTileAt(sg, x, y);
 	if (other != 0) {
 		free = false;
 

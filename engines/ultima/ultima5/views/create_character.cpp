@@ -57,7 +57,7 @@ bool CreateCharacter::msgFocus(const FocusMessage &msg) {
 	}
 
 	if (!loadTitleGraphics() || !_images.load("create", _G(renderMode)) || !_text.load() || _questions.empty() ||
-			!_newGame.load("init.gam"))
+			!_newGame.load("init.gam") || !_newGame.loadWorldObjects("init.ool"))
 		error("Could not load the character creation");
 
 	_name.clear();

@@ -48,7 +48,7 @@ bool Look::keypress(const KeypressMessage &msg) {
 	const Data::Savegame &sg = _G(savegame);
 	byte x = sg._mapX + DX[_chooser.direction()];
 	byte y = sg._mapY + DY[_chooser.direction()];
-	byte tile = _G(world).getTile(x, y);
+	byte tile = g_engine->getMapTile(x, y);
 
 	_log.print("\nThou dost see\n");
 
@@ -69,7 +69,7 @@ bool Look::keypress(const KeypressMessage &msg) {
 		else
 			--x;
 
-		tile = _G(world).getTile(x, y);
+		tile = g_engine->getMapTile(x, y);
 	}
 
 	const Common::String name = _G(lookNames).tileName(tile);
