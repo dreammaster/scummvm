@@ -269,6 +269,26 @@ bool Savegame::isNpcKilled(int npc) const {
 	return (READ_LE_UINT32(&_npcKilled[(_mapId - 1) * 4]) & (1U << npc)) != 0;
 }
 
+void Savegame::setNpcKilled(int npc) {
+	if (npc < 0 || npc >= NPC_COUNT)
+		return;
+
+	const byte kind = _npcTypes[npc] & 0xFC;
+	if ((kind != NPC_KIND_GUARD && kind < NPC_KIND_STAY_DEAD) || kind == NPC_KIND_SHARD) {
+		byte *p = &_npcKilled[(_mapId - 1) * 4];
+		WRITE_LE_UINT32(p, READ_LE_UINT32(p) | (1U << npc));
+	}
+}
+
+bool Savegame::isNpcMet(int npc) const {
+	return (READ_LE_UINT32(&_npcMet[(_mapId - 1) * 4]) & (1U << npc)) != 0;
+}
+
+void Savegame::setNpcMet(int npc) {
+	byte *p = &_npcMet[(_mapId - 1) * 4];
+	WRITE_LE_UINT32(p, READ_LE_UINT32(p) | (1U << npc));
+}
+
 void Savegame::synchronizeWorldObjects(Common::Serializer &s) {
 	s.syncBytes(_worldObjects[0], sizeof(_worldObjects[0]));
 	s.syncBytes(_worldObjects[1], sizeof(_worldObjects[1]));

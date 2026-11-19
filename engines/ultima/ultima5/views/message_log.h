@@ -59,10 +59,27 @@ public:
 	void clear();
 
 	/**
-	 * Prints text at the cursor, wrapping at the edge of the window
-	 * and scrolling it when it gets to the bottom. A newline starts a new line
+	 * Prints text at the cursor, breaking lines between words and scrolling
+	 * the window when it gets to the bottom. A newline starts a new line
 	 */
 	void print(const Common::String &text);
+
+	/**
+	 * Prints one character at the cursor, wrapping at the edge of the window
+	 */
+	void printChar(char ch);
+
+	/**
+	 * Returns the column the cursor is in
+	 */
+	int column() const {
+		return _x;
+	}
+
+	/**
+	 * Rubs out characters before the cursor
+	 */
+	void backspace(int count);
 
 	void draw() override;
 };

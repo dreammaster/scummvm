@@ -92,6 +92,9 @@ struct ActorRecord {
 constexpr int NPC_COUNT = 32;
 constexpr byte NPC_KIND_BOX = 0x0E;
 constexpr byte NPC_KIND_FIRST_PERSON = 0x40;
+constexpr byte NPC_KIND_GUARD = 0x70;
+constexpr byte NPC_KIND_STAY_DEAD = 0x80;
+constexpr byte NPC_KIND_SHARD = 0xB4;
 constexpr int NPC_SCHEDULE_SIZE = 16;
 constexpr int NPC_STATE_SIZE = 16;
 constexpr int NPC_SCHEDULE_SLOTS = 3;
@@ -321,6 +324,19 @@ struct Savegame {
 	 * for good
 	 */
 	bool isNpcKilled(int npc) const;
+
+	/**
+	 * Marks a person of the location the party is in as killed for good, if
+	 * they are of a kind that stays dead
+	 */
+	void setNpcKilled(int npc);
+
+	/**
+	 * Returns true if the party has been told the name of a person of the
+	 * location it is in
+	 */
+	bool isNpcMet(int npc) const;
+	void setNpcMet(int npc);
 };
 
 } // namespace Data

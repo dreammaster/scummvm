@@ -329,6 +329,8 @@ MODULE_OBJS += \
 	ultima5/data/look_names.o \
 	ultima5/data/lzw.o \
 	ultima5/data/savegame.o \
+	ultima5/data/talk_data.o \
+	ultima5/data/talk_file.o \
 	ultima5/data/world_map.o \
 	ultima5/gfx/bit_image_file.o \
 	ultima5/gfx/charset.o \
@@ -340,6 +342,7 @@ MODULE_OBJS += \
 	ultima5/logic/npc_logic.o \
 	ultima5/logic/npc_movement.o \
 	ultima5/logic/party_logic.o \
+	ultima5/logic/talk_logic.o \
 	ultima5/logic/time_logic.o \
 	ultima5/logic/visibility_logic.o \
 	ultima5/logic/world_logic.o \
@@ -351,6 +354,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/leave_location.o \
 	ultima5/views/interactions/look.o \
 	ultima5/views/interactions/new_order.o \
+	ultima5/views/interactions/talk.o \
 	ultima5/views/introduction.o \
 	ultima5/views/message_log.o \
 	ultima5/views/title.o \

@@ -47,24 +47,113 @@ void MessageLog::scroll() {
 	_y = LOG_ROWS - 1;
 }
 
-void MessageLog::print(const Common::String &text) {
-	for (uint i = 0; i < text.size(); ++i) {
-		if (text[i] == '\n') {
+void MessageLog::printChar(char ch) {
+	if (ch == '\n') {
+		_x = 0;
+		++_y;
+	} else {
+		_cells[_y][_x++] = ch;
+		if (_x == LOG_COLUMNS) {
 			_x = 0;
 			++_y;
-		} else {
-			_cells[_y][_x++] = text[i];
-			if (_x == LOG_COLUMNS) {
-				_x = 0;
-				++_y;
-			}
+		}
+	}
+
+	if (_y == LOG_ROWS)
+		scroll();
+
+	redraw();
+}
+
+void MessageLog::backspace(int count) {
+	for (; count > 0 && (_x != 0 || _y != 0); --count) {
+		if (_x == 0) {
+			--_y;
+			_x = LOG_COLUMNS;
 		}
 
-		if (_y == LOG_ROWS)
-			scroll();
+		_cells[_y][--_x] = ' ';
 	}
 
 	redraw();
+}
+
+void MessageLog::print(const Common::String &text) {
+	const char *s = text.c_str();
+	const int width = LOG_COLUMNS - 1;
+	char line[LOG_COLUMNS + 2];
+	int pos = 0;
+	bool breakFirst = false;
+	bool finished = false;
+
+	if (*s == '\0')
+		return;
+
+	// Text is cut into a line at a time, each ending at a space where it
+	// can, and the rest carries on the next line
+	do {
+		if (breakFirst)
+			printChar('\n');
+
+		bool skipSpaces = false;
+		int start = 0;
+		int length = 0;
+		breakFirst = false;
+		const int remaining = width - _x;
+
+		for (; s[pos] != '\n' && s[pos] != '\r' && s[pos] != '\0' && length <= remaining; ++pos, ++length)
+			line[length] = s[pos];
+
+		if (length == 0) {
+			if (s[pos] != '\0')
+				printChar(s[pos++]);
+			else
+				finished = true;
+			continue;
+		}
+
+		if (length > remaining) {
+			const int fullLength = length;
+			const int fullPos = pos;
+
+			for (; s[pos] != ' ' && length != 0 && s[pos] != '\n' && s[pos] != '\0' && s[pos] != '\r'; --length, --pos) {
+			}
+
+			if (length == 0) {
+				// A word too long for the line is split
+				length = fullLength;
+				pos = fullPos;
+
+				if (_x != 0) {
+					printChar('\n');
+					skipSpaces = true;
+				}
+			} else {
+				do {
+					--length;
+				} while (line[length] == ' ' || line[length] == '\r' || line[length] == '\n');
+
+				if (s[pos] != '\0')
+					++pos;
+
+				if (length < remaining)
+					breakFirst = true;
+			}
+
+			if (length > remaining)
+				--length;
+		} else {
+			--length;
+		}
+
+		if (skipSpaces) {
+			while (line[start] == ' ')
+				++start;
+		}
+
+		for (; start <= length; ++start)
+			printChar(line[start]);
+	} while (!finished);
 }
 
 void MessageLog::draw() {
