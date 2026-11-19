@@ -122,7 +122,6 @@ private:
 	bool findLabel();
 	bool findCustomKeyword();
 	bool findLabelKeyword();
-	static int findWord(const byte *needle, const Common::String &haystack);
 	bool matches(const byte *needle) const;
 
 	/**
@@ -172,6 +171,12 @@ private:
 	void askToPay(Payment payment);
 
 public:
+	/**
+	 * Finds the first place in what was typed with the start of a word in it that
+	 * matches, ignoring case, or -1
+	 */
+	static int findWord(const byte *needle, const Common::String &haystack);
+
 	TalkLogic(Views::MessageLog &log);
 
 	/**

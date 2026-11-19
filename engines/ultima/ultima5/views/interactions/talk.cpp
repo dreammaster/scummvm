@@ -82,9 +82,89 @@ bool Talk::openShop(int dialog) {
 	return false;
 }
 
+// The windows shops put over the party, drawn in the cells of the screen
+constexpr int WINDOW_COLUMN = 24;
+constexpr int WINDOW_WIDTH = 15;
+constexpr byte GLYPH_FRAME_TOP_LEFT = 0x10;
+constexpr byte GLYPH_FRAME_TOP = 0x11;
+constexpr byte GLYPH_FRAME_TOP_RIGHT = 0x13;
+constexpr byte GLYPH_FRAME_BOTTOM_LEFT = 0x14;
+constexpr byte GLYPH_FRAME_BOTTOM = 0x15;
+constexpr byte GLYPH_FRAME_BOTTOM_RIGHT = 0x16;
+constexpr byte GLYPH_FRAME_SIDE = 0x17;
+constexpr byte GLYPH_ARROW_UP = 0x18;
+constexpr byte GLYPH_ARROW_DOWN = 0x19;
+constexpr byte GLYPH_ARROWS = 0x12;
+
+static void drawWindowFrame(View &view, int top, int bottom) {
+	const int right = WINDOW_COLUMN + WINDOW_WIDTH - 1;
+
+	view.drawCell(WINDOW_COLUMN, top, GLYPH_FRAME_TOP_LEFT, COLOR_WHITE, COLOR_BLACK);
+	view.drawCell(WINDOW_COLUMN, bottom, GLYPH_FRAME_BOTTOM_LEFT, COLOR_WHITE, COLOR_BLACK);
+	view.drawCell(right, top, GLYPH_FRAME_TOP_RIGHT, COLOR_WHITE, COLOR_BLACK);
+	view.drawCell(right, bottom, GLYPH_FRAME_BOTTOM_RIGHT, COLOR_WHITE, COLOR_BLACK);
+
+	for (int x = WINDOW_COLUMN + 1; x < right; ++x) {
+		view.drawCell(x, top, GLYPH_FRAME_TOP, COLOR_WHITE, COLOR_BLACK);
+		view.drawCell(x, bottom, GLYPH_FRAME_BOTTOM, COLOR_WHITE, COLOR_BLACK);
+
+		for (int y = top + 1; y < bottom; ++y)
+			view.drawCell(x, y, ' ', COLOR_WHITE, COLOR_BLACK);
+	}
+
+	for (int y = top + 1; y < bottom; ++y) {
+		view.drawCell(WINDOW_COLUMN, y, GLYPH_FRAME_SIDE, COLOR_WHITE, COLOR_BLACK);
+		view.drawCell(right, y, GLYPH_FRAME_SIDE, COLOR_WHITE, COLOR_BLACK);
+	}
+}
+
 void Talk::draw(View &view) {
-	if (_shop && _shop->needsMember())
+	if (!_shop)
+		return;
+
+	if (_shop->needsMember()) {
 		_members.draw(view);
+		return;
+	}
+
+	ShopLogic::SellWindow sell;
+	if (_shop->sellWindow(sell)) {
+		drawWindowFrame(view, 1, 6);
+
+		for (int i = 0; i < 4; ++i) {
+			const bool picked = i == sell.selected;
+			view.print(WINDOW_COLUMN + 1, 2 + i, sell.rows[i] + Common::String(13 - sell.rows[i].size(), ' '),
+				picked ? COLOR_BLACK : COLOR_WHITE, picked ? COLOR_WHITE : COLOR_BLACK);
+		}
+
+		// The label of the window is set in the border above it, and which ways it scrolls below
+		view.drawCaps(28 * 8, 0, true);
+		view.print(29, 0, "Arms", COLOR_WHITE, COLOR_BLACK);
+		view.drawCaps(33 * 8, 0, false);
+
+		if (sell.arrows != 0) {
+			view.drawCaps(30 * 8, 7 * 8, true);
+			view.drawCell(31, 7, sell.arrows == 1 ? GLYPH_ARROW_DOWN : sell.arrows == 2 ? GLYPH_ARROW_UP : GLYPH_ARROWS,
+				COLOR_WHITE, COLOR_BLACK);
+			view.drawCaps(32 * 8, 7 * 8, false);
+		}
+
+		return;
+	}
+
+	Common::Array<Common::String> guests;
+	int picked;
+	if (_shop->guestWindow(guests, picked)) {
+		drawWindowFrame(view, 1, 9);
+		view.print(WINDOW_COLUMN + 1, 2, "    GUEST", COLOR_WHITE, COLOR_BLACK);
+		view.print(WINDOW_COLUMN + 1, 3, "  REGISTER:", COLOR_WHITE, COLOR_BLACK);
+
+		for (uint i = 0; i < guests.size(); ++i) {
+			const bool on = (int)i == picked;
+			view.print(WINDOW_COLUMN + 1, 5 + i, Common::String(13, ' '), COLOR_WHITE, on ? COLOR_WHITE : COLOR_BLACK);
+			view.print(WINDOW_COLUMN + 4, 5 + i, guests[i], on ? COLOR_BLACK : COLOR_WHITE, on ? COLOR_WHITE : COLOR_BLACK);
+		}
+	}
 }
 
 bool Talk::keypress(const KeypressMessage &msg) {

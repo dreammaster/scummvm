@@ -343,7 +343,10 @@ MODULE_OBJS += \
 	ultima5/logic/npc_logic.o \
 	ultima5/logic/npc_movement.o \
 	ultima5/logic/party_logic.o \
+	ultima5/logic/shop_inn.o \
 	ultima5/logic/shop_logic.o \
+	ultima5/logic/shop_tavern.o \
+	ultima5/logic/shop_weapons.o \
 	ultima5/logic/talk_logic.o \
 	ultima5/logic/time_logic.o \
 	ultima5/logic/visibility_logic.o \

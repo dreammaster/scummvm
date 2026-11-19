@@ -48,6 +48,15 @@ constexpr int NO_ONE = -1;
 constexpr int FREE_MAP = 5;
 constexpr int SOMETIMES_FREE_MAP = 7;
 constexpr int FREE_PRICE_LIMIT = 100;
+constexpr int KEY_LEFT = 1;
+constexpr int KEY_RIGHT = 2;
+constexpr int KEY_UP = 3;
+constexpr int KEY_DOWN = 4;
+constexpr int KEY_BACKSPACE = 8;
+constexpr int KEY_HOME = 0xD3;
+constexpr int KEY_END = 0xD4;
+constexpr int KEY_PGUP = 0xD5;
+constexpr int KEY_PGDN = 0xD6;
 constexpr int KEY_ESCAPE = 27;
 constexpr int KEY_ENTER = 13;
 constexpr int KEY_SPACE = ' ';
@@ -83,15 +92,7 @@ ShopLogic::~ShopLogic() {
 }
 
 bool ShopLogic::isSupported(int dialog) {
-	switch (dialog - FIRST_SHOP_DIALOG) {
-	case KIND_STABLES:
-	case KIND_PROVISIONER:
-	case KIND_GUILD:
-	case KIND_HEALER:
-		return true;
-	default:
-		return false;
-	}
+	return dialog >= FIRST_SHOP_DIALOG && dialog < FIRST_SHOP_DIALOG + Data::SHOP_KINDS;
 }
 
 void ShopLogic::sayText(const byte *text) {
@@ -130,6 +131,12 @@ void ShopLogic::sayText(const byte *text) {
 				out += "afternoon";
 			else
 				out += "evening";
+			break;
+		case '&':
+			out += _item1;
+			break;
+		case '*':
+			out += _item2;
 			break;
 		case '%':
 			out += Common::String::format("%d", _price);
@@ -184,6 +191,24 @@ bool ShopLogic::isFemale() const {
 
 int ShopLogic::upperKey(const Graphics::Views::KeypressMessage &msg) {
 	switch (msg.keycode) {
+	case Common::KEYCODE_LEFT:
+		return KEY_LEFT;
+	case Common::KEYCODE_RIGHT:
+		return KEY_RIGHT;
+	case Common::KEYCODE_UP:
+		return KEY_UP;
+	case Common::KEYCODE_DOWN:
+		return KEY_DOWN;
+	case Common::KEYCODE_HOME:
+		return KEY_HOME;
+	case Common::KEYCODE_END:
+		return KEY_END;
+	case Common::KEYCODE_PAGEUP:
+		return KEY_PGUP;
+	case Common::KEYCODE_PAGEDOWN:
+		return KEY_PGDN;
+	case Common::KEYCODE_BACKSPACE:
+		return KEY_BACKSPACE;
 	case Common::KEYCODE_ESCAPE:
 		return KEY_ESCAPE;
 	case Common::KEYCODE_RETURN:
@@ -291,6 +316,31 @@ bool ShopLogic::start(int dialog) {
 		_step = STEP_HEALER_OFFER;
 		break;
 
+	case KIND_WEAPONS:
+		weaponsWelcome();
+		break;
+
+	case KIND_TAVERN:
+		_style = Data::TAVERN_STYLES[_index];
+		_bought = 0;
+		_drinks = 0;
+		greet();
+		_step = STEP_TAVERN_OFFER;
+		break;
+
+	case KIND_SHIPWRIGHT:
+		_shipFailed = false;
+		_shipBought = false;
+		greet();
+		_step = STEP_SHIP_OFFER;
+		break;
+
+	case KIND_INN:
+		_innCode = 0;
+		greet();
+		_step = STEP_INN_OFFER;
+		break;
+
 	default:
 		return true;
 	}
@@ -300,12 +350,142 @@ bool ShopLogic::start(int dialog) {
 
 bool ShopLogic::keypress(const Graphics::Views::KeypressMessage &msg) {
 	const int key = upperKey(msg);
+	const int raw = msg.ascii;
 
 	switch (_step) {
 	case STEP_ANY_KEY:
 		_step = _afterKey;
 		if (_step == STEP_PROVISIONER_MENU)
 			provisionerMenu();
+		else if (_step == STEP_WEAPONS_SOLD)
+			weaponsAfterBuy();
+		break;
+
+	case STEP_WEAPONS_WELCOME:
+		say("\n$ says,\n\"");
+		_log.print(Data::WEAPON_GREETINGS[_G(gameRandom).range(0, 1)]);
+		_log.print("\" ");
+		_step = STEP_WEAPONS_CHOOSE;
+		break;
+
+	case STEP_WEAPONS_CHOOSE:
+		weaponsChoose(key);
+		break;
+
+	case STEP_WEAPONS_MENU:
+		if (key >= 'A' && key <= 'H')
+			weaponsItem(key - 'A');
+		else if (key == KEY_ESCAPE || key == KEY_SPACE)
+			finish(_code);
+		break;
+
+	case STEP_WEAPONS_CONFIRM:
+		if (key == 'Y' || key == 'N')
+			weaponsAnswer(key);
+		break;
+
+	case STEP_WEAPONS_SELL:
+		weaponsSellKey(key);
+		break;
+
+	case STEP_WEAPONS_SELL_CONFIRM:
+		if (key == 'Y' || key == 'N')
+			weaponsSellAnswer(key);
+		break;
+
+	case STEP_TAVERN_OFFER:
+		tavernOffer(key);
+		break;
+
+	case STEP_TAVERN_ORDER:
+		tavernOrder(key);
+		break;
+
+	case STEP_TAVERN_ENOUGH:
+		if (key == 'Y') {
+			_log.print("Yes\n\n");
+			tavernMore();
+		} else if (key == 'N') {
+			_log.print("No!");
+			_G(savegame)._drunkTurns = 0x19;
+			if (_G(savegame)._karma > 0)
+				--_G(savegame)._karma;
+			tavernDrinkBought();
+		}
+		break;
+
+	case STEP_TAVERN_WINE:
+		tavernWine(key);
+		break;
+
+	case STEP_TAVERN_COUNT:
+		if (editNumber(key, 2))
+			tavernRationsCount();
+		break;
+
+	case STEP_TAVERN_LORE:
+		if (editLine(raw ? raw : key, 15))
+			tavernLoreEntered();
+		break;
+
+	case STEP_TAVERN_LORE_CONFIRM:
+		if (key == 'Y' || key == 'N')
+			tavernLoreAnswer(key);
+		break;
+
+	case STEP_TAVERN_AGAIN:
+		if (key == 'Y' || key == 'N')
+			tavernAgainAnswer(key);
+		break;
+
+	case STEP_SHIP_OFFER:
+		shipOffer(key);
+		break;
+
+	case STEP_SHIP_MENU:
+		shipKey(key);
+		break;
+
+	case STEP_SHIP_OWNED:
+		if (key == 'Y' || key == 'N')
+			shipOwned(key);
+		break;
+
+	case STEP_SHIP_FRIGATE:
+		if (key == 'Y' || key == 'N')
+			shipFrigate(key);
+		break;
+
+	case STEP_SHIP_SKIFF:
+		if (key == 'Y' || key == 'N')
+			shipSkiff(key);
+		break;
+
+	case STEP_SHIP_AGAIN:
+		if (key == 'Y' || key == 'N')
+			shipAgain(key);
+		break;
+
+	case STEP_INN_OFFER:
+		innOffer(key == KEY_SPACE ? 'N' : key);
+		break;
+
+	case STEP_INN_CHOOSE:
+		innChoose(key);
+		break;
+
+	case STEP_INN_REST_CONFIRM:
+		if (key == 'Y' || key == 'N')
+			innRestAnswer(key);
+		break;
+
+	case STEP_INN_LEAVE_CONFIRM:
+		if (key == 'Y' || key == 'N')
+			innLeaveAnswer(key);
+		break;
+
+	case STEP_INN_GUEST:
+		innGuestKey(key);
 		break;
 
 	case STEP_GUILD_OFFER:
@@ -646,6 +826,11 @@ void ShopLogic::healerNeed(int key) {
 }
 
 bool ShopLogic::memberChosen(int member) {
+	if (_step == STEP_INN_LEAVE_MEMBER) {
+		innLeaveMember(member);
+		return _step == STEP_DONE;
+	}
+
 	if (member == NO_ONE) {
 		_log.print("No one");
 		healerAgain();

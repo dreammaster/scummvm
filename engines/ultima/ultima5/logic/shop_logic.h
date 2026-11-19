@@ -22,6 +22,7 @@
 #ifndef ULTIMA5_LOGIC_SHOP_LOGIC_H
 #define ULTIMA5_LOGIC_SHOP_LOGIC_H
 
+#include "common/array.h"
 #include "common/str.h"
 #include "ultima/ultima5/data/shop_data.h"
 #include "ultima/ultima5/views/message_log.h"
@@ -63,7 +64,34 @@ private:
 		STEP_HEALER_OFFER,
 		STEP_HEALER_NEED,
 		STEP_HEALER_MEMBER,
-		STEP_HEALER_PAY
+		STEP_HEALER_PAY,
+		STEP_WEAPONS_WELCOME,
+		STEP_WEAPONS_CHOOSE,
+		STEP_WEAPONS_MENU,
+		STEP_WEAPONS_CONFIRM,
+		STEP_WEAPONS_SOLD,
+		STEP_WEAPONS_SELL,
+		STEP_WEAPONS_SELL_CONFIRM,
+		STEP_TAVERN_OFFER,
+		STEP_TAVERN_ORDER,
+		STEP_TAVERN_ENOUGH,
+		STEP_TAVERN_WINE,
+		STEP_TAVERN_COUNT,
+		STEP_TAVERN_LORE,
+		STEP_TAVERN_LORE_CONFIRM,
+		STEP_TAVERN_AGAIN,
+		STEP_SHIP_OFFER,
+		STEP_SHIP_MENU,
+		STEP_SHIP_OWNED,
+		STEP_SHIP_FRIGATE,
+		STEP_SHIP_SKIFF,
+		STEP_SHIP_AGAIN,
+		STEP_INN_OFFER,
+		STEP_INN_CHOOSE,
+		STEP_INN_REST_CONFIRM,
+		STEP_INN_LEAVE_MEMBER,
+		STEP_INN_LEAVE_CONFIRM,
+		STEP_INN_GUEST
 	};
 
 	// What was asked of the healer
@@ -94,6 +122,32 @@ private:
 	int _horseY = 0;
 	Need _need = NEED_CURE;
 	int _target = 0;
+
+	// The weapons shop's window of things to sell
+	int _sellTop = 0;
+	int _sellSelected = 0;
+	int _sellRow = 0;
+
+	// The tavern
+	int _style = 0;
+	int _bought = 0;
+	int _diners = 0;
+	int _foodCount = 0;
+	int _drinks = 0;
+	int _topic = 0;
+	int _count = 0;
+	int _orderResult = 0;
+	Common::String _line;
+	Common::String _digits;
+	bool _noMoney = false;
+	bool _shipFailed = false;
+	bool _shipBought = false;
+	Common::String _item1;
+	Common::String _item2;
+
+	// The inn
+	int _guest = 0;
+	int _innCode = 0;
 
 	/**
 	 * Says what's at a place in the shop text file, or a string that has the
@@ -144,6 +198,86 @@ private:
 	void healerPay(int answer);
 	void healerAgain();
 
+	/**
+	 * The shops that sell weapons and armour
+	 */
+	void weaponsWelcome();
+	void weaponsChoose(int key);
+	void weaponsMenu();
+	void weaponsItem(int choice);
+	void weaponsAnswer(int answer);
+	void weaponsAfterBuy();
+	void weaponsSell();
+	void weaponsSellKey(int key);
+	void weaponsSellAnswer(int answer);
+	void weaponsSellContinue();
+	void weaponsSellDone(bool refused);
+	bool anyEquipment() const;
+	int prevOwned(int from) const;
+	int nextOwned(int from) const;
+	void settleSellList();
+
+	/**
+	 * The taverns
+	 */
+	void tavernOffer(int key);
+	void tavernOrder(int key);
+	void tavernMore();
+	void tavernAgainAnswer(int answer);
+	bool tavernPayBill();
+	void tavernDrink();
+	void tavernDrinkBought();
+	void tavernWine(int key);
+	void tavernRations();
+	void tavernRationsCount();
+	void tavernLore();
+	void tavernLorePrompt();
+	void tavernLoreEntered();
+	void tavernLoreAnswer(int answer);
+	void startDiners(int price);
+	void printCount();
+	void printSirOrMilady();
+	void startLine(Step step);
+	void startNumber(Step step);
+	bool editLine(int key, int maxLength);
+	bool editNumber(int key, int maxLength);
+
+	/**
+	 * The shipwrights
+	 */
+	void shipOffer(int key);
+	void shipMenu();
+	void shipKey(int key);
+	void shipOwned(int answer);
+	void shipFrigate(int answer);
+	void shipSkiff(int answer);
+	void shipAgain(int answer);
+	void shipDeal(bool place, bool pay);
+	void shipEnd();
+	bool shipAfford(int price);
+
+	/**
+	 * The inns
+	 */
+	void innOffer(int key);
+	void innChoose(int key);
+	void innAfter(bool done);
+	void innRest();
+	void innRestAnswer(int answer);
+	void innSleep();
+	void innLeave();
+	void innLeaveWho();
+	void innLeaveMember(int member);
+	void innLeaveAnswer(int answer);
+	void innPickUp();
+	void innGuestKey(int key);
+	void innCheckOut();
+	bool innRoom();
+	int innGuests() const;
+	int innNextGuest(int from) const;
+	int innPrevGuest(int from) const;
+	int innPrice(int multiplier) const;
+
 public:
 	ShopLogic(Views::MessageLog &log);
 	~ShopLogic();
@@ -170,7 +304,7 @@ public:
 	 * Returns true if a member of the party has to be picked
 	 */
 	bool needsMember() const {
-		return _step == STEP_HEALER_MEMBER;
+		return _step == STEP_HEALER_MEMBER || _step == STEP_INN_LEAVE_MEMBER;
 	}
 
 	/**
@@ -178,6 +312,26 @@ public:
 	 * @returns		True once the business is done
 	 */
 	bool memberChosen(int member);
+
+	/**
+	 * What's in the window of things to sell
+	 */
+	struct SellWindow {
+		Common::String rows[4];
+		int selected = -1;
+		int arrows = 0;
+	};
+
+	/**
+	 * Returns true if the window of things to sell is up, filling in what's in it
+	 */
+	bool sellWindow(SellWindow &window) const;
+
+	/**
+	 * Returns true if the inn's register of guests is up, with their names
+	 * and which is picked
+	 */
+	bool guestWindow(Common::Array<Common::String> &names, int &selected) const;
 };
 
 } // namespace Ultima5
