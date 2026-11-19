@@ -104,6 +104,7 @@ private:
 	Payment _payment = PAY_CHARITY;
 	int _tribute = 0;
 	bool _steal = false;
+	int _shopDialog = 0;
 	bool _inLabel = false;
 	byte _label = 0;
 	int _keywordIndex = 0;
@@ -178,6 +179,14 @@ public:
 	 * @returns		True if there was nothing more to it than that
 	 */
 	bool start(int npc);
+
+	/**
+	 * Returns what a shopkeeper that wants to do business says, from 0x81, or zero
+	 * if the person isn't one
+	 */
+	int shopDialog() const {
+		return _shopDialog;
+	}
 
 	/**
 	 * Handles a keypress

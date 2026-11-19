@@ -329,6 +329,7 @@ MODULE_OBJS += \
 	ultima5/data/look_names.o \
 	ultima5/data/lzw.o \
 	ultima5/data/savegame.o \
+	ultima5/data/shop_data.o \
 	ultima5/data/talk_data.o \
 	ultima5/data/talk_file.o \
 	ultima5/data/world_map.o \
@@ -342,6 +343,7 @@ MODULE_OBJS += \
 	ultima5/logic/npc_logic.o \
 	ultima5/logic/npc_movement.o \
 	ultima5/logic/party_logic.o \
+	ultima5/logic/shop_logic.o \
 	ultima5/logic/talk_logic.o \
 	ultima5/logic/time_logic.o \
 	ultima5/logic/visibility_logic.o \

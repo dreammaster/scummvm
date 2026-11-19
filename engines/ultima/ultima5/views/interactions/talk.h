@@ -22,6 +22,8 @@
 #ifndef ULTIMA5_VIEWS_INTERACTIONS_TALK_H
 #define ULTIMA5_VIEWS_INTERACTIONS_TALK_H
 
+#include "common/ptr.h"
+#include "ultima/ultima5/logic/shop_logic.h"
 #include "ultima/ultima5/logic/talk_logic.h"
 #include "ultima/ultima5/views/interactions/interaction.h"
 
@@ -37,7 +39,15 @@ class Talk : public Interaction {
 private:
 	DirectionChooser _chooser;
 	TalkLogic _logic;
+	PartyMemberChooser _members;
+	Common::ScopedPtr<ShopLogic> _shop;
 	bool _talking = false;
+
+	/**
+	 * Goes on to doing business, if the person is a shopkeeper
+	 * @returns		True if it's all over
+	 */
+	bool openShop(int dialog);
 
 	/**
 	 * Finds the object at a place on the level the party is on, or zero
@@ -58,6 +68,7 @@ public:
 	Talk(MessageLog &log) : Interaction(log), _logic(log) {}
 
 	bool keypress(const KeypressMessage &msg) override;
+	void draw(View &view) override;
 };
 
 } // namespace Interactions

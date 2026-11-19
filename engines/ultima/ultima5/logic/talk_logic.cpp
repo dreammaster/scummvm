@@ -898,6 +898,7 @@ bool TalkLogic::start(int npc) {
 	Data::Savegame &sg = _G(savegame);
 	_npc = npc;
 	_steal = false;
+	_shopDialog = 0;
 	_phase = PHASE_DONE;
 
 	_log.printChar('\n');
@@ -976,7 +977,7 @@ bool TalkLogic::start(int npc) {
 
 	// The people who keep shops are talked to at their counters
 	if ((state._slot & 1) != 0 && (NpcLogic::scheduleSlot(schedule, sg._hour) & 1) != 0) {
-		_log.print("No response!\n");
+		_shopDialog = dialog;
 		return true;
 	}
 

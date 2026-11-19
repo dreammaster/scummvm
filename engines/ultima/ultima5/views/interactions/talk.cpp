@@ -68,7 +68,39 @@ int Talk::personOf(int object) {
 	return -1;
 }
 
+bool Talk::openShop(int dialog) {
+	if (!ShopLogic::isSupported(dialog)) {
+		_log.print("No response!\n");
+		return true;
+	}
+
+	_shop.reset(new ShopLogic(_log));
+	if (_shop->start(dialog))
+		return true;
+
+	_talking = true;
+	return false;
+}
+
+void Talk::draw(View &view) {
+	if (_shop && _shop->needsMember())
+		_members.draw(view);
+}
+
 bool Talk::keypress(const KeypressMessage &msg) {
+	if (_shop) {
+		if (!_shop->needsMember())
+			return _shop->keypress(msg);
+
+		const PartyMemberChooser::Result result = _members.handleKey(msg);
+		if (result == PartyMemberChooser::PENDING)
+			return false;
+
+		const int member = result == PartyMemberChooser::CHOSEN ? _members.index() : -1;
+		_members.reset();
+		return _shop->memberChosen(member);
+	}
+
 	if (_talking)
 		return _logic.keypress(msg);
 
@@ -124,7 +156,7 @@ bool Talk::keypress(const KeypressMessage &msg) {
 	}
 
 	if (_logic.start(npc))
-		return true;
+		return _logic.shopDialog() == 0 || openShop(_logic.shopDialog());
 
 	_talking = true;
 	return false;
