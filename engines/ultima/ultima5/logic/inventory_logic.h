@@ -87,6 +87,12 @@ public:
 	static EquipResult equip(Data::Savegame &savegame, int who, int item);
 
 	/**
+	 * Brings a dead member of the party back, with the experience that the karma allows and
+	 * only a point of health
+	 */
+	static void resurrect(Data::Savegame &savegame, int who);
+
+	/**
 	 * Gets the amounts of the different items that aren't weapons and armour
 	 * that the party has, with 0xFF where there's just one
 	 */
@@ -115,6 +121,7 @@ private:
 	const byte *_counts = nullptr;
 	int _count = 0;
 	int _who = InventoryLogic::NOTHING;
+	bool _pick = false;
 	byte _marker = '-';
 	TextGrid _grid;
 
@@ -128,9 +135,11 @@ private:
 public:
 	/**
 	 * Starts at the top of a list. Giving a character has it for picking
-	 * what to ready, with what's ready by them marked and shown even if there's none left
+	 * what to ready, with what's ready by them marked and shown even if there's none left,
+	 * and without one it can still have a row picked
 	 */
-	void start(InventoryLogic::ListKind kind, const byte *counts, int count, int who = InventoryLogic::NOTHING);
+	void start(InventoryLogic::ListKind kind, const byte *counts, int count, int who = InventoryLogic::NOTHING,
+		bool pick = false);
 
 	/**
 	 * Returns true if there's nothing in the list

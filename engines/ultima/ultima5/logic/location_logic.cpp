@@ -23,6 +23,7 @@
 #include "ultima/ultima5/logic/game_random.h"
 #include "ultima/ultima5/logic/npc_logic.h"
 #include "ultima/ultima5/logic/time_logic.h"
+#include "ultima/ultima5/logic/transport_logic.h"
 #include "ultima/ultima5/data/location_tables.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -292,6 +293,7 @@ void LocationLogic::leave() {
 	sg._mapY = Data::LOCATION_ENTRANCE_Y[sg._mapId - 1];
 	sg._mapId = 0;
 	sg.restoreWorldObjects(sg._mapLevel != 0);
+	TransportLogic::placePurchasedShip();
 	WorldLogic::centerWindow(sg);
 	_G(visibility).invalidate();
 }

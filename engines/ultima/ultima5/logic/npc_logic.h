@@ -34,11 +34,6 @@ namespace Ultima5 {
 class NpcLogic {
 private:
 	/**
-	 * Finds a spare object for a person, or returns zero if there isn't one
-	 */
-	static int findFreeObject(const Data::Savegame &savegame);
-
-	/**
 	 * Reads the people of the location the party is in from the game folder
 	 * @returns		False if they couldn't be loaded
 	 */
@@ -50,6 +45,11 @@ private:
 	static void initialize(Data::Savegame &savegame);
 
 public:
+	/**
+	 * Finds a spare object for a person, or returns zero if there isn't one
+	 */
+	static int findFreeObject(const Data::Savegame &savegame);
+
 	/**
 	 * Puts a person at a place, on the map if that's the level the party is on
 	 */

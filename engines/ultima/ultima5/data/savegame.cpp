@@ -95,7 +95,7 @@ void Savegame::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_hourCopy);
 	s.syncAsByte(_minute);
 	s.syncAsByte(_unk02DC);
-	s.syncAsByte(_unk02DD);
+	s.syncAsByte(_windTicks);
 	s.syncAsByte(_unk02DE);
 	s.syncAsByte(_trammelPhase);
 	s.syncAsByte(_feluccaPhase);
@@ -150,8 +150,8 @@ void Savegame::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_doorTurns);
 	s.syncAsByte(_shipX);
 	s.syncAsByte(_shipY);
-	s.syncAsByte(_unk03AF);
-	s.syncAsByte(_unk03B0);
+	s.syncAsByte(_sailHeading);
+	s.syncAsByte(_sailBreak);
 	s.syncAsByte(_drunkTurns);
 	s.syncAsByte(_unk03B2);
 	s.syncAsByte(_unk03B3);
@@ -173,7 +173,7 @@ void Savegame::synchronize(Common::Serializer &s) {
 	s.syncAsByte(_unk105C);
 	s.syncAsByte(_unk105D);
 	s.syncAsByte(_unk105E);
-	s.syncAsByte(_unk105F);
+	s.syncAsByte(_shipOrder);
 }
 
 ActorRecord Savegame::getActor(int idx) const {
@@ -188,7 +188,7 @@ ActorRecord Savegame::getActor(int idx) const {
 	actor._z = p[4];
 	actor._hull = p[5];
 	actor._unk6 = p[6];
-	actor._unk7 = p[7];
+	actor._skiffs = p[7];
 	return actor;
 }
 
@@ -203,7 +203,7 @@ void Savegame::setActor(int idx, const ActorRecord &actor) {
 	p[4] = actor._z;
 	p[5] = actor._hull;
 	p[6] = actor._unk6;
-	p[7] = actor._unk7;
+	p[7] = actor._skiffs;
 }
 
 NpcSchedule Savegame::getSchedule(int npc) const {

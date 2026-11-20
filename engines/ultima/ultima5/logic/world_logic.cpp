@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/logic/world_logic.h"
+#include "ultima/ultima5/logic/transport_logic.h"
 #include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/data/world_map.h"
 #include "ultima/ultima5/ultima5.h"
@@ -180,31 +181,20 @@ bool WorldLogic::walk(Direction direction) {
 	static const int8 DY[] = { -1, 0, 1, 0 };
 
 	Data::Savegame &sg = _G(savegame);
-	_log.print(NAMES[direction]);
+	TransportLogic transport(_log);
+
+	// A vehicle turns before it goes
+	if (transport.steer(direction))
+		return true;
+
+	if (sg._sailHeading == 0)
+		_log.print(NAMES[direction]);
+
+	if (!transport.canMove(DX[direction], DY[direction]))
+		return false;
 
 	const byte x = sg._mapX + DX[direction];
 	const byte y = sg._mapY + DY[direction];
-	const byte party = sg._partyTile;
-
-	// Other things in the way, unless they're something to get on
-	bool free = true;
-	const byte other = objectTileAt(sg, x, y);
-	if (other != 0) {
-		free = false;
-
-		if (party >= ACTOR_FIRST_LAND || party < ACTOR_FIRST_FRIGATE) {
-			if ((other >= ACTOR_SECOND_FRIGATE && other < ACTOR_PIRATE) || other == ACTOR_CARPET ||
-					(other & 0xFE) == ACTOR_HORSE)
-				free = true;
-		} else if (party >= ACTOR_SKIFF && other >= ACTOR_SECOND_FRIGATE && other < ACTOR_SKIFF) {
-			free = true;
-		}
-	}
-
-	if (!free || !isWalkable(party, _G(world).getTile(x, y))) {
-		_log.print("Blocked!\n");
-		return false;
-	}
 
 	sg._mapX = x;
 	sg._mapY = y;

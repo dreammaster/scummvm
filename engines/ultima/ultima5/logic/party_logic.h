@@ -46,6 +46,16 @@ public:
 	 * Swaps two members of the party, who can't be the leader
 	 */
 	void swapMembers(int first, int second);
+
+	/**
+	 * Does an amount of damage to a member of the party, who dies if they've none left
+	 */
+	static void hurtMember(int member, int amount);
+
+	/**
+	 * Hurts each of the living members of the party by a few points
+	 */
+	static void hurtParty();
 };
 
 } // namespace Ultima5

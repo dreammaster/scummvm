@@ -175,14 +175,11 @@ bool Ztats::keypress(const KeypressMessage &msg) {
 		if (_empty)
 			return turnPage(key);
 
-		if (_list.scroll(key)) {
-			_list.redraw();
-			return false;
-		}
-
-		if (key == KEY_LEFT || key == KEY_RIGHT || key == KEY_ESCAPE || key == KEY_SPACE || (key >= '0' && key <= '6'))
+		if (!_list.scroll(key) && (key == KEY_LEFT || key == KEY_RIGHT || key == KEY_ESCAPE || key == KEY_SPACE ||
+				(key >= '0' && key <= '6')))
 			return turnPage(key);
 
+		_list.redraw();
 		return false;
 	}
 

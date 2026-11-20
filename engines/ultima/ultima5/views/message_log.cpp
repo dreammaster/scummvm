@@ -22,6 +22,7 @@
 #include "ultima/ultima5/views/message_log.h"
 #include "ultima/ultima5/logic/word_wrap.h"
 #include "ultima/ultima5/views/view.h"
+#include "ultima/ultima5/ultima5.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -38,6 +39,7 @@ MessageLog::MessageLog(Graphics::Views::UIElement *parent) : Shared::UIElement("
 
 void MessageLog::clear() {
 	memset(_cells, ' ', sizeof(_cells));
+	memset(_runes, 0, sizeof(_runes));
 	_x = _y = 0;
 	redraw();
 }
@@ -45,6 +47,8 @@ void MessageLog::clear() {
 void MessageLog::scroll() {
 	memmove(_cells[0], _cells[1], (LOG_ROWS - 1) * LOG_COLUMNS);
 	memset(_cells[LOG_ROWS - 1], ' ', LOG_COLUMNS);
+	memmove(_runes[0], _runes[1], (LOG_ROWS - 1) * LOG_COLUMNS);
+	memset(_runes[LOG_ROWS - 1], 0, LOG_COLUMNS);
 	_y = LOG_ROWS - 1;
 }
 
@@ -53,6 +57,7 @@ void MessageLog::printChar(char ch) {
 		_x = 0;
 		++_y;
 	} else {
+		_runes[_y][_x] = _runeMode;
 		_cells[_y][_x++] = ch;
 		if (_x == LOG_COLUMNS) {
 			_x = 0;
@@ -73,6 +78,7 @@ void MessageLog::backspace(int count) {
 			_x = LOG_COLUMNS;
 		}
 
+		_runes[_y][_x - 1] = false;
 		_cells[_y][--_x] = ' ';
 	}
 
@@ -106,6 +112,16 @@ void MessageLog::draw() {
 
 	for (int y = 0; y < LOG_ROWS; ++y)
 		s.writeString(Common::Point(0, y), Common::String(_cells[y], LOG_COLUMNS));
+
+	// The rune font is drawn over the places that have it
+	for (int y = 0; y < LOG_ROWS; ++y) {
+		for (int x = 0; x < LOG_COLUMNS; ++x) {
+			if (_runes[y][x]) {
+				s.fillRect(Common::Rect(x * 8, y * 8, x * 8 + 8, y * 8 + 8), COLOR_BLACK);
+				g_engine->_runes->drawChar(s.surfacePtr(), (byte)_cells[y][x], x * 8, y * 8, COLOR_WHITE);
+			}
+		}
+	}
 
 	s.writeChar(Common::Point(_x, _y), GLYPH_CURSOR + _cursorFrame);
 }

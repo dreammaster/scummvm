@@ -86,7 +86,7 @@ struct ActorRecord {
 	byte _z = 0;
 	byte _hull = 0;
 	byte _unk6 = 0;
-	byte _unk7 = 0;
+	byte _skiffs = 0;
 };
 
 constexpr int NPC_COUNT = 32;
@@ -176,7 +176,7 @@ struct Savegame {
 	byte _hourCopy = 0;
 	byte _minute = 0; // Minute
 	byte _unk02DC = 0;
-	byte _unk02DD = 0;
+	byte _windTicks = 0;
 	byte _unk02DE = 0;
 	byte _trammelPhase = 0; // Phase of Trammel
 	byte _feluccaPhase = 0; // Phase of Felucca
@@ -231,8 +231,8 @@ struct Savegame {
 	byte _doorTurns = 0;
 	byte _shipX = 0;
 	byte _shipY = 0;
-	byte _unk03AF = 0;
-	byte _unk03B0 = 0;
+	byte _sailHeading = 0;
+	byte _sailBreak = 0;
 	byte _drunkTurns = 0;
 	byte _unk03B2 = 0;
 	byte _unk03B3 = 0;
@@ -254,7 +254,7 @@ struct Savegame {
 	byte _unk105C = 0;
 	byte _unk105D = 0;
 	byte _unk105E = 0;
-	byte _unk105F = 0;
+	byte _shipOrder = 0;
 
 	/**
 	 * Reads or writes the savegame

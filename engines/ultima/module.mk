@@ -353,6 +353,8 @@ MODULE_OBJS += \
 	ultima5/logic/text_grid.o \
 	ultima5/logic/time_logic.o \
 	ultima5/logic/visibility_logic.o \
+	ultima5/logic/transport_logic.o \
+	ultima5/logic/use_logic.o \
 	ultima5/logic/word_wrap.o \
 	ultima5/logic/world_logic.o \
 	ultima5/views/acknowledgements.o \
@@ -365,6 +367,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/new_order.o \
 	ultima5/views/interactions/ready.o \
 	ultima5/views/interactions/talk.o \
+	ultima5/views/interactions/use.o \
 	ultima5/views/interactions/ztats.o \
 	ultima5/views/introduction.o \
 	ultima5/views/message_log.o \

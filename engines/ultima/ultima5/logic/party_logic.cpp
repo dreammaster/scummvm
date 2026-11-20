@@ -48,5 +48,28 @@ void PartyLogic::swapMembers(int first, int second) {
 	SWAP(sg._party[first], sg._party[second]);
 }
 
+void PartyLogic::hurtMember(int member, int amount) {
+	Data::Savegame &sg = _G(savegame);
+	Data::Character &c = sg._party[member];
+
+	c._hp -= amount;
+	if (c._hp <= 0) {
+		c._hp = 0;
+		c._status = Data::STATUS_DEAD;
+
+		if (member == sg._activeChar)
+			sg._activeChar = Data::NO_ACTIVE_CHARACTER;
+	}
+}
+
+void PartyLogic::hurtParty() {
+	const Data::Savegame &sg = _G(savegame);
+
+	for (int i = 0; i < 6; ++i) {
+		if (i < sg._partySize && sg._party[i]._status != Data::STATUS_DEAD)
+			hurtMember(i, _G(gameRandom).range(1, 8));
+	}
+}
+
 } // namespace Ultima5
 } // namespace Ultima

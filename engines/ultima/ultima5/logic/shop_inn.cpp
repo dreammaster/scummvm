@@ -110,7 +110,7 @@ void ShopLogic::shipKey(int key) {
 	case 'F':
 		_log.print("F\n\n");
 
-		if ((sg._unk105F & SHIP_OWNED_MASK) != 0) {
+		if ((sg._shipOrder & SHIP_OWNED_MASK) != 0) {
 			sayAt(TEXT_SHIP_OWNED);
 			_step = STEP_SHIP_OWNED;
 		} else {
@@ -167,7 +167,7 @@ void ShopLogic::shipFrigate(int answer) {
 		return;
 	}
 
-	sg._unk105F = SHIP_FRIGATE_STATE;
+	sg._shipOrder = SHIP_FRIGATE_STATE;
 	shipDeal(true, true);
 }
 
@@ -186,12 +186,12 @@ void ShopLogic::shipSkiff(int answer) {
 		return;
 	}
 
-	if ((sg._unk105F & SHIP_OWNED_MASK) == 0) {
-		sg._unk105F = SHIP_SKIFF_BIT;
+	if ((sg._shipOrder & SHIP_OWNED_MASK) == 0) {
+		sg._shipOrder = SHIP_SKIFF_BIT;
 		shipDeal(true, true);
-	} else if ((sg._unk105F & SHIP_FRIGATE_BIT) != 0) {
+	} else if ((sg._shipOrder & SHIP_FRIGATE_BIT) != 0) {
 		sayAt(TEXT_SHIP_SECOND_SKIFF);
-		++sg._unk105F;
+		++sg._shipOrder;
 		shipDeal(false, true);
 	} else {
 		sayAt(TEXT_SHIP_THIRD_SKIFF);

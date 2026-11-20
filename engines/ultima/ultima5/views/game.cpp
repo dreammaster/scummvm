@@ -25,12 +25,14 @@
 #include "ultima/ultima5/logic/npc_movement.h"
 #include "ultima/ultima5/logic/party_logic.h"
 #include "ultima/ultima5/logic/time_logic.h"
+#include "ultima/ultima5/logic/transport_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
 #include "ultima/ultima5/views/interactions/ready.h"
 #include "ultima/ultima5/views/interactions/talk.h"
+#include "ultima/ultima5/views/interactions/use.h"
 #include "ultima/ultima5/views/interactions/ztats.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -43,6 +45,10 @@ constexpr byte OUTDOOR_MAP = 0;
 
 // How long a command takes
 constexpr int MINUTES_PER_TURN = 2;
+constexpr int FRAMES_PER_SAIL_STEP = 6;
+constexpr byte TILE_ROUGH_SEAS = 1;
+constexpr byte TILE_SKIFF = 0x28;
+constexpr byte TILE_CARPET = 0x14;
 constexpr int MINUTES_PER_LOCATION_TURN = 1;
 constexpr int FIRST_NIGHT_HOUR = 20;
 constexpr int FIRST_DAY_HOUR = 5;
@@ -112,6 +118,23 @@ public:
 
 Game::Game() : View("Game"), _messages(this) {
 	_messages.setBounds(Common::Rect(LOG_LEFT, LOG_TOP, 320, LOG_BOTTOM));
+	delayFrames(FRAMES_PER_SAIL_STEP);
+}
+
+void Game::timeout() {
+	delayFrames(FRAMES_PER_SAIL_STEP);
+
+	// A ship that's been set sailing goes on without being told to
+	if (_interaction || _G(savegame)._mapId != OUTDOOR_MAP || TransportLogic::heading() < 0)
+		return;
+
+	if (TransportLogic::sailTick(_planTick)) {
+		_sailingStep = true;
+		walk(static_cast<Direction>(TransportLogic::heading()));
+		_sailingStep = false;
+	} else {
+		redraw();
+	}
 }
 
 void Game::draw() {
@@ -340,6 +363,14 @@ void Game::endTurn() {
 
 	if (sg._mapId == OUTDOOR_MAP) {
 		TimeLogic::advance(sg, MINUTES_PER_TURN);
+		TransportLogic::clearHeadingIfNotSailing();
+
+		// Small boats and carpets don't last in rough water
+		if (g_engine->getMapTile(sg._mapX, sg._mapY) == TILE_ROUGH_SEAS &&
+				((sg._partyTile & 0xFC) == TILE_SKIFF || (sg._partyTile & 0xFE) == TILE_CARPET)) {
+			_messages.print("Rough seas!\n");
+			TransportLogic(_messages).damage();
+		}
 	} else {
 		const byte hour = sg._hour;
 		TimeLogic::advance(sg, MINUTES_PER_LOCATION_TURN);
@@ -356,6 +387,10 @@ void Game::endTurn() {
 
 bool Game::walk(Direction direction) {
 	if (_G(savegame)._mapId == OUTDOOR_MAP) {
+		// A ship that's sailing already ignores being told to go the way it's going
+		if (TransportLogic::heading() == direction && !_sailingStep)
+			return true;
+
 		if (WorldLogic(_messages).walk(direction))
 			endTurn();
 		else
@@ -422,6 +457,33 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 	case 'L':
 		_messages.print("Look-");
 		startInteraction(new Interactions::Look(_messages));
+		return true;
+
+	case 'U': {
+		_messages.print("Use item\n\n");
+		Interactions::Use *use = new Interactions::Use(_messages);
+
+		if (use->done()) {
+			delete use;
+			endTurn();
+		} else {
+			startInteraction(use);
+		}
+		return true;
+	}
+
+	case 'B':
+		_messages.print("Board ");
+		if (TransportLogic(_messages).board())
+			endTurn();
+		else
+			redraw();
+		return true;
+
+	case 'X':
+		_messages.print("X-it ");
+		TransportLogic(_messages).getOff();
+		endTurn();
 		return true;
 
 	case 'R':

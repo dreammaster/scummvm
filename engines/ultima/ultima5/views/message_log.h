@@ -40,6 +40,8 @@ constexpr int LOG_ROWS = 13;
 class MessageLog : public Shared::UIElement {
 private:
 	char _cells[LOG_ROWS][LOG_COLUMNS];
+	bool _runes[LOG_ROWS][LOG_COLUMNS];
+	bool _runeMode = false;
 	int _x = 0;
 	int _y = 0;
 	int _cursorFrame = 0;
@@ -74,6 +76,13 @@ public:
 	 */
 	int column() const {
 		return _x;
+	}
+
+	/**
+	 * Has what is printed next be in the rune font, for the coordinates of places
+	 */
+	void setRunes(bool runes) {
+		_runeMode = runes;
 	}
 
 	/**

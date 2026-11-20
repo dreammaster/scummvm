@@ -22,6 +22,7 @@
 #include "common/file.h"
 #include "common/util.h"
 #include "ultima/ultima5/logic/shop_logic.h"
+#include "ultima/ultima5/logic/inventory_logic.h"
 #include "ultima/ultima5/data/talk_data.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -932,26 +933,7 @@ void ShopLogic::healerPay(int answer) {
 			break;
 
 		case NEED_RESURRECT:
-			who._status = Data::STATUS_GOOD;
-			who._hp = 1;
-
-			if (who._class == 'A' || who._class == 'M')
-				who._mag = who._int;
-			else if (who._class == 'B')
-				who._mag = who._int >> 1;
-
-			if (sg._karma < 0x62)
-				who._exp = (int16)((int32)who._exp * (int32)sg._karma / 100);
-
-			{
-				int level = 1;
-				for (int i = who._exp / 100; i > 0; i >>= 1)
-					++level;
-
-				who._level = level;
-				who._maxHp = level * 0x1E;
-			}
-
+			InventoryLogic::resurrect(sg, _target);
 			who._hp = who._maxHp;
 			break;
 		}

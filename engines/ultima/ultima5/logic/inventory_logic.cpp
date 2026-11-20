@@ -184,6 +184,28 @@ InventoryLogic::EquipResult InventoryLogic::equip(Data::Savegame &sg, int who, i
 	return result;
 }
 
+void InventoryLogic::resurrect(Data::Savegame &sg, int who) {
+	Data::Character &c = sg._party[who];
+
+	c._status = Data::STATUS_GOOD;
+	c._hp = 1;
+
+	if (c._class == 'A' || c._class == 'M')
+		c._mag = c._int;
+	else if (c._class == 'B')
+		c._mag = c._int >> 1;
+
+	if (sg._karma < 0x62)
+		c._exp = (int16)((int32)c._exp * (int32)sg._karma / 100);
+
+	int level = 1;
+	for (int i = c._exp / 100; i > 0; i >>= 1)
+		++level;
+
+	c._level = level;
+	c._maxHp = level * 0x1E;
+}
+
 void InventoryLogic::specialItems(const Data::Savegame &sg, byte counts[SPECIAL_ITEMS]) {
 	for (int i = 0; i < 8; ++i) {
 		counts[i] = sg._scrolls[i];
@@ -315,11 +337,12 @@ constexpr int PICK_LAST_ROW = 7;
 constexpr int NEXT_ROW_LIMIT = 8;
 constexpr int FRAME_BOTTOM = 8;
 
-void ItemList::start(InventoryLogic::ListKind kind, const byte *counts, int count, int who) {
+void ItemList::start(InventoryLogic::ListKind kind, const byte *counts, int count, int who, bool pick) {
 	_kind = kind;
 	_counts = counts;
 	_count = count;
 	_who = who;
+	_pick = pick || who != InventoryLogic::NOTHING;
 	_marker = '-';
 	_first = InventoryLogic::nextOwned(-1, _count, _counts, _who);
 	_last = -1;
@@ -345,7 +368,7 @@ bool ItemList::empty() const {
 
 void ItemList::redraw() {
 	const Data::Savegame &sg = _G(savegame);
-	const bool pick = _who != InventoryLogic::NOTHING;
+	const bool pick = _pick;
 
 	_grid.setPosition(1, 1);
 	_shown = 0;
@@ -361,7 +384,8 @@ void ItemList::redraw() {
 				_item = item;
 			}
 
-			marker = InventoryLogic::isReady(sg._party[_who], item) ? Data::EQUIPMENT_MARKERS[item] : ' ';
+			marker = _who != InventoryLogic::NOTHING && InventoryLogic::isReady(sg._party[_who], item) ?
+				Data::EQUIPMENT_MARKERS[item] : ' ';
 		}
 
 		InventoryLogic::printRow(_grid, _kind, item, _counts, marker);
@@ -386,7 +410,7 @@ void ItemList::redraw() {
 }
 
 bool ItemList::scroll(int key) {
-	const bool pick = _who != InventoryLogic::NOTHING;
+	const bool pick = _pick;
 
 	switch (key) {
 	case KEY_LEFT:

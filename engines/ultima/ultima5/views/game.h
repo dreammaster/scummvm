@@ -40,6 +40,8 @@ namespace Views {
 class Game : public View {
 private:
 	MessageLog _messages;
+	bool _planTick = false;
+	bool _sailingStep = false;
 	Common::ScopedPtr<Interactions::Interaction> _interaction;
 
 	/**
@@ -99,6 +101,7 @@ public:
 	~Game() override {}
 
 	void draw() override;
+	void timeout() override;
 	bool msgKeypress(const KeypressMessage &msg) override;
 };
 
