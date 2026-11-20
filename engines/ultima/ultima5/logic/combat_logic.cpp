@@ -60,6 +60,7 @@ constexpr byte TILE_ENERGY = 0xEA;
 constexpr byte TILE_BARRIER = 0xEB;
 constexpr byte TILE_SHIP_FIRST = 0x20;
 constexpr byte TILE_SHOT = 0xF4;
+constexpr byte TILE_PIRATE = 0x2C;
 
 // The tiles of the map
 constexpr byte MAP_SWAMP = 0x04;
@@ -674,22 +675,31 @@ bool CombatLogic::loadMap(const char *filename, int offset) {
 	return true;
 }
 
-int CombatLogic::mapFor(byte terrain, bool onShip, bool pirate, bool enemyAtSea, byte mapId) {
-	if (onShip) {
-		if (pirate)
+int CombatLogic::mapFor(byte ground, byte partyTile, byte enemyTile, byte mapId) {
+	const int group = enemyTile & 0xFC;
+	bool atSea = ground < 4 || ((ground & 0xFE) != 0x6A && (ground & 0xF0) == 0x60);
+
+	if (group == 0xFC)
+		return 10;
+
+	if ((group & 0xF0) == 0x80)
+		atSea = true;
+
+	if ((partyTile & 0xF8) == TILE_SHIP_FIRST) {
+		if (group == TILE_PIRATE)
 			return 14;
-		return enemyAtSea ? 11 : 13;
+		return atSea ? 11 : 13;
 	}
 
-	if (pirate)
+	if (group == TILE_PIRATE)
 		return 12;
-	if (enemyAtSea)
+	if (atSea)
 		return 15;
 
-	switch (terrain) {
-	case 0x01:
+	switch (ground) {
+	case 0x04:
 		return 1;
-	case 0x02:
+	case 0x05:
 		return 2;
 	case 0x06:
 	case 0x08:
@@ -718,6 +728,10 @@ int CombatLogic::mapFor(byte terrain, bool onShip, bool pirate, bool enemyAtSea,
 	default:
 		return mapId != 0 ? 8 : 2;
 	}
+}
+
+int CombatLogic::enemyKind(byte tile) {
+	return (tile & 0xFC) == TILE_PIRATE ? 1 : (tile - TILE_WIZARD) >> 2;
 }
 
 void CombatLogic::begin(int kind, bool lone, int flags, byte origin) {

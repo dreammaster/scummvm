@@ -23,6 +23,7 @@
 #define ULTIMA5_VIEWS_INTERACTIONS_COMBAT_H
 
 #include "common/ptr.h"
+#include "ultima/ultima5/logic/attack_logic.h"
 #include "ultima/ultima5/logic/combat_logic.h"
 #include "ultima/ultima5/views/interactions/interaction.h"
 
@@ -48,6 +49,8 @@ private:
 	State _state = STATE_COMMAND;
 	Common::ScopedPtr<Interaction> _sub;
 	int _subKey = 0;
+	AttackLogic::Fight _fight;
+	bool _hasFight = false;
 
 	/**
 	 * Carries on with the fight until it needs the player again
@@ -72,6 +75,14 @@ public:
 	 * @returns			False if the map couldn't be loaded
 	 */
 	bool start(int kind, int map, bool lone);
+
+	/**
+	 * Has what the fight was against taken off the map once it's over
+	 */
+	void setAftermath(const AttackLogic::Fight &fight) {
+		_fight = fight;
+		_hasFight = true;
+	}
 
 	/**
 	 * Returns true if the fight was over before the player had a turn

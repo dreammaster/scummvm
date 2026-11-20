@@ -66,6 +66,10 @@ bool Combat::start(int kind, int map, bool lone) {
 bool Combat::carryOn() {
 	if (_logic.advance() == CombatLogic::STATE_FINISHED) {
 		_logic.finish();
+
+		if (_hasFight)
+			AttackLogic::afterFight(_fight, _logic.won());
+
 		return true;
 	}
 

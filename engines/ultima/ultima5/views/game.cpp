@@ -27,6 +27,7 @@
 #include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/logic/transport_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
+#include "ultima/ultima5/views/interactions/attack.h"
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
@@ -489,6 +490,19 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 		return true;
 	}
 
+	case 'A': {
+		_messages.print("Attack-");
+		Interactions::Attack *attack = new Interactions::Attack(_messages);
+
+		if (attack->done()) {
+			delete attack;
+			redraw();
+		} else {
+			startInteraction(attack);
+		}
+		return true;
+	}
+
 	case 'B':
 		_messages.print("Board ");
 		if (TransportLogic(_messages).board())
@@ -535,9 +549,12 @@ bool Game::msgKeypress(const KeypressMessage &msg) {
 	if (_interaction) {
 		if (_interaction->keypress(msg)) {
 			const bool timePasses = _interaction->takesTime();
-			_interaction.reset();
+			Interactions::Interaction *next = _interaction->takeNext();
+			_interaction.reset(next);
 
-			if (timePasses)
+			if (next)
+				redraw();
+			else if (timePasses)
 				endTurn();
 			else
 				redraw();

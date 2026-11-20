@@ -238,14 +238,18 @@ public:
 
 	/**
 	 * Picks the map for a fight
-	 * @param terrain		The tile the party is on
-	 * @param onShip		Whether the party is on a ship
-	 * @param pirate		Whether the enemy is pirates
-	 * @param enemyAtSea	Whether the enemy is in the water
-	 * @param mapId			The map the party is on
+	 * @param ground		The tile of the map the enemy is on
+	 * @param partyTile		The tile the party is shown as
+	 * @param enemyTile		The tile of the enemy
+	 * @param mapId			The map the party is in
 	 * @returns				The number of the map, in the file of the maps of the fights
 	 */
-	static int mapFor(byte terrain, bool onShip, bool pirate, bool enemyAtSea, byte mapId);
+	static int mapFor(byte ground, byte partyTile, byte enemyTile, byte mapId);
+
+	/**
+	 * Returns which kind of enemy a tile of the objects on the map is
+	 */
+	static int enemyKind(byte tile);
 
 	/**
 	 * Loads a map of the fights from a file of them

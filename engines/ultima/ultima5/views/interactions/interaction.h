@@ -58,6 +58,13 @@ public:
 	}
 
 	/**
+	 * Gives what is to follow once this is over, if anything, and hands over its ownership
+	 */
+	virtual Interaction *takeNext() {
+		return nullptr;
+	}
+
+	/**
 	 * Draws over the game view
 	 */
 	virtual void draw(View &) {}
