@@ -21,9 +21,11 @@
 
 #include "ultima/ultima5/console.h"
 #include "ultima/ultima5/ultima5.h"
+#include "ultima/ultima5/data/combat_data.h"
 #include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/views/asset_viewer.h"
+#include "ultima/ultima5/views/game.h"
 
 namespace Ultima {
 namespace Ultima5 {
@@ -33,6 +35,7 @@ Console::Console() : GUI::Debugger() {
 	registerCmd("image", WRAP_METHOD(Console, cmdImage));
 	registerCmd("teleport", WRAP_METHOD(Console, cmdTeleport));
 	registerCmd("location", WRAP_METHOD(Console, cmdLocation));
+	registerCmd("combat", WRAP_METHOD(Console, cmdCombat));
 }
 
 Console::~Console() {
@@ -139,6 +142,34 @@ bool Console::cmdLocation(int argc, const char **argv) {
 	}
 
 	g_engine->replaceView("Game", true);
+	return false;
+}
+
+bool Console::cmdCombat(int argc, const char **argv) {
+	if (!_G(savegame).hasActiveGame()) {
+		debugPrintf("Create a character first\n");
+		return true;
+	}
+
+	if (argc < 2) {
+		debugPrintf("combat <enemy> [map]  - Starts a fight with a kind of enemy (0-47), on a map of the fights (0-15)\n");
+		return true;
+	}
+
+	const int kind = atoi(argv[1]);
+	const int map = (argc > 2) ? atoi(argv[2]) : 2;
+	if (kind < 0 || kind >= Data::ENEMY_COUNT || map < 0 || map > 15) {
+		debugPrintf("The enemy is from 0 to 47 and the map from 0 to 15\n");
+		return true;
+	}
+
+	g_engine->replaceView("Game", true);
+	Views::Game *game = dynamic_cast<Views::Game *>(g_engine->findView("Game"));
+	if (!game || !game->startCombat(kind, map, false)) {
+		debugPrintf("Could not start the fight\n");
+		return true;
+	}
+
 	return false;
 }
 

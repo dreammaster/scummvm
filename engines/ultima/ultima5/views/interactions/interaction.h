@@ -51,6 +51,13 @@ public:
 	virtual bool keypress(const KeypressMessage &msg) = 0;
 
 	/**
+	 * Returns true if time goes by in the game once it's over
+	 */
+	virtual bool takesTime() const {
+		return true;
+	}
+
+	/**
 	 * Draws over the game view
 	 */
 	virtual void draw(View &) {}

@@ -100,6 +100,15 @@ public:
 	Game();
 	~Game() override {}
 
+	/**
+	 * Starts a fight with a kind of enemy
+	 * @param kind		The kind of enemy
+	 * @param map		The number of the map of the fight
+	 * @param lone		Whether a lone enemy is met in places where they come one at a time
+	 * @returns			False if the map of the fight couldn't be loaded
+	 */
+	bool startCombat(int kind, int map, bool lone);
+
 	void draw() override;
 	void timeout() override;
 	bool msgKeypress(const KeypressMessage &msg) override;

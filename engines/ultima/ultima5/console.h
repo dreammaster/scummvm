@@ -33,6 +33,7 @@ private:
 	bool cmdImage(int argc, const char **argv);
 	bool cmdTeleport(int argc, const char **argv);
 	bool cmdLocation(int argc, const char **argv);
+	bool cmdCombat(int argc, const char **argv);
 
 public:
 	Console();

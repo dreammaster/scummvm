@@ -327,6 +327,7 @@ MODULE_OBJS += \
 	ultima5/data/inventory_data.o \
 	ultima5/data/location_map.o \
 	ultima5/data/location_tables.o \
+	ultima5/data/combat_data.o \
 	ultima5/data/look_names.o \
 	ultima5/data/lzw.o \
 	ultima5/data/savegame.o \
@@ -339,6 +340,7 @@ MODULE_OBJS += \
 	ultima5/gfx/image_file.o \
 	ultima5/gfx/story_text.o \
 	ultima5/gfx/tileset.o \
+	ultima5/logic/combat_logic.o \
 	ultima5/logic/creation_logic.o \
 	ultima5/logic/inventory_logic.o \
 	ultima5/logic/location_logic.o \
@@ -362,6 +364,7 @@ MODULE_OBJS += \
 	ultima5/views/create_character.o \
 	ultima5/views/game.o \
 	ultima5/views/interactions/interaction.o \
+	ultima5/views/interactions/combat.o \
 	ultima5/views/interactions/leave_location.o \
 	ultima5/views/interactions/look.o \
 	ultima5/views/interactions/new_order.o \

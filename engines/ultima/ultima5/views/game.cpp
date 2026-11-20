@@ -27,6 +27,7 @@
 #include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/logic/transport_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
+#include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
@@ -358,6 +359,22 @@ void Game::startInteraction(Interactions::Interaction *interaction) {
 	redraw();
 }
 
+bool Game::startCombat(int kind, int map, bool lone) {
+	Interactions::Combat *combat = new Interactions::Combat(_messages);
+
+	if (!combat->start(kind, map, lone)) {
+		delete combat;
+		return false;
+	}
+
+	if (combat->done())
+		delete combat;
+	else
+		startInteraction(combat);
+
+	return true;
+}
+
 void Game::endTurn() {
 	Data::Savegame &sg = _G(savegame);
 
@@ -517,8 +534,13 @@ bool Game::msgKeypress(const KeypressMessage &msg) {
 
 	if (_interaction) {
 		if (_interaction->keypress(msg)) {
+			const bool timePasses = _interaction->takesTime();
 			_interaction.reset();
-			endTurn();
+
+			if (timePasses)
+				endTurn();
+			else
+				redraw();
 		} else {
 			redraw();
 		}
