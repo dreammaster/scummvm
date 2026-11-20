@@ -66,6 +66,7 @@ protected:
 
 public:
 	Common::ScopedPtr<Gfx::CharSet> _charset;
+	Common::ScopedPtr<Gfx::CharSet> _runes;
 	Data::LocationMap _location;
 	Data::LookNames _lookNames;
 	Data::Savegame _savegame;

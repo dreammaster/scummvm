@@ -324,6 +324,7 @@ MODULE_OBJS += \
 	ultima5/console.o \
 	ultima5/metaengine.o \
 	ultima5/data/data.o \
+	ultima5/data/inventory_data.o \
 	ultima5/data/location_map.o \
 	ultima5/data/location_tables.o \
 	ultima5/data/look_names.o \
@@ -339,6 +340,7 @@ MODULE_OBJS += \
 	ultima5/gfx/story_text.o \
 	ultima5/gfx/tileset.o \
 	ultima5/logic/creation_logic.o \
+	ultima5/logic/inventory_logic.o \
 	ultima5/logic/location_logic.o \
 	ultima5/logic/npc_logic.o \
 	ultima5/logic/npc_movement.o \
@@ -348,8 +350,10 @@ MODULE_OBJS += \
 	ultima5/logic/shop_tavern.o \
 	ultima5/logic/shop_weapons.o \
 	ultima5/logic/talk_logic.o \
+	ultima5/logic/text_grid.o \
 	ultima5/logic/time_logic.o \
 	ultima5/logic/visibility_logic.o \
+	ultima5/logic/word_wrap.o \
 	ultima5/logic/world_logic.o \
 	ultima5/views/acknowledgements.o \
 	ultima5/views/asset_viewer.o \
@@ -359,7 +363,9 @@ MODULE_OBJS += \
 	ultima5/views/interactions/leave_location.o \
 	ultima5/views/interactions/look.o \
 	ultima5/views/interactions/new_order.o \
+	ultima5/views/interactions/ready.o \
 	ultima5/views/interactions/talk.o \
+	ultima5/views/interactions/ztats.o \
 	ultima5/views/introduction.o \
 	ultima5/views/message_log.o \
 	ultima5/views/title.o \

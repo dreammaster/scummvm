@@ -89,6 +89,9 @@ PartyMemberChooser::Result PartyMemberChooser::handleKey(const KeypressMessage &
 		break;
 	}
 
+	if (_allowAll && msg.ascii == '0')
+		return ALL;
+
 	const int number = msg.ascii - '1';
 	if (number >= 0 && number < MIN(partySize, 6))
 		_index = number;

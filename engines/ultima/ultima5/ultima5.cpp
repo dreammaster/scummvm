@@ -69,6 +69,7 @@ Common::Error Ultima5Engine::run() {
 	// Initialize 320x200 graphics mode
 	initGraphics(320, 200);
 	_charset.reset(new Gfx::CharSet());
+	_runes.reset(new Gfx::CharSet("runes.ch"));
 	Data::setPalette(_renderMode);
 
 	if (!_tileset.load(_renderMode) || !_lookNames.load()) {

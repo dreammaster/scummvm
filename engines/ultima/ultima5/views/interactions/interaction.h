@@ -89,13 +89,22 @@ public:
 class PartyMemberChooser {
 private:
 	int _index = 0;
+	bool _allowAll = false;
 
 public:
 	enum Result {
 		PENDING,
 		CANCELLED,
-		CHOSEN
+		CHOSEN,
+		ALL
 	};
+
+	/**
+	 * Lets the zero key pick everyone, for things that can show the party's shared belongings
+	 */
+	void allowAll() {
+		_allowAll = true;
+	}
 
 	/**
 	 * Handles a keypress. Escape cancels

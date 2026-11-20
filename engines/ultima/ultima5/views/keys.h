@@ -40,6 +40,40 @@ inline bool isModifierKey(Common::KeyCode key) {
 		key == Common::KEYCODE_SCROLLOCK;
 }
 
+/**
+ * Returns the code the original game gave to a key: the arrow keys and page keys have
+ * small numbers, the others are what's typed, with the letters in capitals
+ */
+inline int originalKey(const Common::KeyState &key) {
+	switch (key.keycode) {
+	case Common::KEYCODE_LEFT:
+		return 1;
+	case Common::KEYCODE_RIGHT:
+		return 2;
+	case Common::KEYCODE_UP:
+		return 3;
+	case Common::KEYCODE_DOWN:
+		return 4;
+	case Common::KEYCODE_HOME:
+		return 0xD3;
+	case Common::KEYCODE_END:
+		return 0xD4;
+	case Common::KEYCODE_PAGEUP:
+		return 0xD5;
+	case Common::KEYCODE_PAGEDOWN:
+		return 0xD6;
+	case Common::KEYCODE_ESCAPE:
+		return 27;
+	case Common::KEYCODE_RETURN:
+	case Common::KEYCODE_KP_ENTER:
+		return 13;
+	case Common::KEYCODE_SPACE:
+		return ' ';
+	default:
+		return key.ascii >= 'a' && key.ascii <= 'z' ? key.ascii - 'a' + 'A' : key.ascii;
+	}
+}
+
 } // namespace Views
 } // namespace Ultima5
 } // namespace Ultima

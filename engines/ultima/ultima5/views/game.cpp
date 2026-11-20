@@ -29,7 +29,9 @@
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
+#include "ultima/ultima5/views/interactions/ready.h"
 #include "ultima/ultima5/views/interactions/talk.h"
+#include "ultima/ultima5/views/interactions/ztats.h"
 #include "ultima/ultima5/ultima5.h"
 
 namespace Ultima {
@@ -420,6 +422,16 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 	case 'L':
 		_messages.print("Look-");
 		startInteraction(new Interactions::Look(_messages));
+		return true;
+
+	case 'R':
+		_messages.print("Ready...\n\n");
+		startInteraction(new Interactions::Ready(_messages));
+		return true;
+
+	case 'Z':
+		_messages.print("Z-stats...\n");
+		startInteraction(new Interactions::Ztats(_messages));
 		return true;
 
 	case 'T':

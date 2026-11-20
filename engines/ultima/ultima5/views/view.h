@@ -23,6 +23,7 @@
 #define ULTIMA5_VIEWS_VIEW_H
 
 #include "common/str.h"
+#include "ultima/ultima5/logic/text_grid.h"
 #include "ultima/shared/engine/view.h"
 
 namespace Ultima {
@@ -62,6 +63,32 @@ public:
 	 * at a position given in pixels
 	 */
 	void drawCaps(int x, int y, bool left);
+
+	/**
+	 * Draws a character of the rune font, which has the small pictures too, in a cell
+	 */
+	void drawRune(int col, int row, byte ch, byte fg, byte bg);
+
+	/**
+	 * Draws the box that the windows over the party have, from one row to another
+	 */
+	void drawWindowFrame(int top, int bottom);
+
+	/**
+	 * Draws the window of text that goes over the party, from a row of the screen
+	 */
+	void drawTextGrid(const TextGrid &grid, int top);
+
+	/**
+	 * Sets a label centered in the top border
+	 */
+	void drawLabel(const Common::String &text);
+
+	/**
+	 * Shows in a border row which ways a list goes on: 0 for neither, 1 for down,
+	 * 2 for up and 3 for both
+	 */
+	void drawScrollArrows(int row, int arrows);
 
 	View(const Common::String &name) : Shared::View(name) {}
 	~View() override {}

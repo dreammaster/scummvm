@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/views/message_log.h"
+#include "ultima/ultima5/logic/word_wrap.h"
 #include "ultima/ultima5/views/view.h"
 
 namespace Ultima {
@@ -78,82 +79,25 @@ void MessageLog::backspace(int count) {
 	redraw();
 }
 
+// Prints to the window a character at a time, for the printing of strings
+class LogPrinter : public WordWrapPrinter {
+private:
+	MessageLog &_log;
+
+public:
+	LogPrinter(MessageLog &log) : _log(log) {}
+
+	void printChar(char ch) override {
+		_log.printChar(ch);
+	}
+
+	int column() const override {
+		return _log.column();
+	}
+};
+
 void MessageLog::print(const Common::String &text) {
-	const char *s = text.c_str();
-	const int width = LOG_COLUMNS - 1;
-	char line[LOG_COLUMNS + 2];
-	int pos = 0;
-	bool breakFirst = false;
-	bool finished = false;
-
-	if (*s == '\0')
-		return;
-
-	// Text is cut into a line at a time, each ending at a space where it
-	// can, and the rest carries on the next line
-	do {
-		if (breakFirst)
-			printChar('\n');
-
-		bool skipSpaces = false;
-		int start = 0;
-		int length = 0;
-		breakFirst = false;
-		const int remaining = width - _x;
-
-		for (; s[pos] != '\n' && s[pos] != '\r' && s[pos] != '\0' && length <= remaining; ++pos, ++length)
-			line[length] = s[pos];
-
-		if (length == 0) {
-			if (s[pos] != '\0')
-				printChar(s[pos++]);
-			else
-				finished = true;
-			continue;
-		}
-
-		if (length > remaining) {
-			const int fullLength = length;
-			const int fullPos = pos;
-
-			for (; s[pos] != ' ' && length != 0 && s[pos] != '\n' && s[pos] != '\0' && s[pos] != '\r'; --length, --pos) {
-			}
-
-			if (length == 0) {
-				// A word too long for the line is split
-				length = fullLength;
-				pos = fullPos;
-
-				if (_x != 0) {
-					printChar('\n');
-					skipSpaces = true;
-				}
-			} else {
-				do {
-					--length;
-				} while (line[length] == ' ' || line[length] == '\r' || line[length] == '\n');
-
-				if (s[pos] != '\0')
-					++pos;
-
-				if (length < remaining)
-					breakFirst = true;
-			}
-
-			if (length > remaining)
-				--length;
-		} else {
-			--length;
-		}
-
-		if (skipSpaces) {
-			while (line[start] == ' ')
-				++start;
-		}
-
-		for (; start <= length; ++start)
-			printChar(line[start]);
-	} while (!finished);
+	LogPrinter(*this).printString(text.c_str(), LOG_COLUMNS - 1);
 }
 
 void MessageLog::draw() {
