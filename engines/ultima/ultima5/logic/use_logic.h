@@ -37,7 +37,8 @@ public:
 	enum Need {
 		NEED_NONE,
 		NEED_DIRECTION,
-		NEED_MEMBER
+		NEED_MEMBER,
+		NEED_VIEW
 	};
 
 private:

@@ -90,6 +90,11 @@ private:
 	bool handleDungeonCommand(const KeypressMessage &msg);
 
 	/**
+	 * Looks into a gem, which shows the map from above
+	 */
+	void viewGem();
+
+	/**
 	 * Clears the screen and draws the blue frame and the outlines of the windows
 	 */
 	void drawFrame();

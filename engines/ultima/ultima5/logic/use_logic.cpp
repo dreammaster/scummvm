@@ -236,14 +236,6 @@ UseLogic::Need UseLogic::directionChosen(int key) {
 UseLogic::Need UseLogic::scroll(int which) {
 	Data::Savegame &sg = _G(savegame);
 
-	// The scroll of viewing needs the map of what's around to be shown
-	if (which == 4) {
-		_log.print("Scroll\n\n");
-		_log.print("View!\n");
-		_result = 0;
-		return NEED_NONE;
-	}
-
 	--sg._scrolls[which];
 	_log.print("Scroll\n\n");
 
@@ -269,6 +261,11 @@ UseLogic::Need UseLogic::scroll(int which) {
 		_log.print("Negate magic!\n");
 		setIcon(ICON_NEGATE_MAGIC, DURATION_NEGATE_MAGIC);
 		break;
+
+	case 4:
+		_log.print("View!\n");
+		_result = -1;
+		return NEED_VIEW;
 
 	case 5:
 		_log.print("Summon Daemon!\n");

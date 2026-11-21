@@ -336,6 +336,7 @@ MODULE_OBJS += \
 	ultima5/data/shop_data.o \
 	ultima5/data/talk_data.o \
 	ultima5/data/talk_file.o \
+	ultima5/data/view_data.o \
 	ultima5/data/world_map.o \
 	ultima5/gfx/bit_image_file.o \
 	ultima5/gfx/charset.o \
@@ -378,6 +379,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/combat.o \
 	ultima5/views/interactions/dungeon_climb.o \
 	ultima5/views/interactions/dungeon_item.o \
+	ultima5/views/interactions/gem_view.o \
 	ultima5/views/interactions/leave_location.o \
 	ultima5/views/interactions/look.o \
 	ultima5/views/interactions/new_order.o \

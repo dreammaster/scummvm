@@ -48,11 +48,19 @@ private:
 	ItemList _list;
 	UseLogic _logic;
 	PartyMemberChooser _members;
+	Interaction *_next = nullptr;
 
 	bool apply(UseLogic::Need need);
 
 public:
 	Use(MessageLog &log);
+	~Use() override;
+
+	Interaction *takeNext() override {
+		Interaction *next = _next;
+		_next = nullptr;
+		return next;
+	}
 
 	/**
 	 * Returns true if there was nothing to pick and it's already over

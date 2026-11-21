@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/views/interactions/use.h"
+#include "ultima/ultima5/views/interactions/gem_view.h"
 #include "ultima/ultima5/views/keys.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -47,8 +48,17 @@ Use::Use(MessageLog &log) : Interaction(log), _logic(log) {
 	_log.print("Item: ");
 }
 
+Use::~Use() {
+	delete _next;
+}
+
 bool Use::apply(UseLogic::Need need) {
 	switch (need) {
+	case UseLogic::NEED_VIEW:
+		_next = new GemView(_log);
+		_state = STATE_DONE;
+		return true;
+
 	case UseLogic::NEED_DIRECTION:
 		_state = STATE_DIRECTION;
 		return false;

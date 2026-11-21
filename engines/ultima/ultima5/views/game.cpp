@@ -34,6 +34,7 @@
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/dungeon_climb.h"
 #include "ultima/ultima5/views/interactions/dungeon_item.h"
+#include "ultima/ultima5/views/interactions/gem_view.h"
 #include "ultima/ultima5/views/interactions/object_command.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
@@ -565,6 +566,21 @@ bool Game::passDungeonTime() {
 	return false;
 }
 
+void Game::viewGem() {
+	Data::Savegame &sg = _G(savegame);
+
+	_messages.print("View a gem!\n");
+
+	if (sg._gems == 0) {
+		_messages.print("You have none!\n");
+		endTurn();
+		return;
+	}
+
+	--sg._gems;
+	startInteraction(new Interactions::GemView(_messages));
+}
+
 bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 	PartyLogic party(_messages);
 	int key = 0;
@@ -644,6 +660,10 @@ bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 		}
 		return true;
 	}
+
+	case 'V':
+		viewGem();
+		return true;
 
 	case 'I':
 		party.igniteTorch();
@@ -790,6 +810,10 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 		}
 		return true;
 	}
+
+	case 'V':
+		viewGem();
+		return true;
 
 	case 'I':
 		party.igniteTorch();
