@@ -334,6 +334,7 @@ MODULE_OBJS += \
 	ultima5/data/object_data.o \
 	ultima5/data/savegame.o \
 	ultima5/data/shop_data.o \
+	ultima5/data/shrine_data.o \
 	ultima5/data/spell_data.o \
 	ultima5/data/talk_data.o \
 	ultima5/data/talk_file.o \
@@ -361,6 +362,7 @@ MODULE_OBJS += \
 	ultima5/logic/shop_inn.o \
 	ultima5/logic/shop_logic.o \
 	ultima5/logic/shop_tavern.o \
+	ultima5/logic/shrine_logic.o \
 	ultima5/logic/spell_logic.o \
 	ultima5/logic/shop_weapons.o \
 	ultima5/logic/talk_logic.o \
@@ -390,6 +392,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/new_order.o \
 	ultima5/views/interactions/object_command.o \
 	ultima5/views/interactions/ready.o \
+	ultima5/views/interactions/shrine.o \
 	ultima5/views/interactions/talk.o \
 	ultima5/views/interactions/use.o \
 	ultima5/views/interactions/ztats.o \

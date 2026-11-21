@@ -34,10 +34,12 @@
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/dungeon_climb.h"
 #include "ultima/ultima5/views/interactions/cast.h"
+#include "ultima/ultima5/data/shrine_data.h"
 #include "ultima/ultima5/views/interactions/death.h"
 #include "ultima/ultima5/views/interactions/dungeon_item.h"
 #include "ultima/ultima5/views/interactions/gem_view.h"
 #include "ultima/ultima5/views/interactions/object_command.h"
+#include "ultima/ultima5/views/interactions/shrine.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
@@ -68,6 +70,8 @@ constexpr int EARTHQUAKE_ROLL = 0x69;
 constexpr byte TILE_BED = 0xAB;
 constexpr byte TILE_SKIFF = 0x28;
 constexpr byte SHIP_FIRST = 0x20;
+constexpr byte TILE_SHRINE = 0x19;
+constexpr byte TILE_CODEX = 0x11;
 constexpr byte TILE_CARPET = 0x14;
 constexpr int MINUTES_PER_LOCATION_TURN = 1;
 constexpr int FIRST_NIGHT_HOUR = 20;
@@ -817,6 +821,22 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 
 		{
 			const byte tile = _G(world).getTile(_G(savegame)._mapX, _G(savegame)._mapY);
+
+			if (tile == TILE_SHRINE) {
+				const int shrine = ShrineLogic::shrineAt(_G(savegame)._mapX, _G(savegame)._mapY);
+
+				_messages.print("the shrine of\n");
+				_messages.print(Data::SHRINE_VIRTUES[shrine]);
+				_messages.printChar('\n');
+				startInteraction(new Interactions::Shrine(_messages, false));
+				return true;
+			}
+
+			if (tile == TILE_CODEX) {
+				_messages.print("the Shrine of the Codex!\n");
+				startInteraction(new Interactions::Shrine(_messages, true));
+				return true;
+			}
 			const char *dungeon = tile == TILE_CAVE ? "cave" : tile == TILE_MINE ? "mine" : tile == TILE_DUNGEON ? "dungeon" : nullptr;
 
 			if (dungeon) {
