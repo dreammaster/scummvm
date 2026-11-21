@@ -342,6 +342,7 @@ MODULE_OBJS += \
 	ultima5/gfx/tileset.o \
 	ultima5/logic/attack_logic.o \
 	ultima5/logic/combat_logic.o \
+	ultima5/logic/monster_logic.o \
 	ultima5/logic/creation_logic.o \
 	ultima5/logic/inventory_logic.o \
 	ultima5/logic/location_logic.o \

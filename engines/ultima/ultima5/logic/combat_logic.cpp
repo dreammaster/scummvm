@@ -1415,8 +1415,8 @@ int CombatLogic::project(int attacker, int tx, int ty, bool landed, int kind) {
 	return -1;
 }
 
-// Follows a thing from one place to another. Gives false if something is in the way
-bool CombatLogic::pathClear(int fromX, int fromY, int toX, int toY, int kind) {
+// Follows a thing from one place to another over tiles 32 to a row. Gives false if something is in the way
+bool CombatLogic::traceProjectile(int fromX, int fromY, int toX, int toY, int kind, const byte *tiles, int &lastX, int &lastY) {
 	byte px[PATH_BUFFER];
 	byte py[PATH_BUFFER];
 	memset(px, 0xFF, sizeof(px));
@@ -1512,12 +1512,12 @@ bool CombatLogic::pathClear(int fromX, int fromY, int toX, int toY, int kind) {
 
 		// Where in the map that is, or off it
 		if (px[pos] < 8 || px[pos] > 0xB7 || py[pos] < 8 || py[pos] > 0xB7) {
-			_scratchX = _scratchY = -1;
+			lastX = lastY = -1;
 			break;
 		}
 
-		_scratchX = (px[pos] - 8) / 0x10;
-		_scratchY = (py[pos] - 8) / 0x10;
+		lastX = (px[pos] - 8) / 0x10;
+		lastY = (py[pos] - 8) / 0x10;
 
 		// Fire, energy and the like are made of sparks, which are random
 		if (kind >= 3 && kind <= 6) {
@@ -1537,12 +1537,23 @@ bool CombatLogic::pathClear(int fromX, int fromY, int toX, int toY, int kind) {
 		if (px[pos] == 0xFF)
 			break;
 
-		const int ground = _map[_scratchY * COMBAT_MAP_STRIDE + _scratchX];
-		if (((0x80 >> (ground & 7)) & PROJECTILE_PASS[ground >> 3]) == 0 && (fromX != _scratchX || fromY != _scratchY))
+		const int ground = tiles[lastY * COMBAT_MAP_STRIDE + lastX];
+		if (((0x80 >> (ground & 7)) & PROJECTILE_PASS[ground >> 3]) == 0 && (fromX != lastX || fromY != lastY))
 			return false;
 	}
 
 	return true;
+}
+
+// Follows a thing from one place to another on the map of the fight
+bool CombatLogic::pathClear(int fromX, int fromY, int toX, int toY, int kind) {
+	int lastX = _scratchX;
+	int lastY = _scratchY;
+	const bool clear = traceProjectile(fromX, fromY, toX, toY, kind, _map, lastX, lastY);
+
+	_scratchX = lastX;
+	_scratchY = lastY;
+	return clear;
 }
 
 // Changes the map where the party has trodden or a thing has landed, in the rooms that do that

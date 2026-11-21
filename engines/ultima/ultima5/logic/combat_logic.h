@@ -247,6 +247,14 @@ public:
 	static int mapFor(byte ground, byte partyTile, byte enemyTile, byte mapId);
 
 	/**
+	 * Follows a shot from one place to another over a map of tiles with 32 to a row, as the
+	 * fights and the open country do
+	 * @param lastX,lastY	Where it got to, going in as where the last one got to
+	 * @returns				False if something was in the way
+	 */
+	static bool traceProjectile(int fromX, int fromY, int toX, int toY, int kind, const byte *tiles, int &lastX, int &lastY);
+
+	/**
 	 * Returns which kind of enemy a tile of the objects on the map is
 	 */
 	static int enemyKind(byte tile);

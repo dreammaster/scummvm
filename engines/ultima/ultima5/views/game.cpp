@@ -27,6 +27,7 @@
 #include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/logic/transport_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
+#include "ultima/ultima5/logic/monster_logic.h"
 #include "ultima/ultima5/views/interactions/attack.h"
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
@@ -360,6 +361,23 @@ void Game::startInteraction(Interactions::Interaction *interaction) {
 	redraw();
 }
 
+void Game::startFight(int object) {
+	AttackLogic::Fight fight;
+	fight._started = true;
+	fight._actor = object;
+	AttackLogic(_messages).prepare(fight);
+
+	Interactions::Combat *combat = new Interactions::Combat(_messages);
+	combat->setAftermath(fight);
+
+	if (!combat->start(fight._kind, fight._map, fight._lone) || combat->done()) {
+		delete combat;
+		redraw();
+	} else {
+		startInteraction(combat);
+	}
+}
+
 bool Game::startCombat(int kind, int map, bool lone) {
 	Interactions::Combat *combat = new Interactions::Combat(_messages);
 
@@ -388,6 +406,13 @@ void Game::endTurn() {
 				((sg._partyTile & 0xFC) == TILE_SKIFF || (sg._partyTile & 0xFE) == TILE_CARPET)) {
 			_messages.print("Rough seas!\n");
 			TransportLogic(_messages).damage();
+		}
+
+		// The monsters have their turn
+		const MonsterLogic::Result monsters = MonsterLogic(_messages).turn();
+		if (monsters._fight) {
+			startFight(monsters._actor);
+			return;
 		}
 	} else {
 		const byte hour = sg._hour;

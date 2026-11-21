@@ -101,6 +101,11 @@ public:
 	~Game() override {}
 
 	/**
+	 * Starts a fight with an object on the map that has come to blows with the party
+	 */
+	void startFight(int object);
+
+	/**
 	 * Starts a fight with a kind of enemy
 	 * @param kind		The kind of enemy
 	 * @param map		The number of the map of the fight
