@@ -22,6 +22,7 @@
 #include "ultima/ultima5/logic/object_items.h"
 #include "ultima/ultima5/data/object_data.h"
 #include "ultima/ultima5/logic/attack_logic.h"
+#include "ultima/ultima5/logic/dungeon_logic.h"
 #include "ultima/ultima5/logic/npc_logic.h"
 #include "ultima/ultima5/logic/party_logic.h"
 #include "ultima/ultima5/ultima5.h"
@@ -101,6 +102,13 @@ constexpr byte TILE_CANNON_FLOOR = 0x45;
 constexpr byte PARTY_ON_FOOT = 0x1C;
 constexpr byte PARTY_RIDING_HORSE = 0x12;
 constexpr int FALL_DAMAGE = 5;
+constexpr byte SHIP_FIRST = 0x20;
+constexpr byte SHIP_LAST = 0x27;
+constexpr int CANNON_RANGE = 4;
+constexpr int SHIP_RANGE = 3;
+constexpr int SHOT_DAMAGE = 0x14;
+constexpr int SHOT_KARMA_COST = 5;
+constexpr byte WRECK_FIRST = 0xEC;
 constexpr int WINDOW_MARGIN = 5;
 constexpr int WINDOW_LAST = 0x1A;
 constexpr int CHUNK_STEP = 16;
@@ -273,6 +281,9 @@ bool ObjectItems::ready() {
 
 	if (_kind == KIND_KLIMB)
 		return climbReady();
+
+	if (_kind == KIND_FIRE)
+		return fireReady();
 
 	return true;
 }
@@ -453,6 +464,158 @@ void ObjectItems::push() {
 	sg._mapY += _dy;
 }
 
+// The top of the objects on a square, going down from the last, and what it is
+static int topAt(int x, int y, byte &tile) {
+	const Data::Savegame &sg = save();
+
+	for (int i = Data::ACTOR_COUNT - 1; i >= 0; --i) {
+		const Data::ActorRecord a = sg.getActor(i);
+
+		if (atSquare(a, x, y)) {
+			tile = a._tile;
+			return i;
+		}
+	}
+
+	tile = 0;
+	return -1;
+}
+
+// Whether a cannonball of a ship can hurt what is there
+static bool hittable(byte tile) {
+	if (tile >= 0x2C && tile <= 0x2F)
+		return true;
+
+	if (tile < 0x80 || (tile >= 0xB4 && tile <= 0xB7) || (tile >= 0xE8 && tile <= 0xEB))
+		return false;
+
+	return true;
+}
+
+bool ObjectItems::fireReady() {
+	const Data::Savegame &sg = save();
+
+	if (DungeonLogic::isDungeon(sg._mapId)) {
+		_log.print("What?\n");
+		return false;
+	}
+
+	if (sg._mapId == 0) {
+		if (sg._partyTile < SHIP_FIRST || sg._partyTile > SHIP_LAST) {
+			_log.print("What?\n");
+			return false;
+		}
+
+		return true;
+	}
+
+	fireCannon();
+	return false;
+}
+
+// Fires a cannon that is next to the party, in the way it points
+void ObjectItems::fireCannon() {
+	static const int8 DX[4] = { 0, 1, 0, -1 };
+	static const int8 DY[4] = { -1, 0, 1, 0 };
+	Data::Savegame &sg = save();
+
+	closeDoor();
+
+	int side = 0;
+	byte cannon = 0;
+	for (; side < 4; ++side) {
+		cannon = tileAt(sg._mapX + DX[side], sg._mapY + DY[side]);
+		if ((cannon & 0xFC) == TILE_CANNON)
+			break;
+	}
+
+	if (side == 4) {
+		_log.print("What?\n");
+		return;
+	}
+
+	int x = sg._mapX + DX[side];
+	int y = sg._mapY + DY[side];
+	const int dx = DX[cannon & 3];
+	const int dy = DY[cannon & 3];
+
+	_log.print("BOOOM!\n");
+	AttackLogic::callGuards();
+
+	bool door = false;
+	int hit = -1;
+
+	for (int left = CANNON_RANGE; left > 0 && !door && hit < 0; --left) {
+		byte tile;
+		const int object = topAt(x += dx, y += dy, tile);
+
+		if (tile == 0) {
+			switch (tileAt(x, y)) {
+			case TILE_LOCKED_A:
+			case TILE_LOCKED_B:
+			case TILE_HEAVY:
+			case TILE_DOOR_OPEN_A:
+			case TILE_DOOR_LOCKED_A:
+			case TILE_DOOR_OPEN_B:
+			case TILE_DOOR_LOCKED_B:
+				door = true;
+				break;
+			default:
+				break;
+			}
+		} else if (tile >= 0x1C || tile == 0x10 || tile == 0x11) {
+			hit = object;
+		}
+	}
+
+	if (door) {
+		_log.print("Door destroyed!\n");
+		setTileAt(x, y, TILE_FLOOR);
+		sg._doorOpen = 0;
+	}
+
+	if (hit == 0) {
+		PartyLogic::hurtParty();
+	} else if (hit > 0) {
+		clear(hit);
+		lowerKarma(SHOT_KARMA_COST);
+
+		const int npc = AttackLogic::findNpc(hit);
+		if (npc != -1) {
+			sg.setNpcKilled(npc);
+			NpcLogic::despawn(sg, npc);
+		}
+	}
+}
+
+// Fires the guns of a ship, which are along its sides
+void ObjectItems::fireShip() {
+	Data::Savegame &sg = save();
+
+	if ((_dx == 0 && (sg._partyTile & 1) == 0) || (_dx != 0 && (sg._partyTile & 1) != 0)) {
+		_log.print("Fire broadsides only!\n");
+		return;
+	}
+
+	int x = sg._mapX;
+	int y = sg._mapY;
+
+	for (int i = 0; i < SHIP_RANGE; ++i) {
+		byte tile;
+		const int object = firstAt(x += _dx, y += _dy, tile);
+
+		if (hittable(tile) && (tile & 0xFC) != WRECK_FIRST) {
+			Data::ActorRecord a = sg.getActor(object);
+			a._hull -= _G(gameRandom).range(1, SHOT_DAMAGE);
+			sg.setActor(object, a);
+
+			if (a._hull > 0x7F)
+				clear(object);
+			return;
+		}
+	}
+}
+
 ObjectItems::Need ObjectItems::begin(int dx, int dy) {
 	const Data::Savegame &sg = save();
 
@@ -478,6 +641,10 @@ ObjectItems::Need ObjectItems::begin(int dx, int dy) {
 
 	case KIND_PUSH:
 		push();
+		return NEED_NONE;
+
+	case KIND_FIRE:
+		fireShip();
 		return NEED_NONE;
 
 	default:

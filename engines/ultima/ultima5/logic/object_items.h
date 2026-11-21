@@ -39,7 +39,8 @@ public:
 		KIND_JIMMY,
 		KIND_SEARCH,
 		KIND_KLIMB,
-		KIND_PUSH
+		KIND_PUSH,
+		KIND_FIRE
 	};
 
 	enum Need {
@@ -93,6 +94,9 @@ private:
 	bool climbReady();
 	void climb();
 	void push();
+	bool fireReady();
+	void fireCannon();
+	void fireShip();
 
 public:
 	ObjectItems(Views::MessageLog &log, Kind kind) : _log(log), _items(log), _kind(kind) {}

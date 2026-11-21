@@ -55,11 +55,6 @@ private:
 	static int findObject(int x, int y);
 
 	static void lowerKarma();
-
-	/**
-	 * Makes the guards, and some of the others, take against the party
-	 */
-	static void callGuards();
 	static void callGuard(int npc);
 	static void provoke(int npc);
 
@@ -73,6 +68,11 @@ public:
 	 * Finds the person that an object is, or -1
 	 */
 	static int findNpc(int object);
+
+	/**
+	 * Makes the guards, and some of the others, take against the party
+	 */
+	static void callGuards();
 
 	/**
 	 * Says why, and gives false, if the party can't attack from where it is

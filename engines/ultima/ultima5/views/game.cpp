@@ -684,6 +684,11 @@ bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 		viewGem();
 		return true;
 
+	case 'F':
+		_messages.print("Fire-What?\n");
+		endTurn();
+		return true;
+
 	case 'I':
 		party.igniteTorch();
 		endTurn();
@@ -832,6 +837,10 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 
 	case 'P':
 		objectCommand(ObjectItems::KIND_PUSH, "Push-");
+		return true;
+
+	case 'F':
+		objectCommand(ObjectItems::KIND_FIRE, "Fire-");
 		return true;
 
 	case 'Y': {
