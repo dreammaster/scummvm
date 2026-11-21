@@ -430,8 +430,9 @@ void Game::endTurn() {
 	Data::Savegame &sg = _G(savegame);
 
 	if (DungeonLogic::isDungeon(sg._mapId)) {
-		passDungeonTime();
-		DungeonLogic(_messages).arrive();
+		const bool timePassed = passDungeonTime();
+		dungeonEvent(DungeonLogic(_messages).arrive(timePassed));
+		return;
 	} else if (sg._mapId == OUTDOOR_MAP) {
 		TimeLogic::advance(sg, MINUTES_PER_TURN);
 		TransportLogic::clearHeadingIfNotSailing();
@@ -517,7 +518,28 @@ bool Game::walk(Direction direction) {
 	return true;
 }
 
-void Game::passDungeonTime() {
+void Game::dungeonEvent(const DungeonLogic::Event &event) {
+	if (event._kind == DungeonLogic::Event::EVENT_NONE) {
+		redraw();
+		return;
+	}
+
+	Interactions::Combat *combat = new Interactions::Combat(_messages);
+	if (combat->startDungeon(event) && !combat->done()) {
+		startInteraction(combat);
+		return;
+	}
+
+	Interactions::Interaction *next = combat->takeNext();
+	delete combat;
+
+	if (next)
+		startInteraction(next);
+	else
+		redraw();
+}
+
+bool Game::passDungeonTime() {
 	Data::Savegame &sg = _G(savegame);
 
 	// A minute goes by with each command, or each other one when quick
@@ -525,9 +547,16 @@ void Game::passDungeonTime() {
 		_quickToggle = !_quickToggle;
 		if (_quickToggle)
 			TimeLogic::advance(sg, 1);
-	} else if (sg._icon != 'T') {
-		TimeLogic::advance(sg, 1);
+
+		return _quickToggle;
 	}
+
+	if (sg._icon != 'T') {
+		TimeLogic::advance(sg, 1);
+		return true;
+	}
+
+	return false;
 }
 
 bool Game::handleDungeonCommand(const KeypressMessage &msg) {
@@ -560,11 +589,12 @@ bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 	if (key != 0) {
 		const DungeonLogic::Move move = DungeonLogic(_messages).command(key);
 
-		passDungeonTime();
+		const bool timePassed = passDungeonTime();
 		if (move == DungeonLogic::MOVE_WALKED)
-			DungeonLogic(_messages).arrive();
+			dungeonEvent(DungeonLogic(_messages).arrive(timePassed));
+		else
+			redraw();
 
-		redraw();
 		return true;
 	}
 

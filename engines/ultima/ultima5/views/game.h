@@ -24,6 +24,7 @@
 
 #include "common/ptr.h"
 #include "ultima/ultima5/gfx/tileset.h"
+#include "ultima/ultima5/logic/dungeon_logic.h"
 #include "ultima/ultima5/logic/visibility_logic.h"
 #include "ultima/ultima5/views/dungeon_scene.h"
 #include "ultima/ultima5/views/interactions/interaction.h"
@@ -76,7 +77,12 @@ private:
 	/**
 	 * Lets time go by in a dungeon after a command
 	 */
-	void passDungeonTime();
+	bool passDungeonTime();
+
+	/**
+	 * Deals with what came of the party arriving somewhere in a dungeon
+	 */
+	void dungeonEvent(const DungeonLogic::Event &event);
 
 	/**
 	 * Carries out the command of a key in a dungeon

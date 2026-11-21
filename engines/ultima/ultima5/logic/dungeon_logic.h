@@ -23,6 +23,7 @@
 #define ULTIMA5_LOGIC_DUNGEON_LOGIC_H
 
 #include "ultima/ultima5/data/savegame.h"
+#include "ultima/ultima5/logic/combat_logic.h"
 #include "ultima/ultima5/views/message_log.h"
 
 namespace Ultima {
@@ -64,6 +65,23 @@ public:
 		CELL_ROOM = 0xF0
 	};
 
+	/**
+	 * What came of arriving in a cell, which may be a fight
+	 */
+	struct Event {
+		enum Kind {
+			EVENT_NONE,
+			EVENT_ATTACK,	// A monster has come to the party
+			EVENT_ROOM		// The party is in a room
+		};
+
+		Kind _kind = EVENT_NONE;
+		int _cell = 0;			// What the cell is, for a room
+		int _savedX = 0;		// Where the party was
+		int _savedY = 0;
+		bool _bothLadders = false;
+	};
+
 private:
 	Views::MessageLog &_log;
 
@@ -71,6 +89,12 @@ private:
 	static int _facing;
 	static int _arrival;
 
+	static void markRoomCleared(int room);
+	static bool roomCleared(int room);
+	static bool placeMonster();
+	bool moveMonster();
+	static void buildFightMap(byte *map, bool &bothLadders);
+	static void fillSides(byte *map, byte floor, byte wall);
 	void electricField(int sign);
 	void pitTrap();
 	void sleepSpell();
@@ -116,8 +140,41 @@ public:
 
 	/**
 	 * Does what's in the cell the party has come to, and the turn's upkeep
+	 * @param timePassed	Whether the monster has its turn as well
 	 */
-	void arrive();
+	Event arrive(bool timePassed);
+
+	/**
+	 * Works out what's in the cell the party is in, which can be a room
+	 */
+	Event checkCell();
+
+	/**
+	 * Puts a new wandering monster somewhere, or takes it away
+	 */
+	static void spawnMonster();
+	static void clearMonster();
+
+	/**
+	 * Sets up a fight with a monster that has come to the party, or with what is in a room
+	 */
+	bool prepareFight(CombatLogic &fight, Event &event);
+
+	/**
+	 * Does what follows from the fight, which can lead to another
+	 * @returns		What the party has come to next
+	 */
+	Event finishFight(const CombatLogic &fight, const Event &event);
+
+	/**
+	 * Goes the way the party left a fight by
+	 */
+	void applyExit(int code);
+
+	/**
+	 * Marks the rooms that have been fought in as empty
+	 */
+	static void hideClearedRooms();
 
 	/**
 	 * Climbs a ladder, up if negative

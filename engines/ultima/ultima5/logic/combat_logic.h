@@ -80,7 +80,9 @@ public:
 		OUTCOME_DONE,		// The turn is over
 		OUTCOME_AGAIN,		// The command didn't use up the turn
 		OUTCOME_AIM,		// A target is to be picked
-		OUTCOME_SUBCOMMAND	// A list or a picture is to be shown by the caller
+		OUTCOME_SUBCOMMAND,	// A list or a picture is to be shown by the caller
+		OUTCOME_CHOICE,		// Up or down is to be chosen
+		OUTCOME_DIRECTION	// A direction is to be chosen
 	};
 
 	// The ways of leaving a fight
@@ -150,6 +152,7 @@ private:
 	int _interferer[COMBAT_ENTITIES];
 	byte _lastKey = 0xFF;
 	int _armed = 0;
+	bool _bothLadders = false;	// The room has a ladder to go either way
 	int _lastTargetX = 0;
 	int _lastTargetY = 0;
 
@@ -233,6 +236,9 @@ private:
 	Outcome attack();
 	Outcome nextWeapon();
 	Outcome movePlayer(int key);
+	Outcome klimb();
+	Outcome klimbAt(int tile);
+	int objectTileAt(int x, int y) const;
 	bool leaveBattle(int idx, int code);
 	bool setActive(int who);
 	int armedWith(int item, bool first, Common::String &list);
@@ -293,6 +299,27 @@ public:
 	 * @param apparition	Set if the party is visited as it rested
 	 */
 	CampResult camp(int guard, int hours, byte origin, bool &apparition);
+
+	/**
+	 * Sets up a fight in a dungeon on the map that has been put in place: where the party and the
+	 * enemies start, and what stands about in a room
+	 * @param facing		Which way the party faces
+	 * @param cell			What the cell of the dungeon is, for rooms
+	 * @param level			The level of the dungeon
+	 * @param withEnemies	Whether the map's enemies are put in, as they are for rooms that hold some
+	 * @param ladders		Whether the room has ladders both ways
+	 */
+	void beginDungeon(byte origin, int flags, int facing, int cell, int level, bool withEnemies, bool ladders);
+
+	/**
+	 * Carries on with a Klimb of the party once up or down is chosen, or on a ladder
+	 */
+	Outcome klimbChosen(bool down);
+
+	/**
+	 * Carries on with a Klimb that asked for a direction
+	 */
+	Outcome klimbDirection(int dx, int dy, bool cancelled);
 
 	/**
 	 * Carries on until a member of the party is to be told what to do, or the fight is over

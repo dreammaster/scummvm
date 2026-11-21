@@ -37,6 +37,8 @@ class DungeonScene {
 private:
 	Gfx::ImageFile _walls;
 	Gfx::ImageFile _items;
+	Gfx::ImageFile _monster;
+	int _monsterTile = -1;
 	int _style = 0;
 	int _wobble = 0;
 	View *_view = nullptr;
@@ -50,6 +52,7 @@ private:
 	void drawTorchGlow(int depth, int frame);
 	int drawFlame(int x, int y, int state, int depth);
 	void drawSign(int number);
+	void drawMonster(int depth);
 
 public:
 	/**

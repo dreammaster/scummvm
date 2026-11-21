@@ -22,6 +22,7 @@
 #include "common/file.h"
 #include "ultima/ultima5/logic/combat_logic.h"
 #include "ultima/ultima5/data/combat_data.h"
+#include "ultima/ultima5/data/dungeon_data.h"
 #include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/ultima5.h"
@@ -2336,6 +2337,9 @@ CombatLogic::Outcome CombatLogic::command(int key) {
 	case 'A':
 		return attack();
 
+	case 'K':
+		return klimb();
+
 	case 'R':
 		say("Ready...\n\n");
 		return OUTCOME_SUBCOMMAND;
@@ -2469,6 +2473,186 @@ CombatLogic::Outcome CombatLogic::command(int key) {
 
 void CombatLogic::commandDone(int key) {
 	endTurn(key);
+}
+
+constexpr byte MAP_LADDER_UP = 0xC8;
+constexpr byte MAP_LADDER_DOWN = 0xC9;
+constexpr byte MAP_ROOM_EXIT = 0x86;
+constexpr int ROOM_FLAG = 2;
+
+// The tile of the last object at a place, which is zero if there's none
+int CombatLogic::objectTileAt(int x, int y) const {
+	for (int i = COMBAT_ENTITIES - 1; i >= 0; --i) {
+		if (_actors[i]._x == x && _actors[i]._y == y)
+			return _actors[i]._tile;
+	}
+
+	return 0;
+}
+
+// Climbing in a room of a dungeon, which goes up or down a ladder
+CombatLogic::Outcome CombatLogic::klimb() {
+	const Entity &e = _entities[_current];
+	const byte tile = _map[e._y * COMBAT_MAP_STRIDE + e._x];
+
+	say("Klimb-");
+
+	if ((_flags & ROOM_FLAG) && tile == MAP_LADDER_UP && _bothLadders) {
+		say("U/D-");
+		return OUTCOME_CHOICE;
+	}
+
+	return klimbAt(tile);
+}
+
+CombatLogic::Outcome CombatLogic::klimbChosen(bool down) {
+	return klimbAt(down ? MAP_LADDER_DOWN : MAP_LADDER_UP);
+}
+
+CombatLogic::Outcome CombatLogic::klimbAt(int tile) {
+	if (tile == MAP_LADDER_UP) {
+		say("Up!\n");
+
+		if (leaveBattle(_current, EXIT_UP)) {
+			endTurn('K');
+			return OUTCOME_DONE;
+		}
+
+		newline();
+		return OUTCOME_INVALID;
+	}
+
+	if ((tile == MAP_ROOM_EXIT && (_flags & 0x80)) || tile == MAP_LADDER_DOWN) {
+		say("Down!\n");
+
+		if (leaveBattle(_current, EXIT_DOWN)) {
+			endTurn('K');
+			return OUTCOME_DONE;
+		}
+
+		newline();
+		return OUTCOME_INVALID;
+	}
+
+	return OUTCOME_DIRECTION;
+}
+
+CombatLogic::Outcome CombatLogic::klimbDirection(int dx, int dy, bool cancelled) {
+	Entity &e = _entities[_current];
+
+	if (!cancelled) {
+		const int x = e._x + dx;
+		const int y = e._y + dy;
+
+		if (inside(x, y) && _map[y * COMBAT_MAP_STRIDE + x] == MAP_GRAVE && objectTileAt(x, y) == 0) {
+			_actors[e._actor]._x = e._x = x;
+			_actors[e._actor]._y = e._y = y;
+			triggers(x, y);
+		} else {
+			say("What?\n");
+			newline();
+			return OUTCOME_INVALID;
+		}
+	}
+
+	endTurn('K');
+	return OUTCOME_DONE;
+}
+
+constexpr int DUNGEON_MONSTER_ROW = 5;
+constexpr int DUNGEON_MONSTER_X_ROW = 6;
+constexpr int DUNGEON_MONSTER_Y_ROW = 7;
+constexpr int DUNGEON_SPECIAL_COLUMN = 11;
+constexpr int DUNGEON_SPECIAL_Y = 6;
+constexpr int DUNGEON_KIND_CHEST = 1;
+constexpr int DUNGEON_KIND_GOLD = 2;
+constexpr int DUNGEON_KIND_OTHER_LIMIT = 0x10;
+constexpr int DUNGEON_RANDOM_FIRST = 0xEC;
+
+void CombatLogic::beginDungeon(byte origin, int flags, int facing, int cell, int level, bool withEnemies, bool ladders) {
+	Savegame &sg = save();
+
+	_origin = origin;
+	_flags = flags;
+	_exitCode = 0;
+	_won = false;
+	_result = 1;
+	_current = 0xFF;
+	_outcome = 0;
+	_bothLadders = ladders;
+	_savedActive = sg._activeChar;
+	sg._activeChar = NO_ACTIVE_CHARACTER;
+
+	// Where the party starts depends on the way it came in
+	int row = 4;
+	switch (facing) {
+	case 0:
+	case 5:
+		row = 3;
+		break;
+	case 1:
+		row = 2;
+		break;
+	case 3:
+		row = 1;
+		break;
+	}
+
+	for (int i = 0; i < 6; ++i) {
+		_partyX[i] = _map[row * COMBAT_MAP_STRIDE + DUNGEON_SPECIAL_COLUMN + i];
+		_partyY[i] = _map[row * COMBAT_MAP_STRIDE + DUNGEON_SPECIAL_COLUMN + DUNGEON_SPECIAL_Y + i];
+	}
+
+	placeParty();
+
+	for (int i = 0; i < sg._partySize; ++i) {
+		_entities[i]._x = _actors[i]._x = _partyX[i];
+		_entities[i]._y = _actors[i]._y = _partyY[i];
+	}
+
+	if (withEnemies) {
+		byte roll[4];
+		for (int i = 0; i < 4; ++i)
+			roll[i] = ROOM_ENEMY_KIND[rnd(0, 7)];
+
+		for (int i = 0; i < 16; ++i) {
+			const byte tile = _map[DUNGEON_MONSTER_ROW * COMBAT_MAP_STRIDE + DUNGEON_SPECIAL_COLUMN + i];
+			if (tile == 0)
+				continue;
+
+			int type;
+			int kind;
+			if (tile < 0x40 || (tile & 0xFC) == 0xB4 || (tile & 0xFC) == 0xE8) {
+				type = 2;
+				kind = tile;
+			} else {
+				type = 0;
+				kind = (tile - 0x40) / 4;
+			}
+
+			if ((tile & 0xFC) == DUNGEON_RANDOM_FIRST)
+				kind = roll[tile & 3];
+
+			const int placed = place(kind, type, _map[DUNGEON_MONSTER_X_ROW * COMBAT_MAP_STRIDE + DUNGEON_SPECIAL_COLUMN + i],
+				_map[DUNGEON_MONSTER_Y_ROW * COMBAT_MAP_STRIDE + DUNGEON_SPECIAL_COLUMN + i]);
+
+			if (type == 2 && placed >= 0) {
+				if (kind == DUNGEON_KIND_CHEST) {
+					_actors[placed]._hull = level * 3 + 7;
+				} else if (kind == DUNGEON_KIND_GOLD) {
+					_actors[placed]._hull = rnd(1, level * 10 + 10);
+				} else if (kind < DUNGEON_KIND_OTHER_LIMIT && kind >= 3) {
+					_actors[placed]._hull = TREASURE_BASE[kind - 3] + rnd(0, TREASURE_RANGE[kind - 3] - 1);
+				}
+			}
+		}
+	}
+
+	int enemies, party;
+	countSides(enemies, party);
+	_won = enemies == 0;
+	_stage = STAGE_SCAN;
+	_current = 0;
 }
 
 // The kinds of enemy that can come on the party as it sleeps

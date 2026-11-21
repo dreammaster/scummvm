@@ -115,6 +115,57 @@ void DungeonScene::drawSign(int number) {
 	}
 }
 
+// The wandering monster of the dungeon, which moves about as it stands
+void DungeonScene::drawMonster(int depth) {
+	Data::Savegame &sg = _G(savegame);
+	Data::ActorRecord monster = sg.getActor(1);
+
+	if (monster._tile != _monsterTile) {
+		const Common::String name = Common::String::format("mon%d", monster._tile);
+		_monster.load(name.c_str(), g_engine->_renderMode);
+		_monsterTile = monster._tile;
+	}
+
+	if (sg._icon == 'T')
+		monster._unk6 = Data::WANDERER_MODE[monster._tile & 7];
+
+	const bool upside = monster._skiffs == 0xFF;
+	const int side = monster._unk6 & 0x90;
+	const int mode = monster._unk6 & 0x60;
+	int frame = monster._unk6 & 0xF;
+	int left, right;
+
+	if (sg._icon == 'T') {
+		left = right = 1;
+	} else {
+		left = _G(gameRandom).range(0, 100) < 0x32;
+		right = _G(gameRandom).range(0, 100) < 0x32;
+
+		switch (mode) {
+		case 0x20:
+			left = right = frame = (frame == 0);
+			break;
+
+		case 0x60:
+			if (--frame < 0)
+				frame = 3;
+			left = Data::MONSTER_CONTACT[frame] >> 1;
+			right = Data::MONSTER_CONTACT[frame] & 1;
+			break;
+		}
+	}
+
+	if (side != 0)
+		right = (side == 0x90) ^ left;
+
+	const int y = Data::VIEW_MONSTER_Y[(upside ? 4 : 0) + depth];
+	_monster.draw(*_surface, left * 3 + depth - 1, Data::VIEW_MONSTER_X[depth], y, upside ? Gfx::IMAGE_VFLIP : 0);
+	_monster.draw(*_surface, right * 3 + depth - 1, CENTRE_X, y, (upside ? Gfx::IMAGE_VFLIP : 0) | Gfx::IMAGE_HFLIP);
+
+	monster._unk6 = mode + side + frame;
+	sg.setActor(1, monster);
+}
+
 // Draws what is in front of the party at a distance, and tells if the way goes on
 bool DungeonScene::drawWall(int x, int y, int depth) {
 	Data::Savegame &sg = _G(savegame);
@@ -272,6 +323,12 @@ void DungeonScene::drawFeatures(int x, int y, int depth) {
 	if (type < 9 && (DungeonLogic::cell(x, y, sg._mapLevel) & 8) != 0) {
 		drawFrame(DOOR_FEATURE_FRAME + depth * 2, true, false);
 		drawFrame(DOOR_FEATURE_FRAME + depth * 2, true, true);
+	}
+
+	if (depth != 0) {
+		const Data::ActorRecord monster = sg.getActor(1);
+		if ((x & 7) == monster._x && (y & 7) == monster._y)
+			drawMonster(depth);
 	}
 
 	if (depth == 0 && ++_wobble > 2)

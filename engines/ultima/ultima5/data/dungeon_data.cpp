@@ -63,11 +63,11 @@ const byte MONSTER_CONTACT[4] = {
 	1, 3, 2, 3
 };
 
-const int16 MONSTER_X[4] = {
+const int16 VIEW_MONSTER_X[4] = {
 	40, 72, 80, 88
 };
 
-const int16 MONSTER_Y[8] = {
+const int16 VIEW_MONSTER_Y[8] = {
 	86, 86, 96, 98, 16, 40, 70, 85
 };
 
@@ -161,6 +161,90 @@ const int8 SIDE_Y[4] = {
 
 const byte ROOM_CENTRE[8] = {
 	0, 200, 201, 200, 220, 216, 0, 0
+};
+
+const byte CAMP_PARTY_X[6] = {
+	5, 6, 5, 4, 4, 6
+};
+
+const byte CAMP_PARTY_Y[6] = {
+	4, 5, 6, 5, 4, 6
+};
+
+const byte ROOM_SPOTS_A[6] = {
+	5, 4, 6, 3, 5, 7
+};
+
+const byte ROOM_SPOTS_B[6] = {
+	6, 7, 7, 8, 8, 8
+};
+
+const byte ROOM_SPOTS_C[6] = {
+	4, 3, 3, 2, 2, 2
+};
+
+const byte ROOM_SPOTS_D[6] = {
+	5, 4, 6, 3, 5, 7
+};
+
+const byte ENEMY_SPOTS_A[16] = {
+	5, 4, 6, 3, 7, 2, 8, 5,
+	2, 8, 3, 7, 2, 4, 6, 8
+};
+
+const byte ENEMY_SPOTS_B[16] = {
+	8, 8, 8, 7, 7, 6, 6, 9,
+	8, 8, 9, 9, 10, 10, 10, 10
+};
+
+const byte ENEMY_SPOTS_C[16] = {
+	2, 2, 2, 3, 3, 4, 4, 1,
+	2, 2, 1, 1, 0, 0, 0, 0
+};
+
+const byte ENEMY_SPOTS_D[16] = {
+	5, 4, 6, 3, 7, 2, 8, 5,
+	2, 8, 7, 3, 2, 4, 6, 8
+};
+
+const byte CAMP_ENEMY_X[16] = {
+	2, 2, 2, 3, 3, 3, 4, 5,
+	5, 6, 7, 7, 7, 8, 8, 8
+};
+
+const byte CAMP_ENEMY_Y[16] = {
+	4, 5, 7, 2, 3, 8, 8, 3,
+	8, 3, 4, 7, 8, 3, 6, 7
+};
+
+const byte WANDERER_KIND[8] = {
+	20, 21, 22, 23, 24, 25, 28, 27
+};
+
+const byte WANDERER_MODE[8] = {
+	96, 160, 0, 144, 128, 96, 0, 0
+};
+
+const byte ROOM_ENEMY_KIND[8] = {
+	20, 21, 22, 34, 33, 24, 31, 24
+};
+
+const byte TREASURE_RANGE[13] = {
+	8, 8, 4, 3, 8, 8, 4, 3,
+	6, 3, 8, 1, 8
+};
+
+const byte TREASURE_BASE[13] = {
+	0, 0, 30, 4, 1, 1, 0, 42,
+	9, 45, 1, 1, 1
+};
+
+const byte ARRIVAL_FACING[6] = {
+	0, 1, 2, 3, 0, 2
+};
+
+const byte CLEARED_ROOM_SKIP[6] = {
+	80, 91, 65, 70, 75, 76
 };
 
 const char *const SIGN_TEXT[11] = {

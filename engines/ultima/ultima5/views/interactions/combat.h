@@ -25,6 +25,7 @@
 #include "common/ptr.h"
 #include "ultima/ultima5/logic/attack_logic.h"
 #include "ultima/ultima5/logic/combat_logic.h"
+#include "ultima/ultima5/logic/dungeon_logic.h"
 #include "ultima/ultima5/views/interactions/interaction.h"
 
 namespace Ultima {
@@ -42,6 +43,8 @@ private:
 		STATE_COMMAND,
 		STATE_AIM,
 		STATE_SUB,
+		STATE_CHOICE,
+		STATE_DIRECTION,
 		STATE_DONE
 	};
 
@@ -51,6 +54,9 @@ private:
 	int _subKey = 0;
 	AttackLogic::Fight _fight;
 	bool _hasFight = false;
+	bool _dungeon = false;
+	DungeonLogic::Event _event;
+	Interaction *_next = nullptr;
 
 	/**
 	 * Carries on with the fight until it needs the player again
@@ -66,6 +72,7 @@ private:
 
 public:
 	Combat(MessageLog &log);
+	~Combat() override;
 
 	/**
 	 * Sets up the fight
@@ -75,6 +82,12 @@ public:
 	 * @returns			False if the map couldn't be loaded
 	 */
 	bool start(int kind, int map, bool lone);
+
+	/**
+	 * Sets up a fight in a dungeon, with a monster that has come to the party or in a room
+	 * @returns		False if it couldn't be set up
+	 */
+	bool startDungeon(const DungeonLogic::Event &event);
 
 	/**
 	 * Has the party rest for some hours on the map of the fights, which an ambush
@@ -107,6 +120,12 @@ public:
 
 	bool takesTime() const override {
 		return false;
+	}
+
+	Interaction *takeNext() override {
+		Interaction *next = _next;
+		_next = nullptr;
+		return next;
 	}
 
 	bool keypress(const KeypressMessage &msg) override;

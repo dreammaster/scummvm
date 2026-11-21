@@ -52,6 +52,23 @@ static const char *const MAP_FILE = "brit.cbt";
 Combat::Combat(MessageLog &log) : Interaction(log), _logic(log) {
 }
 
+Combat::~Combat() {
+	delete _next;
+}
+
+bool Combat::startDungeon(const DungeonLogic::Event &event) {
+	_event = event;
+	_dungeon = true;
+
+	if (!DungeonLogic(_log).prepareFight(_logic, _event))
+		return false;
+
+	if (carryOn())
+		_state = STATE_DONE;
+
+	return true;
+}
+
 bool Combat::start(int kind, int map, bool lone) {
 	if (!_logic.loadMap(MAP_FILE, map * COMBAT_MAP_BYTES))
 		return false;
@@ -98,6 +115,20 @@ bool Combat::carryOn() {
 		if (_hasFight)
 			AttackLogic::afterFight(_fight, _logic.won());
 
+		if (_dungeon) {
+			// What the fight led to may be a room, with another fight
+			const DungeonLogic::Event next = DungeonLogic(_log).finishFight(_logic, _event);
+
+			if (next._kind != DungeonLogic::Event::EVENT_NONE) {
+				Combat *combat = new Combat(_log);
+
+				if (combat->startDungeon(next) && !combat->done())
+					_next = combat;
+				else
+					delete combat;
+			}
+		}
+
 		return true;
 	}
 
@@ -109,6 +140,14 @@ bool Combat::handle(CombatLogic::Outcome outcome, int key) {
 	switch (outcome) {
 	case CombatLogic::OUTCOME_AIM:
 		_state = STATE_AIM;
+		return false;
+
+	case CombatLogic::OUTCOME_CHOICE:
+		_state = STATE_CHOICE;
+		return false;
+
+	case CombatLogic::OUTCOME_DIRECTION:
+		_state = STATE_DIRECTION;
 		return false;
 
 	case CombatLogic::OUTCOME_SUBCOMMAND:
@@ -147,6 +186,40 @@ bool Combat::keypress(const KeypressMessage &msg) {
 	}
 
 	const int key = originalKey(msg);
+
+	if (_state == STATE_CHOICE) {
+		if (key == CombatLogic::KEY_UP || key == 'U')
+			return handle(_logic.klimbChosen(false), key);
+		if (key == CombatLogic::KEY_DOWN || key == 'D')
+			return handle(_logic.klimbChosen(true), key);
+		return false;
+	}
+
+	if (_state == STATE_DIRECTION) {
+		int dx = 0;
+		int dy = 0;
+
+		switch (key) {
+		case CombatLogic::KEY_UP:
+			dy = -1;
+			break;
+		case CombatLogic::KEY_DOWN:
+			dy = 1;
+			break;
+		case CombatLogic::KEY_RIGHT:
+			dx = 1;
+			break;
+		case CombatLogic::KEY_LEFT:
+			dx = -1;
+			break;
+		case KEY_SPACE:
+			return handle(_logic.klimbDirection(0, 0, true), key);
+		default:
+			return false;
+		}
+
+		return handle(_logic.klimbDirection(dx, dy, false), key);
+	}
 
 	if (_state == STATE_AIM) {
 		int dx = 0;
