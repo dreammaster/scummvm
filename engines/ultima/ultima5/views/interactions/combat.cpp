@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/views/interactions/combat.h"
+#include "ultima/ultima5/views/interactions/object_command.h"
 #include "ultima/ultima5/views/interactions/ready.h"
 #include "ultima/ultima5/views/interactions/use.h"
 #include "ultima/ultima5/views/interactions/ztats.h"
@@ -158,6 +159,17 @@ bool Combat::handle(CombatLogic::Outcome outcome, int key) {
 			_sub.reset(new Ready(_log));
 		} else if (key == 'Z') {
 			_sub.reset(new Ztats(_log));
+		} else if (key == 'G' || key == 'J' || key == 'O' || key == 'S') {
+			ObjectCommand *command = new ObjectCommand(_log, key == 'G' ? ObjectItems::KIND_GET :
+				key == 'J' ? ObjectItems::KIND_JIMMY : key == 'O' ? ObjectItems::KIND_OPEN : ObjectItems::KIND_SEARCH, &_logic);
+
+			if (command->done()) {
+				delete command;
+				_logic.commandDone(key);
+				return carryOn();
+			}
+
+			_sub.reset(command);
 		} else {
 			Use *use = new Use(_log);
 			if (use->done()) {

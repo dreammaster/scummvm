@@ -26,7 +26,7 @@ namespace Ultima5 {
 namespace Views {
 namespace Interactions {
 
-ObjectCommand::ObjectCommand(MessageLog &log, ObjectItems::Kind kind) : Interaction(log), _items(log, kind) {
+ObjectCommand::ObjectCommand(MessageLog &log, ObjectItems::Kind kind, CombatLogic *combat) : Interaction(log), _items(log, kind, combat) {
 	if (kind == ObjectItems::KIND_OPEN || kind == ObjectItems::KIND_PUSH)
 		ObjectItems::closeDoor();
 

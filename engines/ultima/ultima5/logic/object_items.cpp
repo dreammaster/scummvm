@@ -102,6 +102,7 @@ constexpr byte TILE_CANNON_FLOOR = 0x45;
 constexpr byte PARTY_ON_FOOT = 0x1C;
 constexpr byte PARTY_RIDING_HORSE = 0x12;
 constexpr int FALL_DAMAGE = 5;
+constexpr int COMBAT_ITEM_FLAG = 0x20;
 constexpr byte SHIP_FIRST = 0x20;
 constexpr byte SHIP_LAST = 0x27;
 constexpr int CANNON_RANGE = 4;
@@ -141,17 +142,39 @@ static Data::Savegame &save() {
 	return _G(savegame);
 }
 
+// The fight that what's done is in, if it's in one
+static CombatLogic *s_combat = nullptr;
+
+static Data::ActorRecord actorOf(int i) {
+	return s_combat ? s_combat->actor(i) : save().getActor(i);
+}
+
+static void storeActor(int i, const Data::ActorRecord &a) {
+	if (s_combat)
+		s_combat->actorRef(i) = a;
+	else
+		save().setActor(i, a);
+}
+
+// Where the party member who is acting stands
+static int standX() {
+	return s_combat ? s_combat->entity(s_combat->current())._x : save()._mapX;
+}
+
+static int standY() {
+	return s_combat ? s_combat->entity(s_combat->current())._y : save()._mapY;
+}
+
 // Whether an object is on the square, on the level the party is on
 static bool atSquare(const Data::ActorRecord &a, int x, int y) {
-	return a._x == x && a._y == y && a._z == save()._mapLevel;
+	return a._x == x && a._y == y && (s_combat || a._z == save()._mapLevel);
 }
 
 // The first of the objects on a square, going up from the first after the party's, and its kind
 static int firstAt(int x, int y, byte &tile) {
-	const Data::Savegame &sg = save();
 
 	for (int i = 1; i < Data::ACTOR_COUNT; ++i) {
-		const Data::ActorRecord a = sg.getActor(i);
+		const Data::ActorRecord a = actorOf(i);
 
 		if (atSquare(a, x, y)) {
 			tile = a._tile;
@@ -165,10 +188,9 @@ static int firstAt(int x, int y, byte &tile) {
 
 // The first chest of a square, if it has one
 static int chestAt(int x, int y) {
-	const Data::Savegame &sg = save();
 
 	for (int i = 1; i < Data::ACTOR_COUNT; ++i) {
-		const Data::ActorRecord a = sg.getActor(i);
+		const Data::ActorRecord a = actorOf(i);
 
 		if (atSquare(a, x, y) && a._tile == OBJECT_CHEST)
 			return i;
@@ -187,11 +209,17 @@ static void lowerKarma(int amount) {
 }
 
 byte ObjectItems::tileAt(int x, int y) {
+	if (s_combat)
+		return x >= 0 && y >= 0 && x < COMBAT_SIZE && y < COMBAT_SIZE ? s_combat->tile(x, y) : 0;
+
 	return g_engine->getMapTile(x, y);
 }
 
 void ObjectItems::setTileAt(int x, int y, byte tile) {
-	if (save()._mapId == 0)
+	if (s_combat) {
+		if (x >= 0 && y >= 0 && x < COMBAT_SIZE && y < COMBAT_SIZE)
+			s_combat->mapData()[y * COMBAT_MAP_STRIDE + x] = tile;
+	} else if (save()._mapId == 0)
 		_G(world).setTile(x, y, tile);
 	else if (x >= 0 && y >= 0 && x < LOCATION_TILES && y < LOCATION_TILES)
 		_G(location).setTile(x, y, tile);
@@ -199,10 +227,9 @@ void ObjectItems::setTileAt(int x, int y, byte tile) {
 
 // The last of the objects that isn't being used, or the first if there is none
 int ObjectItems::freeSlot() {
-	const Data::Savegame &sg = save();
 
 	for (int i = Data::ACTOR_COUNT - 1; i >= 0; --i) {
-		if (sg.getActor(i)._tile == 0)
+		if (actorOf(i)._tile == 0)
 			return i;
 	}
 
@@ -214,7 +241,7 @@ int ObjectItems::scanSlots(int lowest, int highest, bool offscreen) {
 	const Data::Savegame &sg = save();
 
 	for (int i = 1; i < FIRST_FREE_SLOTS; ++i) {
-		const Data::ActorRecord a = sg.getActor(i);
+		const Data::ActorRecord a = actorOf(i);
 
 		if (a._tile < lowest || a._tile > highest || a._tile == 0xB5)
 			continue;
@@ -247,23 +274,21 @@ int ObjectItems::pickSlot() {
 }
 
 void ObjectItems::place(int slot, int tile, int x, int y, int z, int amount) {
-	Data::Savegame &sg = save();
-	Data::ActorRecord a = sg.getActor(slot);
+	Data::ActorRecord a = actorOf(slot);
 
 	a._tile = a._animTile = tile;
 	a._x = x;
 	a._y = y;
 	a._z = z;
 	a._hull = amount;
-	sg.setActor(slot, a);
+	storeActor(slot, a);
 }
 
 void ObjectItems::clear(int slot) {
-	Data::Savegame &sg = save();
-	Data::ActorRecord a = sg.getActor(slot);
+	Data::ActorRecord a = actorOf(slot);
 
 	a._tile = a._animTile = a._x = a._y = a._z = a._hull = 0;
-	sg.setActor(slot, a);
+	storeActor(slot, a);
 }
 
 void ObjectItems::closeDoor() {
@@ -271,6 +296,14 @@ void ObjectItems::closeDoor() {
 
 	if (sg._doorOpen != 0 && sg._mapId != 0 && sg._mapId <= LAST_LOCATION_MAP)
 		setTileAt(sg._doorX, sg._doorY, sg._doorOpen);
+}
+
+ObjectItems::ObjectItems(Views::MessageLog &log, Kind kind, CombatLogic *combat) : _log(log), _items(log), _kind(kind) {
+	s_combat = combat;
+}
+
+ObjectItems::~ObjectItems() {
+	s_combat = nullptr;
 }
 
 bool ObjectItems::ready() {
@@ -466,10 +499,9 @@ void ObjectItems::push() {
 
 // The top of the objects on a square, going down from the last, and what it is
 static int topAt(int x, int y, byte &tile) {
-	const Data::Savegame &sg = save();
 
 	for (int i = Data::ACTOR_COUNT - 1; i >= 0; --i) {
-		const Data::ActorRecord a = sg.getActor(i);
+		const Data::ActorRecord a = actorOf(i);
 
 		if (atSquare(a, x, y)) {
 			tile = a._tile;
@@ -605,9 +637,9 @@ void ObjectItems::fireShip() {
 		const int object = firstAt(x += _dx, y += _dy, tile);
 
 		if (hittable(tile) && (tile & 0xFC) != WRECK_FIRST) {
-			Data::ActorRecord a = sg.getActor(object);
+			Data::ActorRecord a = actorOf(object);
 			a._hull -= _G(gameRandom).range(1, SHOT_DAMAGE);
-			sg.setActor(object, a);
+			storeActor(object, a);
 
 			if (a._hull > 0x7F)
 				clear(object);
@@ -617,12 +649,10 @@ void ObjectItems::fireShip() {
 }
 
 ObjectItems::Need ObjectItems::begin(int dx, int dy) {
-	const Data::Savegame &sg = save();
-
 	_dx = dx;
 	_dy = dy;
-	_x = sg._mapX + dx;
-	_y = sg._mapY + dy;
+	_x = standX() + dx;
+	_y = standY() + dy;
 
 	switch (_kind) {
 	case KIND_GET:
@@ -744,7 +774,7 @@ void ObjectItems::get() {
 	_log.print("\n");
 
 	for (int i = 1; i < Data::ACTOR_COUNT; ++i) {
-		const Data::ActorRecord a = sg.getActor(i);
+		const Data::ActorRecord a = actorOf(i);
 
 		if (atSquare(a, _x, _y) && (a._tile < OBJECT_FIRST_CREATURE || a._tile == OBJECT_MOONSTONE ||
 				a._tile == OBJECT_CARPET || (a._tile & 0xFC) == OBJECT_SHARD)) {
@@ -755,7 +785,8 @@ void ObjectItems::get() {
 	}
 
 	if (object != 0) {
-		_items.award(found._tile, found._hull, object);
+		if (_items.award(found._tile, found._hull, object))
+			clear(object);
 		return;
 	}
 
@@ -839,10 +870,12 @@ ObjectItems::Need ObjectItems::open() {
 
 	case TILE_DOOR_OPEN_A:
 	case TILE_DOOR_OPEN_B:
-		sg._doorOpen = tile;
-		sg._doorTurns = DOOR_OPEN_TURNS;
-		sg._doorX = _x;
-		sg._doorY = _y;
+		if (!s_combat) {
+			sg._doorOpen = tile;
+			sg._doorTurns = DOOR_OPEN_TURNS;
+			sg._doorX = _x;
+			sg._doorY = _y;
+		}
 		setTileAt(_x, _y, TILE_FLOOR);
 		_log.print("Opened!\n");
 		return NEED_NONE;
@@ -853,7 +886,7 @@ ObjectItems::Need ObjectItems::open() {
 
 	// A chest, if there is one, but a box is not to be opened
 	for (int i = 1; i < Data::ACTOR_COUNT; ++i) {
-		const Data::ActorRecord a = sg.getActor(i);
+		const Data::ActorRecord a = actorOf(i);
 
 		if (!atSquare(a, _x, _y))
 			continue;
@@ -875,11 +908,11 @@ ObjectItems::Need ObjectItems::open() {
 
 void ObjectItems::openChest(int who) {
 	Data::Savegame &sg = save();
-	int power = sg.getActor(_object)._hull;
+	int power = actorOf(_object)._hull;
 
 	clear(_object);
 
-	if (sg._mapId >= 1 && sg._mapId <= LAST_LOCATION_MAP)
+	if (!s_combat && sg._mapId >= 1 && sg._mapId <= LAST_LOCATION_MAP)
 		lowerKarma(OPEN_KARMA_COST);
 
 	if (power >= LOCKED_FLAG) {
@@ -957,6 +990,12 @@ void ObjectItems::jimmyPrisoner(int who) {
 		return;
 	}
 
+	if (s_combat) {
+		setTileAt(_x, _y, TILE_FLOOR);
+		_log.print("Unlocked\n");
+		return;
+	}
+
 	const int npc = AttackLogic::findNpc(_object);
 	if (npc == -1) {
 		_log.print("Couldn't find this npc\n\n");
@@ -982,7 +1021,7 @@ void ObjectItems::jimmyPrisoner(int who) {
 
 void ObjectItems::jimmyChest(int who) {
 	Data::Savegame &sg = save();
-	Data::ActorRecord chest = sg.getActor(_object);
+	Data::ActorRecord chest = actorOf(_object);
 
 	if (chest._hull >= LOCKED_FLAG) {
 		const byte skill = ((chest._hull & 0x7F) - sg._party[who]._dex + SKILL_RANGE) >> 1;
@@ -990,7 +1029,7 @@ void ObjectItems::jimmyChest(int who) {
 		if (skill < _G(gameRandom).range(1, SKILL_RANGE)) {
 			_log.print("Success!\n");
 			chest._hull &= 0x7F;
-			sg.setActor(_object, chest);
+			storeActor(_object, chest);
 			return;
 		}
 	}
@@ -1011,7 +1050,7 @@ void ObjectItems::search(int who) {
 	}
 
 	for (int i = Data::ACTOR_COUNT - 1; i >= 0; --i) {
-		const Data::ActorRecord a = sg.getActor(i);
+		const Data::ActorRecord a = actorOf(i);
 
 		if (!atSquare(a, _x, _y))
 			continue;
@@ -1091,7 +1130,7 @@ void ObjectItems::search(int who) {
 // What a look at a chest says of its trap
 void ObjectItems::trapSense(int object, int who) {
 	const Data::Savegame &sg = save();
-	const int trap = sg.getActor(object)._hull;
+	const int trap = actorOf(object)._hull;
 	const int intel = sg._party[who]._int;
 	const int worth = (trap & LOCKED_FLAG) == 0 ? (SKILL_RANGE - intel) >> 1 : ((trap & 0x7F) - intel + SKILL_RANGE) >> 1;
 	const bool sensed = worth <= _G(gameRandom).range(1, SKILL_RANGE);
@@ -1141,7 +1180,7 @@ void ObjectItems::searchBody(int object, int who) {
 		return;
 	}
 
-	Data::ActorRecord a = sg.getActor(object);
+	Data::ActorRecord a = actorOf(object);
 
 	if (_G(gameRandom).range(0, 3) == 0) {
 		_log.print("food!\n");
@@ -1152,12 +1191,15 @@ void ObjectItems::searchBody(int object, int who) {
 	}
 
 	a._hull = _G(gameRandom).range(1, 3);
-	sg.setActor(object, a);
+	storeActor(object, a);
 }
 
 // A moonstone buried here comes up, unless it has
 bool ObjectItems::searchMoonstone(int x, int y) {
 	Data::Savegame &sg = save();
+
+	if (s_combat)
+		return false;
 
 	for (int i = 7; i >= 0; --i) {
 		if (sg._moonstoneX[i] != x || sg._moonstoneY[i] != y || sg._moonstoneZ[i] != sg._mapLevel ||
@@ -1167,7 +1209,7 @@ bool ObjectItems::searchMoonstone(int x, int y) {
 		byte tile;
 		const int top = firstAt(x, y, tile);
 
-		if (tile == OBJECT_MOONSTONE && sg.getActor(top)._hull == i)
+		if (tile == OBJECT_MOONSTONE && actorOf(top)._hull == i)
 			continue;
 
 		place(pickSlot(), OBJECT_MOONSTONE, x, y, sg._mapLevel, i);
@@ -1181,6 +1223,9 @@ bool ObjectItems::searchMoonstone(int x, int y) {
 // Reagents grow in three places and are picked at midnight, once a day
 bool ObjectItems::searchHerbs(int x, int y) {
 	Data::Savegame &sg = save();
+
+	if (s_combat)
+		return false;
 	static const char *const NAMES[HERB_PATCHES] = { "mandrake root!", "mandrake root!", "nightshade!" };
 
 	for (int i = 0; i < HERB_PATCHES; ++i) {
@@ -1206,7 +1251,7 @@ void ObjectItems::searchHidden(int x, int y) {
 	bool found = false;
 	int i;
 
-	for (i = 0; i < Data::HIDDEN_COUNT; ++i) {
+	for (i = 0; i < (s_combat ? 0 : Data::HIDDEN_COUNT); ++i) {
 		if (Data::HIDDEN_MAP[i] != sg._mapId || Data::HIDDEN_LEVEL[i] != sg._mapLevel ||
 				Data::HIDDEN_X[i] != x || Data::HIDDEN_Y[i] != y)
 			continue;
@@ -1260,9 +1305,9 @@ void ObjectItems::spawn(int kind, int amount, int power, bool &found) {
 
 	place(slot, kind, _x, _y, sg._mapLevel, amount);
 
-	Data::ActorRecord a = save().getActor(slot);
-	a._skiffs = 0;
-	save().setActor(slot, a);
+	Data::ActorRecord a = actorOf(slot);
+	a._skiffs = s_combat ? COMBAT_ITEM_FLAG : 0;
+	storeActor(slot, a);
 
 	if (!found) {
 		_log.print("Found:\n");

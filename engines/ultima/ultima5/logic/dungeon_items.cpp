@@ -501,13 +501,13 @@ void DungeonItems::take() {
 	}
 }
 
-void DungeonItems::award(int tile, int amount, int object) {
+bool DungeonItems::award(int tile, int amount, int object) {
 	Data::Savegame &sg = save();
 
 	switch (tile) {
 	case OBJECT_CHEST:
 		_log.print("Open it first!\n");
-		return;
+		return false;
 
 	case OBJECT_MOONSTONE:
 		_log.print("A moonstone!\n");
@@ -625,14 +625,10 @@ void DungeonItems::award(int tile, int amount, int object) {
 
 	default:
 		_log.print("Nothing to get!\n");
-		return;
+		return false;
 	}
 
-	if (object < Data::ACTOR_COUNT) {
-		Data::ActorRecord actor = sg.getActor(object);
-		actor._tile = actor._animTile = actor._x = actor._y = actor._z = actor._hull = 0;
-		sg.setActor(object, actor);
-	}
+	return true;
 }
 
 } // namespace Ultima5

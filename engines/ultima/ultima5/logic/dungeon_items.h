@@ -96,8 +96,9 @@ public:
 	 * @param tile		What kind of thing it is, as the objects are numbered
 	 * @param amount	How many, or which
 	 * @param object	Which of the objects on the map it was taken from, if any
+	 * @returns		True if it was taken, so what it was taken from is to be cleared
 	 */
-	void award(int tile, int amount, int object = Data::ACTOR_COUNT);
+	bool award(int tile, int amount, int object = Data::ACTOR_COUNT);
 };
 
 } // namespace Ultima5

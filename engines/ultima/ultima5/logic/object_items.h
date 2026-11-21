@@ -22,6 +22,7 @@
 #ifndef ULTIMA5_LOGIC_OBJECT_ITEMS_H
 #define ULTIMA5_LOGIC_OBJECT_ITEMS_H
 
+#include "ultima/ultima5/logic/combat_logic.h"
 #include "ultima/ultima5/logic/dungeon_items.h"
 
 namespace Ultima {
@@ -99,7 +100,11 @@ private:
 	void fireShip();
 
 public:
-	ObjectItems(Views::MessageLog &log, Kind kind) : _log(log), _items(log), _kind(kind) {}
+	/**
+	 * @param combat	The fight that it's done in, if it is
+	 */
+	ObjectItems(Views::MessageLog &log, Kind kind, CombatLogic *combat = nullptr);
+	~ObjectItems();
 
 	/**
 	 * Shuts the door that was opened before, if it is still open

@@ -53,7 +53,10 @@ private:
 	bool startWho();
 
 public:
-	ObjectCommand(MessageLog &log, ObjectItems::Kind kind);
+	/**
+	 * @param combat	The fight it is in, if it is
+	 */
+	ObjectCommand(MessageLog &log, ObjectItems::Kind kind, CombatLogic *combat = nullptr);
 
 	/**
 	 * Returns true if it was over as it started

@@ -2352,6 +2352,20 @@ CombatLogic::Outcome CombatLogic::command(int key) {
 		say("Z-stats...\n");
 		return OUTCOME_SUBCOMMAND;
 
+	case 'G':
+	case 'J':
+	case 'O':
+	case 'S':
+		say(key == 'G' ? "Get-" : key == 'J' ? "Jimmy-" : key == 'O' ? "Open-" : "Search-");
+
+		if ((_entities[_current]._flags & FLAG_PLAYER) == 0) {
+			say("Can't!\n");
+			prompt(true);
+			return OUTCOME_AGAIN;
+		}
+
+		return OUTCOME_SUBCOMMAND;
+
 	case 27: {
 		// Escape: everyone goes, if they have won
 		say("Escape");
