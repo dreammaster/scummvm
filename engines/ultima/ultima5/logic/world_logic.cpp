@@ -22,6 +22,7 @@
 #include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/logic/transport_logic.h"
 #include "ultima/ultima5/logic/time_logic.h"
+#include "ultima/ultima5/data/shrine_data.h"
 #include "ultima/ultima5/data/world_map.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -154,6 +155,24 @@ void WorldLogic::centerWindow(Data::Savegame &sg) {
 	sg._chunkY = sg._mapY & 0xF0;
 	if ((sg._mapY & 0x0F) < CHUNK_SIZE / 2)
 		sg._chunkY = (sg._chunkY - CHUNK_SIZE) & 0xF0;
+}
+
+bool WorldLogic::jumpToMoonstone(Data::Savegame &sg, int stone) {
+	if (stone < 0 || stone >= 8 || sg._moonstoneState[stone] != 0)
+		return false;
+
+	sg.storeWorldObjects(sg._mapLevel != 0);
+	sg._mapX = sg._moonstoneX[stone];
+	sg._mapY = sg._moonstoneY[stone];
+	sg._mapLevel = sg._moonstoneZ[stone];
+	sg.restoreWorldObjects(sg._mapLevel != 0);
+	centerWindow(sg);
+	_G(visibility).invalidate();
+	return true;
+}
+
+int WorldLogic::gateMoonstone(const Data::Savegame &sg) {
+	return Data::MOON_PHASES[(sg._day - 1) * 2 + (sg._hour < 12 ? 0 : 1)];
 }
 
 void WorldLogic::syncPartyObject(Data::Savegame &sg) {

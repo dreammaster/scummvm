@@ -41,6 +41,9 @@ extern const byte SHRINE_STRENGTH[SHRINE_COUNT];
 extern const byte SHRINE_DEXTERITY[SHRINE_COUNT];
 extern const byte SHRINE_INTELLIGENCE[SHRINE_COUNT];
 
+// The phases of the two moons for each day of the month, for Trammel and then for Felucca
+extern const byte MOON_PHASES[28 * 2];
+
 } // namespace Data
 } // namespace Ultima5
 } // namespace Ultima

@@ -86,6 +86,13 @@ const byte SHRINE_INTELLIGENCE[SHRINE_COUNT] = {
 	0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00
 };
 
+const byte MOON_PHASES[28 * 2] = {
+	0, 0, 1, 0, 1, 1, 2, 2, 2, 3, 3, 4, 3, 5,
+	4, 6, 5, 7, 5, 0, 6, 0, 6, 1, 7, 2, 7, 3,
+	0, 4, 1, 5, 1, 6, 2, 7, 2, 0, 3, 0, 3, 1,
+	4, 2, 5, 3, 5, 4, 6, 5, 6, 6, 7, 7, 7, 0
+};
+
 } // namespace Data
 } // namespace Ultima5
 } // namespace Ultima

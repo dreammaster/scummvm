@@ -666,15 +666,7 @@ SpellLogic::Need SpellLogic::keyChosen(int key) {
 	if (key >= '1' && key < '1' + MOONSTONES) {
 		const int stone = key - '1';
 
-		if (sg._moonstoneState[stone] == 0) {
-			sg.storeWorldObjects(sg._mapLevel != 0);
-			sg._mapX = sg._moonstoneX[stone];
-			sg._mapY = sg._moonstoneY[stone];
-			sg._mapLevel = sg._moonstoneZ[stone];
-			sg.restoreWorldObjects(sg._mapLevel != 0);
-			WorldLogic::centerWindow(sg);
-			_G(visibility).invalidate();
-
+		if (WorldLogic::jumpToMoonstone(sg, stone)) {
 			_result = -1;
 			_passes = false;
 		}

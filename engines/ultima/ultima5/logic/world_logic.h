@@ -72,6 +72,17 @@ public:
 	static void centerWindow(Data::Savegame &savegame);
 
 	/**
+	 * Takes the party to where a moonstone is buried, if it is outdoors
+	 * @returns		False if that stone isn't buried there
+	 */
+	static bool jumpToMoonstone(Data::Savegame &savegame, int stone);
+
+	/**
+	 * Gives which moonstone the moongates lead to now, from the phases of the moons
+	 */
+	static int gateMoonstone(const Data::Savegame &savegame);
+
+	/**
 	 * Moves the party a step, or reports why it can't
 	 * @returns		True if the party moved
 	 */

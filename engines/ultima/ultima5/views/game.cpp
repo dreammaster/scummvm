@@ -70,6 +70,8 @@ constexpr int EARTHQUAKE_ROLL = 0x69;
 constexpr byte TILE_BED = 0xAB;
 constexpr byte TILE_SKIFF = 0x28;
 constexpr byte SHIP_FIRST = 0x20;
+constexpr byte TILE_MOONGATE = 0xDC;
+constexpr int MOONGATE_SHRINE_MINUTES = 10;
 constexpr byte TILE_SHRINE = 0x19;
 constexpr byte TILE_CODEX = 0x11;
 constexpr byte TILE_CARPET = 0x14;
@@ -472,6 +474,19 @@ void Game::endTurn() {
 				((sg._partyTile & 0xFC) == TILE_SKIFF || (sg._partyTile & 0xFE) == TILE_CARPET)) {
 			_messages.print("Rough seas!\n");
 			TransportLogic(_messages).damage();
+		}
+
+		// A moongate takes the party to where the stone of the moons' phases lies, or at midnight to a shrine
+		if (ground == TILE_MOONGATE) {
+			_G(world).setTile(sg._mapX, sg._mapY, Data::TILE_GRASS);
+			_G(visibility).invalidate();
+
+			if (sg._hour == 0 && sg._minute < MOONGATE_SHRINE_MINUTES) {
+				startInteraction(new Interactions::Shrine(_messages, false));
+				return;
+			}
+
+			WorldLogic::jumpToMoonstone(sg, WorldLogic::gateMoonstone(sg));
 		}
 
 		// The monsters have their turn
