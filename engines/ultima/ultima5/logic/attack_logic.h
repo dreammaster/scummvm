@@ -54,11 +54,6 @@ private:
 	 */
 	static int findObject(int x, int y);
 
-	/**
-	 * Finds the person that an object is, or -1
-	 */
-	static int findNpc(int object);
-
 	static void lowerKarma();
 
 	/**
@@ -73,6 +68,11 @@ private:
 
 public:
 	AttackLogic(Views::MessageLog &log) : _log(log) {}
+
+	/**
+	 * Finds the person that an object is, or -1
+	 */
+	static int findNpc(int object);
 
 	/**
 	 * Says why, and gives false, if the party can't attack from where it is

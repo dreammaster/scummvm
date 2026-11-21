@@ -115,6 +115,72 @@ void PartyMemberChooser::draw(View &view) const {
 	view.drawCaps(LABEL_END_COLUMN * 8, 0, false);
 }
 
+static bool isFit(const Data::Character &c) {
+	return c._status == Data::STATUS_GOOD || c._status == Data::STATUS_POISONED;
+}
+
+ActingMemberChooser::Result ActingMemberChooser::begin(MessageLog &log) {
+	const Data::Savegame &sg = _G(savegame);
+	_asking = false;
+	_who = -1;
+
+	if (sg._activeChar != Data::NO_ACTIVE_CHARACTER) {
+		_who = sg._activeChar;
+		return CHOSEN;
+	}
+
+	int count = 0;
+	for (int i = 0; i < sg._partySize; ++i) {
+		if (isFit(sg._party[i])) {
+			_who = i;
+			++count;
+		}
+	}
+
+	if (count > 1) {
+		log.print("Player: ");
+		_chooser = PartyMemberChooser();
+		_asking = true;
+		return PENDING;
+	}
+
+	if (count == 0) {
+		log.print("None!\n");
+		return CANCELLED;
+	}
+
+	return CHOSEN;
+}
+
+ActingMemberChooser::Result ActingMemberChooser::handleKey(const KeypressMessage &msg, MessageLog &log) {
+	const PartyMemberChooser::Result result = _chooser.handleKey(msg);
+	if (result == PartyMemberChooser::PENDING)
+		return PENDING;
+
+	if (result == PartyMemberChooser::CANCELLED) {
+		_asking = false;
+		_who = -1;
+		log.print("None!\n");
+		return CANCELLED;
+	}
+
+	const Data::Character &c = _G(savegame)._party[_chooser.index()];
+	log.print(c._name);
+	if (log.column() != 0)
+		log.printChar('\n');
+
+	if (!isFit(c)) {
+		log.print("Disabled!\n\n");
+		log.print("Player: ");
+		_chooser = PartyMemberChooser();
+		return PENDING;
+	}
+
+	_asking = false;
+	_who = _chooser.index();
+	return CHOSEN;
+}
+
 } // namespace Interactions
 } // namespace Views
 } // namespace Ultima5

@@ -54,7 +54,7 @@ private:
 
 	Kind _kind;
 	State _state = STATE_DONE;
-	PartyMemberChooser _chooser;
+	ActingMemberChooser _actor;
 	int _who = -1;
 	int _x = 0;
 	int _y = 0;

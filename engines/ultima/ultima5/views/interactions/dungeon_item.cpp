@@ -67,31 +67,19 @@ DungeonItem::DungeonItem(MessageLog &log, Kind kind) : Interaction(log), _kind(k
 
 // Works out who does it: the one that has been picked to lead, or the only one that can
 void DungeonItem::findWho() {
-	const Data::Savegame &sg = _G(savegame);
-
-	if (sg._activeChar != Data::NO_ACTIVE_CHARACTER) {
-		_who = sg._activeChar;
-		proceed();
-		return;
-	}
-
-	int count = 0;
-	for (int i = 0; i < sg._partySize; ++i) {
-		if (sg._party[i]._status == Data::STATUS_GOOD || sg._party[i]._status == Data::STATUS_POISONED) {
-			_who = i;
-			++count;
-		}
-	}
-
-	if (count > 1) {
-		_log.print("Player: ");
-		_chooser = PartyMemberChooser();
+	switch (_actor.begin(_log)) {
+	case ActingMemberChooser::PENDING:
 		_state = STATE_WHO;
 		return;
-	}
 
-	if (count == 0)
+	case ActingMemberChooser::CANCELLED:
 		_who = -1;
+		break;
+
+	default:
+		_who = _actor.who();
+		break;
+	}
 
 	proceed();
 }
@@ -102,10 +90,8 @@ void DungeonItem::proceed() {
 
 	_state = STATE_DONE;
 
-	if (_who == -1) {
-		_log.print("None!\n");
+	if (_who == -1)
 		return;
-	}
 
 	switch (_kind) {
 	case KIND_OPEN:
@@ -135,33 +121,14 @@ bool DungeonItem::keypress(const KeypressMessage &msg) {
 	const int key = originalKey(msg);
 
 	switch (_state) {
-	case STATE_WHO: {
-		const PartyMemberChooser::Result result = _chooser.handleKey(msg);
-		if (result == PartyMemberChooser::PENDING)
+	case STATE_WHO:
+		if (_actor.handleKey(msg, _log) == ActingMemberChooser::PENDING)
 			return false;
 
-		const Data::Savegame &sg = _G(savegame);
-		if (result == PartyMemberChooser::CANCELLED) {
-			_log.print("None!\n");
-			return true;
-		}
-
-		const Data::Character &c = sg._party[_chooser.index()];
-		if (c._status != Data::STATUS_GOOD && c._status != Data::STATUS_POISONED) {
-			_log.print("Disabled!\n\n");
-			_log.print("Player: ");
-			_chooser = PartyMemberChooser();
-			return false;
-		}
-
-		_log.print(c._name);
-		if (_log.column() != 0)
-			_log.printChar('\n');
-
-		_who = _chooser.index();
+		_who = _actor.who();
+		_state = STATE_DONE;
 		proceed();
 		return _state == STATE_DONE;
-	}
 
 	case STATE_DIRECTION:
 		if (key == KEY_SPACE) {
@@ -204,8 +171,7 @@ bool DungeonItem::keypress(const KeypressMessage &msg) {
 }
 
 void DungeonItem::draw(View &view) {
-	if (_state == STATE_WHO)
-		_chooser.draw(view);
+	_actor.draw(view);
 }
 
 } // namespace Interactions

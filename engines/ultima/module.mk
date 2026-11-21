@@ -331,6 +331,7 @@ MODULE_OBJS += \
 	ultima5/data/dungeon_data.o \
 	ultima5/data/look_names.o \
 	ultima5/data/lzw.o \
+	ultima5/data/object_data.o \
 	ultima5/data/savegame.o \
 	ultima5/data/shop_data.o \
 	ultima5/data/talk_data.o \
@@ -352,6 +353,7 @@ MODULE_OBJS += \
 	ultima5/logic/location_logic.o \
 	ultima5/logic/npc_logic.o \
 	ultima5/logic/npc_movement.o \
+	ultima5/logic/object_items.o \
 	ultima5/logic/party_logic.o \
 	ultima5/logic/shop_inn.o \
 	ultima5/logic/shop_logic.o \
@@ -379,6 +381,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/leave_location.o \
 	ultima5/views/interactions/look.o \
 	ultima5/views/interactions/new_order.o \
+	ultima5/views/interactions/object_command.o \
 	ultima5/views/interactions/ready.o \
 	ultima5/views/interactions/talk.o \
 	ultima5/views/interactions/use.o \

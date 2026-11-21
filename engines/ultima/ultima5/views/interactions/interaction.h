@@ -145,6 +145,51 @@ public:
 	void draw(View &view) const;
 };
 
+/**
+ * Finds out which member of the party does something that one has to: the one picked to
+ * lead, or the only one that's fit, or else whichever the player picks
+ */
+class ActingMemberChooser {
+private:
+	PartyMemberChooser _chooser;
+	bool _asking = false;
+	int _who = -1;
+
+public:
+	enum Result {
+		PENDING,
+		CANCELLED,
+		CHOSEN
+	};
+
+	/**
+	 * Starts, asking if there's more than one that could do it. Says that nobody can
+	 * if that is so
+	 */
+	Result begin(MessageLog &log);
+
+	/**
+	 * Handles a keypress while asking
+	 */
+	Result handleKey(const KeypressMessage &msg, MessageLog &log);
+
+	/**
+	 * Returns the member who is to do it
+	 */
+	int who() const {
+		return _who;
+	}
+
+	bool asking() const {
+		return _asking;
+	}
+
+	void draw(View &view) const {
+		if (_asking)
+			_chooser.draw(view);
+	}
+};
+
 } // namespace Interactions
 } // namespace Views
 } // namespace Ultima5

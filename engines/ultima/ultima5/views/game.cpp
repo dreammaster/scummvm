@@ -34,6 +34,7 @@
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/dungeon_climb.h"
 #include "ultima/ultima5/views/interactions/dungeon_item.h"
+#include "ultima/ultima5/views/interactions/object_command.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
@@ -473,6 +474,10 @@ void Game::endTurn() {
 		if (sg._hour != hour && (sg._hour == FIRST_NIGHT_HOUR || sg._hour == FIRST_DAY_HOUR))
 			LocationLogic::updateForHour();
 
+		// A door that was opened shuts again after a few turns
+		if (sg._doorOpen != 0 && --sg._doorTurns == 0)
+			ObjectItems::closeDoor();
+
 		NpcMovement(sg, _G(location), _G(gameRandom)).turn();
 
 		// What the ground does, and the turn's upkeep
@@ -762,6 +767,26 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 				redraw();
 		} else {
 			startInteraction(camp);
+		}
+		return true;
+	}
+
+	case 'G':
+	case 'J':
+	case 'O':
+	case 'S': {
+		const char ch = toupper(msg.ascii);
+		_messages.print(ch == 'G' ? "Get-" : ch == 'J' ? "Jimmy-" : ch == 'O' ? "Open-" : "Search-");
+
+		Interactions::ObjectCommand *command = new Interactions::ObjectCommand(_messages,
+			ch == 'G' ? ObjectItems::KIND_GET : ch == 'J' ? ObjectItems::KIND_JIMMY :
+			ch == 'O' ? ObjectItems::KIND_OPEN : ObjectItems::KIND_SEARCH);
+
+		if (command->done()) {
+			delete command;
+			endTurn();
+		} else {
+			startInteraction(command);
 		}
 		return true;
 	}

@@ -21,7 +21,9 @@
 
 #include "ultima/ultima5/logic/dungeon_items.h"
 #include "ultima/ultima5/data/combat_data.h"
+#include "ultima/ultima5/logic/attack_logic.h"
 #include "ultima/ultima5/logic/dungeon_logic.h"
+#include "ultima/ultima5/logic/npc_logic.h"
 #include "ultima/ultima5/logic/party_logic.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -43,7 +45,19 @@ constexpr int OBJECT_ARMOUR = 0x0B;
 constexpr int OBJECT_AMULET = 0x0C;
 constexpr int OBJECT_TORCH = 0x0D;
 constexpr int OBJECT_FOOD = 0x0F;
+constexpr int OBJECT_BOX = 0x0E;
+constexpr int OBJECT_MOONSTONE = 0x19;
 constexpr int OBJECT_CARPET = 0x1B;
+constexpr int OBJECT_SHARD = 0xB4;
+constexpr int OBJECT_CROWN = 0xB5;
+constexpr int OBJECT_SCEPTRE = 0xB6;
+constexpr int OBJECT_LB_AMULET = 0xB7;
+
+// The carpet in this town is somebody's, and the box's owner is the last person of it
+constexpr int CARPET_TOWN = 0x11;
+constexpr int CARPET_NPC = 0x16;
+constexpr int BOX_KILLED_BYTE = 0x43;
+constexpr byte BOX_KILLED_BIT = 0x80;
 
 constexpr int ARROWS = 0x1B;
 constexpr int QUARRELS = 0x1D;
@@ -487,7 +501,7 @@ void DungeonItems::take() {
 	}
 }
 
-void DungeonItems::award(int tile, int amount) {
+void DungeonItems::award(int tile, int amount, int object) {
 	Data::Savegame &sg = save();
 
 	switch (tile) {
@@ -495,10 +509,52 @@ void DungeonItems::award(int tile, int amount) {
 		_log.print("Open it first!\n");
 		return;
 
+	case OBJECT_MOONSTONE:
+		_log.print("A moonstone!\n");
+		sg._moonstoneState[amount & 7] = 0xFF;
+		break;
+
 	case OBJECT_CARPET:
 		_log.print("A magic carpet!\n");
 		if (++sg._carpets == 100)
 			sg._carpets = MAX_STACK;
+
+		if (sg._mapId == CARPET_TOWN)
+			NpcLogic::despawn(sg, CARPET_NPC);
+		break;
+
+	case OBJECT_BOX:
+		_log.print("A sandalwood box!\n");
+		sg._sandalwoodBox = 0xFF;
+		sg._npcKilled[BOX_KILLED_BYTE] |= BOX_KILLED_BIT;
+		break;
+
+	case OBJECT_SHARD:
+		sg._shards[amount & 3] = 0xFF;
+		_log.print("The Shard of\n");
+		_log.print((amount & 3) == 0 ? "Falsehood!\n" : (amount & 3) == 1 ? "Hatred!\n" : "Cowardice!\n");
+		break;
+
+	case OBJECT_CROWN: {
+		sg._crown = 0xFF;
+		_log.print("The Crown of Lord British!\n");
+
+		const int npc = AttackLogic::findNpc(object);
+		if (npc != -1) {
+			sg.setNpcKilled(npc);
+			NpcLogic::despawn(sg, npc);
+		}
+		break;
+	}
+
+	case OBJECT_SCEPTRE:
+		sg._sceptre = 0xFF;
+		_log.print("The Sceptre of Lord British!\n");
+		break;
+
+	case OBJECT_LB_AMULET:
+		sg._amulet = 0xFF;
+		_log.print("The Amulet of Lord British!\n");
 		break;
 
 	case OBJECT_FOOD:
@@ -569,7 +625,13 @@ void DungeonItems::award(int tile, int amount) {
 
 	default:
 		_log.print("Nothing to get!\n");
-		break;
+		return;
+	}
+
+	if (object < Data::ACTOR_COUNT) {
+		Data::ActorRecord actor = sg.getActor(object);
+		actor._tile = actor._animTile = actor._x = actor._y = actor._z = actor._hull = 0;
+		sg.setActor(object, actor);
 	}
 }
 

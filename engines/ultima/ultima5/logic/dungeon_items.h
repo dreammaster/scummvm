@@ -22,6 +22,7 @@
 #ifndef ULTIMA5_LOGIC_DUNGEON_ITEMS_H
 #define ULTIMA5_LOGIC_DUNGEON_ITEMS_H
 
+#include "ultima/ultima5/data/savegame.h"
 #include "ultima/ultima5/views/message_log.h"
 
 namespace Ultima {
@@ -94,8 +95,9 @@ public:
 	 * Adds something found to what the party has, and says what it is
 	 * @param tile		What kind of thing it is, as the objects are numbered
 	 * @param amount	How many, or which
+	 * @param object	Which of the objects on the map it was taken from, if any
 	 */
-	void award(int tile, int amount);
+	void award(int tile, int amount, int object = Data::ACTOR_COUNT);
 };
 
 } // namespace Ultima5
