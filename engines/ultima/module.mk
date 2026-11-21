@@ -344,6 +344,7 @@ MODULE_OBJS += \
 	ultima5/logic/attack_logic.o \
 	ultima5/logic/camp_logic.o \
 	ultima5/logic/combat_logic.o \
+	ultima5/logic/dungeon_items.o \
 	ultima5/logic/dungeon_logic.o \
 	ultima5/logic/monster_logic.o \
 	ultima5/logic/creation_logic.o \
@@ -374,6 +375,7 @@ MODULE_OBJS += \
 	ultima5/views/dungeon_scene.o \
 	ultima5/views/interactions/combat.o \
 	ultima5/views/interactions/dungeon_climb.o \
+	ultima5/views/interactions/dungeon_item.o \
 	ultima5/views/interactions/leave_location.o \
 	ultima5/views/interactions/look.o \
 	ultima5/views/interactions/new_order.o \

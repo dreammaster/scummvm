@@ -33,6 +33,7 @@
 #include "ultima/ultima5/logic/dungeon_logic.h"
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/dungeon_climb.h"
+#include "ultima/ultima5/views/interactions/dungeon_item.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
@@ -612,6 +613,29 @@ bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 				redraw();
 		} else {
 			startInteraction(climb);
+		}
+		return true;
+	}
+
+	case 'G':
+	case 'O':
+	case 'J':
+	case 'S':
+	case 'L': {
+		const char ch = toupper(msg.ascii);
+		_messages.print(ch == 'G' ? "" : ch == 'O' ? "Open-" : ch == 'J' ? "Jimmy-" : ch == 'S' ? "Search...\n" : "Look...\n");
+
+		Interactions::DungeonItem *item = new Interactions::DungeonItem(_messages,
+			ch == 'G' ? Interactions::DungeonItem::KIND_GET :
+			ch == 'O' ? Interactions::DungeonItem::KIND_OPEN :
+			ch == 'J' ? Interactions::DungeonItem::KIND_JIMMY :
+			ch == 'S' ? Interactions::DungeonItem::KIND_SEARCH : Interactions::DungeonItem::KIND_LOOK);
+
+		if (item->done()) {
+			delete item;
+			endTurn();
+		} else {
+			startInteraction(item);
 		}
 		return true;
 	}
