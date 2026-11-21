@@ -39,7 +39,8 @@ public:
 		NEED_NONE,
 		NEED_DIRECTION,
 		NEED_MEMBER,
-		NEED_VIEW
+		NEED_VIEW,
+		NEED_KEY
 	};
 
 	// What typing a name of a spell can come to
@@ -91,6 +92,11 @@ public:
 
 	Need directionChosen(int key);
 	Need memberChosen(int member);
+
+	/**
+	 * Goes on with a spell that asked for a key, which was typed
+	 */
+	Need keyChosen(int key);
 
 	/**
 	 * Returns true if time goes by after the cast

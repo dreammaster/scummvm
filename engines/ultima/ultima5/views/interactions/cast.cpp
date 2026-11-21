@@ -129,6 +129,10 @@ bool Cast::apply(SpellLogic::Need need) {
 		_state = STATE_MEMBER;
 		return false;
 
+	case SpellLogic::NEED_KEY:
+		_state = STATE_KEY;
+		return false;
+
 	case SpellLogic::NEED_VIEW:
 		_next = new GemView(_log);
 		break;
@@ -192,6 +196,9 @@ bool Cast::keypress(const KeypressMessage &msg) {
 
 		return apply(_logic.memberChosen(result == PartyMemberChooser::CHOSEN ? _members.index() : -1));
 	}
+
+	case STATE_KEY:
+		return apply(_logic.keyChosen(msg.ascii));
 
 	default:
 		return true;

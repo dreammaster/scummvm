@@ -46,6 +46,9 @@ constexpr int FIRST_DUNGEON_MAP = 0x21;
 constexpr int FIRST_COMBAT_MAP = 0x80;
 constexpr int CASTLE_MAP = 0x12;
 constexpr int STONEGATE_MAP = 0x1D;
+constexpr int DOOM_MAP = 40;
+constexpr int SHIP_TILES = 0x20;
+constexpr int MOONSTONES = 8;
 constexpr int LIGHT_TURNS = 100;
 constexpr int LONG_LIGHT_TURNS = 0xFF;
 constexpr int MAX_FOOD = 9999;
@@ -268,7 +271,7 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 	}
 
 	// These need more than has been written yet, so they are left as they are
-	if (spell == SPELL_CLIMB_UP || spell == SPELL_CLIMB_DOWN || spell == SPELL_WIZARD_EYE || spell == SPELL_MOON_TRAVEL)
+	if (spell == SPELL_WIZARD_EYE || (spell == SPELL_MOON_TRAVEL && sg._mapId != 0))
 		here = false;
 
 	if (!here) {
@@ -381,6 +384,28 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 
 	case SPELL_VIEW:
 		return NEED_VIEW;
+
+	case SPELL_MOON_TRAVEL:
+		if ((sg._partyTile & 0xF0) == SHIP_TILES) {
+			_result = 0;
+			break;
+		}
+
+		_log.print("To phase: ");
+		return NEED_KEY;
+
+	case SPELL_CLIMB_UP:
+	case SPELL_CLIMB_DOWN: {
+		if (sg._mapId == DOOM_MAP) {
+			_result = 0;
+			break;
+		}
+
+		DungeonLogic dungeon(_log);
+		if (dungeon.climb(spell == SPELL_CLIMB_UP ? -1 : 1))
+			dungeon.leave();
+		break;
+	}
 
 	default:
 		break;
@@ -623,6 +648,36 @@ SpellLogic::Need SpellLogic::directionChosen(int key) {
 
 	default:
 		break;
+	}
+
+	return finish();
+}
+
+// Goes to where one of the moonstones is buried, if it is outdoors
+SpellLogic::Need SpellLogic::keyChosen(int key) {
+	Data::Savegame &sg = save();
+
+	if (key >= ' ')
+		_log.printChar(key);
+	_log.printChar('\n');
+
+	_result = 0;
+
+	if (key >= '1' && key < '1' + MOONSTONES) {
+		const int stone = key - '1';
+
+		if (sg._moonstoneState[stone] == 0) {
+			sg.storeWorldObjects(sg._mapLevel != 0);
+			sg._mapX = sg._moonstoneX[stone];
+			sg._mapY = sg._moonstoneY[stone];
+			sg._mapLevel = sg._moonstoneZ[stone];
+			sg.restoreWorldObjects(sg._mapLevel != 0);
+			WorldLogic::centerWindow(sg);
+			_G(visibility).invalidate();
+
+			_result = -1;
+			_passes = false;
+		}
 	}
 
 	return finish();
