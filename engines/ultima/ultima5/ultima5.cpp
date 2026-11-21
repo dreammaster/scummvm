@@ -36,6 +36,9 @@
 namespace Ultima {
 namespace Ultima5 {
 
+// The maps from this one up are dungeons, caves and mines, which have no map of tiles
+constexpr int DUNGEON_FIRST_MAP = 0x21;
+
 constexpr int SAVEGAME_VERSION = 1;
 
 Ultima5Engine *g_engine;
@@ -146,6 +149,9 @@ bool Ultima5Engine::loadWorld() {
 }
 
 bool Ultima5Engine::loadMap() {
+	if (_savegame._mapId > DUNGEON_FIRST_MAP - 1)
+		return true;
+
 	return _savegame._mapId == 0 ? loadWorld() : LocationLogic::load();
 }
 

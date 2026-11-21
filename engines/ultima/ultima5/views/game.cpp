@@ -30,7 +30,9 @@
 #include "ultima/ultima5/logic/monster_logic.h"
 #include "ultima/ultima5/views/interactions/attack.h"
 #include "ultima/ultima5/views/interactions/camp.h"
+#include "ultima/ultima5/logic/dungeon_logic.h"
 #include "ultima/ultima5/views/interactions/combat.h"
+#include "ultima/ultima5/views/interactions/dungeon_climb.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
@@ -51,6 +53,9 @@ constexpr byte OUTDOOR_MAP = 0;
 constexpr int MINUTES_PER_TURN = 2;
 constexpr int FRAMES_PER_SAIL_STEP = 6;
 constexpr byte TILE_ROUGH_SEAS = 1;
+constexpr byte TILE_CAVE = 0x16;
+constexpr byte TILE_MINE = 0x17;
+constexpr byte TILE_DUNGEON = 0x18;
 constexpr byte TILE_POISON_GROUND = 4;
 constexpr byte TILE_LAVA = 0x8F;
 constexpr byte TILE_FIREPLACE = 0xBC;
@@ -151,7 +156,13 @@ void Game::draw() {
 		error("Could not load the map");
 
 	drawFrame();
-	drawMap();
+
+	if (DungeonLogic::isDungeon(_G(savegame)._mapId)) {
+		drawDungeonFrame();
+		_scene.draw(*this);
+	} else {
+		drawMap();
+	}
 
 	drawParty();
 	drawStatus();
@@ -159,6 +170,21 @@ void Game::draw() {
 
 	if (_interaction)
 		_interaction->draw(*this);
+}
+
+void Game::drawDungeonFrame() {
+	static const char *const DIRECTIONS[] = { "North", " East", "South", " West" };
+	const Data::Savegame &sg = _G(savegame);
+	auto s = getSurface();
+
+	// The level and the way the party faces are set in the borders
+	s.fillRect(Common::Rect(0x28, 0, 0x99, 8), COLOR_BLUE);
+	s.fillRect(Common::Rect(0x30, 0xB9, 0x99, 0xC0), COLOR_BLUE);
+	s.hLine(0x28, 7, 0x98, COLOR_WHITE);
+	s.hLine(0x30, 0xB8, 0x98, COLOR_WHITE);
+
+	print(10, 0, Common::String::format("L %d", sg._mapLevel + 1), COLOR_WHITE, COLOR_BLUE);
+	print(6, 23, Common::String("Dir: ") + DIRECTIONS[DungeonLogic::facing() & 3], COLOR_WHITE, COLOR_BLUE);
 }
 
 void Game::drawFrame() {
@@ -403,7 +429,10 @@ bool Game::startCombat(int kind, int map, bool lone) {
 void Game::endTurn() {
 	Data::Savegame &sg = _G(savegame);
 
-	if (sg._mapId == OUTDOOR_MAP) {
+	if (DungeonLogic::isDungeon(sg._mapId)) {
+		passDungeonTime();
+		DungeonLogic(_messages).arrive();
+	} else if (sg._mapId == OUTDOOR_MAP) {
 		TimeLogic::advance(sg, MINUTES_PER_TURN);
 		TransportLogic::clearHeadingIfNotSailing();
 
@@ -488,7 +517,125 @@ bool Game::walk(Direction direction) {
 	return true;
 }
 
+void Game::passDungeonTime() {
+	Data::Savegame &sg = _G(savegame);
+
+	// A minute goes by with each command, or each other one when quick
+	if (sg._icon == 'Q') {
+		_quickToggle = !_quickToggle;
+		if (_quickToggle)
+			TimeLogic::advance(sg, 1);
+	} else if (sg._icon != 'T') {
+		TimeLogic::advance(sg, 1);
+	}
+}
+
+bool Game::handleDungeonCommand(const KeypressMessage &msg) {
+	PartyLogic party(_messages);
+	int key = 0;
+
+	switch (msg.keycode) {
+	case Common::KEYCODE_LEFT:
+		key = 1;
+		break;
+	case Common::KEYCODE_RIGHT:
+		key = 2;
+		break;
+	case Common::KEYCODE_UP:
+		key = 3;
+		break;
+	case Common::KEYCODE_DOWN:
+		key = 4;
+		break;
+	case Common::KEYCODE_RETURN:
+	case Common::KEYCODE_KP_ENTER:
+		key = 13;
+		break;
+	default:
+		if (msg.ascii == '.')
+			key = '.';
+		break;
+	}
+
+	if (key != 0) {
+		const DungeonLogic::Move move = DungeonLogic(_messages).command(key);
+
+		passDungeonTime();
+		if (move == DungeonLogic::MOVE_WALKED)
+			DungeonLogic(_messages).arrive();
+
+		redraw();
+		return true;
+	}
+
+	switch (toupper(msg.ascii)) {
+	case 'K': {
+		Interactions::DungeonClimb *climb = new Interactions::DungeonClimb(_messages);
+
+		if (climb->done()) {
+			const bool time = climb->takesTime();
+			delete climb;
+
+			if (time)
+				endTurn();
+			else
+				redraw();
+		} else {
+			startInteraction(climb);
+		}
+		return true;
+	}
+
+	case 'I':
+		party.igniteTorch();
+		endTurn();
+		return true;
+
+	case 'R':
+		_messages.print("Ready...\n\n");
+		startInteraction(new Interactions::Ready(_messages));
+		return true;
+
+	case 'Z':
+		_messages.print("Z-stats...\n");
+		startInteraction(new Interactions::Ztats(_messages));
+		return true;
+
+	case 'U': {
+		_messages.print("Use item\n\n");
+		Interactions::Use *use = new Interactions::Use(_messages);
+
+		if (use->done()) {
+			delete use;
+			endTurn();
+		} else {
+			startInteraction(use);
+		}
+		return true;
+	}
+
+	case 'N':
+		_messages.print("New Order");
+		startInteraction(new Interactions::NewOrder(_messages));
+		return true;
+
+	default:
+		break;
+	}
+
+	if (msg.keycode == Common::KEYCODE_SPACE) {
+		_messages.print("Pass\n");
+		endTurn();
+		return true;
+	}
+
+	return false;
+}
+
 bool Game::handleCommand(const KeypressMessage &msg) {
+	if (DungeonLogic::isDungeon(_G(savegame)._mapId))
+		return handleDungeonCommand(msg);
+
 	const bool outdoors = _G(savegame)._mapId == OUTDOOR_MAP;
 	WorldLogic world(_messages);
 	PartyLogic party(_messages);
@@ -517,6 +664,18 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 			return false;
 
 		_messages.print("Enter ");
+
+		{
+			const byte tile = _G(world).getTile(_G(savegame)._mapX, _G(savegame)._mapY);
+			const char *dungeon = tile == TILE_CAVE ? "cave" : tile == TILE_MINE ? "mine" : tile == TILE_DUNGEON ? "dungeon" : nullptr;
+
+			if (dungeon) {
+				DungeonLogic(_messages).enter(dungeon);
+				redraw();
+				return true;
+			}
+		}
+
 		if (LocationLogic(_messages).enter())
 			endTurn();
 		else

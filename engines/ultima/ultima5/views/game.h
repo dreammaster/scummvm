@@ -25,6 +25,7 @@
 #include "common/ptr.h"
 #include "ultima/ultima5/gfx/tileset.h"
 #include "ultima/ultima5/logic/visibility_logic.h"
+#include "ultima/ultima5/views/dungeon_scene.h"
 #include "ultima/ultima5/views/interactions/interaction.h"
 #include "ultima/ultima5/views/message_log.h"
 #include "ultima/ultima5/views/view.h"
@@ -42,6 +43,8 @@ private:
 	MessageLog _messages;
 	bool _planTick = false;
 	bool _sailingStep = false;
+	bool _quickToggle = false;
+	DungeonScene _scene;
 	Common::ScopedPtr<Interactions::Interaction> _interaction;
 
 	/**
@@ -64,6 +67,21 @@ private:
 	 * @returns		True if the key was a command
 	 */
 	bool handleCommand(const KeypressMessage &msg);
+
+	/**
+	 * Draws what is set in the borders in a dungeon
+	 */
+	void drawDungeonFrame();
+
+	/**
+	 * Lets time go by in a dungeon after a command
+	 */
+	void passDungeonTime();
+
+	/**
+	 * Carries out the command of a key in a dungeon
+	 */
+	bool handleDungeonCommand(const KeypressMessage &msg);
 
 	/**
 	 * Clears the screen and draws the blue frame and the outlines of the windows
