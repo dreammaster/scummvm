@@ -96,6 +96,12 @@ private:
 	void viewGem();
 
 	/**
+	 * Casts a spell, and mixes them from reagents
+	 */
+	void castSpell();
+	void mixReagents();
+
+	/**
 	 * Starts one of the commands that act on what is next to the party
 	 */
 	void objectCommand(ObjectItems::Kind kind, const char *prompt);

@@ -765,7 +765,7 @@ void ObjectItems::get() {
 	case TILE_SCONCE_A:
 	case TILE_SCONCE_B:
 		setTileAt(_x, _y, TILE_FLOOR);
-		sg._unk0300 = SCONCE_LIGHT;
+		sg._unk0301 = SCONCE_LIGHT;
 		_log.print("Borrowed!\n");
 		break;
 

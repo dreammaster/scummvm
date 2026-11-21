@@ -33,6 +33,7 @@
 #include "ultima/ultima5/logic/dungeon_logic.h"
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/dungeon_climb.h"
+#include "ultima/ultima5/views/interactions/cast.h"
 #include "ultima/ultima5/views/interactions/dungeon_item.h"
 #include "ultima/ultima5/views/interactions/gem_view.h"
 #include "ultima/ultima5/views/interactions/object_command.h"
@@ -585,6 +586,37 @@ void Game::objectCommand(ObjectItems::Kind kind, const char *prompt) {
 	}
 }
 
+void Game::castSpell() {
+	_messages.print("Cast...\n");
+
+	Interactions::Cast *cast = new Interactions::Cast(_messages);
+
+	if (cast->done()) {
+		const bool time = cast->takesTime();
+		delete cast;
+
+		if (time)
+			endTurn();
+		else
+			redraw();
+	} else {
+		startInteraction(cast);
+	}
+}
+
+void Game::mixReagents() {
+	_messages.print("Mix Reagents\n\n");
+
+	Interactions::Mix *mix = new Interactions::Mix(_messages);
+
+	if (mix->done()) {
+		delete mix;
+		endTurn();
+	} else {
+		startInteraction(mix);
+	}
+}
+
 void Game::viewGem() {
 	Data::Savegame &sg = _G(savegame);
 
@@ -679,6 +711,14 @@ bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 		}
 		return true;
 	}
+
+	case 'C':
+		castSpell();
+		return true;
+
+	case 'M':
+		mixReagents();
+		return true;
 
 	case 'V':
 		viewGem();
@@ -862,6 +902,14 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 		endTurn();
 		return true;
 	}
+
+	case 'C':
+		castSpell();
+		return true;
+
+	case 'M':
+		mixReagents();
+		return true;
 
 	case 'V':
 		viewGem();
