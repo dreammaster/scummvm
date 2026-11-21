@@ -462,15 +462,22 @@ void CombatLogic::hideIfInvisible(int idx) {
 			_actors[e._actor]._animTile = TILE_HIDDEN_PARTY;
 			e._flags |= FLAG_INVISIBLE;
 		} else if (sg._party[e._entity]._equipment[4] == ITEM_REGEN_RING) {
-			for (int i = 0; i < sg._partySize; ++i) {
-				if (sg._party[i]._status != STATUS_DEAD && sg._party[i]._equipment[4] == ITEM_REGEN_RING) {
-					if (rnd(0, 7) == 7) {
-						if (sg._party[i]._hp + 1 < sg._party[i]._maxHp)
-							sg._party[i]._hp += 1;
-						else
-							sg._party[i]._hp = sg._party[i]._maxHp;
-					}
-				}
+			regenerate();
+		}
+	}
+}
+
+// The rings of regeneration heal now and then
+void CombatLogic::regenerate() {
+	Savegame &sg = save();
+
+	for (int i = 0; i < sg._partySize; ++i) {
+		if (sg._party[i]._status != STATUS_DEAD && sg._party[i]._equipment[4] == ITEM_REGEN_RING) {
+			if (rnd(0, 7) == 7) {
+				if (sg._party[i]._hp + 1 < sg._party[i]._maxHp)
+					sg._party[i]._hp += 1;
+				else
+					sg._party[i]._hp = sg._party[i]._maxHp;
 			}
 		}
 	}
@@ -625,7 +632,21 @@ void CombatLogic::placeParty() {
 	}
 }
 
-void CombatLogic::placeEnemies(int kind, bool lone) {
+void CombatLogic::placeEnemies(int kind, bool lone, bool shuffle) {
+	// Who goes where is mixed up when the party is taken by surprise
+	int order[16];
+	for (int i = 0; i < 16; ++i)
+		order[i] = i;
+
+	if (shuffle) {
+		for (int i = 0; i < 15; ++i) {
+			const int other = rnd(0, 0xF);
+			const int kept = order[i];
+			order[i] = order[other];
+			order[other] = kept;
+		}
+	}
+
 	say("*** CONFLICT ***\n");
 
 	int count;
@@ -640,7 +661,7 @@ void CombatLogic::placeEnemies(int kind, bool lone) {
 			count = 0x1A;
 	}
 
-	place(kind, 0, _monsterX[0], _monsterY[0]);
+	place(kind, 0, _monsterX[order[0]], _monsterY[order[0]]);
 
 	const int mixed = count / 4 + 1;
 	for (int i = 1; i < count; ++i) {
@@ -648,7 +669,7 @@ void CombatLogic::placeEnemies(int kind, bool lone) {
 		if (i < mixed && rnd0(8) == 0)
 			what = ENEMY_SPLIT[kind];
 
-		place(what, 0, _monsterX[i], _monsterY[i]);
+		place(what, 0, _monsterX[order[i]], _monsterY[order[i]]);
 	}
 }
 
@@ -2448,6 +2469,190 @@ CombatLogic::Outcome CombatLogic::command(int key) {
 
 void CombatLogic::commandDone(int key) {
 	endTurn(key);
+}
+
+// The kinds of enemy that can come on the party as it sleeps
+static const byte AMBUSHERS[8] = { 0x29, 0x14, 0x15, 0x18, 0x16, 0x19, 0x24, 0x14 };
+
+constexpr int CAMP_STEP_MINUTES = 5;
+constexpr int CAMP_AMBUSH_ODDS = 0x3F;
+constexpr int CAMP_REST_HOURS = 5;
+constexpr int CAMP_REST_DELAY = 0xE;
+constexpr int CAMP_APPARITION_ODDS = 0x18;
+constexpr int CAMP_HEAL_MAX = 0x3F;
+
+CombatLogic::CampResult CombatLogic::camp(int guard, int hours, byte origin, bool &apparition) {
+	Savegame &sg = save();
+	int poisoned[8] = {};
+	int lastHour = sg._hour;
+
+	apparition = false;
+	_origin = origin;
+	_flags = KIND_CAMP;
+	_exitCode = 0;
+	_won = false;
+	_result = 1;
+	_current = 0xFF;
+	_outcome = 0;
+
+	sg._icon = 0;
+	sg._protection = 0;
+	_savedActive = sg._activeChar;
+	sg._activeChar = NO_ACTIVE_CHARACTER;
+
+	placeParty();
+
+	int target = hours + sg._hour;
+	if (target > 0x17)
+		target -= 0x18;
+
+	if (guard > 5 || guard < -1)
+		guard = -1;
+
+	int slot = 0;
+	for (int member = 0; member < sg._partySize; ++member) {
+		for (slot = 0; slot < COMBAT_ENTITIES; ++slot) {
+			if (member == _entities[slot]._entity)
+				break;
+		}
+
+		switch (sg._party[member]._status) {
+		case STATUS_POISONED:
+			++poisoned[member];
+			// Fall through
+
+		case STATUS_GOOD:
+		case STATUS_SLEEP:
+			// Those that are poisoned stay awake
+			if (member != guard && slot < COMBAT_ENTITIES &&
+					((_entities[slot]._flags & FLAG_PLAYER) == 0 || sg._party[_entities[slot]._entity]._status != STATUS_POISONED))
+				fallAsleep(slot);
+			break;
+		}
+	}
+
+	say("Zzzzzz...\n\n");
+
+	int guardSlot = 0;
+	byte guardTile = 0;
+	if (guard != -1) {
+		for (guardSlot = 0; guardSlot < COMBAT_ENTITIES; ++guardSlot) {
+			if (_entities[guardSlot]._entity == guard)
+				break;
+		}
+
+		guardSlot = MIN(guardSlot, COMBAT_ENTITIES - 1);
+		guardTile = _actors[_entities[guardSlot]._actor]._tile;
+	}
+
+	while (target != sg._hour) {
+		if (sg._hour >= 0x18)
+			sg._hour -= 0x18;
+
+		regenerate();
+
+		if (lastHour != sg._hour) {
+			if (rnd(0, CAMP_AMBUSH_ODDS) == 0) {
+				// Whatever comes on the party comes at a time that can't be told beforehand
+				_G(gameRandom).seed(g_system ? g_system->getMillis() : 0);
+				const int kind = AMBUSHERS[rnd(0, 7)];
+				say("Ambushed!\n\n");
+
+				if (guard > -1) {
+					for (int i = 0; i < 6; ++i) {
+						const int member = _entities[i]._entity;
+
+						if (member < sg._partySize) {
+							wakeUp(i);
+							sg._party[member]._status = poisoned[member] != 0 ? STATUS_POISONED : STATUS_GOOD;
+						}
+					}
+				}
+
+				placeEnemies(kind, true, true);
+
+				int enemies, party;
+				countSides(enemies, party);
+				_won = enemies == 0;
+				_stage = STAGE_SCAN;
+				_current = 0;
+				return CAMP_AMBUSHED;
+			}
+		}
+
+		lastHour = sg._hour;
+		TimeLogic::advance(sg, CAMP_STEP_MINUTES);
+
+		if (guard != -1 && rnd(0, 3) == 2) {
+			Entity &g = _entities[guardSlot];
+			int x = g._x;
+			int y = g._y;
+
+			switch (rnd(0, 3)) {
+			case 0:
+				--y;
+				break;
+			case 1:
+				++y;
+				break;
+			case 2:
+				++x;
+				break;
+			default:
+				--x;
+				break;
+			}
+
+			if (inside(x, y) && canStand(guardTile, x, y)) {
+				_actors[g._actor]._x = g._x = x;
+				_actors[g._actor]._y = g._y = y;
+			}
+		}
+	}
+
+	CampResult result = CAMP_NO_EFFECT;
+
+	if (sg._unk02E6 < 1 && hours > CAMP_REST_HOURS) {
+		say("Party rested!\n");
+		result = CAMP_RESTED;
+
+		for (int member = 0; member < sg._partySize; ++member) {
+			Character &c = sg._party[member];
+
+			if (poisoned[member] == 0 && sg._unk02E6 < 1 && hours > CAMP_REST_HOURS && c._status != STATUS_DEAD && member != guard) {
+				c._hp += rnd(1, CAMP_HEAL_MAX);
+				if (c._hp > c._maxHp)
+					c._hp = c._maxHp;
+
+				switch (c._class) {
+				case 'A':
+				case 'M':
+					c._mag = c._int;
+					break;
+				case 'B':
+					c._mag = c._int >> 1;
+					break;
+				}
+			}
+		}
+
+		if ((_flags & 0x82) == 0 && rnd(0, 99) <= CAMP_APPARITION_ODDS) {
+			sg._unk02E7 = sg._month;
+			apparition = true;
+		}
+
+		sg._unk02E6 = CAMP_REST_DELAY;
+	} else {
+		say("No effect...\n");
+	}
+
+	for (int member = 0; member < sg._partySize; ++member) {
+		if (sg._party[member]._status == STATUS_SLEEP)
+			sg._party[member]._status = STATUS_GOOD;
+	}
+
+	sg._activeChar = _savedActive;
+	return result;
 }
 
 } // namespace Ultima5

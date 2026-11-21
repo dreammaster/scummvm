@@ -29,6 +29,7 @@
 #include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/logic/monster_logic.h"
 #include "ultima/ultima5/views/interactions/attack.h"
+#include "ultima/ultima5/views/interactions/camp.h"
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
@@ -50,6 +51,11 @@ constexpr byte OUTDOOR_MAP = 0;
 constexpr int MINUTES_PER_TURN = 2;
 constexpr int FRAMES_PER_SAIL_STEP = 6;
 constexpr byte TILE_ROUGH_SEAS = 1;
+constexpr byte TILE_POISON_GROUND = 4;
+constexpr byte TILE_LAVA = 0x8F;
+constexpr byte TILE_FIREPLACE = 0xBC;
+constexpr int EARTHQUAKE_ROLL = 0x69;
+constexpr byte TILE_BED = 0xAB;
 constexpr byte TILE_SKIFF = 0x28;
 constexpr byte TILE_CARPET = 0x14;
 constexpr int MINUTES_PER_LOCATION_TURN = 1;
@@ -401,6 +407,20 @@ void Game::endTurn() {
 		TimeLogic::advance(sg, MINUTES_PER_TURN);
 		TransportLogic::clearHeadingIfNotSailing();
 
+		// Poisonous and burning ground, and the earth moving below
+		const byte ground = g_engine->getMapTile(sg._mapX, sg._mapY);
+		if (ground == TILE_POISON_GROUND && sg._partyTile == TILE_AVATAR)
+			PartyLogic(_messages).stepOnPoison(1);
+		else if (ground == TILE_LAVA)
+			PartyLogic(_messages).stepOnFire();
+
+		if (sg._mapLevel != 0 && _G(gameRandom).range(0, 0xFF) == EARTHQUAKE_ROLL) {
+			_messages.print("EARTHQUAKE!\n");
+			PartyLogic::hurtParty();
+		}
+
+		PartyLogic(_messages).turnUpkeep();
+
 		// Small boats and carpets don't last in rough water
 		if (g_engine->getMapTile(sg._mapX, sg._mapY) == TILE_ROUGH_SEAS &&
 				((sg._partyTile & 0xFC) == TILE_SKIFF || (sg._partyTile & 0xFE) == TILE_CARPET)) {
@@ -423,6 +443,17 @@ void Game::endTurn() {
 			LocationLogic::updateForHour();
 
 		NpcMovement(sg, _G(location), _G(gameRandom)).turn();
+
+		// What the ground does, and the turn's upkeep
+		PartyLogic::wakeSleepers();
+
+		const byte ground = g_engine->getMapTile(sg._mapX, sg._mapY);
+		if (ground == TILE_POISON_GROUND && sg._partyTile == TILE_AVATAR)
+			PartyLogic(_messages).stepOnPoison(0);
+		else if (ground == TILE_FIREPLACE || ground == TILE_LAVA)
+			PartyLogic(_messages).stepOnFire();
+
+		PartyLogic(_messages).turnUpkeep();
 	}
 
 	redraw();
@@ -491,6 +522,36 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 		else
 			redraw();
 		return true;
+
+	case 'H': {
+		if (!outdoors) {
+			// In a town it's only in a bed
+			_messages.print("Hole up- ");
+
+			if (g_engine->getMapTile(_G(savegame)._mapX, _G(savegame)._mapY) != TILE_BED) {
+				_messages.print("Only in bed!\n");
+				redraw();
+			} else {
+				startInteraction(new Interactions::Bed(_messages));
+			}
+			return true;
+		}
+
+		Interactions::Camp *camp = new Interactions::Camp(_messages);
+
+		if (camp->done()) {
+			Interactions::Interaction *next = camp->takeNext();
+			delete camp;
+
+			if (next)
+				startInteraction(next);
+			else
+				redraw();
+		} else {
+			startInteraction(camp);
+		}
+		return true;
+	}
 
 	case 'I':
 		party.igniteTorch();

@@ -63,6 +63,34 @@ bool Combat::start(int kind, int map, bool lone) {
 	return true;
 }
 
+bool Combat::startCamp(int guard, int hours, bool &apparition) {
+	if (!_logic.loadMap(MAP_FILE, 0))
+		return false;
+
+	const CombatLogic::CampResult result = _logic.camp(guard, hours, _G(savegame)._mapId, apparition);
+	if (result != CombatLogic::CAMP_AMBUSHED || carryOn())
+		_state = STATE_DONE;
+
+	return true;
+}
+
+Combat *Combat::forObject(MessageLog &log, int object) {
+	AttackLogic::Fight fight;
+	fight._started = true;
+	fight._actor = object;
+	AttackLogic(log).prepare(fight);
+
+	Combat *combat = new Combat(log);
+	combat->setAftermath(fight);
+
+	if (!combat->start(fight._kind, fight._map, fight._lone) || combat->done()) {
+		delete combat;
+		return nullptr;
+	}
+
+	return combat;
+}
+
 bool Combat::carryOn() {
 	if (_logic.advance() == CombatLogic::STATE_FINISHED) {
 		_logic.finish();

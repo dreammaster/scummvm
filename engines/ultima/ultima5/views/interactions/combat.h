@@ -77,6 +77,20 @@ public:
 	bool start(int kind, int map, bool lone);
 
 	/**
+	 * Has the party rest for some hours on the map of the fights, which an ambush
+	 * can turn into a fight
+	 * @param apparition	Set if the party was visited
+	 * @returns				False if the map couldn't be loaded
+	 */
+	bool startCamp(int guard, int hours, bool &apparition);
+
+	/**
+	 * Starts the fight with an object of the map that the party has come to blows with
+	 * @returns		The fight, or nothing if it was over before it began
+	 */
+	static Combat *forObject(MessageLog &log, int object);
+
+	/**
 	 * Has what the fight was against taken off the map once it's over
 	 */
 	void setAftermath(const AttackLogic::Fight &fight) {

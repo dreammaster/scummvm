@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/logic/party_logic.h"
+#include "ultima/ultima5/logic/combat_logic.h"
 #include "ultima/ultima5/ultima5.h"
 
 namespace Ultima {
@@ -60,6 +61,74 @@ void PartyLogic::hurtMember(int member, int amount) {
 		if (member == sg._activeChar)
 			sg._activeChar = Data::NO_ACTIVE_CHARACTER;
 	}
+}
+
+void PartyLogic::turnUpkeep() {
+	Data::Savegame &sg = _G(savegame);
+	int fit = 0;
+
+	for (int i = 0; i < sg._partySize; ++i) {
+		const byte status = sg._party[i]._status;
+
+		if (status == Data::STATUS_DEAD && i == sg._activeChar)
+			sg._activeChar = Data::NO_ACTIVE_CHARACTER;
+
+		if (status != Data::STATUS_DEAD && status != Data::STATUS_SLEEP) {
+			if (status == Data::STATUS_POISONED)
+				hurtMember(i, 1);
+
+			++fit;
+		}
+	}
+
+	if (sg._hour != sg._hourCopy) {
+		if (sg._food == 0) {
+			_log.print("Starving!\n");
+			hurtParty();
+		} else if (sg._hour == 6 || sg._hour == 12 || sg._hour == 18) {
+			sg._food = sg._food > fit ? sg._food - fit : 0;
+		}
+
+		sg._hourCopy = sg._hour;
+	}
+
+	sg._turnCount = sg._turnCount + 1 < 0xFF ? sg._turnCount + 1 : 0xFF;
+
+	if (sg._protection != 0 && sg._protection != 0xFF) {
+		if (--sg._protection == 0)
+			sg._icon = 0;
+	}
+
+	CombatLogic::regenerate();
+}
+
+void PartyLogic::wakeSleepers() {
+	Data::Savegame &sg = _G(savegame);
+
+	for (int i = 0; i < sg._partySize; ++i) {
+		if (sg._party[i]._status == Data::STATUS_SLEEP && _G(gameRandom).range(0, 0xF) == 0xF)
+			sg._party[i]._status = Data::STATUS_GOOD;
+	}
+}
+
+void PartyLogic::stepOnPoison(int lowest) {
+	Data::Savegame &sg = _G(savegame);
+
+	for (int i = 0; i < sg._partySize; ++i) {
+		Data::Character &c = sg._party[i];
+
+		if (c._status != Data::STATUS_DEAD && c._status != Data::STATUS_POISONED) {
+			if (c._dex < _G(gameRandom).range(lowest, 0x1E - (lowest == 0 ? 1 : 0))) {
+				c._status = Data::STATUS_POISONED;
+				_log.print("Poisoned!\n");
+			}
+		}
+	}
+}
+
+void PartyLogic::stepOnFire() {
+	_log.print("Burning!\n");
+	hurtParty();
 }
 
 void PartyLogic::hurtParty() {

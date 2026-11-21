@@ -53,6 +53,28 @@ public:
 	static void hurtMember(int member, int amount);
 
 	/**
+	 * What goes on with the party each turn: poison, hunger, the hour's food, the spell
+	 * that wears off and the rings that heal
+	 */
+	void turnUpkeep();
+
+	/**
+	 * Sleepers wake now and then in a town
+	 */
+	static void wakeSleepers();
+
+	/**
+	 * Treading on poisonous ground poisons those with the worst footing
+	 * @param lowest	The lowest the roll to beat can be
+	 */
+	void stepOnPoison(int lowest);
+
+	/**
+	 * Treading on burning ground hurts everyone
+	 */
+	void stepOnFire();
+
+	/**
 	 * Hurts each of the living members of the party by a few points
 	 */
 	static void hurtParty();

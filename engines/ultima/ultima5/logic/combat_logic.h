@@ -39,7 +39,11 @@ constexpr int COMBAT_MAP_BYTES = 0x160;
  * fighters take their turns in order of how quick they are. The turns of the party
  * wait here for the player's commands
  */
+class PartyLogic;
+
 class CombatLogic {
+	friend class PartyLogic;
+
 public:
 	// What a fighter is, and is going through
 	enum Flags {
@@ -183,7 +187,8 @@ private:
 	void clearFighters();
 	int place(int what, int type, int x, int y);
 	void placeParty();
-	void placeEnemies(int kind, bool lone);
+	void placeEnemies(int kind, bool lone, bool shuffle = false);
+	static void regenerate();
 	void removeFighter(int idx);
 	void fallAsleep(int idx);
 	void wakeUp(int idx);
@@ -273,6 +278,21 @@ public:
 	 * @param origin	The map the party is in
 	 */
 	void begin(int kind, bool lone, int flags, byte origin);
+
+	// What came of a night's rest
+	enum CampResult {
+		CAMP_NO_EFFECT,
+		CAMP_RESTED,
+		CAMP_AMBUSHED
+	};
+
+	/**
+	 * Has the party sleep for a number of hours on the loaded map, which can be broken by an ambush
+	 * that leads straight into the fight
+	 * @param guard			Which of the party keeps watch, or -1
+	 * @param apparition	Set if the party is visited as it rested
+	 */
+	CampResult camp(int guard, int hours, byte origin, bool &apparition);
 
 	/**
 	 * Carries on until a member of the party is to be told what to do, or the fight is over

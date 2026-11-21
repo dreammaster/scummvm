@@ -341,6 +341,7 @@ MODULE_OBJS += \
 	ultima5/gfx/story_text.o \
 	ultima5/gfx/tileset.o \
 	ultima5/logic/attack_logic.o \
+	ultima5/logic/camp_logic.o \
 	ultima5/logic/combat_logic.o \
 	ultima5/logic/monster_logic.o \
 	ultima5/logic/creation_logic.o \
@@ -367,6 +368,7 @@ MODULE_OBJS += \
 	ultima5/views/game.o \
 	ultima5/views/interactions/interaction.o \
 	ultima5/views/interactions/attack.o \
+	ultima5/views/interactions/camp.o \
 	ultima5/views/interactions/combat.o \
 	ultima5/views/interactions/leave_location.o \
 	ultima5/views/interactions/look.o \
