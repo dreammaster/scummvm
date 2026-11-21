@@ -34,6 +34,7 @@
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/views/interactions/dungeon_climb.h"
 #include "ultima/ultima5/views/interactions/cast.h"
+#include "ultima/ultima5/views/interactions/death.h"
 #include "ultima/ultima5/views/interactions/dungeon_item.h"
 #include "ultima/ultima5/views/interactions/gem_view.h"
 #include "ultima/ultima5/views/interactions/object_command.h"
@@ -433,6 +434,12 @@ bool Game::startCombat(int kind, int map, bool lone) {
 
 void Game::endTurn() {
 	Data::Savegame &sg = _G(savegame);
+
+	// When all are dead, Lord British takes them in
+	if (DeathLogic::partyDead()) {
+		startInteraction(new Interactions::Death(_messages));
+		return;
+	}
 
 	if (DungeonLogic::isDungeon(sg._mapId)) {
 		const bool timePassed = passDungeonTime();
