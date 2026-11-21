@@ -27,7 +27,7 @@ namespace Views {
 namespace Interactions {
 
 ObjectCommand::ObjectCommand(MessageLog &log, ObjectItems::Kind kind) : Interaction(log), _items(log, kind) {
-	if (kind == ObjectItems::KIND_OPEN)
+	if (kind == ObjectItems::KIND_OPEN || kind == ObjectItems::KIND_PUSH)
 		ObjectItems::closeDoor();
 
 	if (_items.ready())
@@ -62,6 +62,7 @@ bool ObjectCommand::keypress(const KeypressMessage &msg) {
 			return false;
 
 		if (result == DirectionChooser::CANCELLED) {
+			_items.cancel();
 			_state = STATE_DONE;
 			return true;
 		}

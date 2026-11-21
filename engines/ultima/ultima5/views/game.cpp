@@ -65,6 +65,7 @@ constexpr byte TILE_FIREPLACE = 0xBC;
 constexpr int EARTHQUAKE_ROLL = 0x69;
 constexpr byte TILE_BED = 0xAB;
 constexpr byte TILE_SKIFF = 0x28;
+constexpr byte SHIP_FIRST = 0x20;
 constexpr byte TILE_CARPET = 0x14;
 constexpr int MINUTES_PER_LOCATION_TURN = 1;
 constexpr int FIRST_NIGHT_HOUR = 20;
@@ -566,6 +567,24 @@ bool Game::passDungeonTime() {
 	return false;
 }
 
+void Game::objectCommand(ObjectItems::Kind kind, const char *prompt) {
+	_messages.print(prompt);
+
+	Interactions::ObjectCommand *command = new Interactions::ObjectCommand(_messages, kind);
+
+	if (command->done()) {
+		const bool time = command->takesTime();
+		delete command;
+
+		if (time)
+			endTurn();
+		else
+			redraw();
+	} else {
+		startInteraction(command);
+	}
+}
+
 void Game::viewGem() {
 	Data::Savegame &sg = _G(savegame);
 
@@ -792,22 +811,46 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 	}
 
 	case 'G':
+		objectCommand(ObjectItems::KIND_GET, "Get-");
+		return true;
+
 	case 'J':
+		objectCommand(ObjectItems::KIND_JIMMY, "Jimmy-");
+		return true;
+
 	case 'O':
-	case 'S': {
-		const char ch = toupper(msg.ascii);
-		_messages.print(ch == 'G' ? "Get-" : ch == 'J' ? "Jimmy-" : ch == 'O' ? "Open-" : "Search-");
+		objectCommand(ObjectItems::KIND_OPEN, "Open-");
+		return true;
 
-		Interactions::ObjectCommand *command = new Interactions::ObjectCommand(_messages,
-			ch == 'G' ? ObjectItems::KIND_GET : ch == 'J' ? ObjectItems::KIND_JIMMY :
-			ch == 'O' ? ObjectItems::KIND_OPEN : ObjectItems::KIND_SEARCH);
+	case 'S':
+		objectCommand(ObjectItems::KIND_SEARCH, "Search-");
+		return true;
 
-		if (command->done()) {
-			delete command;
-			endTurn();
+	case 'K':
+		objectCommand(ObjectItems::KIND_KLIMB, "Klimb-");
+		return true;
+
+	case 'P':
+		objectCommand(ObjectItems::KIND_PUSH, "Push-");
+		return true;
+
+	case 'Y': {
+		Data::Savegame &sg = _G(savegame);
+
+		// Only the ship's sails are told what to do, as the words of power aren't asked for yet
+		if ((sg._partyTile & 0xF8) != SHIP_FIRST)
+			return false;
+
+		_messages.print("Yell ");
+		if ((sg._partyTile & 0xFC) == SHIP_FIRST) {
+			_messages.print("FURL!\n");
+			sg._partyTile += 4;
 		} else {
-			startInteraction(command);
+			_messages.print("HOIST!\n");
+			sg._partyTile -= 4;
 		}
+
+		endTurn();
 		return true;
 	}
 

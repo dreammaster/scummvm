@@ -62,6 +62,10 @@ public:
 		return _state == STATE_DONE;
 	}
 
+	bool takesTime() const override {
+		return _items.passes();
+	}
+
 	bool keypress(const KeypressMessage &msg) override;
 	void draw(View &view) override;
 };

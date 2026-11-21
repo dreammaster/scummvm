@@ -22,6 +22,8 @@
 #include "ultima/ultima5/logic/object_items.h"
 #include "ultima/ultima5/data/object_data.h"
 #include "ultima/ultima5/logic/attack_logic.h"
+#include "ultima/ultima5/logic/npc_logic.h"
+#include "ultima/ultima5/logic/party_logic.h"
 #include "ultima/ultima5/ultima5.h"
 
 namespace Ultima {
@@ -85,6 +87,23 @@ constexpr byte TILE_DOOR_LOCKED_B = 0xBB;
 constexpr byte TILE_FIREPLACE = 0xBC;
 constexpr byte TILE_MOONGATE = 0xDC;
 
+constexpr byte TILE_STAIR_DOWN = 0x86;
+constexpr byte TILE_LADDER_UP = 0xC8;
+constexpr byte TILE_LADDER_DOWN = 0xC9;
+constexpr byte TILE_CLIMB_A = 0x4C;
+constexpr byte TILE_CLIMB_B = 0xCA;
+constexpr byte TILE_CLIMB_C = 0xCB;
+constexpr byte TILE_MOUNTAIN = 0x0C;
+constexpr byte TILE_IMPASSABLE = 0x0D;
+constexpr byte TILE_CHAIR = 0x90;
+constexpr byte TILE_CANNON = 0xB4;
+constexpr byte TILE_CANNON_FLOOR = 0x45;
+constexpr byte PARTY_ON_FOOT = 0x1C;
+constexpr byte PARTY_RIDING_HORSE = 0x12;
+constexpr int FALL_DAMAGE = 5;
+constexpr int WINDOW_MARGIN = 5;
+constexpr int WINDOW_LAST = 0x1A;
+constexpr int CHUNK_STEP = 16;
 constexpr int LOCATION_TILES = 32;
 constexpr int FIRST_COMBAT_MAP = 0x80;
 constexpr int LAST_LOCATION_MAP = 0x20;
@@ -252,7 +271,186 @@ bool ObjectItems::ready() {
 		return false;
 	}
 
+	if (_kind == KIND_KLIMB)
+		return climbReady();
+
 	return true;
+}
+
+void ObjectItems::cancel() {
+	// Nothing is climbed in a town if no way is given
+	if (_kind == KIND_KLIMB && save()._mapId != 0)
+		_passes = false;
+}
+
+// Gets ready to climb. Ladders and stairs are used where the party stands
+bool ObjectItems::climbReady() {
+	Data::Savegame &sg = save();
+
+	if (sg._mapId == 0) {
+		if (sg._grapple == 0) {
+			_log.print("With what?\n");
+			return false;
+		}
+
+		if (sg._partyTile != PARTY_ON_FOOT) {
+			_log.print("On foot!\n");
+			return false;
+		}
+
+		return true;
+	}
+
+	if ((sg._partyTile & 0xFE) == PARTY_RIDING_HORSE) {
+		_log.print("-On foot!\n");
+		_passes = false;
+		return false;
+	}
+
+	const byte here = tileAt(sg._mapX, sg._mapY);
+	int change = 0;
+
+	if (here == TILE_LADDER_UP)
+		change = 1;
+	else if (here == TILE_STAIR_DOWN || here == TILE_LADDER_DOWN)
+		change = -1;
+
+	if (change == 0)
+		return true;
+
+	sg._mapLevel += change;
+	_log.print(change > 0 ? "Up!\n" : "Down!\n");
+	sg._doorOpen = 0;
+	NpcLogic::place(sg);
+	return false;
+}
+
+void ObjectItems::climb() {
+	Data::Savegame &sg = save();
+	const byte tile = tileAt(_x, _y);
+
+	if (sg._mapId != 0) {
+		if (tile != TILE_CLIMB_A && tile != TILE_CLIMB_B && tile != TILE_CLIMB_C) {
+			_log.print("What?\n");
+			_passes = false;
+			return;
+		}
+
+		sg._mapX = _x;
+		sg._mapY = _y;
+		return;
+	}
+
+	if (tile == TILE_IMPASSABLE) {
+		_log.print("Impassable!\n");
+		return;
+	}
+
+	if (tile != TILE_MOUNTAIN) {
+		_log.print("Not climbable!\n");
+		return;
+	}
+
+	for (int i = 0; i < sg._partySize; ++i) {
+		if (sg._party[i]._status != Data::STATUS_DEAD && sg._party[i]._dex < _G(gameRandom).range(1, SKILL_RANGE)) {
+			_log.print("Fell!\n");
+			PartyLogic::hurtMember(i, _G(gameRandom).range(1, FALL_DAMAGE));
+		}
+	}
+
+	sg._mapX = _x;
+	sg._mapY = _y;
+
+	// The window of the map moves on when the party gets near its edge
+	const int across = (sg._mapX - sg._chunkX) & 0x1F;
+	const int down = (sg._mapY - sg._chunkY) & 0x1F;
+	if (across < WINDOW_MARGIN || across > WINDOW_LAST || down < WINDOW_MARGIN || down > WINDOW_LAST) {
+		sg._chunkX = (_dx * CHUNK_STEP + sg._chunkX) & 0xF0;
+		sg._chunkY = (_dy * CHUNK_STEP + sg._chunkY) & 0xF0;
+		_G(visibility).invalidate();
+	}
+}
+
+// What can be pushed about
+static bool pushable(byte tile) {
+	switch (tile) {
+	case 0x5B:
+	case 0x90:
+	case 0x91:
+	case 0x92:
+	case 0x93:
+	case TILE_DESK:
+	case TILE_BARREL:
+	case TILE_VANITY:
+	case 0xA9:
+	case TILE_DRESSER:
+	case 0xAE:
+	case TILE_TRUNK:
+	case 0xB4:
+	case 0xB5:
+	case 0xB6:
+	case 0xB7:
+		return true;
+	default:
+		return false;
+	}
+}
+
+// Chairs and cannons turn to face the way they were moved
+static byte faced(int dx, int dy, byte tile, bool pulled) {
+	if (dx == 1 && dy == 0)
+		tile += 1;
+	if (dx == 0 && dy == 1)
+		tile += 2;
+	if (dx == -1 && dy == 0)
+		tile += 3;
+
+	return pulled ? tile ^ 2 : tile;
+}
+
+void ObjectItems::push() {
+	Data::Savegame &sg = save();
+	const byte tile = tileAt(_x, _y);
+	byte there;
+
+	firstAt(_x, _y, there);
+
+	if (there != 0 || !pushable(tile)) {
+		_log.print("Won't budge!\n");
+		return;
+	}
+
+	const byte floor = (tile & 0xFC) == TILE_CANNON ? TILE_CANNON_FLOOR : TILE_FLOOR;
+	const int beyondX = _x + _dx;
+	const int beyondY = _y + _dy;
+	const byte beyond = tileAt(beyondX, beyondY);
+	const byte standing = tileAt(sg._mapX, sg._mapY);
+	const byte base = tile & 0xFC;
+	const bool turns = base == TILE_CHAIR || base == TILE_CANNON;
+
+	firstAt(beyondX, beyondY, there);
+
+	if (there == 0 && beyond == floor) {
+		_log.print("Pushed!\n");
+		setTileAt(beyondX, beyondY, tile);
+		setTileAt(_x, _y, beyond);
+
+		if (turns)
+			setTileAt(beyondX, beyondY, faced(_dx, _dy, base, false));
+	} else if (standing == floor) {
+		_log.print("Pulled!\n");
+		setTileAt(sg._mapX, sg._mapY, tile);
+		setTileAt(_x, _y, standing);
+
+		if (turns)
+			setTileAt(sg._mapX, sg._mapY, faced(_dx, _dy, base, true));
+	} else {
+		_log.print("Won't budge\n");
+		return;
+	}
+
+	sg._mapX += _dx;
+	sg._mapY += _dy;
 }
 
 ObjectItems::Need ObjectItems::begin(int dx, int dy) {
@@ -273,6 +471,14 @@ ObjectItems::Need ObjectItems::begin(int dx, int dy) {
 
 	case KIND_JIMMY:
 		return jimmy();
+
+	case KIND_KLIMB:
+		climb();
+		return NEED_NONE;
+
+	case KIND_PUSH:
+		push();
+		return NEED_NONE;
 
 	default:
 		return NEED_WHO;

@@ -25,6 +25,7 @@
 #include "common/ptr.h"
 #include "ultima/ultima5/gfx/tileset.h"
 #include "ultima/ultima5/logic/dungeon_logic.h"
+#include "ultima/ultima5/logic/object_items.h"
 #include "ultima/ultima5/logic/visibility_logic.h"
 #include "ultima/ultima5/views/dungeon_scene.h"
 #include "ultima/ultima5/views/interactions/interaction.h"
@@ -93,6 +94,11 @@ private:
 	 * Looks into a gem, which shows the map from above
 	 */
 	void viewGem();
+
+	/**
+	 * Starts one of the commands that act on what is next to the party
+	 */
+	void objectCommand(ObjectItems::Kind kind, const char *prompt);
 
 	/**
 	 * Clears the screen and draws the blue frame and the outlines of the windows

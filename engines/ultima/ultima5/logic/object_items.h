@@ -37,7 +37,9 @@ public:
 		KIND_GET,
 		KIND_OPEN,
 		KIND_JIMMY,
-		KIND_SEARCH
+		KIND_SEARCH,
+		KIND_KLIMB,
+		KIND_PUSH
 	};
 
 	enum Need {
@@ -55,6 +57,7 @@ private:
 	int _y = 0;
 	int _object = 0;
 	byte _tile = 0;
+	bool _passes = true;
 
 	enum Lock {
 		LOCK_DOOR,
@@ -87,6 +90,9 @@ private:
 	void spawnLoot(int power);
 	void spawn(int kind, int amount, int power, bool &found);
 	void trapSense(int object, int who);
+	bool climbReady();
+	void climb();
+	void push();
 
 public:
 	ObjectItems(Views::MessageLog &log, Kind kind) : _log(log), _items(log), _kind(kind) {}
@@ -97,9 +103,22 @@ public:
 	static void closeDoor();
 
 	/**
-	 * Says if the party is able to start. Picking a lock takes a key
+	 * Says if a direction is to be asked for. Picking a lock takes a key, and climbing
+	 * needs a hook or a ladder under the party
 	 */
 	bool ready();
+
+	/**
+	 * Says if time goes by once it's over
+	 */
+	bool passes() const {
+		return _passes;
+	}
+
+	/**
+	 * Called when no direction was given
+	 */
+	void cancel();
 
 	/**
 	 * Does what it can with what is in the direction chosen. If the party member that does it
