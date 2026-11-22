@@ -41,7 +41,8 @@ public:
 		NEED_DIRECTION,
 		NEED_MEMBER,
 		NEED_VIEW,
-		NEED_KEY
+		NEED_KEY,
+		NEED_AIM
 	};
 
 	// What typing a name of a spell can come to
@@ -51,6 +52,7 @@ public:
 private:
 	Views::MessageLog &_log;
 	CombatLogic *_combat;
+	int _aimItem = 0;
 	int _caster = 0;
 	int _spell = 0;
 
@@ -109,6 +111,13 @@ public:
 	 */
 	bool passes() const {
 		return _passes;
+	}
+
+	/**
+	 * Gives the thing that is to be aimed in a fight for a spell that is, as the fight numbers them
+	 */
+	int aimItem() const {
+		return _aimItem;
 	}
 };
 

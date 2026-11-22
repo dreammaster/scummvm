@@ -335,6 +335,11 @@ public:
 	State advance();
 
 	/**
+	 * Starts a spell that is aimed, which is shot as the fight's things that are, with a target to pick
+	 */
+	Outcome castAimed(int item);
+
+	/**
 	 * Wakes the fighter that a member of the party is, if they are asleep
 	 */
 	void wakeMember(int member);

@@ -58,6 +58,7 @@ constexpr int WINDOW_TILES = 0x20;
 // The spells by where they are in the list
 enum {
 	SPELL_LIGHT = 0,
+	SPELL_GRAVITY = 1,
 	SPELL_AWAKEN = 2,
 	SPELL_CURE = 3,
 	SPELL_HEAL = 4,
@@ -67,6 +68,7 @@ enum {
 	SPELL_POSITION = 9,
 	SPELL_FOOD_GOLD = 11,
 	SPELL_LONG_LIGHT = 12,
+	SPELL_FIREBALL_WAVE = 13,
 	SPELL_FIELD_FIRE = 14,
 	SPELL_FIELD_POISON = 15,
 	SPELL_FIELD_SLEEP = 16,
@@ -80,6 +82,7 @@ enum {
 	SPELL_OPEN_DOOR = 26,
 	SPELL_FULL_HEAL = 27,
 	SPELL_QUICKNESS = 29,
+	SPELL_ENERGY_BOLT = 37,
 	SPELL_REPEL = 31,
 	SPELL_NEGATE_MAGIC = 32,
 	SPELL_WIZARD_EYE = 33,
@@ -90,6 +93,10 @@ enum {
 };
 
 static const byte FIELD_CELLS[4] = { 0x82, 0x81, 0x80, 0x83 };
+
+// What a field spell is as the fight numbers the things that are shot
+static const byte FIELD_FIGHT_ITEMS[4] = { 0x35, 0x33, 0x34, 0x36 };
+constexpr int FIRST_SPELL_ITEM = 0x30;
 
 static Data::Savegame &save() {
 	return _G(savegame);
@@ -166,6 +173,13 @@ static void aim(int key, int &x, int &y) {
 // The spells that can be cast in a fight so far, which are those that need no one to be aimed at
 static bool combatSpell(int spell) {
 	switch (spell) {
+	case SPELL_GRAVITY:
+	case SPELL_FIREBALL_WAVE:
+	case SPELL_ENERGY_BOLT:
+	case SPELL_FIELD_FIRE:
+	case SPELL_FIELD_POISON:
+	case SPELL_FIELD_SLEEP:
+	case SPELL_FIELD_ENERGY:
 	case SPELL_LIGHT:
 	case SPELL_AWAKEN:
 	case SPELL_CURE:
@@ -365,6 +379,12 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 		sg._unk0300 = LONG_LIGHT_TURNS;
 		break;
 
+	case SPELL_GRAVITY:
+	case SPELL_FIREBALL_WAVE:
+	case SPELL_ENERGY_BOLT:
+		_aimItem = FIRST_SPELL_ITEM + (spell == SPELL_GRAVITY ? 0 : spell == SPELL_FIREBALL_WAVE ? 1 : 2);
+		return NEED_AIM;
+
 	case SPELL_AWAKEN:
 	case SPELL_CURE:
 	case SPELL_HEAL:
@@ -471,6 +491,11 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 
 // Fills the way ahead with a field, if it's open ground
 SpellLogic::Need SpellLogic::field(int kind) {
+	if (_combat) {
+		_aimItem = FIELD_FIGHT_ITEMS[kind];
+		return NEED_AIM;
+	}
+
 	if (!inDungeon()) {
 		_result = 0;
 		return finish();

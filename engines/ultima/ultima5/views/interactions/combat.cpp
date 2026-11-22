@@ -206,7 +206,14 @@ bool Combat::keypress(const KeypressMessage &msg) {
 		if (!_sub->keypress(msg))
 			return false;
 
+		// A spell may want a target to be aimed at
+		const int aimItem = _subKey == 'C' ? static_cast<Cast *>(_sub.get())->aimItem() : -1;
+
 		_sub.reset();
+
+		if (aimItem >= 0)
+			return handle(_logic.castAimed(aimItem), _subKey);
+
 		_logic.commandDone(_subKey);
 		return carryOn();
 	}

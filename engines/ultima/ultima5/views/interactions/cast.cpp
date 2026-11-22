@@ -133,6 +133,10 @@ bool Cast::apply(SpellLogic::Need need) {
 		_state = STATE_KEY;
 		return false;
 
+	case SpellLogic::NEED_AIM:
+		_aimItem = _logic.aimItem();
+		break;
+
 	case SpellLogic::NEED_VIEW:
 		_next = new GemView(_log);
 		break;

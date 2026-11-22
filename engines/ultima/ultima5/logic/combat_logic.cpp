@@ -2062,6 +2062,17 @@ void CombatLogic::wakeMember(int member) {
 	}
 }
 
+CombatLogic::Outcome CombatLogic::castAimed(int item) {
+	_spell = true;
+	_special = item >= ITEM_SPECIAL_FIRST;
+	_item = _queueItem = item;
+	_queueSize = _queuePos = 0;
+
+	say("Aim! ");
+	aimStart(_current, WEAPON_RANGE[item]);
+	return OUTCOME_AIM;
+}
+
 bool CombatLogic::spellInterference() {
 	const int u = _interferer[_current];
 

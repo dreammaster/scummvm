@@ -78,6 +78,7 @@ private:
 	PartyMemberChooser _members;
 	SpellLogic _logic;
 	Interaction *_next = nullptr;
+	int _aimItem = -1;
 
 	void askSpell();
 	bool apply(SpellLogic::Need need);
@@ -98,6 +99,13 @@ public:
 
 	bool takesTime() const override {
 		return _logic.passes();
+	}
+
+	/**
+	 * Gives the thing that a fight is to have aimed for the spell, or -1 if it needs none
+	 */
+	int aimItem() const {
+		return _aimItem;
 	}
 
 	Interaction *takeNext() override {
