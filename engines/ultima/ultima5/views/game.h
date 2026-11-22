@@ -61,6 +61,11 @@ private:
 	void endTurn();
 
 	/**
+	 * Goes on from an interaction that has finished
+	 */
+	void interactionDone();
+
+	/**
 	 * Moves the party in the map it's in
 	 */
 	bool walk(Direction direction);

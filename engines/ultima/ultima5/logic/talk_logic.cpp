@@ -98,6 +98,8 @@ constexpr byte SCHEDULE_FOLLOWS_NEAR = 4;
 constexpr byte SCHEDULE_WANDERS_NEAR = 1;
 constexpr int CHARITY_MAP = 5;
 constexpr int BLACKTHORN_MAP = 0x12;
+constexpr byte BADGE_ICON = 0x1D;
+constexpr int PASSWORD_MAX = 14;
 constexpr int TRIBUTE_PER_MEMBER = 10;
 constexpr int BEGGAR_TURNS = 100;
 
@@ -831,6 +833,18 @@ void TalkLogic::run() {
 	}
 }
 
+void TalkLogic::passwordEntered() {
+	_log.printChar('\n');
+
+	if (findWord((const byte *)"IMPE", _line) == 0) {
+		_log.print("\n\"Pass, friend!\"\n");
+	} else {
+		_refused = true;
+	}
+
+	_phase = PHASE_DONE;
+}
+
 void TalkLogic::startLine(LineKind kind, int maxLength) {
 	_line.clear();
 	_lineKind = kind;
@@ -974,7 +988,18 @@ bool TalkLogic::start(int npc) {
 			return false;
 		}
 
-		return true;
+		// The palace guards let through those who wear the badge and know the password
+		if (sg._icon != BADGE_ICON) {
+			_refused = true;
+			return true;
+		}
+
+		_log.printChar('"');
+		_log.print("Give now the\npassword, bearer\nof the Badge!");
+		_log.printChar('"');
+		_log.print("\n\nYour response?\n");
+		startLine(LINE_PASSWORD, PASSWORD_MAX);
+		return false;
 	}
 
 	// The people who keep shops are talked to at their counters
@@ -1019,6 +1044,9 @@ bool TalkLogic::keypress(const Graphics::Views::KeypressMessage &msg) {
 				break;
 			case LINE_NAME:
 				nameEntered();
+				break;
+			case LINE_PASSWORD:
+				passwordEntered();
 				break;
 			}
 

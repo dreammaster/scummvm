@@ -166,8 +166,19 @@ Game::Game() : View("Game"), _messages(this) {
 void Game::timeout() {
 	delayFrames(FRAMES_PER_SAIL_STEP);
 
+	if (_interaction) {
+		const int result = _interaction->tick();
+
+		if (result == Interactions::TICK_DONE)
+			interactionDone();
+		else if (result == Interactions::TICK_REDRAW)
+			redraw();
+
+		return;
+	}
+
 	// A ship that's been set sailing goes on without being told to
-	if (_interaction || _G(savegame)._mapId != OUTDOOR_MAP || TransportLogic::heading() < 0)
+	if (_G(savegame)._mapId != OUTDOOR_MAP || TransportLogic::heading() < 0)
 		return;
 
 	if (TransportLogic::sailTick(_planTick)) {
@@ -1165,22 +1176,26 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 	}
 }
 
+void Game::interactionDone() {
+	const bool timePasses = _interaction->takesTime();
+	Interactions::Interaction *next = _interaction->takeNext();
+	_interaction.reset(next);
+
+	if (next)
+		redraw();
+	else if (timePasses)
+		endTurn();
+	else
+		redraw();
+}
+
 bool Game::msgKeypress(const KeypressMessage &msg) {
 	if (isModifierKey(msg.keycode))
 		return false;
 
 	if (_interaction) {
 		if (_interaction->keypress(msg)) {
-			const bool timePasses = _interaction->takesTime();
-			Interactions::Interaction *next = _interaction->takeNext();
-			_interaction.reset(next);
-
-			if (next)
-				redraw();
-			else if (timePasses)
-				endTurn();
-			else
-				redraw();
+			interactionDone();
 		} else {
 			redraw();
 		}

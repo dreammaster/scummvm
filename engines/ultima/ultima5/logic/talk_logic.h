@@ -62,7 +62,8 @@ private:
 	enum LineKind {
 		LINE_INTEREST,
 		LINE_RESPONSE,
-		LINE_NAME
+		LINE_NAME,
+		LINE_PASSWORD
 	};
 
 	// What is done once a key has been pressed
@@ -144,6 +145,7 @@ private:
 	void addItem(byte code);
 	void askName();
 	void nameEntered();
+	void passwordEntered();
 
 	/**
 	 * The talk, from asking for things to be told about to the words that end it

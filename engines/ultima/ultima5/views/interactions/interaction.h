@@ -36,6 +36,11 @@ namespace Interactions {
 constexpr int MUSIC_AUTO = -2;
 constexpr int MUSIC_KEEP = -3;
 
+// What an interaction that goes on by itself says after a step of time
+constexpr int TICK_NONE = 0;
+constexpr int TICK_REDRAW = 1;
+constexpr int TICK_DONE = 2;
+
 /**
  * The remainder of a command that needs more input than the key that
  * started it, such as a direction or a party member. It reads the keys
@@ -75,6 +80,14 @@ public:
 	 */
 	virtual int musicTrack() const {
 		return MUSIC_AUTO;
+	}
+
+	/**
+	 * Lets time go by for what acts without being pressed a key
+	 * @returns		Whether there is something to redraw, or that it is over
+	 */
+	virtual int tick() {
+		return TICK_NONE;
 	}
 
 	/**

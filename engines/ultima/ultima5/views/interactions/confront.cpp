@@ -21,7 +21,9 @@
 
 #include "ultima/ultima5/views/interactions/confront.h"
 #include "ultima/ultima5/logic/attack_logic.h"
+#include "ultima/ultima5/logic/camp_logic.h"
 #include "ultima/ultima5/logic/npc_logic.h"
+#include "ultima/ultima5/views/interactions/capture.h"
 #include "ultima/ultima5/views/interactions/combat.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -80,8 +82,13 @@ void Confront::talked() {
 void Confront::arrest() {
 	_state = STATE_DONE;
 
-	if (_G(savegame)._mapId == BLACKTHORN_MAP)
+	// In the palace the party is taken to a cell instead
+	if (_G(savegame)._mapId == BLACKTHORN_MAP) {
+		if (CampLogic::fitMembers() > 0)
+			_next = new Capture(_log);
+
 		return;
+	}
 
 	_log.print("\n\"Thou art under arrest!\"\n\n\"Wilt thou come quietly?\"\n\n:");
 	_state = STATE_ARREST;

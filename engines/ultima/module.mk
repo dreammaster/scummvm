@@ -348,6 +348,7 @@ MODULE_OBJS += \
 	ultima5/gfx/tileset.o \
 	ultima5/logic/attack_logic.o \
 	ultima5/logic/camp_logic.o \
+	ultima5/logic/capture_logic.o \
 	ultima5/logic/combat_logic.o \
 	ultima5/logic/death_logic.o \
 	ultima5/logic/dungeon_items.o \
@@ -382,6 +383,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/interaction.o \
 	ultima5/views/interactions/attack.o \
 	ultima5/views/interactions/camp.o \
+	ultima5/views/interactions/capture.o \
 	ultima5/views/interactions/cast.o \
 	ultima5/views/dungeon_scene.o \
 	ultima5/views/interactions/combat.o \
