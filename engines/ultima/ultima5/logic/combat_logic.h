@@ -216,6 +216,11 @@ private:
 	 * Takes away a fighter who stands at the mirror in the last room, which is the way out of the game
 	 */
 	void checkMirror();
+
+	/**
+	 * Tells if a fighter holds out against a spell of the one whose turn it is
+	 */
+	bool spellResisted(int target);
 	void regurgitate(int idx);
 	void upkeep();
 	void burnOut();
@@ -333,6 +338,13 @@ public:
 	 * Carries on until a member of the party is to be told what to do, or the fight is over
 	 */
 	State advance();
+
+	/**
+	 * Casts a spell that hits a number of the fighters without anyone being aimed at
+	 * @param member	Which member of the party is the caster
+	 * @returns		1 if it worked, 0 if it didn't and -1 if neither is said
+	 */
+	int castInstant(int spell, int member);
 
 	/**
 	 * Starts a spell that is aimed, which is shot as the fight's things that are, with a target to pick

@@ -173,6 +173,11 @@ static void aim(int key, int &x, int &y) {
 // The spells that can be cast in a fight so far, which are those that need no one to be aimed at
 static bool combatSpell(int spell) {
 	switch (spell) {
+	case 7:
+	case 23:
+	case 30:
+	case 36:
+	case 41:
 	case SPELL_GRAVITY:
 	case SPELL_FIREBALL_WAVE:
 	case SPELL_ENERGY_BOLT:
@@ -455,6 +460,14 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 		}
 
 		setIcon(0x54, 10);
+		break;
+
+	case 7:
+	case 23:
+	case 30:
+	case 36:
+	case 41:
+		_result = _combat ? _combat->castInstant(spell, caster) : 0;
 		break;
 
 	case SPELL_VIEW:

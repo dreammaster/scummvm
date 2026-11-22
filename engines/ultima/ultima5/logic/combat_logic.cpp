@@ -46,6 +46,11 @@ constexpr int ENEMY_SEA_FIRST = 8;
 
 // The tiles of the objects in a fight
 constexpr byte TILE_CHEST = 0x01;
+constexpr int SPELL_UNDEAD_BANE = 7;
+constexpr int SPELL_REVEAL = 23;
+constexpr int SPELL_EARTHQUAKE = 30;
+constexpr int SPELL_INVISIBLE = 36;
+constexpr int SPELL_DEATH_WAVE = 41;
 constexpr byte TILE_MIRROR_ACTOR = 0x3C;
 constexpr int MIRROR_ROW = 1;
 constexpr byte TILE_CIRCLE = 0x16;
@@ -2060,6 +2065,74 @@ void CombatLogic::wakeMember(int member) {
 			return;
 		}
 	}
+}
+
+// Whether a fighter stands up to a spell, from how clever it is next to the caster
+bool CombatLogic::spellResisted(int target) {
+	const int mine = stat(_current, STAT_INT);
+	const int theirs = stat(target, STAT_INT);
+
+	return quickRoll() < (theirs + 0x1E - mine) / 2;
+}
+
+int CombatLogic::castInstant(int spell, int member) {
+	Savegame &sg = save();
+	Entity &me = _entities[_current];
+	int result = -1;
+
+	switch (spell) {
+	case SPELL_UNDEAD_BANE:
+	case SPELL_DEATH_WAVE:
+		for (int i = 0; i < COMBAT_ENTITIES; ++i) {
+			Entity &e = _entities[i];
+
+			if ((e._flags & (FLAG_PLAYER | FLAG_MONSTER)) != FLAG_MONSTER || e._entity == 47 || e._entity == 0xE || e._entity == 0xF)
+				continue;
+
+			if (spell == SPELL_UNDEAD_BANE && (ENEMY_FLAGS[e._entity] & ENEMY_FLAG_UNDEAD) == 0)
+				continue;
+
+			if (!spellResisted(i)) {
+				e._hp = 1;
+				e._flags |= FLAG_FLEEING;
+			}
+		}
+		break;
+
+	case SPELL_REVEAL:
+		for (int i = 0; i < COMBAT_ENTITIES; ++i) {
+			Entity &e = _entities[i];
+
+			if (e._flags != 0 && (e._flags & FLAG_PLAYER) == 0 && (e._flags & FLAG_INVISIBLE) != 0) {
+				e._flags &= ~FLAG_INVISIBLE;
+				_actors[e._actor]._animTile = _actors[e._actor]._tile;
+			}
+		}
+		break;
+
+	case SPELL_INVISIBLE:
+		_actors[me._actor]._animTile = TILE_HIDDEN_PARTY;
+		me._flags |= FLAG_INVISIBLE;
+		result = 1;
+		break;
+
+	case SPELL_EARTHQUAKE:
+		for (int i = 0; i < COMBAT_ENTITIES; ++i) {
+			if (_entities[i]._flags == 0 || !isEnemySide(i) || stat(i, STAT_DEX) > quickRoll())
+				continue;
+
+			int gained = takeDamage(i, rnd(1, 0x14));
+			Character &c = sg._party[member];
+			c._exp = c._exp + gained < 9999 ? c._exp + gained : 9999;
+			report(i, _current);
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return result;
 }
 
 CombatLogic::Outcome CombatLogic::castAimed(int item) {
