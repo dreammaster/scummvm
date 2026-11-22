@@ -395,6 +395,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/object_command.o \
 	ultima5/views/interactions/ready.o \
 	ultima5/views/interactions/shrine.o \
+	ultima5/views/interactions/troll_toll.o \
 	ultima5/views/interactions/yell.o \
 	ultima5/views/interactions/talk.o \
 	ultima5/views/interactions/use.o \

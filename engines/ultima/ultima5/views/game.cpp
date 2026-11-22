@@ -40,6 +40,7 @@
 #include "ultima/ultima5/views/interactions/gem_view.h"
 #include "ultima/ultima5/views/interactions/object_command.h"
 #include "ultima/ultima5/views/interactions/shrine.h"
+#include "ultima/ultima5/views/interactions/troll_toll.h"
 #include "ultima/ultima5/views/interactions/yell.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
@@ -71,6 +72,8 @@ constexpr int EARTHQUAKE_ROLL = 0x69;
 constexpr byte TILE_BED = 0xAB;
 constexpr byte TILE_SKIFF = 0x28;
 constexpr byte SHIP_FIRST = 0x20;
+constexpr byte TILE_TROLL_BRIDGE = 0x6A;
+constexpr byte PARTY_ON_FOOT = 0x1C;
 constexpr int MOON_CELLS = 12;
 constexpr int MOON_COLUMN = 6;
 constexpr int SUN_HOUR = 17;
@@ -533,6 +536,18 @@ void Game::endTurn() {
 			}
 
 			WorldLogic::jumpToMoonstone(sg, WorldLogic::gateMoonstone(sg));
+		}
+
+		// Trolls under a bridge may be there to be sneaked past
+		if ((ground & 0xFE) == TILE_TROLL_BRIDGE && sg._partyTile == PARTY_ON_FOOT && _G(gameRandom).range(0, 7) == 0) {
+			Interactions::TrollToll *toll = new Interactions::TrollToll(_messages);
+
+			if (toll->done()) {
+				delete toll;
+			} else {
+				startInteraction(toll);
+				return;
+			}
 		}
 
 		// The monsters have their turn
