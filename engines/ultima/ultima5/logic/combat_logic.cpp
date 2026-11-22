@@ -54,6 +54,11 @@ constexpr int SPELL_DEATH_WAVE = 41;
 constexpr int SPELL_SUMMON = 10;
 constexpr int SPELL_CHARM_GROUP = 24;
 constexpr int SPELL_CHARM = 34;
+constexpr int SPELL_TELEPORT = 17;
+constexpr int SPELL_CLONE = 38;
+constexpr int TELEPORT_TRIES = 7;
+constexpr int CLONE_TRIES = 64;
+constexpr byte TILE_CLONE_STAND = 0x1C;
 constexpr int SPELL_REPLACE = 35;
 constexpr int SPELL_CREATURE_RANGE = 0xF;
 constexpr int SUMMON_TRIES = 8;
@@ -2109,6 +2114,23 @@ int CombatLogic::castInstant(int spell, int member) {
 		}
 		break;
 
+	case SPELL_TELEPORT:
+		// The caster goes to a place picked by chance, except in the rooms of the dungeons
+		result = 0;
+
+		if ((_flags & 2) == 0) {
+			for (int tries = 0; tries < TELEPORT_TRIES; ++tries) {
+				if (!randomSpot() || !canStand(_actors[me._actor]._tile, _scratchX, _scratchY))
+					continue;
+
+				me._x = _actors[me._actor]._x = _scratchX;
+				me._y = _actors[me._actor]._y = _scratchY;
+				result = 1;
+				break;
+			}
+		}
+		break;
+
 	case SPELL_SUMMON: {
 		// Calls up a creature that serves the caster, of a kind picked by chance
 		const int roll = rnd(0, 0xF);
@@ -2395,6 +2417,40 @@ CombatLogic::Outcome CombatLogic::creatureSpell() {
 			say(" charmed!\n");
 			endTurn('A');
 			return OUTCOME_DONE;
+		}
+	} else if (spell == SPELL_CLONE) {
+		// A creature is copied, to stand somewhere else
+		int freeEntity = -1;
+		int freeActor = -1;
+
+		for (int i = 0; i < COMBAT_ENTITIES && freeEntity < 0; ++i) {
+			if (_entities[i]._flags == 0)
+				freeEntity = i;
+		}
+
+		for (int i = 0; i < COMBAT_ENTITIES && freeActor < 0; ++i) {
+			if (_actors[i]._tile == 0)
+				freeActor = i;
+		}
+
+		if (target >= 0 && freeEntity >= 0 && freeActor >= 0) {
+			_entities[freeEntity] = _entities[target];
+			_actors[freeActor] = _actors[_entities[target]._actor];
+			_entities[freeEntity]._actor = freeActor;
+
+			for (int tries = 0; tries < CLONE_TRIES && !worked; ++tries) {
+				if (!randomSpot() || !canStand(TILE_CLONE_STAND, _scratchX, _scratchY))
+					continue;
+
+				_entities[freeEntity]._x = _actors[freeActor]._x = _scratchX;
+				_entities[freeEntity]._y = _actors[freeActor]._y = _scratchY;
+				worked = true;
+			}
+
+			if (!worked) {
+				_entities[freeEntity] = Entity();
+				_actors[freeActor] = Data::ActorRecord();
+			}
 		}
 	} else if (target >= 0 && !special && !spellResisted(target)) {
 		const int x = _entities[target]._x;

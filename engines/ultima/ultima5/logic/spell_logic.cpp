@@ -176,6 +176,7 @@ static bool combatSpell(int spell) {
 	switch (spell) {
 	case 7:
 	case 10:
+	case 17:
 	case 23:
 	case 24:
 	case 28:
@@ -183,6 +184,7 @@ static bool combatSpell(int spell) {
 	case 34:
 	case 35:
 	case 36:
+	case 38:
 	case 40:
 	case 41:
 	case 44:
@@ -407,11 +409,20 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 		promptMember();
 		return NEED_MEMBER;
 
+	case SPELL_PORTAL:
+		// In a fight it takes the caster to a place picked by chance
+		if (_combat) {
+			_result = _combat->castInstant(spell, caster);
+			break;
+		}
+
+		promptDirection();
+		return NEED_DIRECTION;
+
 	case SPELL_REMOVE:
 	case SPELL_WIND:
 	case SPELL_OPEN_DOOR:
 	case SPELL_LOCK_DOOR:
-	case SPELL_PORTAL:
 		promptDirection();
 		return NEED_DIRECTION;
 
@@ -480,6 +491,7 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 
 	case 34:
 	case 35:
+	case 38:
 		_aimItem = CREATURE_SPELL_BASE + spell;
 		return NEED_AIM;
 
