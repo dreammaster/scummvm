@@ -101,7 +101,7 @@ public:
 	 * Starts the fight with an object of the map that the party has come to blows with
 	 * @returns		The fight, or nothing if it was over before it began
 	 */
-	static Combat *forObject(MessageLog &log, int object);
+	static Combat *forObject(MessageLog &log, int object, int npc = -1);
 
 	/**
 	 * Has what the fight was against taken off the map once it's over

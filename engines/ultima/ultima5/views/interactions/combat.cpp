@@ -102,10 +102,11 @@ bool Combat::startCamp(int guard, int hours, bool &apparition) {
 	return true;
 }
 
-Combat *Combat::forObject(MessageLog &log, int object) {
+Combat *Combat::forObject(MessageLog &log, int object, int npc) {
 	AttackLogic::Fight fight;
 	fight._started = true;
 	fight._actor = object;
+	fight._npc = npc;
 	AttackLogic(log).prepare(fight);
 
 	Combat *combat = new Combat(log);

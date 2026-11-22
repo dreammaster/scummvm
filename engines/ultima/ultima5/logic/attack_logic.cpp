@@ -22,7 +22,10 @@
 #include "ultima/ultima5/logic/attack_logic.h"
 #include "ultima/ultima5/data/combat_data.h"
 #include "ultima/ultima5/logic/combat_logic.h"
+#include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/logic/npc_logic.h"
+#include "ultima/ultima5/logic/party_logic.h"
+#include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -56,6 +59,11 @@ constexpr int HOSTILE_SCHEDULE = 3;
 constexpr int CALL_FOR_GUARDS_SCHEDULE = 6;
 constexpr int CALL_FOR_GUARDS_FIRST_SPECIAL = 7;
 constexpr int FIRST_NPC_SPECIAL = 0x2F;
+constexpr int JAIL_MAP = 4;
+constexpr int JAIL_X = 0x19;
+constexpr int JAIL_Y = 4;
+constexpr int JAIL_WAKE_HOUR = 8;
+constexpr int JAIL_WAKE_MINUTES = 20;
 
 static Data::Savegame &save() {
 	return _G(savegame);
@@ -153,6 +161,28 @@ void AttackLogic::callGuards() {
 		else if (_G(gameRandom).range(0, 0xFF) < 0x80)
 			provoke(i);
 	}
+}
+
+void AttackLogic::begone(int npc) {
+	_log.print("\"Begone,\nvermin!\"\n");
+	PartyLogic::hurtParty();
+	provoke(npc);
+}
+
+void AttackLogic::imprison() {
+	Data::Savegame &sg = save();
+
+	sg.clearObjects();
+	sg._mapId = JAIL_MAP;
+	sg._mapX = JAIL_X;
+	sg._mapY = JAIL_Y;
+	sg._mapLevel = 0;
+	sg._keys = 0;
+
+	while (sg._hour != JAIL_WAKE_HOUR)
+		TimeLogic::advance(sg, JAIL_WAKE_MINUTES);
+
+	LocationLogic::arrive();
 }
 
 bool AttackLogic::townAttack(int dx, int dy, Fight &fight) {

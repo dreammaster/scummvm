@@ -385,6 +385,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/cast.o \
 	ultima5/views/dungeon_scene.o \
 	ultima5/views/interactions/combat.o \
+	ultima5/views/interactions/confront.o \
 	ultima5/views/interactions/death.o \
 	ultima5/views/interactions/dungeon_climb.o \
 	ultima5/views/interactions/dungeon_item.o \

@@ -21,6 +21,7 @@
 
 #include "common/util.h"
 #include "ultima/ultima5/logic/talk_logic.h"
+#include "ultima/ultima5/logic/attack_logic.h"
 #include "ultima/ultima5/logic/npc_logic.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -898,6 +899,7 @@ bool TalkLogic::start(int npc) {
 	Data::Savegame &sg = _G(savegame);
 	_npc = npc;
 	_steal = false;
+	_refused = false;
 	_shopDialog = 0;
 	_phase = PHASE_DONE;
 
@@ -944,7 +946,7 @@ bool TalkLogic::start(int npc) {
 
 	if (dialog == DIALOG_VERMIN) {
 		// The person turns on the party
-		_log.print("\"Begone,\nvermin!\"\n");
+		AttackLogic(_log).begone(npc);
 		return true;
 	}
 
@@ -1036,13 +1038,15 @@ bool TalkLogic::keypress(const Graphics::Views::KeypressMessage &msg) {
 		if (ch == 'Y') {
 			_log.print("Yes\n");
 
-			if (_payment == PAY_CHARITY) {
+			if (_payment == PAY_CHARITY)
 				sg._gold /= 2;
-			} else if (sg._gold >= _tribute) {
+			else if (sg._gold >= _tribute)
 				sg._gold -= _tribute;
-			}
+			else
+				_refused = true;
 		} else {
 			_log.print("No!\n");
+			_refused = true;
 		}
 
 		// Whoever isn't paid should turn on the party

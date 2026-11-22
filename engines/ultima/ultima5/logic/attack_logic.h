@@ -75,6 +75,16 @@ public:
 	static void callGuards();
 
 	/**
+	 * Has a person turn on the party, hurting it
+	 */
+	void begone(int npc);
+
+	/**
+	 * Takes the party to the cells of the castle, to wake in the morning
+	 */
+	static void imprison();
+
+	/**
 	 * Says why, and gives false, if the party can't attack from where it is
 	 */
 	bool canAttack();

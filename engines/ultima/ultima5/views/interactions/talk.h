@@ -42,6 +42,8 @@ private:
 	PartyMemberChooser _members;
 	Common::ScopedPtr<ShopLogic> _shop;
 	bool _talking = false;
+	int _npc = -1;
+	Interaction *_next = nullptr;
 
 	/**
 	 * Goes on to doing business, if the person is a shopkeeper
@@ -66,9 +68,16 @@ private:
 
 public:
 	Talk(MessageLog &log) : Interaction(log), _logic(log) {}
+	~Talk() override;
 
 	bool keypress(const KeypressMessage &msg) override;
 	void draw(View &view) override;
+
+	Interaction *takeNext() override {
+		Interaction *next = _next;
+		_next = nullptr;
+		return next;
+	}
 };
 
 } // namespace Interactions

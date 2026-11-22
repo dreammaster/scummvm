@@ -32,6 +32,7 @@
 #include "ultima/ultima5/views/interactions/camp.h"
 #include "ultima/ultima5/logic/dungeon_logic.h"
 #include "ultima/ultima5/views/interactions/combat.h"
+#include "ultima/ultima5/views/interactions/confront.h"
 #include "ultima/ultima5/views/interactions/dungeon_climb.h"
 #include "ultima/ultima5/views/interactions/cast.h"
 #include "ultima/ultima5/data/shrine_data.h"
@@ -57,6 +58,7 @@ namespace Views {
 
 // The id of the map of Britannia and the underworld
 constexpr byte OUTDOOR_MAP = 0;
+constexpr byte ASK_TO_ATTACK = 0x61;
 
 // How long a command takes
 constexpr int MINUTES_PER_TURN = 2;
@@ -613,6 +615,23 @@ void Game::endTurn() {
 			PartyLogic(_messages).stepOnFire();
 
 		PartyLogic(_messages).turnUpkeep();
+
+		// Someone who has come up to the party speaks to it or sets upon it
+		if (sg._unk1019 != 0) {
+			Interactions::Confront *confront = new Interactions::Confront(_messages, sg._unk1019,
+				sg._unk1018 == ASK_TO_ATTACK ? Interactions::Confront::KIND_ATTACK : Interactions::Confront::KIND_TALK);
+			Interactions::Interaction *next = confront;
+
+			if (confront->done()) {
+				next = confront->takeNext();
+				delete confront;
+			}
+
+			if (next) {
+				startInteraction(next);
+				return;
+			}
+		}
 	}
 
 	redraw();

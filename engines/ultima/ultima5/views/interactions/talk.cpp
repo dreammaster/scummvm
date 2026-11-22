@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/views/interactions/talk.h"
+#include "ultima/ultima5/views/interactions/confront.h"
 #include "ultima/ultima5/ultima5.h"
 
 namespace Ultima {
@@ -34,6 +35,10 @@ constexpr byte TILE_MIRROR = 0x9D;
 static const byte COUNTER_TILES[] = {
 	0x29, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0xA5, 0xAE, 0xBA, 0xBB, 0xBE, 0xCA, 0xCB
 };
+
+Talk::~Talk() {
+	delete _next;
+}
 
 bool Talk::isCounter(byte tile) {
 	for (uint i = 0; i < ARRAYSIZE(COUNTER_TILES); ++i) {
@@ -136,8 +141,15 @@ bool Talk::keypress(const KeypressMessage &msg) {
 		return _shop->memberChosen(member);
 	}
 
-	if (_talking)
-		return _logic.keypress(msg);
+	if (_talking) {
+		if (!_logic.keypress(msg))
+			return false;
+
+		if (_logic.refused())
+			_next = new Confront(_log, _npc, Confront::KIND_ARREST);
+
+		return true;
+	}
 
 	const DirectionChooser::Result result = _chooser.handleKey(msg, _log);
 	if (result == DirectionChooser::PENDING)
@@ -190,6 +202,7 @@ bool Talk::keypress(const KeypressMessage &msg) {
 		return true;
 	}
 
+	_npc = npc;
 	if (_logic.start(npc))
 		return _logic.shopDialog() == 0 || openShop(_logic.shopDialog());
 

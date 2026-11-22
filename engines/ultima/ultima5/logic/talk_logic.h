@@ -103,6 +103,7 @@ private:
 	KeyAction _keyAction = KEY_RESUME;
 	Payment _payment = PAY_CHARITY;
 	int _tribute = 0;
+	bool _refused = false;
 	bool _steal = false;
 	int _shopDialog = 0;
 	bool _inLabel = false;
@@ -191,6 +192,13 @@ public:
 	 */
 	int shopDialog() const {
 		return _shopDialog;
+	}
+
+	/**
+	 * Returns true if a guard was refused what was demanded, which has them arrest the party
+	 */
+	bool refused() const {
+		return _refused;
 	}
 
 	/**
