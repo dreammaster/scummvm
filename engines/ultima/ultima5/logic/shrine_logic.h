@@ -92,6 +92,12 @@ public:
 	static Spoken speak(const char *typed, Views::MessageLog &log, int &shrine, int &x, int &y);
 
 	/**
+	 * Says a word in the castles of the shadowlords, which may call one of them up
+	 * @returns		True if one appeared
+	 */
+	static bool callShadowlord(const char *typed, Views::MessageLog &log);
+
+	/**
 	 * Raises the shrine at its ruins again
 	 */
 	static void restore(int shrine, int x, int y);

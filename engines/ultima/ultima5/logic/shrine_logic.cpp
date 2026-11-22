@@ -38,6 +38,10 @@ constexpr int LAST_SHRINE = 7;
 constexpr int DEFAULT_SHRINE = 6;
 constexpr byte LEFT_BEHIND_MAP = 0x7F;
 constexpr byte SEALED_TILE = 0xDF;
+constexpr int FIRST_SHADOWLORD_MAP = 0x1E;
+constexpr int LAST_SHADOWLORD_MAP = 0x20;
+constexpr byte SHADOWLORD_TILE = 0xFC;
+constexpr byte SHADOWLORD_SCHEDULE = 6;
 constexpr byte RUINS_TILE = 0x1A;
 constexpr byte SHRINE_TILE = 0x19;
 
@@ -200,6 +204,87 @@ ShrineLogic::Spoken ShrineLogic::speak(const char *typed, Views::MessageLog &log
 
 	log.print("\nNo effect!\n");
 	return SPOKEN_NOTHING;
+}
+
+bool ShrineLogic::callShadowlord(const char *typed, Views::MessageLog &log) {
+	static const char *const NAMES[3] = { "FAULINEI", "ASTAROTH", "NOSFENTOR" };
+	Data::Savegame &sg = save();
+	int which;
+
+	if (sg._mapId < FIRST_SHADOWLORD_MAP || sg._mapId > LAST_SHADOWLORD_MAP) {
+		log.print("\nNo effect!\n");
+		return false;
+	}
+
+	for (which = 0; which < 3; ++which) {
+		if (find(NAMES[which], typed) > -1)
+			break;
+	}
+
+	if (which == 3 || sg._mapY < 2 || sg._unk0322[which] == 0xFF) {
+		log.print("\nNo effect!\n");
+		return false;
+	}
+
+	for (int i = 0; i < Data::ACTOR_COUNT; ++i) {
+		if (sg.getActor(i)._tile == SHADOWLORD_TILE) {
+			log.print("\nNo effect!\n");
+			return false;
+		}
+	}
+
+	sg._unk0325 = which;
+
+	// The shadowlord takes a free object, and one of the people of the place
+	int slot = -1;
+	for (int i = 1; i < Data::ACTOR_COUNT && slot < 0; ++i) {
+		if (sg.getActor(i)._tile == 0)
+			slot = i;
+	}
+
+	int npc = -1;
+	for (int i = Data::NPC_COUNT - 1; i >= 0 && npc < 0; --i) {
+		if (sg._npcTypes[i] == 0)
+			npc = i;
+	}
+
+	if (slot < 0 || npc < 0) {
+		log.print("\nNo effect!\n");
+		return false;
+	}
+
+	Data::ActorRecord actor = sg.getActor(slot);
+	actor._tile = actor._animTile = SHADOWLORD_TILE;
+	actor._x = sg._mapX;
+	actor._y = sg._mapY - 2;
+	actor._z = sg._mapLevel;
+	actor._hull = 0;
+	sg.setActor(slot, actor);
+
+	Data::NpcState state = sg.getNpcState(npc);
+	state._present = 1;
+	state._object = slot;
+	state._x = actor._x;
+	state._y = actor._y;
+	state._z = actor._z;
+	sg.setNpcState(npc, state);
+
+	Data::NpcSchedule schedule = sg.getSchedule(npc);
+	for (int i = 0; i < Data::NPC_TIME_SLOTS; ++i)
+		schedule._time[i] = 0;
+
+	for (int i = 0; i < Data::NPC_SCHEDULE_SLOTS; ++i) {
+		schedule._type[i] = SHADOWLORD_SCHEDULE;
+		schedule._x[i] = actor._x;
+		schedule._y[i] = actor._y;
+		schedule._z[i] = actor._z;
+	}
+
+	sg.setSchedule(npc, schedule);
+	sg._npcTypes[npc] = SHADOWLORD_TILE;
+
+	log.print("\nA shadowlord appears\n");
+	return true;
 }
 
 void ShrineLogic::restore(int shrine, int x, int y) {

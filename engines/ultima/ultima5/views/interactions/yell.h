@@ -49,12 +49,17 @@ private:
 	int _y = 0;
 	int _mantras = 0;
 	bool _focused = true;
+	bool _passes = true;
 
 	void askMantra();
 	void conclude();
 
 public:
 	Yell(MessageLog &log);
+
+	bool takesTime() const override {
+		return _passes;
+	}
 
 	bool keypress(const KeypressMessage &msg) override;
 };

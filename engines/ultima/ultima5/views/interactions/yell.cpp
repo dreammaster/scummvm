@@ -72,8 +72,7 @@ bool Yell::keypress(const KeypressMessage &msg) {
 
 		const byte map = _G(savegame)._mapId;
 		if (map >= FIRST_LOCATION_MAP && map <= LAST_LOCATION_MAP) {
-			// The words that call up a shadowlord in the castles aren't known yet
-			_log.print("\nNo effect!\n");
+			_passes = !ShrineLogic::callShadowlord(_line.text().c_str(), _log);
 			return true;
 		}
 
