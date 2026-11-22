@@ -153,6 +153,7 @@ private:
 	bool _spell = false;
 	bool _special = false;
 	int _interferer[COMBAT_ENTITIES];
+	int _creatureSpell = -1;	// The spell that is waiting for a creature to be picked
 	byte _lastKey = 0xFF;
 	int _armed = 0;
 	bool _bothLadders = false;	// The room has a ladder to go either way
@@ -221,6 +222,11 @@ private:
 	 * Tells if a fighter holds out against a spell of the one whose turn it is
 	 */
 	bool spellResisted(int target);
+
+	/**
+	 * Carries out a spell that was aimed at a creature, once it was aimed
+	 */
+	Outcome creatureSpell();
 	void regurgitate(int idx);
 	void upkeep();
 	void burnOut();
@@ -345,6 +351,11 @@ public:
 	 * @returns		1 if it worked, 0 if it didn't and -1 if neither is said
 	 */
 	int castInstant(int spell, int member);
+
+	/**
+	 * Starts a spell that is aimed at a creature, which is to be picked
+	 */
+	Outcome castCreature(int spell);
 
 	/**
 	 * Starts a spell that is aimed, which is shot as the fight's things that are, with a target to pick

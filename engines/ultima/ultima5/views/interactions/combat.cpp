@@ -43,6 +43,7 @@ constexpr int KEY_PAGE_UP = 0xD5;
 constexpr int KEY_PAGE_DOWN = 0xD6;
 
 constexpr int VIEW_X = 8;
+constexpr int CREATURE_SPELL_BASE = 0x100;
 constexpr int VIEW_Y = 8;
 constexpr int ACTOR_TILE_BASE = 0x100;
 constexpr byte ACTOR_REMAINS = 0xE8;
@@ -210,6 +211,9 @@ bool Combat::keypress(const KeypressMessage &msg) {
 		const int aimItem = _subKey == 'C' ? static_cast<Cast *>(_sub.get())->aimItem() : -1;
 
 		_sub.reset();
+
+		if (aimItem >= CREATURE_SPELL_BASE)
+			return handle(_logic.castCreature(aimItem - CREATURE_SPELL_BASE), _subKey);
 
 		if (aimItem >= 0)
 			return handle(_logic.castAimed(aimItem), _subKey);

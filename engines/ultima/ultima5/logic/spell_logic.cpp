@@ -97,6 +97,7 @@ static const byte FIELD_CELLS[4] = { 0x82, 0x81, 0x80, 0x83 };
 // What a field spell is as the fight numbers the things that are shot
 static const byte FIELD_FIGHT_ITEMS[4] = { 0x35, 0x33, 0x34, 0x36 };
 constexpr int FIRST_SPELL_ITEM = 0x30;
+constexpr int CREATURE_SPELL_BASE = 0x100;
 
 static Data::Savegame &save() {
 	return _G(savegame);
@@ -174,8 +175,12 @@ static void aim(int key, int &x, int &y) {
 static bool combatSpell(int spell) {
 	switch (spell) {
 	case 7:
+	case 10:
 	case 23:
+	case 24:
 	case 30:
+	case 34:
+	case 35:
 	case 36:
 	case 41:
 	case SPELL_GRAVITY:
@@ -462,8 +467,15 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 		setIcon(0x54, 10);
 		break;
 
+	case 34:
+	case 35:
+		_aimItem = CREATURE_SPELL_BASE + spell;
+		return NEED_AIM;
+
 	case 7:
+	case 10:
 	case 23:
+	case 24:
 	case 30:
 	case 36:
 	case 41:

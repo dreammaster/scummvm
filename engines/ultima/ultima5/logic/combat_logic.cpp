@@ -51,6 +51,16 @@ constexpr int SPELL_REVEAL = 23;
 constexpr int SPELL_EARTHQUAKE = 30;
 constexpr int SPELL_INVISIBLE = 36;
 constexpr int SPELL_DEATH_WAVE = 41;
+constexpr int SPELL_SUMMON = 10;
+constexpr int SPELL_CHARM_GROUP = 24;
+constexpr int SPELL_CHARM = 34;
+constexpr int SPELL_REPLACE = 35;
+constexpr int SPELL_CREATURE_RANGE = 0xF;
+constexpr int SUMMON_TRIES = 8;
+constexpr int REPLACEMENT_KIND = 0x14;
+constexpr int CHARMED_KIND = 0x1F;
+constexpr byte SUMMON_TILE = 0x90;
+constexpr byte CHARM_GROUP_TILE = 0xBC;
 constexpr byte TILE_MIRROR_ACTOR = 0x3C;
 constexpr int MIRROR_ROW = 1;
 constexpr byte TILE_CIRCLE = 0x16;
@@ -2099,6 +2109,45 @@ int CombatLogic::castInstant(int spell, int member) {
 		}
 		break;
 
+	case SPELL_SUMMON: {
+		// Calls up a creature that serves the caster, of a kind picked by chance
+		const int roll = rnd(0, 0xF);
+		const int kind = roll < 6 ? 0x14 : roll < 0xB ? 0x16 : roll < 0xE ? 0x15 : 0x22;
+
+		result = 0;
+		for (int tries = 0; tries < SUMMON_TRIES; ++tries) {
+			if (!randomSpot() || !canStand(SUMMON_TILE, _scratchX, _scratchY))
+				continue;
+
+			const int placed = place(kind, 0, _scratchX, _scratchY);
+			if (placed >= 0) {
+				_entities[placed]._flags |= FLAG_CHARMED;
+				result = 1;
+			}
+			break;
+		}
+		break;
+	}
+
+	case SPELL_CHARM_GROUP: {
+		// Calls up a group of creatures that serve the caster, where there is room
+		bool found = false;
+
+		result = 0;
+		for (int tries = 0; tries < SUMMON_TRIES && !found; ++tries)
+			found = randomSpot() && canStand(CHARM_GROUP_TILE, _scratchX, _scratchY);
+
+		for (int i = 0; found && i < 4; ++i) {
+			const int placed = place(CHARMED_KIND, 0, _scratchX, _scratchY);
+			if (placed < 0)
+				break;
+
+			_entities[placed]._flags |= FLAG_CHARMED;
+			result = 1;
+		}
+		break;
+	}
+
 	case SPELL_REVEAL:
 		for (int i = 0; i < COMBAT_ENTITIES; ++i) {
 			Entity &e = _entities[i];
@@ -2133,6 +2182,55 @@ int CombatLogic::castInstant(int spell, int member) {
 	}
 
 	return result;
+}
+
+CombatLogic::Outcome CombatLogic::castCreature(int spell) {
+	_creatureSpell = spell;
+	say("Creature: ");
+	aimStart(_current, SPELL_CREATURE_RANGE);
+	return OUTCOME_AIM;
+}
+
+CombatLogic::Outcome CombatLogic::creatureSpell() {
+	Savegame &sg = save();
+	const int spell = _creatureSpell;
+	_creatureSpell = -1;
+
+	// Nothing was picked, and nothing is said
+	if (_aimDistance == 0) {
+		endTurn('A');
+		return OUTCOME_DONE;
+	}
+
+	const int target = findFighter(_aimX, _aimY);
+	const bool special = target >= 0 && (_entities[target]._entity == 47 || _entities[target]._entity == 0xE || _entities[target]._entity == 0xF);
+	bool worked = false;
+
+	if (spell == SPELL_CHARM) {
+		if ((tile(_aimX, _aimY) & 0xFE) != 0x84 && target >= 0 && !special && isEnemySide(target) && !spellResisted(target)) {
+			Entity &t = _entities[target];
+
+			t._flags ^= FLAG_CHARMED;
+			if (t._flags & FLAG_PLAYER)
+				sg._party[t._entity]._status = STATUS_GOOD;
+
+			sayName(target);
+			say(" charmed!\n");
+			endTurn('A');
+			return OUTCOME_DONE;
+		}
+	} else if (target >= 0 && !special && !spellResisted(target)) {
+		const int x = _entities[target]._x;
+		const int y = _entities[target]._y;
+
+		removeFighter(-target - 1);
+		place(REPLACEMENT_KIND, 0, x, y);
+		worked = true;
+	}
+
+	say(worked ? "Success!\n" : "Failed!\n");
+	endTurn('A');
+	return OUTCOME_DONE;
 }
 
 CombatLogic::Outcome CombatLogic::castAimed(int item) {
@@ -2395,6 +2493,9 @@ CombatLogic::Outcome CombatLogic::nextWeapon() {
 
 // Carries out an attack at what's aimed at, then goes on to the next weapon
 CombatLogic::Outcome CombatLogic::aimFire() {
+	if (_creatureSpell >= 0)
+		return creatureSpell();
+
 	const int item = _queueItem;
 	const Entity &e = _entities[_current];
 	const int attacker = _current;
