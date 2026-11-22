@@ -40,6 +40,7 @@
 #include "ultima/ultima5/views/interactions/gem_view.h"
 #include "ultima/ultima5/views/interactions/object_command.h"
 #include "ultima/ultima5/views/interactions/shrine.h"
+#include "ultima/ultima5/views/interactions/yell.h"
 #include "ultima/ultima5/views/interactions/leave_location.h"
 #include "ultima/ultima5/views/interactions/look.h"
 #include "ultima/ultima5/views/interactions/new_order.h"
@@ -750,6 +751,11 @@ bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 		viewGem();
 		return true;
 
+	case 'Y':
+		_messages.print("Yell ");
+		startInteraction(new Interactions::Yell(_messages));
+		return true;
+
 	case 'F':
 		_messages.print("Fire-What?\n");
 		endTurn();
@@ -928,11 +934,14 @@ bool Game::handleCommand(const KeypressMessage &msg) {
 	case 'Y': {
 		Data::Savegame &sg = _G(savegame);
 
-		// Only the ship's sails are told what to do, as the words of power aren't asked for yet
-		if ((sg._partyTile & 0xF8) != SHIP_FIRST)
-			return false;
-
 		_messages.print("Yell ");
+
+		// A ship has its sails told what to do, and otherwise a word is asked for
+		if ((sg._partyTile & 0xF8) != SHIP_FIRST) {
+			startInteraction(new Interactions::Yell(_messages));
+			return true;
+		}
+
 		if ((sg._partyTile & 0xFC) == SHIP_FIRST) {
 			_messages.print("FURL!\n");
 			sg._partyTile += 4;

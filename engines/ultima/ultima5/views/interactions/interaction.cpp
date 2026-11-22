@@ -115,6 +115,35 @@ void PartyMemberChooser::draw(View &view) const {
 	view.drawCaps(LABEL_END_COLUMN * 8, 0, false);
 }
 
+bool LineInput::handleKey(const KeypressMessage &msg, MessageLog &log, int maxLength) {
+	switch (msg.keycode) {
+	case Common::KEYCODE_RETURN:
+	case Common::KEYCODE_KP_ENTER:
+		return true;
+
+	case Common::KEYCODE_ESCAPE:
+		_text.clear();
+		return true;
+
+	case Common::KEYCODE_BACKSPACE:
+		if (!_text.empty()) {
+			_text.deleteLastChar();
+			log.backspace(1);
+		}
+		return false;
+
+	default:
+		break;
+	}
+
+	if (msg.ascii >= ' ' && msg.ascii < 0x7F && (int)_text.size() < maxLength) {
+		_text += (char)msg.ascii;
+		log.printChar(msg.ascii);
+	}
+
+	return false;
+}
+
 static bool isFit(const Data::Character &c) {
 	return c._status == Data::STATUS_GOOD || c._status == Data::STATUS_POISONED;
 }

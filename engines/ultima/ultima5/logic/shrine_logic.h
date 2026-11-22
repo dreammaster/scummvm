@@ -78,6 +78,24 @@ public:
 	 */
 	static void reward(int shrine, Views::MessageLog &log);
 
+	// What yelling a word of power came to
+	enum Spoken {
+		SPOKEN_NOTHING,
+		SPOKEN_EFFECT,
+		SPOKEN_RUINS
+	};
+
+	/**
+	 * Says what a word that was yelled outdoors does, next to a dungeon's way in or to the
+	 * ruins of a shrine. If it is at ruins, those are given
+	 */
+	static Spoken speak(const char *typed, Views::MessageLog &log, int &shrine, int &x, int &y);
+
+	/**
+	 * Raises the shrine at its ruins again
+	 */
+	static void restore(int shrine, int x, int y);
+
 	/**
 	 * Gives how many of the party that were left behind are in urns
 	 */

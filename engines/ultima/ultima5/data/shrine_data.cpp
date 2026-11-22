@@ -86,6 +86,21 @@ const byte SHRINE_INTELLIGENCE[SHRINE_COUNT] = {
 	0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00
 };
 
+const char *const SHRINE_WORDS[SHRINE_COUNT] = {
+	"FALLAX",
+	"VILIS",
+	"INOPIA",
+	"MALUM",
+	"AVIDUS",
+	"INFAMA",
+	"IGNAVUS",
+	"VERAMOCOR"
+};
+
+const byte SHRINE_GATE_TILES[SHRINE_COUNT] = {
+	0x18, 0x16, 0x16, 0x18, 0x18, 0x17, 0x17, 0x16
+};
+
 const byte MOON_PHASES[28 * 2] = {
 	0, 0, 1, 0, 1, 1, 2, 2, 2, 3, 3, 4, 3, 5,
 	4, 6, 5, 7, 5, 0, 6, 0, 6, 1, 7, 2, 7, 3,

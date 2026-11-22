@@ -146,6 +146,30 @@ public:
 };
 
 /**
+ * Takes a line of text that is typed, which is echoed to the message window. The return key
+ * ends it and escape throws it away
+ */
+class LineInput {
+private:
+	Common::String _text;
+
+public:
+	/**
+	 * Handles a keypress
+	 * @returns		True once the line is finished
+	 */
+	bool handleKey(const KeypressMessage &msg, MessageLog &log, int maxLength);
+
+	const Common::String &text() const {
+		return _text;
+	}
+
+	void clear() {
+		_text.clear();
+	}
+};
+
+/**
  * Finds out which member of the party does something that one has to: the one picked to
  * lead, or the only one that's fit, or else whichever the player picks
  */

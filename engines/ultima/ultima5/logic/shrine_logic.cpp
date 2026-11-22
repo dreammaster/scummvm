@@ -21,6 +21,7 @@
 
 #include "ultima/ultima5/logic/shrine_logic.h"
 #include "common/file.h"
+#include "ultima/ultima5/data/dungeon_data.h"
 #include "ultima/ultima5/data/shrine_data.h"
 #include "ultima/ultima5/ultima5.h"
 
@@ -36,6 +37,9 @@ constexpr int REWARD_KARMA = 3;
 constexpr int LAST_SHRINE = 7;
 constexpr int DEFAULT_SHRINE = 6;
 constexpr byte LEFT_BEHIND_MAP = 0x7F;
+constexpr byte SEALED_TILE = 0xDF;
+constexpr byte RUINS_TILE = 0x1A;
+constexpr byte SHRINE_TILE = 0x19;
 
 static Data::Savegame &save() {
 	return _G(savegame);
@@ -153,6 +157,55 @@ void ShrineLogic::reward(int shrine, Views::MessageLog &log) {
 
 	if (shrine == LAST_SHRINE)
 		sg._karma = MIN<int>(sg._karma + REWARD_KARMA, KARMA_LIMIT);
+}
+
+ShrineLogic::Spoken ShrineLogic::speak(const char *typed, Views::MessageLog &log, int &shrine, int &x, int &y) {
+	static const int8 DX[4] = { -1, 0, 1, 0 };
+	static const int8 DY[4] = { 0, 1, 0, -1 };
+	Data::Savegame &sg = save();
+
+	for (int word = 0; word < Data::SHRINE_COUNT; ++word) {
+		if (find(Data::SHRINE_WORDS[word], typed) == -1)
+			continue;
+
+		log.print("\nA word of power is uttered\n");
+
+		for (int side = 0; side < 4; ++side) {
+			const int tx = sg._mapX + DX[side];
+			const int ty = sg._mapY + DY[side];
+			const byte tile = _G(world).getTile(tx, ty);
+
+			if (tile != Data::SHRINE_GATE_TILES[word] && tile != SEALED_TILE && tile != RUINS_TILE)
+				continue;
+
+			if (tile == RUINS_TILE) {
+				shrine = word;
+				x = tx;
+				y = ty;
+				return SPOKEN_RUINS;
+			}
+
+			if (tx == Data::DUNGEON_ENTRANCE_X[Data::SHRINE_COUNT * 4 + word] &&
+					ty == Data::DUNGEON_ENTRANCE_Y[Data::SHRINE_COUNT * 4 + word]) {
+				sg._unk032A[word] ^= 0x80;
+				_G(world).setTile(tx, ty, tile ^ Data::SHRINE_GATE_TILES[word] ^ SEALED_TILE);
+				_G(visibility).invalidate();
+			}
+
+			return SPOKEN_EFFECT;
+		}
+
+		break;
+	}
+
+	log.print("\nNo effect!\n");
+	return SPOKEN_NOTHING;
+}
+
+void ShrineLogic::restore(int shrine, int x, int y) {
+	save()._unk0332[shrine] &= 0x7F;
+	_G(world).setTile(x, y, SHRINE_TILE);
+	_G(visibility).invalidate();
 }
 
 int ShrineLogic::urnCount() {

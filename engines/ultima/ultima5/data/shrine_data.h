@@ -41,6 +41,10 @@ extern const byte SHRINE_STRENGTH[SHRINE_COUNT];
 extern const byte SHRINE_DEXTERITY[SHRINE_COUNT];
 extern const byte SHRINE_INTELLIGENCE[SHRINE_COUNT];
 
+// The words of power that open and close the way into the dungeons, and what those look like open
+extern const char *const SHRINE_WORDS[SHRINE_COUNT];
+extern const byte SHRINE_GATE_TILES[SHRINE_COUNT];
+
 // The phases of the two moons for each day of the month, for Trammel and then for Felucca
 extern const byte MOON_PHASES[28 * 2];
 
