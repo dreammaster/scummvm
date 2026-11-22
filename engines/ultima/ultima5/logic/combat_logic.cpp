@@ -2058,6 +2058,24 @@ CombatLogic::State CombatLogic::advance() {
 	}
 }
 
+void CombatLogic::syncDeath(int member) {
+	Savegame &sg = save();
+
+	for (int i = 0; i < COMBAT_ENTITIES; ++i) {
+		Entity &e = _entities[i];
+
+		if ((e._flags & FLAG_PLAYER) == 0 || e._entity != member)
+			continue;
+
+		e._flags |= FLAG_DEAD;
+		_actors[e._actor]._tile = _actors[e._actor]._animTile = TILE_SLEEPING;
+
+		if (member == sg._activeChar)
+			sg._activeChar = NO_ACTIVE_CHARACTER;
+		break;
+	}
+}
+
 void CombatLogic::moveCurrent(int dx, int dy) {
 	Entity &e = _entities[_current];
 

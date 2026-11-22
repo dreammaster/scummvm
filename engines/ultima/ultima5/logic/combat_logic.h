@@ -353,6 +353,12 @@ public:
 	}
 
 	/**
+	 * Takes the fighter of a member of the party out of the fight if the member has died of something
+	 * that was done outside the blows of the fight
+	 */
+	void syncDeath(int member);
+
+	/**
 	 * Moves the fighter whose turn it is one square, as when they push something
 	 */
 	void moveCurrent(int dx, int dy);

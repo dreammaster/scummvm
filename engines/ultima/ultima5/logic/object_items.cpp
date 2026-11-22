@@ -928,6 +928,9 @@ void ObjectItems::openChest(int who) {
 		power &= 0x7F;
 		_log.print("Trapped!\n");
 		_items.chestTrap(who);
+
+		if (s_combat && sg._party[who]._status == Data::STATUS_DEAD)
+			s_combat->syncDeath(who);
 	}
 
 	spawnLoot(power);
