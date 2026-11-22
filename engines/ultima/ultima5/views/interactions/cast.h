@@ -83,7 +83,10 @@ private:
 	bool apply(SpellLogic::Need need);
 
 public:
-	Cast(MessageLog &log);
+	/**
+	 * @param combat	The fight it is in, if it is
+	 */
+	Cast(MessageLog &log, CombatLogic *combat = nullptr);
 	~Cast() override;
 
 	/**

@@ -88,6 +88,8 @@ constexpr int ITEM_ARROWS = 0x1B;
 constexpr int ITEM_QUARRELS = 0x1D;
 
 constexpr int ICON_TIME_STOP = 'T';
+constexpr int ICON_NEGATE_MAGIC = 'N';
+constexpr int CASTLE_MAP = 0x12;
 constexpr int ICON_QUICK = 'Q';
 constexpr int ICON_NEGATE = 'N';
 constexpr int ICON_CHARM = 'C';
@@ -2051,6 +2053,28 @@ void CombatLogic::checkMirror() {
 	removeFighter(-_current - 1);
 }
 
+void CombatLogic::wakeMember(int member) {
+	for (int i = 0; i < COMBAT_ENTITIES; ++i) {
+		if ((_entities[i]._flags & FLAG_PLAYER) && _entities[i]._entity == member) {
+			wakeUp(i);
+			return;
+		}
+	}
+}
+
+bool CombatLogic::spellInterference() {
+	const int u = _interferer[_current];
+
+	if (u == 0xFF || _entities[u]._flags == 0 || !isEnemySide(u) || (_entities[u]._flags & (FLAG_ASLEEP | FLAG_SWALLOWED)) != 0 ||
+			save()._icon == ICON_TIME_STOP || distance(_current, u) != 1)
+		return false;
+
+	newline();
+	sayName(u);
+	say(" interferes!\n");
+	return true;
+}
+
 void CombatLogic::finish() {
 	Savegame &sg = save();
 
@@ -2368,6 +2392,27 @@ CombatLogic::Outcome CombatLogic::command(int key) {
 
 	case 'Z':
 		say("Z-stats...\n");
+		return OUTCOME_SUBCOMMAND;
+
+	case 'C':
+		say("Cast...\n");
+
+		if ((_entities[_current]._flags & FLAG_PLAYER) == 0) {
+			say("Can't!\n");
+			prompt(true);
+			return OUTCOME_AGAIN;
+		}
+
+		if (spellInterference()) {
+			prompt(true);
+			return OUTCOME_AGAIN;
+		}
+
+		if (save()._icon == ICON_NEGATE_MAGIC || (save()._crown == 0 && _origin == CASTLE_MAP)) {
+			say("Absorbed!\n");
+			break;
+		}
+
 		return OUTCOME_SUBCOMMAND;
 
 	case 'G':

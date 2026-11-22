@@ -95,13 +95,42 @@ static Data::Savegame &save() {
 	return _G(savegame);
 }
 
+// The fight that is cast in, if it is
+static CombatLogic *s_combat = nullptr;
+
+SpellLogic::SpellLogic(Views::MessageLog &log, CombatLogic *combat) : _log(log), _combat(combat) {
+	s_combat = combat;
+}
+
+SpellLogic::~SpellLogic() {
+	s_combat = nullptr;
+}
+
+static int standX() {
+	return s_combat ? s_combat->entity(s_combat->current())._x : save()._mapX;
+}
+
+static int standY() {
+	return s_combat ? s_combat->entity(s_combat->current())._y : save()._mapY;
+}
+
+static byte tileAtPos(int x, int y) {
+	if (s_combat)
+		return x >= 0 && y >= 0 && x < COMBAT_SIZE && y < COMBAT_SIZE ? s_combat->tile(x, y) : 0;
+
+	return tileAtPos(x, y);
+}
+
 static byte &dungeonCell(int x, int y) {
 	Data::Savegame &sg = save();
 	return sg._mapData[sg._mapLevel * DUNGEON_LEVEL_BYTES + (y & 7) * DUNGEON_SIZE + (x & 7)];
 }
 
 static void setTileAt(int x, int y, byte tile) {
-	if (save()._mapId == 0)
+	if (s_combat) {
+		if (x >= 0 && y >= 0 && x < COMBAT_SIZE && y < COMBAT_SIZE)
+			s_combat->mapData()[y * COMBAT_MAP_STRIDE + x] = tile;
+	} else if (save()._mapId == 0)
 		_G(world).setTile(x, y, tile);
 	else if (x >= 0 && y >= 0 && x < Data::LOCATION_SIZE && y < Data::LOCATION_SIZE)
 		_G(location).setTile(x, y, tile);
@@ -113,10 +142,8 @@ static bool inDungeon() {
 
 // Works out where a direction key points from the party, as the map does
 static void aim(int key, int &x, int &y) {
-	const Data::Savegame &sg = save();
-
-	x = sg._mapX;
-	y = sg._mapY;
+	x = standX();
+	y = standY();
 
 	switch (key) {
 	case KEY_UP:
@@ -133,6 +160,32 @@ static void aim(int key, int &x, int &y) {
 		break;
 	default:
 		break;
+	}
+}
+
+// The spells that can be cast in a fight so far, which are those that need no one to be aimed at
+static bool combatSpell(int spell) {
+	switch (spell) {
+	case SPELL_LIGHT:
+	case SPELL_AWAKEN:
+	case SPELL_CURE:
+	case SPELL_HEAL:
+	case SPELL_REMOVE:
+	case SPELL_UNLOCK:
+	case SPELL_FOOD_GOLD:
+	case SPELL_LONG_LIGHT:
+	case SPELL_PROTECTION:
+	case SPELL_LOCK_DOOR:
+	case SPELL_OPEN_DOOR:
+	case SPELL_FULL_HEAL:
+	case SPELL_QUICKNESS:
+	case SPELL_REPEL:
+	case SPELL_NEGATE_MAGIC:
+	case SPELL_RESURRECT:
+	case SPELL_NEGATE_TIME:
+		return true;
+	default:
+		return false;
 	}
 }
 
@@ -257,7 +310,9 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 	_result = -1;
 	_passes = true;
 
-	if (sg._mapId == 0) {
+	if (_combat) {
+		here = (Data::SPELL_PLACES[spell] & PLACE_COMBAT) != 0 && combatSpell(spell);
+	} else if (sg._mapId == 0) {
 		here = (Data::SPELL_PLACES[spell] & PLACE_OUTDOORS) != 0;
 	} else if (sg._mapId >= FIRST_COMBAT_MAP) {
 		here = (Data::SPELL_PLACES[spell] & PLACE_COMBAT) != 0;
@@ -554,7 +609,7 @@ SpellLogic::Need SpellLogic::directionChosen(int key) {
 
 	case SPELL_REMOVE: {
 		static const byte REMOVABLE[13] = { 0x5B, 0x90, 0x91, 0x92, 0x93, 0x9D, 0xA5, 0xA6, 0xA8, 0xA9, 0xAD, 0xAE, 0xAF };
-		const byte tile = g_engine->getMapTile(x, y);
+		const byte tile = tileAtPos(x, y);
 
 		_result = 0;
 		for (int i = 0; i < 13; ++i) {
@@ -569,7 +624,7 @@ SpellLogic::Need SpellLogic::directionChosen(int key) {
 	}
 
 	case SPELL_UNLOCK: {
-		const byte tile = g_engine->getMapTile(x, y);
+		const byte tile = tileAtPos(x, y);
 		_result = 0;
 
 		if (tile == 0xB9 || tile == 0xBB) {
@@ -579,11 +634,15 @@ SpellLogic::Need SpellLogic::directionChosen(int key) {
 		}
 
 		for (int i = 0; i < Data::ACTOR_COUNT; ++i) {
-			Data::ActorRecord a = sg.getActor(i);
+			Data::ActorRecord a = s_combat ? s_combat->actor(i) : sg.getActor(i);
 
-			if (a._tile == 1 && a._x == x && a._y == y && a._z == sg._mapLevel) {
+			if (a._tile == 1 && a._x == x && a._y == y && (s_combat || a._z == sg._mapLevel)) {
 				a._hull &= 0x7F;
-				sg.setActor(i, a);
+
+				if (s_combat)
+					s_combat->actorRef(i) = a;
+				else
+					sg.setActor(i, a);
 				_result = 1;
 				break;
 			}
@@ -592,7 +651,7 @@ SpellLogic::Need SpellLogic::directionChosen(int key) {
 	}
 
 	case SPELL_LOCK_DOOR: {
-		const byte tile = g_engine->getMapTile(x, y);
+		const byte tile = tileAtPos(x, y);
 		_result = 0;
 
 		if (tile == 0xB8 || tile == 0xB9) {
@@ -606,7 +665,7 @@ SpellLogic::Need SpellLogic::directionChosen(int key) {
 	}
 
 	case SPELL_OPEN_DOOR: {
-		const byte tile = g_engine->getMapTile(x, y);
+		const byte tile = tileAtPos(x, y);
 		_result = 0;
 
 		if (tile == 0x97) {
@@ -698,6 +757,9 @@ SpellLogic::Need SpellLogic::memberChosen(int member) {
 		if (c._status == Data::STATUS_SLEEP) {
 			c._status = Data::STATUS_GOOD;
 			_result = -1;
+
+			if (_combat)
+				_combat->wakeMember(member);
 		} else {
 			_result = 0;
 		}

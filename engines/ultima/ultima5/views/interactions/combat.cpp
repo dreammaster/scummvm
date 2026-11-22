@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/views/interactions/combat.h"
+#include "ultima/ultima5/views/interactions/cast.h"
 #include "ultima/ultima5/views/interactions/endgame.h"
 #include "ultima/ultima5/views/interactions/object_command.h"
 #include "ultima/ultima5/views/interactions/ready.h"
@@ -162,6 +163,16 @@ bool Combat::handle(CombatLogic::Outcome outcome, int key) {
 			_sub.reset(new Ready(_log));
 		} else if (key == 'Z') {
 			_sub.reset(new Ztats(_log));
+		} else if (key == 'C') {
+			Cast *cast = new Cast(_log, &_logic);
+
+			if (cast->done()) {
+				delete cast;
+				_logic.commandDone(key);
+				return carryOn();
+			}
+
+			_sub.reset(cast);
 		} else if (key == 'G' || key == 'J' || key == 'O' || key == 'S') {
 			ObjectCommand *command = new ObjectCommand(_log, key == 'G' ? ObjectItems::KIND_GET :
 				key == 'J' ? ObjectItems::KIND_JIMMY : key == 'O' ? ObjectItems::KIND_OPEN : ObjectItems::KIND_SEARCH, &_logic);

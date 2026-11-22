@@ -23,6 +23,7 @@
 #define ULTIMA5_LOGIC_SPELL_LOGIC_H
 
 #include "ultima/ultima5/data/savegame.h"
+#include "ultima/ultima5/logic/combat_logic.h"
 #include "ultima/ultima5/views/message_log.h"
 
 namespace Ultima {
@@ -49,6 +50,7 @@ public:
 
 private:
 	Views::MessageLog &_log;
+	CombatLogic *_combat;
 	int _caster = 0;
 	int _spell = 0;
 
@@ -67,7 +69,11 @@ private:
 	void showPosition();
 
 public:
-	SpellLogic(Views::MessageLog &log) : _log(log) {}
+	/**
+	 * @param combat	The fight that it's cast in, if it is
+	 */
+	SpellLogic(Views::MessageLog &log, CombatLogic *combat = nullptr);
+	~SpellLogic();
 
 	/**
 	 * Works out which spell the letters typed make up, which can be none or not one

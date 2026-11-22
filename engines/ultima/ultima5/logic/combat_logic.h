@@ -335,6 +335,16 @@ public:
 	State advance();
 
 	/**
+	 * Wakes the fighter that a member of the party is, if they are asleep
+	 */
+	void wakeMember(int member);
+
+	/**
+	 * Tells if an enemy next to the one whose turn it is stops them from casting a spell, and says so
+	 */
+	bool spellInterference();
+
+	/**
 	 * Tells the member of the party whose turn it is what to do
 	 * @param key		The key, as the original gives it
 	 */

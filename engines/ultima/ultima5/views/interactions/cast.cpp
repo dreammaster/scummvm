@@ -93,7 +93,7 @@ int SpellEntry::spell() const {
 	return SpellLogic::identify(_letters, _count);
 }
 
-Cast::Cast(MessageLog &log) : Interaction(log), _logic(log) {
+Cast::Cast(MessageLog &log, CombatLogic *combat) : Interaction(log), _logic(log, combat) {
 	switch (_actor.begin(_log)) {
 	case ActingMemberChooser::PENDING:
 		_state = STATE_WHO;
