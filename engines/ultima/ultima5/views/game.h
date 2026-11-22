@@ -125,6 +125,7 @@ private:
 	 * Draws the wind in the bottom border, or clears it below ground
 	 */
 	void drawWind();
+	void drawMoons();
 
 	/**
 	 * Draws the part of the map around the party, with the party and the other

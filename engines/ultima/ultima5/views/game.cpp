@@ -71,6 +71,14 @@ constexpr int EARTHQUAKE_ROLL = 0x69;
 constexpr byte TILE_BED = 0xAB;
 constexpr byte TILE_SKIFF = 0x28;
 constexpr byte SHIP_FIRST = 0x20;
+constexpr int MOON_CELLS = 12;
+constexpr int MOON_COLUMN = 6;
+constexpr int SUN_HOUR = 17;
+constexpr int TRAMMEL_HOUR = 8;
+constexpr int FELUCCA_HOUR = 2;
+constexpr int HOURS_IN_DAY = 24;
+constexpr byte COLOR_YELLOW = 14;
+constexpr byte COLOR_LIGHT_GRAY = 7;
 constexpr byte TILE_MOONGATE = 0xDC;
 constexpr int MOONGATE_SHRINE_MINUTES = 10;
 constexpr byte TILE_SHRINE = 0x19;
@@ -175,6 +183,7 @@ void Game::draw() {
 		_scene.draw(*this);
 	} else {
 		drawMap();
+		drawMoons();
 	}
 
 	drawParty();
@@ -292,6 +301,42 @@ void Game::drawStatus() {
 		s.hLine(0xC0, 0x38, 0x137, COLOR_WHITE);
 		s.hLine(0xC0, 0x3F, 0x137, COLOR_WHITE);
 	}
+}
+
+void Game::drawMoons() {
+	const Data::Savegame &sg = _G(savegame);
+	auto s = getSurface();
+
+	if (sg._mapId == NO_WIND_MAP || sg._mapLevel >= Data::MAP_LEVEL_UNDERGROUND) {
+		s.fillRect(Common::Rect(0x28, 0, 0x98, 6), COLOR_BLUE);
+		s.hLine(0x28, 7, 0x98, COLOR_WHITE);
+		return;
+	}
+
+	// The sun and the two moons cross the sky as the hours go by
+	char cells[MOON_CELLS + 1];
+	memset(cells, ' ', MOON_CELLS);
+	cells[MOON_CELLS] = 0;
+
+	const int sun = SUN_HOUR - sg._hour;
+	if (sun >= 0 && sun < MOON_CELLS)
+		cells[sun] = '*';
+
+	const int day = (sg._day - 1) * 2;
+	int trammel = TRAMMEL_HOUR - sg._hour;
+	if (trammel < -MOON_CELLS)
+		trammel += HOURS_IN_DAY;
+	if (trammel >= 0 && trammel < MOON_CELLS)
+		cells[trammel] = '0' + Data::MOON_PHASES[day];
+
+	int felucca = FELUCCA_HOUR - sg._hour;
+	if (felucca < -MOON_CELLS)
+		felucca += HOURS_IN_DAY;
+	if (felucca >= 0 && felucca < MOON_CELLS)
+		cells[felucca] = '0' + Data::MOON_PHASES[day + 1];
+
+	for (int i = 0; i < MOON_CELLS; ++i)
+		drawRune(MOON_COLUMN + i, 0, cells[i], cells[i] == '*' ? COLOR_YELLOW : COLOR_LIGHT_GRAY, COLOR_BLUE);
 }
 
 void Game::drawWind() {
