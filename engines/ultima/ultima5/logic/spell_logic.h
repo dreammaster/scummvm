@@ -42,7 +42,8 @@ public:
 		NEED_MEMBER,
 		NEED_VIEW,
 		NEED_KEY,
-		NEED_AIM
+		NEED_AIM,
+		NEED_EYE
 	};
 
 	// What typing a name of a spell can come to

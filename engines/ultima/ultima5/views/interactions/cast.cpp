@@ -137,6 +137,10 @@ bool Cast::apply(SpellLogic::Need need) {
 		_aimItem = _logic.aimItem();
 		break;
 
+	case SpellLogic::NEED_EYE:
+		_next = new WizardEye(_log);
+		break;
+
 	case SpellLogic::NEED_VIEW:
 		_next = new GemView(_log);
 		break;

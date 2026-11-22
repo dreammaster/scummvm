@@ -397,6 +397,34 @@ void GemView::draw(View &view) {
 	drawDungeon(view, c);
 }
 
+// The tiles shown about the party, and where its tile is among them
+constexpr int EYE_TILES = 11;
+constexpr int EYE_CENTRE = 5;
+constexpr int EYE_ACTOR_BASE = 0x100;
+
+void WizardEye::draw(View &view) {
+	const Data::Savegame &sg = _G(savegame);
+	auto s = view.getSurface();
+
+	for (int y = 0; y < EYE_TILES; ++y) {
+		for (int x = 0; x < EYE_TILES; ++x) {
+			_G(tileset).drawTile(s, AREA_LEFT + x * Gfx::TILE_SIZE, AREA_TOP + y * Gfx::TILE_SIZE,
+				g_engine->getMapTile(sg._mapX + x - EYE_CENTRE, sg._mapY + y - EYE_CENTRE));
+		}
+	}
+
+	for (int i = 0; i < Data::ACTOR_COUNT; ++i) {
+		const Data::ActorRecord a = sg.getActor(i);
+		const int x = (byte)(a._x - sg._mapX) + EYE_CENTRE;
+		const int y = (byte)(a._y - sg._mapY) + EYE_CENTRE;
+
+		if (a._tile == 0 || a._z != sg._mapLevel || x < 0 || y < 0 || x >= EYE_TILES || y >= EYE_TILES)
+			continue;
+
+		_G(tileset).drawTile(s, AREA_LEFT + x * Gfx::TILE_SIZE, AREA_TOP + y * Gfx::TILE_SIZE, EYE_ACTOR_BASE + a._animTile);
+	}
+}
+
 } // namespace Interactions
 } // namespace Views
 } // namespace Ultima5

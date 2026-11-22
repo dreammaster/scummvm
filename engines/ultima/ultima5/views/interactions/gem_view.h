@@ -44,6 +44,21 @@ public:
 	void draw(View &view) override;
 };
 
+/**
+ * The wizard eye: what is all about the party is shown, without the walls hiding anything, until
+ * a key is pressed
+ */
+class WizardEye : public Interaction {
+public:
+	WizardEye(MessageLog &log) : Interaction(log) {}
+
+	bool keypress(const KeypressMessage &) override {
+		return true;
+	}
+
+	void draw(View &view) override;
+};
+
 } // namespace Interactions
 } // namespace Views
 } // namespace Ultima5

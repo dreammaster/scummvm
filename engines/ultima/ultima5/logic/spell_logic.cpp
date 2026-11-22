@@ -356,7 +356,7 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 	}
 
 	// These need more than has been written yet, so they are left as they are
-	if (spell == SPELL_WIZARD_EYE || (spell == SPELL_MOON_TRAVEL && sg._mapId != 0))
+	if (spell == SPELL_MOON_TRAVEL && sg._mapId != 0)
 		here = false;
 
 	if (!here) {
@@ -507,6 +507,9 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 
 	case SPELL_VIEW:
 		return NEED_VIEW;
+
+	case SPELL_WIZARD_EYE:
+		return NEED_EYE;
 
 	case SPELL_MOON_TRAVEL:
 		if ((sg._partyTile & 0xF0) == SHIP_TILES) {
