@@ -134,8 +134,10 @@ void UseLogic::promptMember() {
 }
 
 UseLogic::Need UseLogic::finish() {
-	if (_result == 0)
+	if (_result == 0) {
 		_log.print("Failed!\n");
+		g_engine->sound().alert();
+	}
 
 	return NEED_NONE;
 }
@@ -463,6 +465,7 @@ void UseLogic::sceptre() {
 	_log.print("Sceptre\n\n");
 	_log.print("Wielding the Sceptre");
 	_log.print(" of Lord British...\n");
+	g_engine->sound().pulse(0x1450, 1, 50000, 5000, 1);
 
 	int cleared = 0;
 	if (sg._mapId < FIRST_DUNGEON || sg._mapId > LAST_DUNGEON) {
@@ -473,6 +476,7 @@ void UseLogic::sceptre() {
 
 				if ((g_engine->getMapTile(x, y) & 0xF0) == TILE_FIELD_KIND) {
 					setTileAt(x, y, TILE_GRASS);
+					g_engine->sound().noise(10, 3000, 2000);
 					++cleared;
 				}
 			}
@@ -503,6 +507,7 @@ void UseLogic::gemShard(int which) {
 	if (FLAME_X[which] != sg._mapX || FLAME_Y[which] != sg._mapY || FLAME_MAP[which] != sg._mapId ||
 			FLAME_LEVEL[which] != sg._mapLevel) {
 		_log.print("\n\nNo effect!\n");
+		g_engine->sound().alert();
 		return;
 	}
 

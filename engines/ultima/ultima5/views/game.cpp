@@ -1203,6 +1203,13 @@ bool Game::msgKeypress(const KeypressMessage &msg) {
 		return true;
 	}
 
+	if (msg.keycode == Common::KEYCODE_s && (msg.flags & Common::KBD_CTRL)) {
+		g_engine->sound().toggle();
+		_messages.print(g_engine->sound().isOn() ? "Sound On\n" : "Sound Off\n");
+		redraw();
+		return true;
+	}
+
 	return handleCommand(msg);
 }
 

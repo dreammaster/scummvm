@@ -322,6 +322,7 @@ ifdef ENABLE_ULTIMA5
 MODULE_OBJS += \
 	ultima5/ultima5.o \
 	ultima5/audio/music.o \
+	ultima5/audio/sound.o \
 	ultima5/console.o \
 	ultima5/metaengine.o \
 	ultima5/data/data.o \

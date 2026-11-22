@@ -284,6 +284,7 @@ bool ShrineLogic::callShadowlord(const char *typed, Views::MessageLog &log) {
 	sg._npcTypes[npc] = SHADOWLORD_TILE;
 
 	log.print("\nA shadowlord appears\n");
+	g_engine->sound().pulse(0x28A0, 1, 30000, 2000, 2);
 	return true;
 }
 

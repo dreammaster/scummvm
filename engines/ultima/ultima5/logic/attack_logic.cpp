@@ -295,6 +295,7 @@ void AttackLogic::prepare(Fight &fight) {
 
 	if (group == TILE_SHADOWLORD && sg._sceptre != 0) {
 		_log.print("The Sceptre is reclaimed!\n");
+		g_engine->sound().pulse(0xFD2, 1, 65000, 1, 1);
 		sg._sceptre = 0;
 	}
 }

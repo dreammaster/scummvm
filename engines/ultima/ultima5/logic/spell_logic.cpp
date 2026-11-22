@@ -325,6 +325,7 @@ SpellLogic::Need SpellLogic::finish() {
 		_log.print("Success!\n");
 	} else if (_result == 0) {
 		_log.print("Failed!\n");
+		g_engine->sound().alert();
 	}
 
 	return NEED_NONE;
@@ -349,6 +350,7 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 	} else {
 		if ((sg._mapId == CASTLE_MAP && sg._crown == 0) || sg._mapId == STONEGATE_MAP) {
 			_log.print("Absorbed!\n");
+			g_engine->sound().absorbed();
 			return NEED_NONE;
 		}
 
@@ -357,6 +359,7 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 
 	if (!here) {
 		_log.print("Not here!\n");
+		g_engine->sound().alert();
 		return NEED_NONE;
 	}
 
@@ -381,6 +384,8 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 		_result = 0;
 		return finish();
 	}
+
+	g_engine->sound().castEffect(level);
 
 	switch (spell) {
 	case SPELL_LIGHT:
@@ -470,6 +475,7 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 		for (int i = 0; i < Data::ACTOR_COUNT; ++i) {
 			if (sg.getActor(i)._tile == 0xFC) {
 				_log.print("Magic absorbed!\n");
+				g_engine->sound().absorbed();
 				_result = 0;
 				return finish();
 			}
@@ -696,6 +702,7 @@ SpellLogic::Need SpellLogic::directionChosen(int key) {
 			if (tile == REMOVABLE[i]) {
 				setTileAt(x, y, 0x44);
 				_log.print("POOF!\n");
+				g_engine->sound().refuse();
 				_result = -1;
 				break;
 			}

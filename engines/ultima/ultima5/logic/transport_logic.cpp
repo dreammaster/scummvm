@@ -429,6 +429,7 @@ bool TransportLogic::canMove(int dx, int dy) {
 				_log.print("Docked!\n");
 				sg._partyTile += 4;
 			} else {
+				g_engine->sound().noise(100, 2000, 300);
 				damage();
 			}
 
@@ -440,6 +441,8 @@ bool TransportLogic::canMove(int dx, int dy) {
 			if (ground == TILE_THORNS) {
 				_log.print("OUCH!\n");
 				PartyLogic::hurtParty();
+			} else {
+				g_engine->sound().blocked();
 			}
 		}
 	}

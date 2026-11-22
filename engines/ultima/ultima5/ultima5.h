@@ -38,6 +38,7 @@
 #include "ultima/ultima5/gfx/tileset.h"
 #include "ultima/ultima5/logic/game_random.h"
 #include "ultima/ultima5/audio/music.h"
+#include "ultima/ultima5/audio/sound.h"
 #include "ultima/ultima5/logic/visibility_logic.h"
 
 namespace Ultima {
@@ -81,12 +82,18 @@ public:
 
 private:
 	Common::ScopedPtr<Music> _music;
+	Common::ScopedPtr<Sound> _sound;
 
 public:
 	/**
 	 * Gives the music player, which is made when the music is first wanted
 	 */
 	Music &music();
+
+	/**
+	 * Gives the player of the sounds the game makes, which is made when one is first wanted
+	 */
+	Sound &sound();
 
 	/**
 	 * Has a tune be the one that plays, or none, unless the music is turned off

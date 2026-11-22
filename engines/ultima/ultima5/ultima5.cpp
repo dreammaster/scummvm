@@ -166,6 +166,13 @@ Music &Ultima5Engine::music() {
 	return *_music;
 }
 
+Sound &Ultima5Engine::sound() {
+	if (!_sound)
+		_sound.reset(new Sound());
+
+	return *_sound;
+}
+
 void Ultima5Engine::cueMusic(int track) {
 	if (!Music::enabled()) {
 		if (_music)

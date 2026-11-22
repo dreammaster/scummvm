@@ -581,6 +581,7 @@ void ObjectItems::fireCannon() {
 	const int dy = DY[cannon & 3];
 
 	_log.print("BOOOM!\n");
+	g_engine->sound().sweep(1000, 200, 5, 300);
 	AttackLogic::callGuards();
 
 	bool door = false;
@@ -807,6 +808,7 @@ void ObjectItems::get() {
 		setTileAt(_x, _y, TILE_FLOOR);
 		sg._unk0301 = SCONCE_LIGHT;
 		_log.print("Borrowed!\n");
+		g_engine->sound().alert();
 		break;
 
 	case TILE_CROPS:
@@ -949,6 +951,7 @@ ObjectItems::Need ObjectItems::jimmy() {
 	case TILE_LOCKED_A:
 	case TILE_LOCKED_B:
 		_log.print("Key broke!\n");
+		g_engine->sound().alert();
 		--save()._keys;
 		return NEED_NONE;
 
@@ -985,6 +988,7 @@ void ObjectItems::jimmyDoor(int who) {
 
 	if (sg._party[who]._dex <= _G(gameRandom).range(0, DEX_RANGE)) {
 		_log.print("Key broke!\n");
+		g_engine->sound().alert();
 		--sg._keys;
 		return;
 	}
@@ -998,6 +1002,7 @@ void ObjectItems::jimmyPrisoner(int who) {
 
 	if (sg._party[who]._dex <= _G(gameRandom).range(0, DEX_RANGE)) {
 		_log.print("Key broke!\n");
+		g_engine->sound().alert();
 		--sg._keys;
 		return;
 	}
@@ -1047,6 +1052,7 @@ void ObjectItems::jimmyChest(int who) {
 	}
 
 	_log.print("Key broke!\n");
+		g_engine->sound().alert();
 	--sg._keys;
 }
 
@@ -1171,6 +1177,7 @@ void ObjectItems::searchBody(int object, int who) {
 
 		if (_G(gameRandom).range(0, 0x1F) == 0x13) {
 			_log.print("Plague!\n");
+			g_engine->sound().noise(0x28, 3000, 500);
 			sg._party[who]._status = Data::STATUS_POISONED;
 			return;
 		}

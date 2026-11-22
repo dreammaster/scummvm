@@ -153,6 +153,7 @@ void DungeonLogic::electricField(int sign) {
 	Data::Savegame &sg = save();
 
 	_log.print("Ouch!\nElectric field!\n");
+	g_engine->sound().noise(1, 500, 20000);
 
 	if (sign > 0) {
 		sg._mapX -= DX[_facing];

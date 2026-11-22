@@ -857,6 +857,7 @@ void TalkLogic::stealSomething() {
 	GameRandom &random = _G(gameRandom);
 
 	_log.print("\nSomething was stolen!\n");
+	g_engine->sound().alert();
 
 	if ((sg._keys | sg._gems | sg._torches) != 0) {
 		byte *const things[] = { &sg._keys, &sg._gems, &sg._torches };

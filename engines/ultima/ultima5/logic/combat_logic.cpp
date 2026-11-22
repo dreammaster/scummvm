@@ -620,6 +620,7 @@ void CombatLogic::placeParty() {
 
 		if (ring != 0 && rnd(0, 0xF) == 0xB) {
 			say("A ring has vanished!\n");
+			g_engine->sound().refuse();
 			unequip(i, ring);
 		}
 
@@ -1013,6 +1014,7 @@ bool CombatLogic::monsterSpecial(int idx) {
 
 				sayName(victim);
 				say(" possessed!\n");
+				g_engine->sound().pulse(0xC1C, 1, 30000, 1000, 2);
 
 				if (kind == ENEMY_DAEMON)
 					removeFighter(-idx - 1);
@@ -1047,6 +1049,7 @@ bool CombatLogic::monsterSpecial(int idx) {
 				newline();
 				sayName(idx);
 				say(" gates in a daemon!\n");
+				g_engine->sound().pulse(0xAC8, 1, 5000, 1000, 0xF);
 
 				_actors[_entities[daemon]._actor]._tile = _actors[_entities[daemon]._actor]._animTile = TILE_DAEMON;
 				return true;
@@ -1340,6 +1343,7 @@ void CombatLogic::report(int idx, int attacker) {
 	if (_outcome & OUTCOME_GRAZED) {
 		sayName(idx);
 		say(" grazed!\n");
+		g_engine->sound().refuse();
 	}
 
 	if ((_outcome & (OUTCOME_GRAZED | OUTCOME_VANISHED)) == 0) {
@@ -1356,6 +1360,7 @@ void CombatLogic::report(int idx, int attacker) {
 			if (flags & FLAG_PLAYER) {
 				if (attacker != 0xFF && _entities[attacker]._entity == ENEMY_SEA_SERPENT) {
 					say(" dragged under!\n");
+					g_engine->sound().refuse();
 					_entities[idx]._flags |= FLAG_SWALLOWED;
 					_actors[_entities[idx]._actor]._animTile = 0;
 				} else {
@@ -1718,6 +1723,7 @@ int CombatLogic::monsterAttack(int idx) {
 				_actors[actor]._unk6 = 0x20;
 
 			_interferer[target] = idx;
+			g_engine->sound().sweep(0x2EE, 400, 5, 0x96);
 			if (!hits(target, idx, 0))
 				return 1;
 
@@ -1725,6 +1731,7 @@ int CombatLogic::monsterAttack(int idx) {
 				say("\nA ");
 				sayName(idx);
 				say(" stole some food!\n");
+				g_engine->sound().sweep(800, 2000, 1, 0x32);
 				sg._food = sg._food > 5 ? sg._food - 5 : 0;
 				return 1;
 			}
@@ -1754,6 +1761,7 @@ int CombatLogic::monsterShoot(int idx, int target, bool protect) {
 	if (!protect)
 		landed = hits(target, idx, 0);
 
+	g_engine->sound().sweep(0x2EE, 400, 5, 0x96);
 	const int hit = project(idx, _entities[target]._x, _entities[target]._y, landed, shot);
 	if (hit >= 0) {
 		newline();
@@ -1768,6 +1776,7 @@ void CombatLogic::regurgitate(int idx) {
 	if (quickRoll() < _entities[idx]._dex) {
 		sayName(idx);
 		say(" regurgitated!\n");
+		g_engine->sound().noise(1, 7000, 600);
 
 		_entities[idx]._flags &= ~FLAG_SWALLOWED;
 		_actors[_entities[idx]._actor]._animTile = _actors[_entities[idx]._actor]._tile;
@@ -1808,6 +1817,7 @@ void CombatLogic::monsterTurn() {
 					newline();
 					sayName(_current);
 					say(" escapes!\n");
+					g_engine->sound().refuse();
 					removeFighter(-_current - 1);
 
 					if ((e._flags & FLAG_PLAYER) == 0 && e._entity == ENEMY_SHADOWLORD)
@@ -1929,6 +1939,7 @@ bool CombatLogic::prompt(bool header) {
 
 	if (e._flags & FLAG_SWALLOWED) {
 		say("ARGH!\n");
+		g_engine->sound().noise(0x28, 3000, 500);
 		regurgitate(_current);
 		endTurn(0xFF);
 		return false;
@@ -2014,6 +2025,7 @@ CombatLogic::State CombatLogic::advance() {
 			} else if (enemies == 0 && !_won) {
 				say("\nVICTORY!\n");
 				_won = true;
+				g_engine->sound().victory();
 			}
 
 			_stage = STAGE_SCAN;
@@ -2096,6 +2108,7 @@ void CombatLogic::checkMirror() {
 	newline();
 	sayName(_current);
 	say(" is absorbed!\n");
+	g_engine->sound().refuse();
 	save()._activeChar = NO_ACTIVE_CHARACTER;
 	removeFighter(-_current - 1);
 }
@@ -2612,6 +2625,7 @@ CombatLogic::Outcome CombatLogic::movePlayer(int key) {
 	if (canStand(_actors[e._actor]._tile, x, y)) {
 		_actors[e._actor]._x = e._x = x;
 		_actors[e._actor]._y = e._y = y;
+		g_engine->sound().footstep();
 
 		if (_flags & 0x82)
 			triggers(x, y);
@@ -2620,6 +2634,7 @@ CombatLogic::Outcome CombatLogic::movePlayer(int key) {
 	}
 
 	say("Blocked!\n");
+	g_engine->sound().blocked();
 	return OUTCOME_INVALID;
 }
 
@@ -2789,6 +2804,8 @@ CombatLogic::Outcome CombatLogic::aimFire() {
 		const int found = findFighter(_aimX, _aimY);
 		int hit;
 
+		g_engine->sound().sweep(0x514, 300, 5, 100);
+
 		if (found > -1) {
 			me._skiffs = found;
 			useAmmunition(item, _aimDistance);
@@ -2855,6 +2872,7 @@ CombatLogic::Outcome CombatLogic::command(int key) {
 
 		if (save()._icon == ICON_NEGATE_MAGIC || (save()._crown == 0 && _origin == CASTLE_MAP)) {
 			say("Absorbed!\n");
+			g_engine->sound().pulse(0x2648, 1, 28000, 1000, 2);
 			break;
 		}
 

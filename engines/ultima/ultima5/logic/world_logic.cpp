@@ -231,12 +231,15 @@ bool WorldLogic::walk(Direction direction) {
 	if (sg._sailHeading == 0)
 		_log.print(NAMES[direction]);
 
+	g_engine->sound().walking(sg._partyTile);
+
 	if (!transport.canMove(DX[direction], DY[direction]))
 		return false;
 
 	const byte x = sg._mapX + DX[direction];
 	const byte y = sg._mapY + DY[direction];
 
+	g_engine->sound().walking(sg._partyTile, true);
 	sg._mapX = x;
 	sg._mapY = y;
 

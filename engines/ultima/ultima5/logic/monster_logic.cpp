@@ -553,6 +553,7 @@ int MonsterLogic::attackCheck(int object, Result &result) {
 		}
 	} else if ((tile & 0xFC) == TILE_PIRATE && ((dx == 0 && dy < 4) || (dy == 0 && dx < 4))) {
 		_log.print("* BOOOM! *\n\n");
+		g_engine->sound().sweep(1000, 200, 5, 300);
 		pirateShot(object, dx, dy);
 		return 1;
 	}

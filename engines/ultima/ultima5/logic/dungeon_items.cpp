@@ -446,6 +446,7 @@ void DungeonItems::jimmy(int who) {
 			_log.print("No keys!\n");
 		} else {
 			_log.print("Key broke!\n");
+			g_engine->sound().alert();
 			--sg._keys;
 		}
 	} else if ((found & 0xF0) == 0x40) {
@@ -456,6 +457,7 @@ void DungeonItems::jimmy(int who) {
 			cellAt(sg._mapX, sg._mapY) = (found & CELL_VISITED) + 0x40;
 		} else {
 			_log.print("Key broke!\n");
+			g_engine->sound().alert();
 			--sg._keys;
 		}
 	} else if ((found & 0xF0) == 0x70) {

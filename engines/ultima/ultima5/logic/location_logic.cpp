@@ -225,6 +225,7 @@ LocationLogic::WalkResult LocationLogic::walk(Direction direction) {
 
 	Data::Savegame &sg = _G(savegame);
 	_log.print(NAMES[direction]);
+	g_engine->sound().walking(sg._partyTile);
 
 	const int x = sg._mapX + DX[direction];
 	const int y = sg._mapY + DY[direction];
@@ -249,6 +250,7 @@ LocationLogic::WalkResult LocationLogic::walk(Direction direction) {
 
 	if (!free || !WorldLogic::isWalkable(party, tile)) {
 		_log.print("Blocked!\n");
+		g_engine->sound().blocked();
 		return WALK_BLOCKED;
 	}
 
@@ -257,6 +259,7 @@ LocationLogic::WalkResult LocationLogic::walk(Direction direction) {
 
 	sg._mapX = x;
 	sg._mapY = y;
+	g_engine->sound().walking(party, true);
 
 	// Stairs lead up in the direction they're facing, and down the other way
 	if ((tile & 0xFC) == TILE_STAIRS) {
