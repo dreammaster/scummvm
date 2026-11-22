@@ -178,11 +178,15 @@ static bool combatSpell(int spell) {
 	case 10:
 	case 23:
 	case 24:
+	case 28:
 	case 30:
 	case 34:
 	case 35:
 	case 36:
+	case 40:
 	case 41:
+	case 44:
+	case 45:
 	case SPELL_GRAVITY:
 	case SPELL_FIREBALL_WAVE:
 	case SPELL_ENERGY_BOLT:
@@ -467,6 +471,13 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 		setIcon(0x54, 10);
 		break;
 
+	case 28:
+	case 40:
+	case 44:
+	case 45:
+		promptDirection();
+		return NEED_DIRECTION;
+
 	case 34:
 	case 35:
 		_aimItem = CREATURE_SPELL_BASE + spell;
@@ -656,6 +667,14 @@ SpellLogic::Need SpellLogic::directionChosen(int key) {
 	switch (_spell) {
 	case SPELL_WIND:
 		return windSpell(key);
+
+	case 28:
+	case 40:
+	case 44:
+	case 45:
+		if (_combat)
+			_combat->castWave(_spell == 28 ? 1 : _spell == 40 ? 2 : _spell == 45 ? 3 : 4, key, _caster);
+		return finish();
 
 	case SPELL_REMOVE: {
 		static const byte REMOVABLE[13] = { 0x5B, 0x90, 0x91, 0x92, 0x93, 0x9D, 0xA5, 0xA6, 0xA8, 0xA9, 0xAD, 0xAE, 0xAF };

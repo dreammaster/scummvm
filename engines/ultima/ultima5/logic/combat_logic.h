@@ -353,6 +353,12 @@ public:
 	int castInstant(int spell, int member);
 
 	/**
+	 * Sends a wave of a spell across the fight the way a direction key says
+	 * @param kind	1 sleeps, 2 poisons or hurts, 3 burns and 4 kills those it comes to
+	 */
+	void castWave(int kind, int key, int member);
+
+	/**
 	 * Starts a spell that is aimed at a creature, which is to be picked
 	 */
 	Outcome castCreature(int spell);

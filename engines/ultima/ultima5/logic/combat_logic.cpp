@@ -2184,6 +2184,183 @@ int CombatLogic::castInstant(int spell, int member) {
 	return result;
 }
 
+// How far each of the beams of a wave goes before it drifts to the side
+static const uint16 WAVE_DRIFT[21] = {
+	0x0A, 0x0C, 0x0E, 0x10, 0x14, 0x19, 0x23, 0x32, 0x50, 0xBE, 0x7D0, 0xBE, 0x50, 0x32, 0x23, 0x19, 0x14, 0x10, 0x0E, 0x0C, 0x0A
+};
+
+void CombatLogic::castWave(int kind, int key, int member) {
+	Savegame &sg = save();
+	const Entity &caster = _entities[_current];
+	int bx[21], by[21], drift[21];
+	bool done[21];
+	bool visited[COMBAT_SIZE][COMBAT_SIZE] = {};
+	int tilesX[64], tilesY[64];
+	int found = 0;
+	int startX = caster._x * 0x10 + 8;
+	int startY = caster._y * 0x10 + 8;
+
+	switch (key) {
+	case KEY_UP:
+		startX += 8;
+		break;
+	case KEY_RIGHT:
+		startX += 0x10;
+		startY += 8;
+		break;
+	case KEY_LEFT:
+		startY += 8;
+		break;
+	case KEY_DOWN:
+		startX += 8;
+		startY += 0x10;
+		break;
+	default:
+		return;
+	}
+
+	for (int k = 0; k < 21; ++k) {
+		done[k] = false;
+		drift[k] = WAVE_DRIFT[k];
+		bx[k] = startX;
+		by[k] = startY;
+	}
+
+	int tileX = -1;
+	int tileY = -1;
+	int finished;
+
+	// Each beam is walked a few steps at a time, noting the tiles it crosses until it hits something
+	do {
+		finished = 0;
+
+		for (int k = 0; k < 21; ++k) {
+			if (done[k]) {
+				++finished;
+				continue;
+			}
+
+			const int steps = rnd(0, 0xF);
+
+			for (int s = 0; s < steps; ++s) {
+				bool open;
+
+				if (bx[k] < 8 || bx[k] > 0xB6 || by[k] < 8 || by[k] > 0xB6) {
+					tileX = tileY = -1;
+					open = false;
+				} else if ((by[k] & 1) != 0) {
+					tileX = (bx[k] - 8) / 0x10;
+					tileY = (by[k] - 8) / 0x10;
+					const byte ground = tileX < COMBAT_SIZE && tileY < COMBAT_SIZE ? _map[tileY * COMBAT_MAP_STRIDE + tileX] : 0;
+					open = ((0x80 >> (ground & 7)) & PROJECTILE_PASS[ground >> 3]) != 0;
+				} else {
+					open = true;
+				}
+
+				if (!open) {
+					done[k] = true;
+				} else if (found < 0x3F && tileX > -1 && tileY > -1 && tileX < COMBAT_SIZE && tileY < COMBAT_SIZE && !visited[tileY][tileX]) {
+					visited[tileY][tileX] = true;
+					tilesX[++found] = tileX;
+					tilesY[found] = tileY;
+				}
+
+				if (!done[k]) {
+					drift[k] -= 10;
+
+					switch (key) {
+					case KEY_LEFT:
+						--bx[k];
+						break;
+					case KEY_RIGHT:
+						++bx[k];
+						break;
+					case KEY_UP:
+						--by[k];
+						break;
+					default:
+						++by[k];
+						break;
+					}
+
+					if (drift[k] < 1) {
+						const int side = k < 10 ? -1 : 1;
+
+						switch (key) {
+						case KEY_LEFT:
+							by[k] -= side;
+							break;
+						case KEY_RIGHT:
+							by[k] += side;
+							break;
+						case KEY_UP:
+							bx[k] += side;
+							break;
+						default:
+							bx[k] -= side;
+							break;
+						}
+
+						drift[k] += WAVE_DRIFT[k];
+					}
+				}
+
+				if (done[k])
+					break;
+			}
+		}
+	} while (finished < 21);
+
+	// Those standing where the wave went are taken by it, each once
+	bool affected[COMBAT_ENTITIES] = {};
+	Character &leader = sg._party[member];
+
+	for (int t = 1; t <= found; ++t) {
+		for (int i = COMBAT_ENTITIES - 1; i >= 0; --i) {
+			Entity &e = _entities[i];
+
+			if (e._x != tilesX[t] || e._y != tilesY[t] || affected[i] || (e._flags & FLAG_DEAD) != 0 || e._flags == 0)
+				continue;
+
+			affected[i] = true;
+			const bool special = e._entity == 47 || e._entity == 0xE || e._entity == 0xF;
+			int gained = 0;
+
+			switch (kind) {
+			case 1:
+				if (!spellResisted(i) && !special) {
+					fallAsleep(i);
+					report(i, _current);
+				}
+				break;
+
+			case 2:
+				if (stat(i, STAT_DEX) <= quickRoll()) {
+					poison(i, _current);
+					report(i, _current);
+				}
+				break;
+
+			case 3:
+				gained = takeDamage(i, rnd(0, 0x1E));
+				leader._exp = leader._exp + gained < 9999 ? leader._exp + gained : 9999;
+				report(i, _current);
+				break;
+
+			default:
+				if (!spellResisted(i) && !special) {
+					gained = takeDamage(i, 99);
+					leader._exp = leader._exp + gained < 9999 ? leader._exp + gained : 9999;
+					report(i, _current);
+				}
+				break;
+			}
+
+			break;
+		}
+	}
+}
+
 CombatLogic::Outcome CombatLogic::castCreature(int spell) {
 	_creatureSpell = spell;
 	say("Creature: ");
