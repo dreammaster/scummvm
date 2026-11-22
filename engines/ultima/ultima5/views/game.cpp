@@ -82,6 +82,7 @@ constexpr int FELUCCA_HOUR = 2;
 constexpr int HOURS_IN_DAY = 24;
 constexpr byte COLOR_YELLOW = 14;
 constexpr byte COLOR_LIGHT_GRAY = 7;
+constexpr byte CGA_WHITE = 3;
 constexpr byte TILE_MOONGATE = 0xDC;
 constexpr int MOONGATE_SHRINE_MINUTES = 10;
 constexpr byte TILE_SHRINE = 0x19;
@@ -338,8 +339,13 @@ void Game::drawMoons() {
 	if (felucca >= 0 && felucca < MOON_CELLS)
 		cells[felucca] = '0' + Data::MOON_PHASES[day + 1];
 
+	// The colours are those of the screen mode, which has only white of those to pick from in CGA
+	const bool cga = g_engine->_renderMode == Data::RENDER_CGA;
+	const byte sunColor = cga ? CGA_WHITE : COLOR_YELLOW;
+	const byte moonColor = cga ? CGA_WHITE : COLOR_LIGHT_GRAY;
+
 	for (int i = 0; i < MOON_CELLS; ++i)
-		drawRune(MOON_COLUMN + i, 0, cells[i], cells[i] == '*' ? COLOR_YELLOW : COLOR_LIGHT_GRAY, COLOR_BLUE);
+		drawRune(MOON_COLUMN + i, 0, cells[i], cells[i] == '*' ? sunColor : moonColor, COLOR_BLUE);
 }
 
 void Game::drawWind() {
