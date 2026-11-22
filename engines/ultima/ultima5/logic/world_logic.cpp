@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/logic/world_logic.h"
+#include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/logic/transport_logic.h"
 #include "ultima/ultima5/logic/time_logic.h"
 #include "ultima/ultima5/data/shrine_data.h"
@@ -29,6 +30,8 @@
 namespace Ultima {
 namespace Ultima5 {
 
+constexpr int MOONSTONE_CARRIED = 0xFF;
+constexpr int FIRST_DUNGEON_MAP = 0x21;
 constexpr int MINUTES_PER_SLOW_STEP = 2;
 constexpr int MINUTES_PER_VERY_SLOW_STEP = 4;
 
@@ -158,16 +161,35 @@ void WorldLogic::centerWindow(Data::Savegame &sg) {
 }
 
 bool WorldLogic::jumpToMoonstone(Data::Savegame &sg, int stone) {
-	if (stone < 0 || stone >= 8 || sg._moonstoneState[stone] != 0)
+	if (stone < 0 || stone >= 8)
 		return false;
 
-	sg.storeWorldObjects(sg._mapLevel != 0);
+	// A stone in the party's pack is nowhere to go to, and none are buried in the dungeons
+	const int map = sg._moonstoneState[stone];
+	if (map == MOONSTONE_CARRIED || map >= FIRST_DUNGEON_MAP)
+		return false;
+
+	const int from = sg._mapId;
+
+	if (from == 0)
+		sg.storeWorldObjects(sg._mapLevel != 0);
+
 	sg._mapX = sg._moonstoneX[stone];
 	sg._mapY = sg._moonstoneY[stone];
 	sg._mapLevel = sg._moonstoneZ[stone];
-	sg.restoreWorldObjects(sg._mapLevel != 0);
-	centerWindow(sg);
-	_G(visibility).invalidate();
+	sg._mapId = map;
+	sg._doorOpen = 0;
+
+	if (map == 0) {
+		// Back out in the open, with the things that were out there
+		sg.restoreWorldObjects(sg._mapLevel != 0);
+		centerWindow(sg);
+		_G(visibility).invalidate();
+	} else {
+		sg.clearObjects();
+		LocationLogic::arrive();
+	}
+
 	return true;
 }
 

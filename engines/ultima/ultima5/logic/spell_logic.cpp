@@ -355,10 +355,6 @@ SpellLogic::Need SpellLogic::cast(int caster, int spell) {
 		here = (Data::SPELL_PLACES[spell] & (sg._mapId < FIRST_DUNGEON_MAP ? PLACE_TOWN : PLACE_DUNGEON)) != 0;
 	}
 
-	// These need more than has been written yet, so they are left as they are
-	if (spell == SPELL_MOON_TRAVEL && sg._mapId != 0)
-		here = false;
-
 	if (!here) {
 		_log.print("Not here!\n");
 		return NEED_NONE;
