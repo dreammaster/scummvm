@@ -22,6 +22,7 @@
 #ifndef ULTIMA5_VIEWS_INTERACTIONS_INTERACTION_H
 #define ULTIMA5_VIEWS_INTERACTIONS_INTERACTION_H
 
+#include "ultima/ultima5/audio/music.h"
 #include "ultima/ultima5/logic/world_logic.h"
 #include "ultima/ultima5/views/message_log.h"
 #include "ultima/ultima5/views/view.h"
@@ -30,6 +31,10 @@ namespace Ultima {
 namespace Ultima5 {
 namespace Views {
 namespace Interactions {
+
+// What an interaction may say of the music that goes with it, besides the tracks of the music
+constexpr int MUSIC_AUTO = -2;
+constexpr int MUSIC_KEEP = -3;
 
 /**
  * The remainder of a command that needs more input than the key that
@@ -62,6 +67,14 @@ public:
 	 */
 	virtual Interaction *takeNext() {
 		return nullptr;
+	}
+
+	/**
+	 * Gives the tune that is to play while this is going on: none for silence, whichever there is for where
+	 * the party is, or to leave what is playing
+	 */
+	virtual int musicTrack() const {
+		return MUSIC_AUTO;
 	}
 
 	/**

@@ -66,6 +66,10 @@ public:
 	bool keypress(const KeypressMessage &msg) override;
 	void draw(View &view) override;
 
+	int musicTrack() const override {
+		return Music::TRACK_STONES;
+	}
+
 	bool takesTime() const override {
 		return false;
 	}

@@ -89,6 +89,8 @@ Endgame::Endgame(MessageLog &log) : Interaction(log) {
 	_sprites[LORD_BRITISH]._x = 5;
 	_sprites[LORD_BRITISH]._y = 3;
 
+	g_engine->cueReunion();
+
 	// The party comes in, and the dead among it are brought back
 	for (int i = 0; i < sg._partySize && i < 6; ++i) {
 		Data::Character &c = sg._party[i];
@@ -144,6 +146,7 @@ void Endgame::answered(bool yes) {
 	}
 
 	// The box was not brought, and they are left to sit and wait
+	g_engine->cueMusic(Music::TRACK_RULEBRIT);
 	_log.print("\"I see...\n");
 	print(0x2D5);
 	_sprites[0]._x = 8;
@@ -164,6 +167,7 @@ void Endgame::ending() {
 	_certificate = EndgameLogic::certificate();
 	_slide = 0;
 	_state = loadSlides() ? STATE_SLIDES : STATE_CERTIFICATE;
+	cue();
 }
 
 bool Endgame::keypress(const KeypressMessage &msg) {
@@ -199,6 +203,8 @@ bool Endgame::keypress(const KeypressMessage &msg) {
 	case STATE_SLIDES:
 		if (++_slide >= SLIDE_COUNT)
 			_state = STATE_CERTIFICATE;
+
+		cue();
 		return false;
 
 	case STATE_REFUSED:
@@ -209,6 +215,16 @@ bool Endgame::keypress(const KeypressMessage &msg) {
 		g_engine->quitGame();
 		return true;
 	}
+}
+
+// The music that goes with what is shown: while a slide is up, it is the tune of the one that follows
+void Endgame::cue() {
+	if (_state == STATE_CERTIFICATE) {
+		g_engine->cueMusic(Music::TRACK_RULEBRIT);
+		return;
+	}
+
+	g_engine->cueMusic(Music::trackForEndingScene(_slide + 1));
 }
 
 bool Endgame::loadSlides() {

@@ -63,6 +63,7 @@ bool CreateCharacter::msgFocus(const FocusMessage &msg) {
 	_name.clear();
 	_cursorFrame = 0;
 	_phase = PHASE_NAME;
+	g_engine->cueMusic(Music::TRACK_AMIGA);
 
 	delayFrames(FRAMES_PER_STEP);
 	return TitleBase::msgFocus(msg);

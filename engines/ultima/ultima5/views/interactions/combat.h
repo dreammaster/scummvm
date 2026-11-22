@@ -128,6 +128,10 @@ public:
 		return next;
 	}
 
+	int musicTrack() const override {
+		return _logic.won() ? Music::TRACK_THEME : Music::TRACK_ENGGMNT;
+	}
+
 	bool keypress(const KeypressMessage &msg) override;
 	void draw(View &view) override;
 };

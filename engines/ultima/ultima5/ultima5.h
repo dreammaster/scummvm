@@ -37,6 +37,7 @@
 #include "ultima/ultima5/data/world_map.h"
 #include "ultima/ultima5/gfx/tileset.h"
 #include "ultima/ultima5/logic/game_random.h"
+#include "ultima/ultima5/audio/music.h"
 #include "ultima/ultima5/logic/visibility_logic.h"
 
 namespace Ultima {
@@ -77,6 +78,25 @@ public:
 
 	// Which of the renderers is in use
 	Data::RenderMode _renderMode = Data::RENDER_EGA;
+
+private:
+	Common::ScopedPtr<Music> _music;
+
+public:
+	/**
+	 * Gives the music player, which is made when the music is first wanted
+	 */
+	Music &music();
+
+	/**
+	 * Has a tune be the one that plays, or none, unless the music is turned off
+	 */
+	void cueMusic(int track);
+
+	/**
+	 * Plays Reunion, and Rule Britannia after it
+	 */
+	void cueReunion();
 
 public:
 	Ultima5Engine(OSystem *syst, const Ultima::UltimaGameDescription *gameDesc);

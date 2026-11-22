@@ -96,6 +96,10 @@ void Ultima5Engine::returnToMainMenu() {
 }
 
 void Ultima5Engine::applyGameSettings() {
+	// The music is turned off here, and comes back with the next tune that's asked for
+	if (_music && !Music::enabled())
+		_music->stop();
+
 	const Data::RenderMode mode = configuredRenderMode();
 	if (mode == _renderMode)
 		return;
@@ -153,6 +157,28 @@ bool Ultima5Engine::loadMap() {
 		return true;
 
 	return _savegame._mapId == 0 ? loadWorld() : LocationLogic::load();
+}
+
+Music &Ultima5Engine::music() {
+	if (!_music)
+		_music.reset(new Music());
+
+	return *_music;
+}
+
+void Ultima5Engine::cueMusic(int track) {
+	if (!Music::enabled()) {
+		if (_music)
+			_music->stop();
+		return;
+	}
+
+	music().cue(track);
+}
+
+void Ultima5Engine::cueReunion() {
+	if (Music::enabled())
+		music().playReunion();
 }
 
 byte Ultima5Engine::getMapTile(int x, int y) const {

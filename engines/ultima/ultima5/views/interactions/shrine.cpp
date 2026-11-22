@@ -77,7 +77,7 @@ void Shrine::printRunes(int offset) {
 	_log.setRunes(false);
 }
 
-Shrine::Shrine(MessageLog &log, bool codex) : Interaction(log), _codex(codex) {
+Shrine::Shrine(MessageLog &log, bool codex, bool stones) : Interaction(log), _codex(codex), _stones(stones) {
 	const Data::Savegame &sg = _G(savegame);
 	Common::File f;
 

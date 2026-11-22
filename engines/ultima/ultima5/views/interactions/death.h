@@ -45,6 +45,11 @@ public:
 		return false;
 	}
 
+	// There is no music while the party is dead
+	int musicTrack() const override {
+		return Music::TRACK_NONE;
+	}
+
 	bool keypress(const KeypressMessage &msg) override;
 	void draw(View &view) override;
 };

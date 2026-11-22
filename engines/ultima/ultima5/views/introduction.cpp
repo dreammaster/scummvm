@@ -122,6 +122,8 @@ Common::String Introduction::sceneText(int scene) const {
 }
 
 void Introduction::drawScene(int scene) {
+	g_engine->cueMusic(Music::trackForIntroScene(scene));
+
 	if (STORY_FILES[scene] != _pictureFile) {
 		const Common::String name = Common::String::format("story%d", STORY_FILES[scene] + 1);
 		if (!_pictures.load(name.c_str(), _G(renderMode)))

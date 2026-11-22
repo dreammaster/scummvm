@@ -45,6 +45,8 @@ bool Title::msgFocus(const FocusMessage &msg) {
 	_animFrame = 0;
 	_showNotice = false;
 
+	g_engine->cueMusic(Music::TRACK_THEME);
+
 	delayFrames(FRAMES_PER_STEP);
 	return TitleBase::msgFocus(msg);
 }

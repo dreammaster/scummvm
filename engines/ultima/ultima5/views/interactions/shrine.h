@@ -59,6 +59,7 @@ private:
 	State _state = STATE_DONE;
 	Step _step = STEP_QUEST;
 	bool _codex;
+	bool _stones;
 	int _shrine = 0;
 	int _mantras = 0;
 	bool _focused = true;
@@ -84,7 +85,12 @@ public:
 	/**
 	 * @param codex		True for the shrine of the Codex
 	 */
-	Shrine(MessageLog &log, bool codex);
+	Shrine(MessageLog &log, bool codex, bool stones = true);
+
+	// The shrines that are gone into have their own music
+	int musicTrack() const override {
+		return _stones && !_codex ? Music::TRACK_STONES : MUSIC_AUTO;
+	}
 
 	bool keypress(const KeypressMessage &msg) override;
 	void draw(View &view) override;

@@ -235,6 +235,17 @@ static const ADExtraGuiOptionsMap optionsList[] = {
 		}
 	},
 	{
+		GAMEOPTION_ULTIMA5_UPGRADE_MUSIC,
+		{
+			_s("Play Upgrade music"),
+			_s("Plays the music of the Ultima V Upgrade, if its files are in the game folder"),
+			"upgrade_music",
+			true,
+			0,
+			0
+		}
+	},
+	{
 		GAMEOPTION_ULTIMA3_MIDI_MUSIC,
 		{
 			_s("Play MIDI music"),

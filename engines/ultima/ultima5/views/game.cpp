@@ -197,6 +197,14 @@ void Game::draw() {
 
 	if (_interaction)
 		_interaction->draw(*this);
+
+	// The music is that of the interaction there is, or else that of where the party is
+	int track = _interaction ? _interaction->musicTrack() : Interactions::MUSIC_AUTO;
+	if (track == Interactions::MUSIC_AUTO)
+		track = Music::trackForGameState(_G(savegame));
+
+	if (track != Interactions::MUSIC_KEEP)
+		g_engine->cueMusic(track);
 }
 
 void Game::drawDungeonFrame() {
@@ -556,7 +564,7 @@ void Game::endTurn() {
 			_G(visibility).invalidate();
 
 			if (sg._hour == 0 && sg._minute < MOONGATE_SHRINE_MINUTES) {
-				startInteraction(new Interactions::Shrine(_messages, false));
+				startInteraction(new Interactions::Shrine(_messages, false, false));
 				return;
 			}
 

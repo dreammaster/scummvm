@@ -75,6 +75,7 @@ private:
 	void ending();
 	void certificate();
 	bool loadSlides();
+	void cue();
 	void drawSlide(View &view);
 	void drawCertificate(View &view);
 	Common::String slideText(int slide) const;
@@ -84,6 +85,11 @@ public:
 
 	bool takesTime() const override {
 		return false;
+	}
+
+	// The tunes of the ending are asked for as it goes
+	int musicTrack() const override {
+		return MUSIC_KEEP;
 	}
 
 	bool keypress(const KeypressMessage &msg) override;
