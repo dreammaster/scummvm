@@ -43,6 +43,7 @@ constexpr int KEY_PAGE_UP = 0xD5;
 constexpr int KEY_PAGE_DOWN = 0xD6;
 
 constexpr int VIEW_X = 8;
+constexpr int CAMP_DUNGEON_FLAGS = 6;
 constexpr int CREATURE_SPELL_BASE = 0x100;
 constexpr int VIEW_Y = 8;
 constexpr int ACTOR_TILE_BASE = 0x100;
@@ -85,10 +86,16 @@ bool Combat::start(int kind, int map, bool lone) {
 }
 
 bool Combat::startCamp(int guard, int hours, bool &apparition) {
-	if (!_logic.loadMap(MAP_FILE, 0))
+	// In a dungeon the place to camp is made up, and has the flags of a room
+	const bool dungeon = DungeonLogic::isDungeon(_G(savegame)._mapId);
+
+	if (dungeon)
+		DungeonLogic::buildCampMap(_logic.mapData());
+	else if (!_logic.loadMap(MAP_FILE, 0))
 		return false;
 
-	const CombatLogic::CampResult result = _logic.camp(guard, hours, _G(savegame)._mapId, apparition);
+	const CombatLogic::CampResult result = _logic.camp(guard, hours, _G(savegame)._mapId, apparition,
+		dungeon ? CAMP_DUNGEON_FLAGS : CombatLogic::KIND_CAMP);
 	if (result != CombatLogic::CAMP_AMBUSHED || carryOn())
 		_state = STATE_DONE;
 

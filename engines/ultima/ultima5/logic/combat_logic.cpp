@@ -3191,14 +3191,14 @@ constexpr int CAMP_REST_DELAY = 0xE;
 constexpr int CAMP_APPARITION_ODDS = 0x18;
 constexpr int CAMP_HEAL_MAX = 0x3F;
 
-CombatLogic::CampResult CombatLogic::camp(int guard, int hours, byte origin, bool &apparition) {
+CombatLogic::CampResult CombatLogic::camp(int guard, int hours, byte origin, bool &apparition, int flags) {
 	Savegame &sg = save();
 	int poisoned[8] = {};
 	int lastHour = sg._hour;
 
 	apparition = false;
 	_origin = origin;
-	_flags = KIND_CAMP;
+	_flags = flags;
 	_exitCode = 0;
 	_won = false;
 	_result = 1;

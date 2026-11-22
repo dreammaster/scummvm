@@ -21,6 +21,7 @@
 
 #include "common/file.h"
 #include "ultima/ultima5/logic/camp_logic.h"
+#include "ultima/ultima5/logic/dungeon_logic.h"
 #include "ultima/ultima5/logic/location_logic.h"
 #include "ultima/ultima5/logic/npc_logic.h"
 #include "ultima/ultima5/logic/npc_movement.h"
@@ -54,6 +55,10 @@ static Data::Savegame &save() {
 
 CampLogic::Block CampLogic::check(Views::MessageLog &log) {
 	const Data::Savegame &sg = save();
+
+	// A dungeon can be camped in wherever the party is
+	if (DungeonLogic::isDungeon(sg._mapId))
+		return BLOCK_NONE;
 	const byte ground = g_engine->getMapTile(sg._mapX, sg._mapY);
 
 	if (ground != 0 && ground < 4) {

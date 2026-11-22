@@ -844,6 +844,18 @@ bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 		viewGem();
 		return true;
 
+	case 'H': {
+		Interactions::Camp *camp = new Interactions::Camp(_messages);
+
+		if (camp->done()) {
+			delete camp;
+			redraw();
+		} else {
+			startInteraction(camp);
+		}
+		return true;
+	}
+
 	case 'Y':
 		_messages.print("Yell ");
 		startInteraction(new Interactions::Yell(_messages));

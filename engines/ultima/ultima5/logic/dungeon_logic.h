@@ -94,7 +94,7 @@ private:
 	static bool roomCleared(int room);
 	static bool placeMonster();
 	bool moveMonster();
-	static void buildFightMap(byte *map, bool &bothLadders);
+	static void buildFightMap(byte *map, bool &bothLadders, bool withEnemies = true);
 	static void fillSides(byte *map, byte floor, byte wall);
 	void electricField(int sign);
 	void pitTrap();
@@ -176,6 +176,11 @@ public:
 	 * Marks the rooms that have been fought in as empty
 	 */
 	static void hideClearedRooms();
+
+	/**
+	 * Makes the place that the party camps in, in the dungeon where it is
+	 */
+	static void buildCampMap(byte *map);
 
 	/**
 	 * Climbs a ladder, up if negative

@@ -654,7 +654,7 @@ void DungeonLogic::fillSides(byte *map, byte floor, byte wall) {
 }
 
 // Makes the map for a fight with a monster, from the walls and doors around the party
-void DungeonLogic::buildFightMap(byte *map, bool &bothLadders) {
+void DungeonLogic::buildFightMap(byte *map, bool &bothLadders, bool withEnemies) {
 	Data::Savegame &sg = save();
 	const bool light = style() == 3;
 	const byte wall = light ? 0x4F : 0x4D;
@@ -725,6 +725,9 @@ void DungeonLogic::buildFightMap(byte *map, bool &bothLadders) {
 		map[6 * COMBAT_MAP_STRIDE + 11 + i] = x;
 		map[7 * COMBAT_MAP_STRIDE + 11 + i] = y;
 	}
+
+	if (!withEnemies)
+		return;
 
 	int order[16];
 	for (int i = 0; i < 16; ++i)
@@ -875,6 +878,38 @@ DungeonLogic::Event DungeonLogic::finishFight(const CombatLogic &fight, const Ev
 	clearMonster();
 	PartyLogic(_log).turnUpkeep();
 	return next;
+}
+
+// Where the party and the enemies stand in the place that is made to camp in
+static const byte CAMP_PARTY_X[6] = { 5, 6, 5, 4, 4, 6 };
+static const byte CAMP_PARTY_Y[6] = { 4, 5, 6, 5, 4, 6 };
+static const byte CAMP_ENEMY_X[16] = { 2, 2, 2, 3, 3, 3, 4, 5, 5, 6, 7, 7, 7, 8, 8, 8 };
+static const byte CAMP_ENEMY_Y[16] = { 4, 5, 7, 2, 3, 8, 8, 3, 8, 3, 4, 7, 8, 3, 6, 7 };
+constexpr byte CAMP_FIRE_TILE = 0xB3;
+constexpr int CAMP_MAP_BUFFER = 0x400;
+
+void DungeonLogic::buildCampMap(byte *map) {
+	const byte floor = style() == 3 ? 0x45 : 5;
+	bool bothLadders;
+
+	memset(map, 0, CAMP_MAP_BUFFER);
+	buildFightMap(map, bothLadders, false);
+
+	// A fire is in the middle, unless the cell has something of its own there
+	if (map[5 * COMBAT_MAP_STRIDE + 5] == floor)
+		map[5 * COMBAT_MAP_STRIDE + 5] = CAMP_FIRE_TILE;
+
+	for (int i = 0; i < 6; ++i) {
+		for (int row = 1; row <= 4; ++row) {
+			map[row * COMBAT_MAP_STRIDE + 11 + i] = CAMP_PARTY_X[i];
+			map[row * COMBAT_MAP_STRIDE + 17 + i] = CAMP_PARTY_Y[i];
+		}
+	}
+
+	for (int i = 0; i < 16; ++i) {
+		map[6 * COMBAT_MAP_STRIDE + 11 + i] = CAMP_ENEMY_X[i];
+		map[7 * COMBAT_MAP_STRIDE + 11 + i] = CAMP_ENEMY_Y[i];
+	}
 }
 
 void DungeonLogic::climbOptions(bool &up, bool &down, bool &hook) {

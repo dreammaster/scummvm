@@ -317,7 +317,7 @@ public:
 	 * @param guard			Which of the party keeps watch, or -1
 	 * @param apparition	Set if the party is visited as it rested
 	 */
-	CampResult camp(int guard, int hours, byte origin, bool &apparition);
+	CampResult camp(int guard, int hours, byte origin, bool &apparition, int flags = KIND_CAMP);
 
 	/**
 	 * Sets up a fight in a dungeon on the map that has been put in place: where the party and the
