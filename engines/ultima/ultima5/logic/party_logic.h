@@ -64,6 +64,11 @@ public:
 	static void wakeSleepers();
 
 	/**
+	 * Tells if none of the party can act as those that are alive are all asleep
+	 */
+	static bool allAsleep();
+
+	/**
 	 * Treading on poisonous ground poisons those with the worst footing
 	 * @param lowest	The lowest the roll to beat can be
 	 */

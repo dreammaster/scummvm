@@ -46,6 +46,7 @@ private:
 	bool _planTick = false;
 	bool _sailingStep = false;
 	bool _quickToggle = false;
+	bool _sleeping = false;
 	DungeonScene _scene;
 	Common::ScopedPtr<Interactions::Interaction> _interaction;
 

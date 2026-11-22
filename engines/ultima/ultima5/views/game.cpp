@@ -72,6 +72,7 @@ constexpr int EARTHQUAKE_ROLL = 0x69;
 constexpr byte TILE_BED = 0xAB;
 constexpr byte TILE_SKIFF = 0x28;
 constexpr byte SHIP_FIRST = 0x20;
+constexpr int SLEEP_TURN_LIMIT = 200;
 constexpr byte TILE_TROLL_BRIDGE = 0x6A;
 constexpr byte PARTY_ON_FOOT = 0x1C;
 constexpr int MOON_CELLS = 12;
@@ -495,6 +496,24 @@ bool Game::startCombat(int kind, int map, bool lone) {
 
 void Game::endTurn() {
 	Data::Savegame &sg = _G(savegame);
+
+	// While all the party are asleep the turns go by on their own, until one wakes or something comes
+	if (!_sleeping && PartyLogic::allAsleep()) {
+		_sleeping = true;
+
+		for (int i = 0; i < SLEEP_TURN_LIMIT && PartyLogic::allAsleep() && !_interaction; ++i) {
+			_messages.print("Zzzzzz...\n");
+
+			// Towns wake the sleepers with each turn already
+			if (sg._mapId == OUTDOOR_MAP || DungeonLogic::isDungeon(sg._mapId))
+				PartyLogic::wakeSleepers();
+
+			endTurn();
+		}
+
+		_sleeping = false;
+		return;
+	}
 
 	// When all are dead, Lord British takes them in
 	if (DeathLogic::partyDead()) {

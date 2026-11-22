@@ -111,6 +111,23 @@ void PartyLogic::wakeSleepers() {
 	}
 }
 
+bool PartyLogic::allAsleep() {
+	const Data::Savegame &sg = _G(savegame);
+	bool asleep = false;
+
+	for (int i = 0; i < sg._partySize; ++i) {
+		const byte status = sg._party[i]._status;
+
+		if (status == Data::STATUS_GOOD || status == Data::STATUS_POISONED)
+			return false;
+
+		if (status == Data::STATUS_SLEEP)
+			asleep = true;
+	}
+
+	return asleep;
+}
+
 void PartyLogic::stepOnPoison(int lowest) {
 	Data::Savegame &sg = _G(savegame);
 
