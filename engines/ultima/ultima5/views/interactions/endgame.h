@@ -23,6 +23,8 @@
 #define ULTIMA5_VIEWS_INTERACTIONS_ENDGAME_H
 
 #include "common/array.h"
+#include "ultima/ultima5/gfx/image_file.h"
+#include "ultima/ultima5/gfx/story_text.h"
 #include "ultima/ultima5/logic/endgame_logic.h"
 #include "ultima/ultima5/views/interactions/interaction.h"
 
@@ -43,6 +45,7 @@ private:
 		STATE_BOX_AGAIN,
 		STATE_STORY,
 		STATE_REFUSED,
+		STATE_SLIDES,
 		STATE_CERTIFICATE
 	};
 
@@ -58,12 +61,23 @@ private:
 	Sprite _sprites[32];
 	int _step = 0;
 	Common::Array<EndgameLogic::Line> _certificate;
+	int _slide = 0;
+	Gfx::ImageFile _slideImages[2];
+	Gfx::ImageFile _banners;
+	Gfx::ImageFile _scroll;
+	Gfx::StoryText _font;
+	Common::Array<byte> _slideText;
+	bool _slidesLoaded = false;
 
 	void print(int offset);
 	void askBox(int offset, State next);
 	void answered(bool yes);
 	void ending();
 	void certificate();
+	bool loadSlides();
+	void drawSlide(View &view);
+	void drawCertificate(View &view);
+	Common::String slideText(int slide) const;
 
 public:
 	Endgame(MessageLog &log);

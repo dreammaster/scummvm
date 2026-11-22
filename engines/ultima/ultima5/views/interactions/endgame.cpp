@@ -50,6 +50,27 @@ constexpr int CERTIFICATE_ROW = 1;
 static const byte STAND_X[6] = { 5, 4, 6, 3, 5, 7 };
 static const byte STAND_Y[6] = { 5, 6, 6, 7, 7, 7 };
 
+// The slides that follow, each a picture from one of the two end files beside text from end.dat. The text
+// has two regions, the second being for the lines between the split limits
+constexpr int SLIDE_COUNT = 6;
+constexpr int SLIDE_TEXT_LENGTH = 2000;
+constexpr int SCROLL_X = 0x28;
+constexpr int TEXT_PICTURE = 0;
+static const byte SLIDE_LEFT_A[SLIDE_COUNT] = { 0xAC, 0x00, 0x00, 0xB3, 0x00, 0x00 };
+static const byte SLIDE_LEFT_B[SLIDE_COUNT] = { 0x00, 0x00, 0xC4, 0x00, 0xA1, 0x00 };
+static const uint16 SLIDE_RIGHT_A[SLIDE_COUNT] = { 0x140, 0x140, 0x140, 0x140, 0x140, 0x9A };
+static const uint16 SLIDE_RIGHT_B[SLIDE_COUNT] = { 0x140, 0x140, 0x140, 0x140, 0x140, 0x140 };
+static const byte SLIDE_SPLIT_TOP[SLIDE_COUNT] = { 0x7E, 0x7E, 0x2A, 0x64, 0x52, 0x70 };
+static const byte SLIDE_SPLIT_BOTTOM[SLIDE_COUNT] = { 0xC8, 0xC8, 0x94, 0xC8, 0xC8, 0xC8 };
+static const byte SLIDE_START_X[SLIDE_COUNT] = { 0xAC, 0x00, 0x00, 0xB3, 0x00, 0x00 };
+static const byte SLIDE_START_Y[SLIDE_COUNT] = { 0x42, 0x5C, 0x09, 0x26, 0x09, 0x00 };
+static const byte SLIDE_PICTURE[SLIDE_COUNT] = { 0, 1, 2, 0, 1, 2 };
+static const byte SLIDE_FILE[SLIDE_COUNT] = { 0, 0, 0, 1, 1, 1 };
+static const byte SLIDE_PICTURE_X[SLIDE_COUNT] = { 0x00, 0x40, 0x00, 0x00, 0x00, 0xA0 };
+static const byte SLIDE_PICTURE_Y[SLIDE_COUNT] = { 0x00, 0x00, 0x34, 0x00, 0x5C, 0x00 };
+static const bool SLIDE_BANNERS[SLIDE_COUNT] = { true, false, false, true, false, false };
+static const uint16 SLIDE_TEXT_OFFSET[SLIDE_COUNT] = { 0x0000, 0x01A8, 0x03BC, 0x05FA, 0x08E8, 0x0B74 };
+
 // What he says as he tells of the box, in turn
 static const int STORY[6] = { 0xD3, 0x128, 0x167, 0x1C9, 0x211, 0x24B };
 
@@ -141,7 +162,8 @@ void Endgame::ending() {
 
 	_map[4 * MAP_STRIDE + 5] = TILE_FLOOR;
 	_certificate = EndgameLogic::certificate();
-	_state = STATE_CERTIFICATE;
+	_slide = 0;
+	_state = loadSlides() ? STATE_SLIDES : STATE_CERTIFICATE;
 }
 
 bool Endgame::keypress(const KeypressMessage &msg) {
@@ -174,6 +196,11 @@ bool Endgame::keypress(const KeypressMessage &msg) {
 		ending();
 		return false;
 
+	case STATE_SLIDES:
+		if (++_slide >= SLIDE_COUNT)
+			_state = STATE_CERTIFICATE;
+		return false;
+
 	case STATE_REFUSED:
 		g_engine->quitGame();
 		return true;
@@ -184,28 +211,95 @@ bool Endgame::keypress(const KeypressMessage &msg) {
 	}
 }
 
-void Endgame::draw(View &view) {
+bool Endgame::loadSlides() {
+	Common::File f;
+
+	if (f.open("end.dat")) {
+		_slideText.resize(f.size());
+		f.read(&_slideText[0], _slideText.size());
+	}
+
+	const Data::RenderMode mode = g_engine->_renderMode;
+	_slidesLoaded = !_slideText.empty() && _font.load() && _slideImages[0].load("end1", mode) &&
+		_slideImages[1].load("end2", mode) && _banners.load("text", mode) && _scroll.load("endsc", mode);
+
+	return _slidesLoaded;
+}
+
+Common::String Endgame::slideText(int slide) const {
+	Common::String result;
+
+	for (uint i = SLIDE_TEXT_OFFSET[slide]; i < _slideText.size() && i < (uint)SLIDE_TEXT_OFFSET[slide] + SLIDE_TEXT_LENGTH &&
+			_slideText[i] != 0; ++i)
+		result += (char)_slideText[i];
+
+	return result;
+}
+
+void Endgame::drawSlide(View &view) {
+	auto s = view.getSurface();
+	const int n = _slide;
+
+	s.fillRect(Common::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0);
+
+	// The first and fourth have the title lettering above their text
+	if (SLIDE_BANNERS[n]) {
+		if (n == 0) {
+			_banners.draw(s, TEXT_PICTURE, 0xD8, 0);
+			_banners.draw(s, 4, 0x98, 0x1C);
+		} else {
+			_banners.draw(s, 5, 0xE0, 0);
+			_banners.draw(s, TEXT_PICTURE, 0xB0, 0);
+		}
+	}
+
+	_slideImages[SLIDE_FILE[n]].draw(s, SLIDE_PICTURE[n], SLIDE_PICTURE_X[n], SLIDE_PICTURE_Y[n]);
+
+	Gfx::StoryLayout layout;
+	layout._left[0] = SLIDE_LEFT_A[n];
+	layout._left[1] = SLIDE_LEFT_B[n];
+	layout._right[0] = SLIDE_RIGHT_A[n];
+	layout._right[1] = SLIDE_RIGHT_B[n];
+	layout._splitTop = SLIDE_SPLIT_TOP[n];
+	layout._splitBottom = SLIDE_SPLIT_BOTTOM[n];
+
+	int x = SLIDE_START_X[n];
+	int y = SLIDE_START_Y[n];
+	_font.draw(s, slideText(n), x, y, layout);
+}
+
+// Draws the certificate on the scroll, in letters that are dark on the scroll and light off it
+void Endgame::drawCertificate(View &view) {
 	auto s = view.getSurface();
 
-	if (_state == STATE_CERTIFICATE) {
-		s.fillRect(Common::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0);
+	s.fillRect(Common::Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT), 0);
 
-		for (uint i = 0; i < _certificate.size(); ++i) {
-			const EndgameLogic::Line &line = _certificate[i];
-			const int column = (TEXT_COLUMNS - (int)line._text.size()) / 2;
-			const byte fg = line._inverse ? 0 : 15;
-			const byte bg = line._inverse ? 15 : 0;
+	if (_slidesLoaded)
+		_scroll.draw(s, 0, SCROLL_X, 0);
 
-			if (!line._runes) {
-				view.print(column, CERTIFICATE_ROW + i, line._text, fg, bg);
-				continue;
-			}
+	for (uint i = 0; i < _certificate.size(); ++i) {
+		const EndgameLogic::Line &line = _certificate[i];
+		const int column = (TEXT_COLUMNS - (int)line._text.size()) / 2;
+		const byte color = line._inverse ? 0 : 15;
+		Gfx::CharSet *font = line._runes ? g_engine->_runes.get() : g_engine->_charset.get();
 
-			for (uint j = 0; j < line._text.size(); ++j)
-				view.drawRune(column + j, CERTIFICATE_ROW + i, line._text[j], fg, bg);
-		}
+		for (uint j = 0; j < line._text.size(); ++j)
+			font->drawChar(s.surfacePtr(), (byte)line._text[j], (column + j) * 8, (CERTIFICATE_ROW + i) * 8, color);
+	}
+}
+
+void Endgame::draw(View &view) {
+	if (_state == STATE_SLIDES) {
+		drawSlide(view);
 		return;
 	}
+
+	if (_state == STATE_CERTIFICATE) {
+		drawCertificate(view);
+		return;
+	}
+
+	auto s = view.getSurface();
 
 	for (int y = 0; y < MAP_SIZE; ++y) {
 		for (int x = 0; x < MAP_SIZE; ++x)
