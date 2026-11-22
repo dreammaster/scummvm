@@ -346,6 +346,18 @@ public:
 	State advance();
 
 	/**
+	 * Does what stepping on a square does to the room, for a thing that was pushed there
+	 */
+	bool pushTrigger(int x, int y) {
+		return triggers(x, y);
+	}
+
+	/**
+	 * Moves the fighter whose turn it is one square, as when they push something
+	 */
+	void moveCurrent(int dx, int dy);
+
+	/**
 	 * Casts a spell that hits a number of the fighters without anyone being aimed at
 	 * @param member	Which member of the party is the caster
 	 * @returns		1 if it worked, 0 if it didn't and -1 if neither is said

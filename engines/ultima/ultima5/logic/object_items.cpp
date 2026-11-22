@@ -453,9 +453,12 @@ static byte faced(int dx, int dy, byte tile, bool pulled) {
 }
 
 void ObjectItems::push() {
-	Data::Savegame &sg = save();
 	const byte tile = tileAt(_x, _y);
 	byte there;
+
+	// In a fight the squares that are stepped on may change the room
+	if (s_combat && s_combat->pushTrigger(_x, _y))
+		return;
 
 	firstAt(_x, _y, there);
 
@@ -468,7 +471,9 @@ void ObjectItems::push() {
 	const int beyondX = _x + _dx;
 	const int beyondY = _y + _dy;
 	const byte beyond = tileAt(beyondX, beyondY);
-	const byte standing = tileAt(sg._mapX, sg._mapY);
+	const int fromX = standX();
+	const int fromY = standY();
+	const byte standing = tileAt(fromX, fromY);
 	const byte base = tile & 0xFC;
 	const bool turns = base == TILE_CHAIR || base == TILE_CANNON;
 
@@ -483,18 +488,22 @@ void ObjectItems::push() {
 			setTileAt(beyondX, beyondY, faced(_dx, _dy, base, false));
 	} else if (standing == floor) {
 		_log.print("Pulled!\n");
-		setTileAt(sg._mapX, sg._mapY, tile);
+		setTileAt(fromX, fromY, tile);
 		setTileAt(_x, _y, standing);
 
 		if (turns)
-			setTileAt(sg._mapX, sg._mapY, faced(_dx, _dy, base, true));
+			setTileAt(fromX, fromY, faced(_dx, _dy, base, true));
 	} else {
 		_log.print("Won't budge\n");
 		return;
 	}
 
-	sg._mapX += _dx;
-	sg._mapY += _dy;
+	if (s_combat) {
+		s_combat->moveCurrent(_dx, _dy);
+	} else {
+		save()._mapX += _dx;
+		save()._mapY += _dy;
+	}
 }
 
 // The top of the objects on a square, going down from the last, and what it is

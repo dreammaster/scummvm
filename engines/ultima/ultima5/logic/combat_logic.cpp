@@ -2058,6 +2058,15 @@ CombatLogic::State CombatLogic::advance() {
 	}
 }
 
+void CombatLogic::moveCurrent(int dx, int dy) {
+	Entity &e = _entities[_current];
+
+	e._x += dx;
+	e._y += dy;
+	_actors[e._actor]._x = e._x;
+	_actors[e._actor]._y = e._y;
+}
+
 void CombatLogic::checkMirror() {
 	const Entity &e = _entities[_current];
 
@@ -2831,6 +2840,10 @@ CombatLogic::Outcome CombatLogic::command(int key) {
 			break;
 		}
 
+		return OUTCOME_SUBCOMMAND;
+
+	case 'P':
+		say("Push-");
 		return OUTCOME_SUBCOMMAND;
 
 	case 'G':
