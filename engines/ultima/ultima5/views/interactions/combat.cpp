@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/views/interactions/combat.h"
+#include "ultima/ultima5/views/interactions/endgame.h"
 #include "ultima/ultima5/views/interactions/object_command.h"
 #include "ultima/ultima5/views/interactions/ready.h"
 #include "ultima/ultima5/views/interactions/use.h"
@@ -120,7 +121,9 @@ bool Combat::carryOn() {
 			// What the fight led to may be a room, with another fight
 			const DungeonLogic::Event next = DungeonLogic(_log).finishFight(_logic, _event);
 
-			if (next._kind != DungeonLogic::Event::EVENT_NONE) {
+			if (next._kind == DungeonLogic::Event::EVENT_ENDGAME) {
+				_next = new Endgame(_log);
+			} else if (next._kind != DungeonLogic::Event::EVENT_NONE) {
 				Combat *combat = new Combat(_log);
 
 				if (combat->startDungeon(next) && !combat->done())

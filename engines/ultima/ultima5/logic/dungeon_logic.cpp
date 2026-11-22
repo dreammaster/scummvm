@@ -848,6 +848,11 @@ DungeonLogic::Event DungeonLogic::finishFight(const CombatLogic &fight, const Ev
 		return next;
 	}
 
+	if (fight.result() == 0 && fight.exitCode() == CombatLogic::EXIT_ENDGAME) {
+		next._kind = Event::EVENT_ENDGAME;
+		return next;
+	}
+
 	if (fight.result() == 0) {
 		markRoomCleared(event._cell & 0xF);
 		sg._mapData[sg._mapLevel * DUNGEON_LEVEL_BYTES + event._savedY * DUNGEON_SIZE + event._savedX] &= 0xAF;

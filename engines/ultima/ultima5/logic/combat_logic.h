@@ -101,6 +101,9 @@ public:
 	};
 
 	// What the fights of the game are won or lost to
+	// The way out of a fight that ends the game
+	static constexpr int EXIT_ENDGAME = 0x4D;
+
 	enum Kind {
 		KIND_NORMAL = 1,
 		KIND_DUNGEON_ROOM = 0x82,
@@ -208,6 +211,11 @@ private:
 	bool randomSpot();
 	bool monsterSpecial(int idx);
 	void hazards(int idx);
+
+	/**
+	 * Takes away a fighter who stands at the mirror in the last room, which is the way out of the game
+	 */
+	void checkMirror();
 	void regurgitate(int idx);
 	void upkeep();
 	void burnOut();

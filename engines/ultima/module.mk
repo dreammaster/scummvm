@@ -350,6 +350,7 @@ MODULE_OBJS += \
 	ultima5/logic/combat_logic.o \
 	ultima5/logic/death_logic.o \
 	ultima5/logic/dungeon_items.o \
+	ultima5/logic/endgame_logic.o \
 	ultima5/logic/dungeon_logic.o \
 	ultima5/logic/monster_logic.o \
 	ultima5/logic/creation_logic.o \
@@ -386,6 +387,7 @@ MODULE_OBJS += \
 	ultima5/views/interactions/death.o \
 	ultima5/views/interactions/dungeon_climb.o \
 	ultima5/views/interactions/dungeon_item.o \
+	ultima5/views/interactions/endgame.o \
 	ultima5/views/interactions/gem_view.o \
 	ultima5/views/interactions/leave_location.o \
 	ultima5/views/interactions/look.o \

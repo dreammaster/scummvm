@@ -72,7 +72,8 @@ public:
 		enum Kind {
 			EVENT_NONE,
 			EVENT_ATTACK,	// A monster has come to the party
-			EVENT_ROOM		// The party is in a room
+			EVENT_ROOM,		// The party is in a room
+			EVENT_ENDGAME	// The party has gone through the mirror at the end of the game
 		};
 
 		Kind _kind = EVENT_NONE;

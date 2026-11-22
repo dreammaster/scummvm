@@ -46,6 +46,8 @@ constexpr int ENEMY_SEA_FIRST = 8;
 
 // The tiles of the objects in a fight
 constexpr byte TILE_CHEST = 0x01;
+constexpr byte TILE_MIRROR_ACTOR = 0x3C;
+constexpr int MIRROR_ROW = 1;
 constexpr byte TILE_CIRCLE = 0x16;
 constexpr byte TILE_HIDDEN_PARTY = 0x1D;
 constexpr byte TILE_SLEEPING = 0x1E;
@@ -1965,6 +1967,7 @@ CombatLogic::State CombatLogic::advance() {
 
 		if (_stage == STAGE_AFTER) {
 			_interferer[_current] = 0xFF;
+			checkMirror();
 			hazards(_current);
 
 			int enemies, party;
@@ -2031,6 +2034,21 @@ CombatLogic::State CombatLogic::advance() {
 
 		++_current;
 	}
+}
+
+void CombatLogic::checkMirror() {
+	const Entity &e = _entities[_current];
+
+	if (e._flags == 0 || (e._flags & FLAG_DEAD) != 0 || e._y != MIRROR_ROW + 1 ||
+			(_map[MIRROR_ROW * COMBAT_MAP_STRIDE + e._x] & 0xFC) != TILE_MIRROR_ACTOR)
+		return;
+
+	_exitCode = EXIT_ENDGAME;
+	newline();
+	sayName(_current);
+	say(" is absorbed!\n");
+	save()._activeChar = NO_ACTIVE_CHARACTER;
+	removeFighter(-_current - 1);
 }
 
 void CombatLogic::finish() {
