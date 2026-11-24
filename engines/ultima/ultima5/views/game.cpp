@@ -58,6 +58,16 @@ namespace Views {
 
 // The id of the map of Britannia and the underworld
 constexpr byte OUTDOOR_MAP = 0;
+constexpr int AMBIENT_RANGE = 0x33;
+constexpr byte TILE_CLOCK = 0xFA;
+constexpr byte TILE_WATERFALL = 0xD4;
+constexpr byte TILE_FOUNTAIN = 0xD8;
+constexpr byte TILE_HARPSICHORD = 0x8D;
+constexpr int CASTLE_MAP = 0x11;
+constexpr int CASTLE_UPPER_LEVEL = 2;
+constexpr int HIDDEN_DOOR_X = 0x11;
+constexpr int HIDDEN_DOOR_Y = 0x0D;
+constexpr byte HIDDEN_DOOR_TOGGLE = 0x0B;
 constexpr byte ASK_TO_ATTACK = 0x61;
 
 // How long a command takes
@@ -163,6 +173,101 @@ Game::Game() : View("Game"), _messages(this) {
 	delayFrames(FRAMES_PER_SAIL_STEP);
 }
 
+// The tune that a bard plays, as notes of the scale, and what they are
+static bool bardAt(int x, int y) {
+	const Data::Savegame &sg = _G(savegame);
+
+	for (int i = 1; i < Data::ACTOR_COUNT; ++i) {
+		const Data::ActorRecord actor = sg.getActor(i);
+		if (actor._tile == ACTOR_MUSICIAN && actor._x == x && actor._y == y && actor._z == sg._mapLevel)
+			return true;
+	}
+
+	return false;
+}
+
+static const byte BARD_TUNE[53] = {
+	1, 4, 4, 0, 0, 1, 5, 5, 0, 0, 4, 9, 6, 9, 7, 4,
+	6, 5, 1, 4, 0, 0, 0, 1, 5, 0, 0, 0, 4, 9, 6, 5,
+	6, 4, 0, 0, 0, 5, 8, 8, 9, 5, 6, 8, 9, 5, 4, 6,
+	5, 4, 3, 2, 1
+};
+static const uint16 BARD_NOTES[9] = { 0x0DA9, 0x0F56, 0x1136, 0x123C, 0x1478, 0x16FA, 0x1857, 0x19CA, 0x1B53 };
+
+void Game::ambientSound() {
+	const Data::Savegame &sg = _G(savegame);
+	int found = 0;
+	int closest = AMBIENT_RANGE;
+
+	for (int x = sg._mapX - 5; x < sg._mapX + 6; ++x) {
+		for (int y = sg._mapY - 5; y < sg._mapY + 6; ++y) {
+			const int distance = (y - sg._mapY) * (y - sg._mapY) + (x - sg._mapX) * (x - sg._mapX);
+			if (distance >= closest)
+				continue;
+
+			const byte tile = g_engine->getMapTile(x, y);
+			if ((tile & 0xFE) == TILE_CLOCK) {
+				found = 1;
+			} else if ((tile & 0xFC) == TILE_WATERFALL) {
+				found = 2;
+			} else if ((tile & 0xFC) == TILE_FOUNTAIN) {
+				found = 3;
+			} else if (bardAt(x, y)) {
+				found = 4;
+			} else {
+				continue;
+			}
+
+			closest = distance;
+		}
+	}
+
+	// A clock strikes the hour, and otherwise ticks and tocks
+	if (_clockHour != sg._hour) {
+		_clockHour = sg._hour;
+		_clockStrikes = sg._hour == 0 ? 12 : sg._hour > 12 ? sg._hour - 12 : sg._hour;
+	}
+
+	Sound &sound = g_engine->sound();
+	const bool beat = _clockBeat == 0 || _clockBeat == 4;
+
+	switch (found) {
+	case 1:
+		if (_clockStrikes != 0 && beat)
+			sound.pulse(0xC2C, 1, 2000, 20000, -10);
+		else if (_clockBeat == 0)
+			sound.tone(3000, 3);
+		else if (_clockBeat == 4)
+			sound.tone(2000, 3);
+		break;
+
+	case 2:
+		sound.noise(0x14, 0x3C, 10000);
+		break;
+
+	case 3:
+		sound.noise(10, 0x1E, 25000);
+		break;
+
+	case 4:
+		if (BARD_TUNE[_bardNote] != 0)
+			sound.pulse(BARD_NOTES[BARD_TUNE[_bardNote] - 1], 1, 2000, 20000, -10);
+
+		if (++_bardNote >= (int)ARRAYSIZE(BARD_TUNE))
+			_bardNote = 0;
+		break;
+
+	default:
+		break;
+	}
+
+	if (_clockStrikes != 0 && beat)
+		--_clockStrikes;
+
+	if (++_clockBeat > 7)
+		_clockBeat = 0;
+}
+
 void Game::timeout() {
 	delayFrames(FRAMES_PER_SAIL_STEP);
 
@@ -176,6 +281,9 @@ void Game::timeout() {
 
 		return;
 	}
+
+	if (_G(savegame)._mapId != OUTDOOR_MAP && !DungeonLogic::isDungeon(_G(savegame)._mapId) && _G(savegame)._icon != 'T')
+		ambientSound();
 
 	// A ship that's been set sailing goes on without being told to
 	if (_G(savegame)._mapId != OUTDOOR_MAP || TransportLogic::heading() < 0)
@@ -942,7 +1050,68 @@ bool Game::handleDungeonCommand(const KeypressMessage &msg) {
 	return false;
 }
 
+// The notes of the harpsichord in the castle, which open the way to a hidden room when played as a tune
+static const byte HARPSICHORD_TUNE[13] = { 6, 7, 8, 9, 8, 7, 8, 7, 6, 7, 6, 5, 3 };
+
+bool Game::digitKey(int digit) {
+	Data::Savegame &sg = _G(savegame);
+	const int number = digit - '0';
+
+	if (sg._mapId != OUTDOOR_MAP && !DungeonLogic::isDungeon(sg._mapId) && g_engine->getMapTile(sg._mapX, sg._mapY + 1) == TILE_HARPSICHORD) {
+		static int progress = 0;
+
+		g_engine->sound().harpsichord(number);
+
+		if (HARPSICHORD_TUNE[progress] == number) {
+			if (++progress == 13) {
+				progress = 0;
+
+				if (sg._mapId == CASTLE_MAP && sg._mapLevel == CASTLE_UPPER_LEVEL) {
+					_G(location).setTile(HIDDEN_DOOR_X, HIDDEN_DOOR_Y, _G(location).getTile(HIDDEN_DOOR_X, HIDDEN_DOOR_Y) ^ HIDDEN_DOOR_TOGGLE);
+					_G(visibility).invalidate();
+				}
+			}
+		} else if (progress == 10 && number == 8) {
+			progress = 3;
+		} else if (progress == 11 && number == 7) {
+			progress = 2;
+		} else if (number == HARPSICHORD_TUNE[0]) {
+			progress = 1;
+		} else {
+			progress = 0;
+		}
+
+		redraw();
+		return true;
+	}
+
+	_messages.print("Set Active Plr:\n");
+
+	if (number == 0) {
+		_messages.print("None!\n");
+		sg._activeChar = Data::NO_ACTIVE_CHARACTER;
+		redraw();
+		return true;
+	}
+
+	const int member = number - 1;
+	if (member < sg._partySize && sg._party[member]._status != Data::STATUS_DEAD && sg._party[member]._status != Data::STATUS_SLEEP) {
+		sg._activeChar = member;
+		_messages.print(sg._party[member]._name);
+		_messages.printChar('\n');
+		redraw();
+	} else {
+		_messages.print("Invalid!\n");
+		endTurn();
+	}
+
+	return true;
+}
+
 bool Game::handleCommand(const KeypressMessage &msg) {
+	if (msg.ascii >= '0' && msg.ascii <= '9' && !(msg.flags & (Common::KBD_CTRL | Common::KBD_ALT)))
+		return digitKey(msg.ascii);
+
 	if (DungeonLogic::isDungeon(_G(savegame)._mapId))
 		return handleDungeonCommand(msg);
 

@@ -45,6 +45,12 @@ private:
 	MessageLog _messages;
 	bool _planTick = false;
 	bool _sailingStep = false;
+
+	// Where the sounds of a town have got to: the beat of a clock, the strikes it has left, and the tune of a bard
+	int _clockBeat = 0;
+	int _clockStrikes = 0;
+	int _clockHour = -1;
+	int _bardNote = 0;
 	bool _quickToggle = false;
 	bool _sleeping = false;
 	DungeonScene _scene;
@@ -64,6 +70,16 @@ private:
 	 * Goes on from an interaction that has finished
 	 */
 	void interactionDone();
+
+	/**
+	 * Makes the sound of what is near the party in a town: a clock, falling water, or a bard
+	 */
+	void ambientSound();
+
+	/**
+	 * Picks the party member that acts when none is asked for, or plays the harpsichord
+	 */
+	bool digitKey(int digit);
 
 	/**
 	 * Moves the party in the map it's in

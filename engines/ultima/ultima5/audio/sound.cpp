@@ -237,6 +237,13 @@ void Sound::alert() {
 	sweep(800, 2000, 1, 0x32);
 }
 
+static const uint16 HARPSICHORD_NOTES[10] = { 0x1EAB, 0x0C2C, 0x0DA9, 0x0F56, 0x103F, 0x123C, 0x1478, 0x16FA, 0x1857, 0x1B53 };
+
+void Sound::harpsichord(int note) {
+	if (note >= 0 && note < 10)
+		pulse(HARPSICHORD_NOTES[note], 1, 4000, 20000, -4);
+}
+
 void Sound::absorbed() {
 	pulse(0x2648, 1, 28000, 1000, 2);
 }

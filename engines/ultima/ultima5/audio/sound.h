@@ -122,6 +122,11 @@ public:
 	void castEffect(int circle);
 
 	/**
+	 * A note of the harpsichord, from 0 to 9
+	 */
+	void harpsichord(int note);
+
+	/**
 	 * The sound of Absorbed! when magic is nullified
 	 */
 	void absorbed();
