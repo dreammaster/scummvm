@@ -146,19 +146,20 @@ void Capture::planScene() {
 	const Data::Savegame &sg = _G(savegame);
 
 	add(STEP_BLACKOUT);
-	add(STEP_WAIT, 8);
+	add(STEP_FOOTSTEPS, 5);
 	add(STEP_PRINT, "\n\nStrong guards drag thee away!");
-	add(STEP_WAIT, 4);
+	add(STEP_FOOTSTEPS, 18);
 	add(STEP_CELL);
 	add(STEP_PRINT, "\n\nThou hast been chained and manacled!");
 	add(STEP_WAIT, 8);
 	add(STEP_PRINT, "\n\nFootsteps!");
-	add(STEP_WAIT, 8);
+	add(STEP_FOOTSTEPS, 8);
 
 	addPlace(ACTOR_GUARD_A, TILE_GUARD, 4, 10);
 	addPlace(ACTOR_GUARD_B, TILE_GUARD, 6, 10);
 	addScript(CaptureLogic::SCRIPT_ARRIVE);
 	add(STEP_WAIT, 4);
+	add(STEP_ARRIVE_SOUND);
 	addPlace(ACTOR_BLACKTHORN, TILE_CIRCLE, 5, 5);
 	add(STEP_WAIT, 3);
 	addPlace(ACTOR_BLACKTHORN, TILE_BLACKTHORN, 5, 5);
@@ -240,6 +241,9 @@ int Capture::actorOf(byte code, int &dx, int &dy) {
 }
 
 void Capture::moveUnit() {
+	if (_sound)
+		g_engine->sound().footstep();
+
 	_sprites[_first]._x += _firstX;
 	_sprites[_first]._y += _firstY;
 
@@ -294,6 +298,7 @@ void Capture::scriptTick() {
 			}
 			case 8:
 				_delay = _repeat;
+				g_engine->sound().footstep();
 				_repeat = 1;
 				return;
 			case 9:
@@ -342,6 +347,14 @@ void Capture::run() {
 			break;
 		case STEP_SCRIPT:
 			startScript(step._script);
+			break;
+		case STEP_FOOTSTEPS:
+			for (int i = 0; i < step._value; ++i)
+				g_engine->sound().footstep();
+			_delay = step._value * 2;
+			break;
+		case STEP_ARRIVE_SOUND:
+			g_engine->sound().pulse(0xAF0, 1, 13000, 100, 5);
 			break;
 		case STEP_KEY:
 			_state = STATE_KEY;
