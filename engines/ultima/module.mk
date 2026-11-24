@@ -370,6 +370,7 @@ MODULE_OBJS += \
 	ultima5/logic/spell_logic.o \
 	ultima5/logic/shop_weapons.o \
 	ultima5/logic/talk_logic.o \
+	ultima5/logic/transfer_logic.o \
 	ultima5/logic/text_grid.o \
 	ultima5/logic/time_logic.o \
 	ultima5/logic/visibility_logic.o \
@@ -409,6 +410,7 @@ MODULE_OBJS += \
 	ultima5/views/message_log.o \
 	ultima5/views/title.o \
 	ultima5/views/title_base.o \
+	ultima5/views/transfer_character.o \
 	ultima5/views/view.o
 endif
 

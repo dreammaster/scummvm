@@ -89,6 +89,9 @@ void Title::activate(int index) {
 	case CHOICE_CREATE:
 		addView("CreateCharacter");
 		break;
+	case CHOICE_TRANSFER:
+		addView("TransferCharacter");
+		break;
 	case CHOICE_INTRODUCTION:
 		addView("Introduction");
 		break;
