@@ -122,6 +122,22 @@ public:
 	void castEffect(int circle);
 
 	/**
+	 * A swell and fade of a tone, as a gem or a shrine makes
+	 */
+	void flare(int freq, int duration);
+
+	/**
+	 * What is heard as the old man comes to the party in its sleep, and as each of them is made well
+	 */
+	void apparition();
+	void apparitionHeals();
+
+	/**
+	 * The light of a healer
+	 */
+	void healerLight();
+
+	/**
 	 * A note of the harpsichord, from 0 to 9
 	 */
 	void harpsichord(int note);

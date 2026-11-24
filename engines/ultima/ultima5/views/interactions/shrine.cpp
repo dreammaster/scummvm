@@ -157,6 +157,7 @@ void Shrine::meditated() {
 
 	default:
 		print(TEXT_WELL_DONE);
+		g_engine->sound().flare(0xC1C, 0x96);
 		ShrineLogic::reward(_shrine, _log);
 		finish();
 		break;
@@ -334,6 +335,7 @@ bool Shrine::keypress(const KeypressMessage &msg) {
 		_log.print("ALAKAZAM");
 		_log.setRunes(false);
 		_log.print("!\n");
+		g_engine->sound().flare(0xA8C, 200);
 		finish();
 		return true;
 	}

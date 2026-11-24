@@ -249,8 +249,10 @@ void DungeonLogic::sleepSpell() {
 	_log.print("Sleep spell!\n");
 
 	for (int i = 0; i < sg._partySize; ++i) {
-		if (sg._party[i]._dex <= _G(gameRandom).range(1, 0x1E) && sg._party[i]._status != Data::STATUS_DEAD)
+		if (sg._party[i]._dex <= _G(gameRandom).range(1, 0x1E) && sg._party[i]._status != Data::STATUS_DEAD) {
 			sg._party[i]._status = Data::STATUS_SLEEP;
+			g_engine->sound().noise(1, 0x32, 0xDAC);
+		}
 	}
 
 	sg._mapData[sg._mapLevel * DUNGEON_LEVEL_BYTES + sg._mapY * DUNGEON_SIZE + sg._mapX] &= VISITED;
@@ -262,8 +264,10 @@ void DungeonLogic::poison() {
 	_log.print("Poison!\n");
 
 	for (int i = 0; i < sg._partySize; ++i) {
-		if (sg._party[i]._dex <= _G(gameRandom).range(1, 0x1E) && sg._party[i]._status != Data::STATUS_DEAD)
+		if (sg._party[i]._dex <= _G(gameRandom).range(1, 0x1E) && sg._party[i]._status != Data::STATUS_DEAD) {
 			sg._party[i]._status = Data::STATUS_POISONED;
+			g_engine->sound().noise(1, 0x32, 0xDAC);
+		}
 	}
 }
 

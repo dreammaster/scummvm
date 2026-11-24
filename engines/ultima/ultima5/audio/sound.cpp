@@ -237,6 +237,57 @@ void Sound::alert() {
 	sweep(800, 2000, 1, 0x32);
 }
 
+void Sound::flare(int freq, int duration) {
+	if (!_on)
+		return;
+
+	Samples samples;
+	for (int width = 2000; width < 25000; width += 0x32)
+		addPulse(samples, freq, 1, duration, width, 0);
+	for (int width = 25000; width > 2000; width -= 0x32)
+		addPulse(samples, freq, 1, duration, width, 0);
+
+	play(samples);
+}
+
+void Sound::apparition() {
+	if (!_on)
+		return;
+
+	static const uint16 NOTES[6] = { 0x0A3C, 0x0A3C, 0x0A3C, 0x0E74, 0x0F3C, 0x1040 };
+	Samples samples;
+
+	addPulse(samples, 0x0A3C, 1, 10000, 0x9C4, 6);
+	for (int i = 0; i < 6; ++i)
+		addPulse(samples, NOTES[i], 1, 5000, 200, 0xD);
+
+	play(samples);
+}
+
+void Sound::apparitionHeals() {
+	if (!_on)
+		return;
+
+	Samples samples;
+	addPulse(samples, 5500, 1, 5000, 200, 13);
+	addPulse(samples, 5500, 1, 60000, 2500, 1);
+	play(samples);
+}
+
+void Sound::healerLight() {
+	if (!_on)
+		return;
+
+	Samples samples;
+	addPulse(samples, 0x100E, 1, 0x57E4, 5000, 1);
+	addPulse(samples, 0x100E, 1, 0x57E4, 0x6B6C, -1);
+	addPulse(samples, 0x11B2, 1, 40000, 1, 1);
+	addPulse(samples, 0x11B2, 1, 40000, 40000, -1);
+	addPulse(samples, 0x08FC, 1, 18000, 1, 2);
+	addPulse(samples, 0x08FC, 1, 18000, 36000, -2);
+	play(samples);
+}
+
 static const uint16 HARPSICHORD_NOTES[10] = { 0x1EAB, 0x0C2C, 0x0DA9, 0x0F56, 0x103F, 0x123C, 0x1478, 0x16FA, 0x1857, 0x1B53 };
 
 void Sound::harpsichord(int note) {

@@ -504,6 +504,8 @@ void UseLogic::gemShard(int which) {
 		break;
 	}
 
+	g_engine->sound().flare(0xA50, 200);
+
 	if (FLAME_X[which] != sg._mapX || FLAME_Y[which] != sg._mapY || FLAME_MAP[which] != sg._mapId ||
 			FLAME_LEVEL[which] != sg._mapLevel) {
 		_log.print("\n\nNo effect!\n");

@@ -876,6 +876,7 @@ void ShopLogic::healerService() {
 
 	if (_need != NEED_RESURRECT && sg._mapId == FREE_MAP) {
 		_log.print("Receive now the Light!\"");
+		g_engine->sound().healerLight();
 		healerPay('F');
 		return;
 	}

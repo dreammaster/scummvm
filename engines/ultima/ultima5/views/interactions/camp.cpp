@@ -172,6 +172,7 @@ bool Bed::keypress(const KeypressMessage &msg) {
 
 Apparition::Apparition(MessageLog &log) : Interaction(log) {
 	_log.print("An apparition!\n");
+	g_engine->sound().apparition();
 	run();
 }
 
@@ -187,6 +188,7 @@ void Apparition::run() {
 
 		c._hp = c._maxHp;
 		c._status = Data::STATUS_GOOD;
+		g_engine->sound().apparitionHeals();
 
 		switch (c._class) {
 		case 'A':
