@@ -22,6 +22,7 @@
 #ifndef ULTIMA5_VIEWS_TITLE_H
 #define ULTIMA5_VIEWS_TITLE_H
 
+#include "common/array.h"
 #include "ultima/ultima5/views/title_base.h"
 
 namespace Ultima {
@@ -38,6 +39,16 @@ private:
 	int _selected = 0;
 	int _animFrame = 0;
 	bool _showNotice = false;
+
+	// The logo comes up a scatter of pixels at a time when the title is first shown
+	bool _introDone = false;
+	bool _revealing = false;
+	int _revealed = 0;
+	Common::Array<uint16> _revealOrder;
+	Common::Array<byte> _shown;
+
+	void startReveal();
+	void finishReveal();
 
 	/**
 	 * Moves the highlight to a choice, and carries it out if it's one that's

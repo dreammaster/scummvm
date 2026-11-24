@@ -37,6 +37,45 @@ enum MenuChoice {
 // The letter that picks each choice
 static const char MENU_LETTERS[] = "JCTUAR";
 
+// The part of the screen that has the logo, which is revealed pixel by pixel in a shuffled order
+constexpr int REVEAL_WIDTH = 320;
+constexpr int REVEAL_HEIGHT = 101;
+constexpr int REVEAL_TICKS = 120;
+constexpr int REVEAL_MS = 2000;
+constexpr uint16 REVEAL_TAPS = 0x6000;
+
+void Title::startReveal() {
+	// A shift register of fifteen bits goes through each number but nought, and those that are in the logo are the pixels
+	const int count = REVEAL_WIDTH * REVEAL_HEIGHT;
+	uint16 value = 1;
+
+	_revealOrder.clear();
+	do {
+		if (value < count)
+			_revealOrder.push_back(value);
+
+		const bool carry = (value & 1) != 0;
+		value >>= 1;
+		if (carry)
+			value ^= REVEAL_TAPS;
+	} while (value != 1);
+	_revealOrder.push_back(0);
+
+	_shown.clear();
+	_shown.resize(count);
+	_revealed = 0;
+	_revealing = true;
+
+	g_engine->sound().titleReveal(REVEAL_MS);
+}
+
+void Title::finishReveal() {
+	g_engine->sound().stop();
+
+	_revealing = false;
+	_introDone = true;
+}
+
 bool Title::msgFocus(const FocusMessage &msg) {
 	if (!loadTitleGraphics())
 		error("Could not load the title graphics");
@@ -47,11 +86,28 @@ bool Title::msgFocus(const FocusMessage &msg) {
 
 	g_engine->cueMusic(Music::TRACK_THEME);
 
-	delayFrames(FRAMES_PER_STEP);
+	if (!_introDone)
+		startReveal();
+
+	delayFrames(_revealing ? 1 : FRAMES_PER_STEP);
 	return TitleBase::msgFocus(msg);
 }
 
 void Title::draw() {
+	if (_revealing) {
+		drawLogo();
+
+		auto s = getSurface();
+		if (s.format.bytesPerPixel == 1) {
+			for (int i = 0; i < REVEAL_WIDTH * REVEAL_HEIGHT; ++i) {
+				if (!_shown[i])
+					*(byte *)s.getBasePtr(i % REVEAL_WIDTH, i / REVEAL_WIDTH) = COLOR_BLACK;
+			}
+		}
+
+		return;
+	}
+
 	drawTitle(_animFrame);
 
 	if (_showNotice) {
@@ -63,6 +119,20 @@ void Title::draw() {
 }
 
 void Title::timeout() {
+	if (_revealing) {
+		const int target = MIN<int>(_revealOrder.size(), _revealed + (int)_revealOrder.size() / REVEAL_TICKS + 1);
+
+		for (; _revealed < target; ++_revealed)
+			_shown[_revealOrder[_revealed]] = 1;
+
+		if (_revealed >= (int)_revealOrder.size())
+			finishReveal();
+
+		redraw();
+		delayFrames(_revealing ? 1 : FRAMES_PER_STEP);
+		return;
+	}
+
 	_animFrame = (_animFrame + 1) & 3;
 	redraw();
 	delayFrames(FRAMES_PER_STEP);
@@ -106,6 +176,13 @@ void Title::activate(int index) {
 bool Title::msgKeypress(const KeypressMessage &msg) {
 	if (isModifierKey(msg.keycode))
 		return false;
+
+	// A key shows the whole logo at once
+	if (_revealing) {
+		finishReveal();
+		redraw();
+		return true;
+	}
 
 	if (_showNotice) {
 		_showNotice = false;

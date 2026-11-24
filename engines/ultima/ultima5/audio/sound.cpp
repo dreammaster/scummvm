@@ -288,6 +288,31 @@ void Sound::healerLight() {
 	play(samples);
 }
 
+void Sound::titleReveal(int ms) {
+	if (!_on)
+		return;
+
+	// Every couple of pixels a short tone is sounded, picked from a range that is wider each time
+	constexpr int REVEAL_LOWEST = 120;
+	constexpr int REVEAL_HIGHEST = 8200;
+	constexpr double TONE_MS = 0.09;
+	Samples samples;
+	const int tones = (int)(ms / TONE_MS);
+
+	for (int i = 0; i < tones && (int)samples.size() < MAX_SAMPLES; ++i) {
+		uint16 value = _noiseState + 0x9248;
+		value = (value >> 3) | (value << 13);
+		value ^= 0x9248;
+		value += 0x11;
+		_noiseState = value;
+
+		const int highest = REVEAL_LOWEST + (REVEAL_HIGHEST - REVEAL_LOWEST) * i / tones;
+		addTone(samples, NOISE_LOWEST + value % (highest - NOISE_LOWEST + 1), TONE_MS);
+	}
+
+	play(samples);
+}
+
 static const uint16 HARPSICHORD_NOTES[10] = { 0x1EAB, 0x0C2C, 0x0DA9, 0x0F56, 0x103F, 0x123C, 0x1478, 0x16FA, 0x1857, 0x1B53 };
 
 void Sound::harpsichord(int note) {

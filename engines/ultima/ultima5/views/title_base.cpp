@@ -53,6 +53,12 @@ bool TitleBase::loadTitleGraphics() {
 	return _logo.load("ultima", _G(renderMode)) && _logo.size() > SUBTITLE_FRAME_COUNT;
 }
 
+void TitleBase::drawLogo() {
+	auto s = getSurface();
+	s.clear();
+	_logo.draw(s, 0, 0, 0);
+}
+
 void TitleBase::drawSubtitle(int subtitleFrame) {
 	auto s = getSurface();
 

@@ -138,6 +138,11 @@ public:
 	void healerLight();
 
 	/**
+	 * The crackle that goes with the logo being revealed on the title screen, which rises in pitch
+	 */
+	void titleReveal(int ms);
+
+	/**
 	 * A note of the harpsichord, from 0 to 9
 	 */
 	void harpsichord(int note);

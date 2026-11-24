@@ -56,6 +56,11 @@ protected:
 	void drawTitle(int subtitleFrame);
 
 	/**
+	 * Draws the logo alone on a black screen
+	 */
+	void drawLogo();
+
+	/**
 	 * Draws the subtitle on its own
 	 */
 	void drawSubtitle(int subtitleFrame);
