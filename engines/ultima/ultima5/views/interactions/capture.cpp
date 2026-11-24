@@ -353,6 +353,12 @@ void Capture::run() {
 				g_engine->sound().footstep();
 			_delay = step._value * 2;
 			break;
+		case STEP_SACRIFICE:
+			_victim = CaptureLogic::sacrifice();
+			break;
+		case STEP_VICTIM:
+			_log.print(Common::String("\n\n") + _victim + " is sliced in half! ");
+			break;
 		case STEP_ARRIVE_SOUND:
 			g_engine->sound().pulse(0xAF0, 1, 13000, 100, 5);
 			break;
@@ -408,10 +414,10 @@ void Capture::sliceOff(bool wrong) {
 	addPlace(ACTOR_SECOND, 0, 0, 0);
 	addMap(SLICED_X, SLICED_Y, TILE_BLOOD);
 
-	const Common::String name = CaptureLogic::sacrifice();
+	add(STEP_SACRIFICE);
 
 	if (wrong) {
-		add(STEP_PRINT, Common::String("\n\n") + name + " is sliced in half! ");
+		add(STEP_VICTIM);
 		add(STEP_KEY);
 		add(STEP_PRINT, CaptureLogic::message(TEXT_AFTER_SACRIFICE));
 	}

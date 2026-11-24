@@ -43,7 +43,7 @@ constexpr double NOISE_STEP_MS_PER_RATE = 1.0 / 16.0;
 constexpr int NOISE_LOWEST = 100;
 constexpr byte TILE_RIDING_HORSE = 0x12;
 constexpr byte TILE_AVATAR = 0x1C;
-constexpr int MAX_SAMPLES = SAMPLE_RATE * 6;
+constexpr int MAX_SAMPLES = SAMPLE_RATE * 10;
 
 Sound::~Sound() {
 	stop();

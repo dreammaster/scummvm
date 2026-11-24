@@ -51,6 +51,8 @@ private:
 		STEP_KEY,
 		STEP_FOOTSTEPS,
 		STEP_ARRIVE_SOUND,
+		STEP_SACRIFICE,
+		STEP_VICTIM,
 		STEP_BLACKOUT,
 		STEP_CELL,
 		STEP_PLACE,
@@ -85,6 +87,7 @@ private:
 
 	State _state = STATE_RUNNING;
 	Screen _screen = SCREEN_GAME;
+	Common::String _victim;
 	Common::Array<Step> _steps;
 	uint _next = 0;
 	int _insert = -1;

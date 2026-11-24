@@ -223,7 +223,12 @@ void Game::ambientSound() {
 	}
 
 	// A clock strikes the hour, and otherwise ticks and tocks
-	if (_clockHour != sg._hour) {
+	if (_clockMap != sg._mapId) {
+		// A town just come to has no strikes to make until the next hour
+		_clockMap = sg._mapId;
+		_clockHour = sg._hour;
+		_clockStrikes = 0;
+	} else if (_clockHour != sg._hour) {
 		_clockHour = sg._hour;
 		_clockStrikes = sg._hour == 0 ? 12 : sg._hour > 12 ? sg._hour - 12 : sg._hour;
 	}
@@ -625,6 +630,8 @@ bool Game::startCombat(int kind, int map, bool lone) {
 
 void Game::endTurn() {
 	Data::Savegame &sg = _G(savegame);
+
+	_harpsichordProgress = 0;
 
 	// While all the party are asleep the turns go by on their own, until one wakes or something comes
 	if (!_sleeping && PartyLogic::allAsleep()) {
@@ -1058,27 +1065,25 @@ bool Game::digitKey(int digit) {
 	const int number = digit - '0';
 
 	if (sg._mapId != OUTDOOR_MAP && !DungeonLogic::isDungeon(sg._mapId) && g_engine->getMapTile(sg._mapX, sg._mapY + 1) == TILE_HARPSICHORD) {
-		static int progress = 0;
-
 		g_engine->sound().harpsichord(number);
 
-		if (HARPSICHORD_TUNE[progress] == number) {
-			if (++progress == 13) {
-				progress = 0;
+		if (HARPSICHORD_TUNE[_harpsichordProgress] == number) {
+			if (++_harpsichordProgress == 13) {
+				_harpsichordProgress = 0;
 
 				if (sg._mapId == CASTLE_MAP && sg._mapLevel == CASTLE_UPPER_LEVEL) {
 					_G(location).setTile(HIDDEN_DOOR_X, HIDDEN_DOOR_Y, _G(location).getTile(HIDDEN_DOOR_X, HIDDEN_DOOR_Y) ^ HIDDEN_DOOR_TOGGLE);
 					_G(visibility).invalidate();
 				}
 			}
-		} else if (progress == 10 && number == 8) {
-			progress = 3;
-		} else if (progress == 11 && number == 7) {
-			progress = 2;
+		} else if (_harpsichordProgress == 10 && number == 8) {
+			_harpsichordProgress = 3;
+		} else if (_harpsichordProgress == 11 && number == 7) {
+			_harpsichordProgress = 2;
 		} else if (number == HARPSICHORD_TUNE[0]) {
-			progress = 1;
+			_harpsichordProgress = 1;
 		} else {
-			progress = 0;
+			_harpsichordProgress = 0;
 		}
 
 		redraw();

@@ -51,6 +51,10 @@ private:
 	int _clockStrikes = 0;
 	int _clockHour = -1;
 	int _bardNote = 0;
+	int _clockMap = -1;
+
+	// How much of the tune of the harpsichord has been played
+	int _harpsichordProgress = 0;
 	bool _quickToggle = false;
 	bool _sleeping = false;
 	DungeonScene _scene;
