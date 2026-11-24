@@ -173,6 +173,7 @@ ShrineLogic::Spoken ShrineLogic::speak(const char *typed, Views::MessageLog &log
 			continue;
 
 		log.print("\nA word of power is uttered\n");
+	g_engine->shake();
 
 		for (int side = 0; side < 4; ++side) {
 			const int tx = sg._mapX + DX[side];

@@ -83,6 +83,7 @@ public:
 private:
 	Common::ScopedPtr<Music> _music;
 	Common::ScopedPtr<Sound> _sound;
+	bool _shakeRequested = false;
 
 public:
 	/**
@@ -94,6 +95,22 @@ public:
 	 * Gives the player of the sounds the game makes, which is made when one is first wanted
 	 */
 	Sound &sound();
+
+	/**
+	 * Asks for the view of the map to be shaken
+	 */
+	void shake() {
+		_shakeRequested = true;
+	}
+
+	/**
+	 * Tells if a shake was asked for, which is forgotten once it is
+	 */
+	bool takeShake() {
+		const bool requested = _shakeRequested;
+		_shakeRequested = false;
+		return requested;
+	}
 
 	/**
 	 * Has a tune be the one that plays, or none, unless the music is turned off

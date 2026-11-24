@@ -90,6 +90,7 @@ void DeathLogic::begin() {
 	_log.print("\n\nBut thy slumber is disturbed!");
 	_log.print("\n\nSomeone shouts\n\n\"FORTIS FORTUNA\nAVENTARI\"");
 	_log.print("\n\nThere is a peal of thunder!\n");
+	g_engine->shake();
 	_log.print("\n\"");
 	_log.print(karmaText());
 	_log.print("\"");

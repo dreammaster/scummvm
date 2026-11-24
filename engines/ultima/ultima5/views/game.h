@@ -51,6 +51,9 @@ private:
 	int _clockStrikes = 0;
 	int _clockHour = -1;
 	int _bardNote = 0;
+
+	// How many of the steps of the view of the map being shaken there are left
+	int _shakeSteps = 0;
 	int _clockMap = -1;
 
 	// How much of the tune of the harpsichord has been played
@@ -79,6 +82,11 @@ private:
 	 * Makes the sound of what is near the party in a town: a clock, falling water, or a bard
 	 */
 	void ambientSound();
+
+	/**
+	 * Moves the view of the map to the side, as it is while it is shaken
+	 */
+	void applyShake();
 
 	/**
 	 * Picks the party member that acts when none is asked for, or plays the harpsichord

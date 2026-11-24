@@ -58,6 +58,8 @@ namespace Views {
 
 // The id of the map of Britannia and the underworld
 constexpr byte OUTDOOR_MAP = 0;
+constexpr int SHAKE_STEPS = 16;
+constexpr int SHAKE_PIXELS = 2;
 constexpr int AMBIENT_RANGE = 0x33;
 constexpr byte TILE_CLOCK = 0xFA;
 constexpr byte TILE_WATERFALL = 0xD4;
@@ -273,8 +275,28 @@ void Game::ambientSound() {
 		_clockBeat = 0;
 }
 
+void Game::applyShake() {
+	auto s = getSurface();
+	const Common::Rect area(VIEW_X, VIEW_Y, VIEW_X + VIEW_TILES * Gfx::TILE_SIZE, VIEW_Y + VIEW_TILES * Gfx::TILE_SIZE);
+	Graphics::ManagedSurface copy(area.width(), area.height(), s.format);
+
+	copy.blitFrom(s, area, Common::Point(0, 0));
+	s.fillRect(area, COLOR_BLACK);
+	s.blitFrom(copy, Common::Point(VIEW_X + ((_shakeSteps & 1) ? SHAKE_PIXELS : -SHAKE_PIXELS), VIEW_Y));
+}
+
 void Game::timeout() {
 	delayFrames(FRAMES_PER_SAIL_STEP);
+
+	if (g_engine->takeShake() && _shakeSteps == 0) {
+		_shakeSteps = SHAKE_STEPS;
+		g_engine->sound().noise(0x13, 16000, 0x96);
+	}
+
+	if (_shakeSteps > 0) {
+		--_shakeSteps;
+		redraw();
+	}
 
 	if (_interaction) {
 		const int result = _interaction->tick();
@@ -323,6 +345,9 @@ void Game::draw() {
 
 	if (_interaction)
 		_interaction->draw(*this);
+
+	if (_shakeSteps > 0)
+		applyShake();
 
 	// The music is that of the interaction there is, or else that of where the party is
 	int track = _interaction ? _interaction->musicTrack() : Interactions::MUSIC_AUTO;
@@ -674,6 +699,7 @@ void Game::endTurn() {
 
 		if (sg._mapLevel != 0 && _G(gameRandom).range(0, 0xFF) == EARTHQUAKE_ROLL) {
 			_messages.print("EARTHQUAKE!\n");
+			g_engine->shake();
 			PartyLogic::hurtParty();
 		}
 
@@ -1073,6 +1099,7 @@ bool Game::digitKey(int digit) {
 
 				if (sg._mapId == CASTLE_MAP && sg._mapLevel == CASTLE_UPPER_LEVEL) {
 					_G(location).setTile(HIDDEN_DOOR_X, HIDDEN_DOOR_Y, _G(location).getTile(HIDDEN_DOOR_X, HIDDEN_DOOR_Y) ^ HIDDEN_DOOR_TOGGLE);
+					g_engine->shake();
 					_G(visibility).invalidate();
 				}
 			}

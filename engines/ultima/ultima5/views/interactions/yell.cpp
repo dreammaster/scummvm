@@ -50,6 +50,7 @@ void Yell::conclude() {
 	if (_focused && Data::SHRINE_X[_shrine] == _x && Data::SHRINE_Y[_shrine] == _y) {
 		ShrineLogic::restore(_shrine, _x, _y);
 		_log.print("\n\nThe Shrine is\nrestored!\n");
+		g_engine->shake();
 	} else {
 		_log.printChar('\n');
 	}
