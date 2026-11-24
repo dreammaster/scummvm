@@ -43,11 +43,15 @@ private:
 	// The logo comes up a scatter of pixels at a time when the title is first shown
 	bool _introDone = false;
 	bool _revealing = false;
+	bool _subtitleStage = false;
+	int _subtitleFrame = 0;
+	int _clickOdds = 0;
 	int _revealed = 0;
 	Common::Array<uint16> _revealOrder;
 	Common::Array<byte> _shown;
 
 	void startReveal();
+	void startSubtitleReveal();
 	void finishReveal();
 
 	/**

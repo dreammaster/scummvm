@@ -44,35 +44,66 @@ constexpr int REVEAL_TICKS = 120;
 constexpr int REVEAL_MS = 2000;
 constexpr uint16 REVEAL_TAPS = 0x6000;
 
-void Title::startReveal() {
-	// A shift register of fifteen bits goes through each number but nought, and those that are in the logo are the pixels
-	const int count = REVEAL_WIDTH * REVEAL_HEIGHT;
+// The subtitle is revealed the same way a group of pixels at a time, with a frame of its shimmer for each
+constexpr int SUBTITLE_LEFT = 0x10;
+constexpr int SUBTITLE_TOP = 0x41;
+constexpr int SUBTITLE_WIDTH = 0x120;
+constexpr int SUBTITLE_ROWS = 0x31;
+constexpr int SUBTITLE_GROUP = 0x100;
+constexpr uint16 SUBTITLE_TAPS = 0x3802;
+constexpr int SUBTITLE_FRAMES_PER_GROUP = 3;
+constexpr int CLICK_ODDS_START = 400;
+constexpr int CLICK_ODDS_FALL = 3;
+constexpr int CLICK_ODDS_RANGE = 512;
+
+// Gives the pixels of a picture in a shuffled order. A shift register goes through every number but nought, and
+// those that are less than the number of pixels are the ones, with the pixel at nought last
+static void shuffledOrder(Common::Array<uint16> &order, int count, uint16 taps) {
 	uint16 value = 1;
 
-	_revealOrder.clear();
+	order.clear();
 	do {
 		if (value < count)
-			_revealOrder.push_back(value);
+			order.push_back(value);
 
 		const bool carry = (value & 1) != 0;
 		value >>= 1;
 		if (carry)
-			value ^= REVEAL_TAPS;
+			value ^= taps;
 	} while (value != 1);
-	_revealOrder.push_back(0);
+	order.push_back(0);
+}
 
+void Title::startReveal() {
+	const int count = REVEAL_WIDTH * REVEAL_HEIGHT;
+
+	shuffledOrder(_revealOrder, count, REVEAL_TAPS);
 	_shown.clear();
 	_shown.resize(count);
 	_revealed = 0;
 	_revealing = true;
+	_subtitleStage = false;
 
 	g_engine->sound().titleReveal(REVEAL_MS);
+}
+
+void Title::startSubtitleReveal() {
+	const int count = SUBTITLE_WIDTH * SUBTITLE_ROWS;
+
+	shuffledOrder(_revealOrder, count, SUBTITLE_TAPS);
+	_shown.clear();
+	_shown.resize(count);
+	_revealed = 0;
+	_subtitleStage = true;
+	_subtitleFrame = 0;
+	_clickOdds = CLICK_ODDS_START;
 }
 
 void Title::finishReveal() {
 	g_engine->sound().stop();
 
 	_revealing = false;
+	_subtitleStage = false;
 	_introDone = true;
 }
 
@@ -97,11 +128,18 @@ void Title::draw() {
 	if (_revealing) {
 		drawLogo();
 
+		if (_subtitleStage)
+			drawSubtitle(_subtitleFrame);
+
 		auto s = getSurface();
+		const int width = _subtitleStage ? SUBTITLE_WIDTH : REVEAL_WIDTH;
+		const int left = _subtitleStage ? SUBTITLE_LEFT : 0;
+		const int top = _subtitleStage ? SUBTITLE_TOP : 0;
+
 		if (s.format.bytesPerPixel == 1) {
-			for (int i = 0; i < REVEAL_WIDTH * REVEAL_HEIGHT; ++i) {
+			for (uint i = 0; i < _shown.size(); ++i) {
 				if (!_shown[i])
-					*(byte *)s.getBasePtr(i % REVEAL_WIDTH, i / REVEAL_WIDTH) = COLOR_BLACK;
+					*(byte *)s.getBasePtr(left + i % width, top + i / width) = COLOR_BLACK;
 			}
 		}
 
@@ -120,16 +158,33 @@ void Title::draw() {
 
 void Title::timeout() {
 	if (_revealing) {
-		const int target = MIN<int>(_revealOrder.size(), _revealed + (int)_revealOrder.size() / REVEAL_TICKS + 1);
+		int target;
+
+		if (_subtitleStage) {
+			// A group of pixels, and the shimmer goes on a frame, and now and then there is a click
+			target = MIN<int>(_revealOrder.size(), _revealed + SUBTITLE_GROUP);
+			_subtitleFrame = (_subtitleFrame + 1) & 3;
+
+			if (g_engine->getRandomNumber(CLICK_ODDS_RANGE - 1) < _clickOdds)
+				g_engine->sound().noise(1, 25, 1500);
+
+			_clickOdds -= CLICK_ODDS_FALL;
+		} else {
+			target = MIN<int>(_revealOrder.size(), _revealed + (int)_revealOrder.size() / REVEAL_TICKS + 1);
+		}
 
 		for (; _revealed < target; ++_revealed)
 			_shown[_revealOrder[_revealed]] = 1;
 
-		if (_revealed >= (int)_revealOrder.size())
-			finishReveal();
+		if (_revealed >= (int)_revealOrder.size()) {
+			if (_subtitleStage)
+				finishReveal();
+			else
+				startSubtitleReveal();
+		}
 
 		redraw();
-		delayFrames(_revealing ? 1 : FRAMES_PER_STEP);
+		delayFrames(_subtitleStage ? SUBTITLE_FRAMES_PER_GROUP : _revealing ? 1 : FRAMES_PER_STEP);
 		return;
 	}
 
