@@ -410,6 +410,7 @@ MODULE_OBJS += \
 	ultima5/views/message_log.o \
 	ultima5/views/title.o \
 	ultima5/views/title_base.o \
+	ultima5/views/title_demo.o \
 	ultima5/views/transfer_character.o \
 	ultima5/views/view.o
 endif

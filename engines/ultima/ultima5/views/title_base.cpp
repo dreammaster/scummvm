@@ -126,7 +126,7 @@ void TitleBase::drawMessage(const char *line1, const char *line2, const char *li
 	}
 }
 
-void TitleBase::drawTitle(int subtitleFrame) {
+void TitleBase::drawTitle(int subtitleFrame, const char *bottomLine) {
 	auto s = getSurface();
 	s.clear();
 	_logo.draw(s, 0, 0, 0);
@@ -134,7 +134,8 @@ void TitleBase::drawTitle(int subtitleFrame) {
 	drawMenuFrame();
 
 	// The copyright line sits in a gap in the bottom border, between two caps
-	const int len = strlen(COPYRIGHT);
+	const char *line = bottomLine ? bottomLine : COPYRIGHT;
+	const int len = strlen(line);
 	const int start = 18 - len / 2;
 	const int end = start + len + 2;
 	s.fillRect(Common::Rect(8, 193, start * 8 + 1, 200), COLOR_BLUE);
@@ -143,7 +144,7 @@ void TitleBase::drawTitle(int subtitleFrame) {
 	s.drawLine(end * 8, 192, 311, 192, COLOR_WHITE);
 
 	drawCaps(start * 8, MENU_BOTTOM_ROW * 8, true);
-	print(start + 1, MENU_BOTTOM_ROW, COPYRIGHT, COLOR_WHITE, COLOR_BLACK);
+	print(start + 1, MENU_BOTTOM_ROW, line, COLOR_WHITE, COLOR_BLACK);
 	drawCaps((start + 1 + len) * 8, MENU_BOTTOM_ROW * 8, false);
 }
 

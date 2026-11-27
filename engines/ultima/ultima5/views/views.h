@@ -29,6 +29,7 @@
 #include "ultima/ultima5/views/game.h"
 #include "ultima/ultima5/views/introduction.h"
 #include "ultima/ultima5/views/title.h"
+#include "ultima/ultima5/views/title_demo.h"
 #include "ultima/ultima5/views/transfer_character.h"
 
 namespace Ultima {
@@ -42,6 +43,7 @@ struct Views {
 	Game _game;
 	Introduction _introduction;
 	Title _title;
+	TitleDemo _titleDemo;
 	TransferCharacter _transferCharacter;
 };
 

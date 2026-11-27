@@ -51,9 +51,9 @@ protected:
 
 	/**
 	 * Draws the black screen with the logo, a frame of the subtitle,
-	 * the menu border and the copyright line
+	 * the menu border and the copyright line, or a line that is put in its place
 	 */
-	void drawTitle(int subtitleFrame);
+	void drawTitle(int subtitleFrame, const char *bottomLine = nullptr);
 
 	/**
 	 * Draws the logo alone on a black screen

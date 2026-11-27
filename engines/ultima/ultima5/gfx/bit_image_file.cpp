@@ -20,6 +20,7 @@
  */
 
 #include "common/endian.h"
+#include "common/file.h"
 #include "ultima/ultima5/gfx/bit_image_file.h"
 #include "ultima/ultima5/data/lzw.h"
 
@@ -27,9 +28,23 @@ namespace Ultima {
 namespace Ultima5 {
 namespace Gfx {
 
-bool BitImageFile::load(const char *name) {
+bool BitImageFile::load(const char *name, bool compressed) {
 	_count = 0;
-	if (!Data::loadLzwFile(name, _data) || _data.size() < 2)
+
+	if (compressed) {
+		if (!Data::loadLzwFile(name, _data))
+			return false;
+	} else {
+		Common::File f;
+		if (!f.open(name))
+			return false;
+
+		_data.resize(f.size());
+		if (!_data.empty() && f.read(&_data[0], _data.size()) != _data.size())
+			return false;
+	}
+
+	if (_data.size() < 2)
 		return false;
 
 	const uint count = READ_LE_UINT16(&_data[0]);
@@ -51,6 +66,17 @@ int BitImageFile::getWidth(uint idx) const {
 
 int BitImageFile::getHeight(uint idx) const {
 	return READ_LE_UINT16(imagePtr(idx) + 2);
+}
+
+bool BitImageFile::isSet(uint idx, int x, int y) const {
+	const byte *image = imagePtr(idx);
+	const int width = READ_LE_UINT16(image);
+	const int height = READ_LE_UINT16(image + 2);
+
+	if (x < 0 || y < 0 || x >= width || y >= height)
+		return false;
+
+	return (image[4 + y * ((width + 7) / 8) + (x >> 3)] & (0x80 >> (x & 7))) != 0;
 }
 
 void BitImageFile::draw(Graphics::ManagedSurface &dst, uint idx, int x, int y, byte color) const {

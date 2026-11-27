@@ -44,9 +44,15 @@ private:
 public:
 	/**
 	 * Loads a file
+	 * @param compressed	Whether it is in the compressed form, which most are
 	 * @returns		False if it couldn't be loaded
 	 */
-	bool load(const char *name);
+	bool load(const char *name, bool compressed = true);
+
+	/**
+	 * Tells if a pixel of an image is set
+	 */
+	bool isSet(uint idx, int x, int y) const;
 
 	uint size() const {
 		return _count;
