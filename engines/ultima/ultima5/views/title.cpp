@@ -20,6 +20,7 @@
  */
 
 #include "ultima/ultima5/views/title.h"
+#include "common/config-manager.h"
 #include "common/file.h"
 #include "common/system.h"
 #include "ultima/ultima5/views/keys.h"
@@ -672,6 +673,9 @@ void Title::activate(int index) {
 	case CHOICE_JOURNEY:
 		if (_G(savegame).hasActiveGame()) {
 			replaceView("Game", true);
+		} else if (g_engine->hasSaves()) {
+			// With none being played there may still be one to load
+			g_engine->loadGameDialog();
 		} else {
 			_showNotice = true;
 			redraw();

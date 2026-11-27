@@ -122,6 +122,11 @@ bool Ultima5Engine::canLoadGameStateCurrently(Common::U32String *) {
 	return true;
 }
 
+bool Ultima5Engine::hasSaves() const {
+	auto saves = getMetaEngine()->listSaves(_targetName.c_str());
+	return !saves.empty();
+}
+
 Common::Error Ultima5Engine::syncGame(Common::Serializer &s) {
 	s.syncVersion(SAVEGAME_VERSION);
 	_savegame.synchronize(s);

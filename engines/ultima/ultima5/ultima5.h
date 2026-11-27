@@ -144,6 +144,11 @@ public:
 	bool canLoadGameStateCurrently(Common::U32String *msg = nullptr) override;
 
 	/**
+	 * Returns true if there are any savegames present
+	 */
+	bool hasSaves() const;
+
+	/**
 	 * Uses a serializer to allow implementing savegame
 	 * loading and saving using a single method
 	 */
